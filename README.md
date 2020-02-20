@@ -17,7 +17,7 @@
 ## functions
 - Function that reads tsv with definitions 
 
-- Function that converts hes, primary care,death and self reported tables into a list of dataframes with |n_eid| date| event_dt | event_dur , where event_dur is optional (HESIN) - decide how primary/secondary diag is dealth with.
+- Function that converts hes, primary care,death and self reported tables into a list of dataframes with |n_eid| code | event_dt | event_dur , where event_dur is optional (HESIN) - decide how primary/secondary diag is dealth with.
 
 - Function that pulls out the earliest date that someone is diagnosed before and after the reference date (e.g. visit of interest) for each data-time-to-event data source
   - note that for self report we should only pull out ealiest historical date
