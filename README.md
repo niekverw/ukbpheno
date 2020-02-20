@@ -57,7 +57,8 @@
 - think about age of first diagnosis. 
 - think about censoring dates (e.g. cancer have different censoring dates). can we make further variables that summarize full censoring columns that can be used in cox/kaplan for age-of-diagnosis or (new-onset) event from baseline ? 
 - think about how to merge data where you have no days to event. 
-- think about more complicated merges, e.g. need at least X codes for primary care to be considered? or a specific combination of operation + diagnosis.  
+- think about more complicated merges, e.g. need at least X codes for primary care to be considered? 
+- think about more complex combinations e.g. specific combination of codes like operation + diagnosis.  
 - think about more complex phenotype schemes, e.g. exclude asthma from COPD cases. 
 - functions that can help with defining a disease, e.g. suggest codes based on others. 
 
