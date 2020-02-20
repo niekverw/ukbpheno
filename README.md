@@ -23,7 +23,7 @@
   - note that for self report we should only pull out ealiest historical date
   - note for some we don't have a date, only a code. We should take that into account later. 
   - Input: Disease definition (e.g. code lists of ICD10,ICD9,etc), dates of visit which should be used as reference. 
-  - Output: list of dataframes per source of diagnoses
+  - Output: list of dataframes per source of diagnoses; for hesin include duration of episode. 
  
 
 - Function that pulls out non time-to-event data, e.g. answers that are made during the visit or biomarker cutoffs. 
@@ -35,10 +35,8 @@
   - output: single dataframe with HX and FU data, and primary + secondary death.
     1) HXn: 1/0 if disease in history, or number of events for HESIN only
     2) HXd days until event in history 
-    3) HXt: time of episode duration in history (for HESIN only, NA otherwise)
     4) FUn: 1/0 if disease in future, or number of events for HESIN only
     5) FUd: days until event in future 
-    6) FUt: time of episode duration in history (for HESIN only, NA otherwise)
     7) DOp: 1/0 (primary death)
     8) Do: 1/0 Prim+Sec Death
     9) ... 
