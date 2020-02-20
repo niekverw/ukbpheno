@@ -21,7 +21,7 @@
 
 - Function that pulls out the earliest date that someone is diagnosed before and after the reference date (e.g. visit of interest) for each data-time-to-event data source
   - note that for self report we should only pull out ealiest historical date
-  - Input: Disease definition (e.g. code lists of ICD10,ICD9,etc) 
+  - Input: Disease definition (e.g. code lists of ICD10,ICD9,etc), dates of visit which should be used as reference. 
   - Output: list of dataframes per source of diagnosis with 
     1) HXn: 1/0 if disease in history, or number of events for HESIN only
     2) HXd days until event in history 
@@ -31,9 +31,12 @@
     6) FUt: time of episode duration in history (for HESIN only, NA otherwise)
 
 - Function that pulls out non time-to-event data, e.g. answers that are made during the visit or biomarker cutoffs. 
+  - Input: Definition , dates of visit which should be used as reference.
+  - Output: Hx/FU variables
+  
 
-- Function that merges different data sources into single dataframe, where we can decide that HESIN may cause recurrent events. 
-  - output: single dataframe with HX and FU data, and primary + secondary death.  
+- Function that merges different data sources into single dataframe, where we can decide that HESIN could cause recurrent events. 
+  - output: single dataframe with HX and FU data, and primary + secondary death.
   
 - Function that exports dataframes to STATA format. 
 
@@ -51,6 +54,6 @@
 - think about censoring dates (e.g. cancer have different censoring dates). can we make further variables that summarize full censoring columns that can be used in cox/kaplan for age-of-diagnosis or (new-onset) event from baseline ? 
 - think about how to merge data where you have no days to event. 
 - think about more complicated merges, e.g. need at least X codes in hesin or primary care? 
-
+- think about more complex phenotype schemes, e.g. exclude asthma from COPD cases. 
 
 
