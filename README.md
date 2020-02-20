@@ -3,6 +3,7 @@
 ## data types
 ### Time to event data
 - HESIN: ICD9, ICD10, OPCS3, OPCS4. decide how to optionize with primary and secondary diagnoses. 
+- Primary care: clinical (ReadV2, CTV3) scripts(BNF, DMD) 
 - Death records, decide how to optionize primary and secondary diagnoses. 
 - Self report: non-cancer (20002 + 20009), cancer and operation. Decide how to deal with different answers across visits ( e.g. take the mean  and set event_dt to NA if  >10 years apart.)
 
@@ -16,7 +17,7 @@
 ## functions
 - Function that reads tsv with definitions 
 
-- Function that converts hes, primary care and self reported tables into a list of dataframes with |n_eid| date| event_dt | event_dur , where event_dur is optional (HESIN).
+- Function that converts hes, primary care,death and self reported tables into a list of dataframes with |n_eid| date| event_dt | event_dur , where event_dur is optional (HESIN) - decide how primary/secondary diag is dealth with.
 
 - Function that pulls out the earliest date that someone is diagnosed before and after the reference date (e.g. visit of interest) for each data-time-to-event data source
   - note that for self report we should only pull out ealiest historical date
@@ -32,7 +33,7 @@
 - Function that pulls out non time-to-event data, e.g. answers that are made during the visit or biomarker cutoffs. 
 
 - Function that merges different data sources into single dataframe, where we can decide that HESIN may cause recurrent events. 
-  - output: single dataframe
+  - output: single dataframe with HX and FU data, and primary + secondary death.  
   
 - Function that exports dataframes to STATA format. 
 
