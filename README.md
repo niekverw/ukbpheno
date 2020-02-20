@@ -19,16 +19,12 @@
 
 - Function that converts hes, primary care,death and self reported tables into a list of dataframes with |n_eid| code | event_dt | event_dur , where event_dur is optional (HESIN) - decide how primary/secondary diag is dealth with.
 
-- Function that pulls out the earliest date (or days from reference) that someone is diagnosed for each data-time-to-event data source. Maybe have 2 functions, one which just pulls out the earliest date, and another one that can take a reference timepoint. 
+- Function that pulls out the earliest date (or days from reference) that someone is diagnosed for each data-time-to-event data source before and after reference date. If not reference date is given, just the earliest date?  
   - note that for self report we should only pull out ealiest historical date
+  - note for some we don't have a date, only a code. We should take that into account later. 
   - Input: Disease definition (e.g. code lists of ICD10,ICD9,etc), dates of visit which should be used as reference. 
-  - Output: list of dataframes per source of diagnosis with 
-    1) HXn: 1/0 if disease in history, or number of events for HESIN only
-    2) HXd days until event in history 
-    3) HXt: time of episode duration in history (for HESIN only, NA otherwise)
-    4) FUn: 1/0 if disease in future, or number of events for HESIN only
-    5) FUd: days until event in future 
-    6) FUt: time of episode duration in history (for HESIN only, NA otherwise)
+  - Output: list of dataframes per source of diagnoses
+ 
 
 - Function that pulls out non time-to-event data, e.g. answers that are made during the visit or biomarker cutoffs. 
   - Input: Definition , dates of visit which should be used as reference.
@@ -37,6 +33,15 @@
 
 - Function that merges different data sources into single dataframe, where we can decide that HESIN could cause recurrent events (with an event-duration treshold?). 
   - output: single dataframe with HX and FU data, and primary + secondary death.
+    1) HXn: 1/0 if disease in history, or number of events for HESIN only
+    2) HXd days until event in history 
+    3) HXt: time of episode duration in history (for HESIN only, NA otherwise)
+    4) FUn: 1/0 if disease in future, or number of events for HESIN only
+    5) FUd: days until event in future 
+    6) FUt: time of episode duration in history (for HESIN only, NA otherwise)
+    7) DOp: 1/0 (primary death)
+    8) Do: 1/0 Prim+Sec Death
+    9) ... 
   
 - Function that exports dataframes to STATA format. 
 
