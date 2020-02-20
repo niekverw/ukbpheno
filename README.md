@@ -32,14 +32,15 @@
   
 
 - Function that merges different data sources into single dataframe, where we can decide that HESIN could cause recurrent events (with an event-duration treshold?). 
-  - output: single dataframe with HX and FU data, and primary + secondary death.
+  - output: single dataframe with HX and FU data, and primary + secondary death. think about incorporating censoring 
     1) HXn: 1/0 if disease in history, or number of events for HESIN only
     2) HXd days until event in history 
     4) FUn: 1/0 if disease in future, or number of events for HESIN only
     5) FUd: days until event in future 
-    7) DOp: 1/0 (primary death)
-    8) Do: 1/0 Prim+Sec Death
-    9) ... 
+    7) DOp: 1/0 (primary death) 
+    8) DOpd: days to primary death?
+    9) Do: 1/0 Prim+Sec Death
+    10) DOd: days to Prim+Sec death?
   
 - Function that exports dataframes to STATA format. 
 
