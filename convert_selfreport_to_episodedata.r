@@ -52,7 +52,7 @@ convert_nurseselfreport_to_episodedata <- function(df,field_sr_diagnosis = "2000
   
   # deduplicate, min/max/mean/sd <- not very efficient? 
   library(dplyr)
-  dfout_extrastats<- dfout %>% group_by(n_eid,!!as.name("20002")) %>%
+  dfout_extrastats<- dfout %>% group_by(n_eid,!!as.name(field_sr_diagnosis)) %>%
     mutate(mindt = min(eventdate, na.rm = TRUE),maxdt = max(eventdate, na.rm = TRUE),meandt = mean(eventdate, na.rm = TRUE))
   
   dfout_extrastats$diffdt <- (dfout_extrastats$maxdt - dfout_extrastats$mindt)/daysinyear
