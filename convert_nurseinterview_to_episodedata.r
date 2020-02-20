@@ -1,4 +1,4 @@
-convert_nurseselfreport_to_episodedata <- function(df,field_sr_diagnosis = "20002",field_sr_date = "20009",qc_treshold_year=10){
+convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002",field_sr_date = "20009",qc_treshold_year=10){
   # df
   # field_sr_diagnosis = "20002"
   # field_sr_date = "20009"
