@@ -35,7 +35,7 @@
   - Output: Hx/FU variables
   
 
-- Function that merges different data sources into single dataframe, where we can decide that HESIN could cause recurrent events. 
+- Function that merges different data sources into single dataframe, where we can decide that HESIN could cause recurrent events (with an event-duration treshold?). 
   - output: single dataframe with HX and FU data, and primary + secondary death.
   
 - Function that exports dataframes to STATA format. 
