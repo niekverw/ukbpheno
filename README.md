@@ -18,6 +18,8 @@
 - Function that reads tsv with definitions and converts it to some lists. 
 
 - Function that converts hes, primary care,death and self reported tables into a list of dataframes with |n_eid| code | event_dt | event_dur , where event_dur is optional (HESIN) - decide how primary/secondary diag is dealth with.
+  - see convert_nurseinterview_to_episodedata.r 
+  - 
 
 - Function that pulls out the earliest date (or days from reference) that someone is diagnosed for each data-time-to-event data source before and after reference date. If not reference date is given, just the earliest date?  
   - note that for self report we should only pull out ealiest historical date
