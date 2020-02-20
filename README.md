@@ -2,8 +2,8 @@
 
 ## data types
 ### Time to event data
-- HESIN: ICD9, ICD10, OPCS3, OPCS4. decide how to deal with primary and secondary diagnoses. 
-- Death records, decide how to deal with primary and secondary diagnoses. 
+- HESIN: ICD9, ICD10, OPCS3, OPCS4. decide how to optionize with primary and secondary diagnoses. 
+- Death records, decide how to optionize primary and secondary diagnoses. 
 - Self report: non-cancer (20002 + 20009), cancer and operation. Decide how to deal with different answers across visits ( e.g. take the mean  and set event_dt to NA if  >10 years apart.)
 
 ### Other data, e.g. yes/no, categorical without dates. 
@@ -47,7 +47,7 @@
 --------
 
 - think about age of first diagnosis. 
-- think about censoring dates
+- think about censoring dates (e.g. cancer have different censoring dates). can we make further variables that summarize full censoring columns that can be used in cox/kaplan for age-of-diagnosis or (new-onset) event from baseline ? 
 - think about how to merge data where you have no days to event. 
 - think about more complicated merges, e.g. need at least X codes in hesin or primary care? 
 
