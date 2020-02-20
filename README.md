@@ -60,6 +60,6 @@
 - think about more complicated queries, e.g. need at least X codes for primary care to be considered? 
 - think about more complex combinations e.g. specific combination of codes like operation + diagnosis.  
 - think about more complex phenotype schemes, e.g. exclude asthma from COPD cases. 
-- think about intersections/outersections to define high confidence cases vs low confidence vs controls. 
+- think about scoring cases/intersections e.g. to define high confidence cases vs low confidence vs controls. 
 - functions that can help with defining a disease, e.g. suggest codes based on others. 
 
