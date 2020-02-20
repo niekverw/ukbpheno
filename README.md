@@ -15,7 +15,7 @@
 
 
 ## functions
-- Function that reads tsv with definitions 
+- Function that reads tsv with definitions and converts it to some lists. 
 
 - Function that converts hes, primary care,death and self reported tables into a list of dataframes with |n_eid| code | event_dt | event_dur , where event_dur is optional (HESIN) - decide how primary/secondary diag is dealth with.
 
@@ -55,5 +55,5 @@
 - think about how to merge data where you have no days to event. 
 - think about more complicated merges, e.g. need at least X codes in hesin or primary care? 
 - think about more complex phenotype schemes, e.g. exclude asthma from COPD cases. 
-
+- functions that can help with defining a disease, e.g. suggest codes based on others. 
 
