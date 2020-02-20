@@ -19,7 +19,7 @@
 
 - Function that converts hes, primary care,death and self reported tables into a list of dataframes with |n_eid| code | event_dt | event_dur , where event_dur is optional (HESIN) - decide how primary/secondary diag is dealth with.
 
-- Function that pulls out the earliest date (or days from reference) that someone is diagnosed for each data-time-to-event data source
+- Function that pulls out the earliest date (or days from reference) that someone is diagnosed for each data-time-to-event data source. Maybe have 2 functions, one which just pulls out the earliest date, and another one that can take a reference timepoint. 
   - note that for self report we should only pull out ealiest historical date
   - Input: Disease definition (e.g. code lists of ICD10,ICD9,etc), dates of visit which should be used as reference. 
   - Output: list of dataframes per source of diagnosis with 
