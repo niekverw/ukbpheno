@@ -59,7 +59,7 @@ convert_nurseselfreport_to_episodedata <- function(df,field_sr_diagnosis = "2000
   dfout_extrastats[dfout_extrastats$diffdt>qc_treshold_year ,"meandt"] <- NA
   
   dfout$eventdate <- dfout_extrastats$meandt
-  dfout <- dfout[!dfout$`20002` %in% 99999,]
+  dfout <- dfout[!dfout[,field_sr_diagnosis] %in% 99999,]
   
   dfout <- dfout[!duplicated(dfout),]
   
