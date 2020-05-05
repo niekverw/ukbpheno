@@ -157,13 +157,7 @@ lst$df_sr <- read_sr_data(f)
 lst$tte.sr_20002 <- convert_nurseinterview_to_episodedata(lst$df_sr,field_sr_diagnosis = "20002",field_sr_date = "20008",qc_treshold_year = 10) # non cancer
 lst$tte.sr_20001 <- convert_nurseinterview_to_episodedata(lst$df_sr,field_sr_diagnosis = "20001",field_sr_date = "20006",qc_treshold_year = 10) # cancer
 lst$tte.sr_20004 <- convert_nurseinterview_to_episodedata(lst$df_sr,field_sr_diagnosis = "20004",field_sr_date = "20010",qc_treshold_year = 10) # operation
+# MEDICATION
 lst$sr_medication<- convert_nurseinterview_to_episodedata(lst$df_sr,field_sr_diagnosis = "20003",field_sr_date = "",qc_treshold_year = 10) 
-
-print(format(object.size(lst$tte.sr_20002), units = "Mb"))
-
-
-
-#https://stackoverflow.com/questions/40368866/extract-rows-for-the-first-occurrence-of-a-variable-in-a-group
-
 
 
