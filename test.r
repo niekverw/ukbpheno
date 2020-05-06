@@ -67,8 +67,10 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   # qc_treshold_year=10
 
   # 
+  if(!is.null(field_sr_date)) { if(field_sr_date==""){field_sr_date=NULL}} 
+  if(is.null(field_sr_date))  { print("field_sr_date == NULL; qc_treshold_year and field_sr_date_type will not be used.") }
   daysinyear=365.25
-  if(!is.null(field_sr_date)){ if(field_sr_date==""){field_sr_date=NULL}} 
+  
   identifierfield = names(df)[grepl("eid", names(df))]
   visitdatefields = names(df)[grepl(paste0("[^0-9]",field_visit_date,"[^0-9]"), names(df))]
   srdiagnosisfields = names(df)[grepl(field_sr_diagnosis, names(df))]
@@ -87,7 +89,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   df_out <-  matrix(ncol=5, nrow=0) # initiate output 
   
   for (v in 0:(visits-1)){ # for each visit, 
-    print(v)
+    print(paste0("querying visit ",v))
     diagfields = names(df_)[grepl(paste0("[^0-9]",field_sr_diagnosis,"[^0-9]",v),names(df_))]
     if(!is.null(field_sr_date)){diagdatefields = names(df_)[grepl(paste0("[^0-9]",field_sr_date,"[^0-9]",v),names(df_))]}
     visitdatefield = visitdatefields[v+1]
@@ -153,11 +155,14 @@ f="/Volumes/data/ukb/ukb38326.tab"
 
 lst <- list()
 lst$df_sr <- read_sr_data(f)
-# TIME TO EVENT DATA
+# TIME TO EVENT DATA ; data is unique (eid,code) contains first events, but also some without date, so can't say if its event. 
 lst$tte.sr_20002 <- convert_nurseinterview_to_episodedata(lst$df_sr,field_sr_diagnosis = "20002",field_sr_date = "20008",qc_treshold_year = 10) # non cancer
 lst$tte.sr_20001 <- convert_nurseinterview_to_episodedata(lst$df_sr,field_sr_diagnosis = "20001",field_sr_date = "20006",qc_treshold_year = 10) # cancer
 lst$tte.sr_20004 <- convert_nurseinterview_to_episodedata(lst$df_sr,field_sr_diagnosis = "20004",field_sr_date = "20010",qc_treshold_year = 10) # operation
-# MEDICATION
-lst$sr_medication<- convert_nurseinterview_to_episodedata(lst$df_sr,field_sr_diagnosis = "20003",field_sr_date = "",qc_treshold_year = 10) 
+# MEDICATION (data is not unique for eid, code)
+lst$sr_medication <- convert_nurseinterview_to_episodedata(lst$df_sr,field_sr_diagnosis = "20003",field_sr_date = "",qc_treshold_year = 10) 
+
+
+
 
 
