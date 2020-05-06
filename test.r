@@ -1,14 +1,31 @@
 
-source("/repos/ukbpheno/convert_nurseinterview_to_episodedata.r")
+library(disk.frame)
+library(ukbtools)  # chmod -R u+w /usr/local/Cellar/r
 
+source("/repos/ukbpheno/convert_nurseinterview_to_episodedata.r")
 source("/repos/ukbpheno/ProcessdfDefinitions.R")
 
+fhtml = "/Volumes/data/ukb/ukb38326.html"
+fdefinitions = "/repos/ukbpheno/definitions.tsv"
 
-dfDefinitions <- fread("/repos/ukbpheno/definitions.tsv", colClasses = 'character', data.table = FALSE)
+dfDefinitions <- fread(fdefinitions, colClasses = 'character', data.table = FALSE)
 dfDefinitions_processed <- ProcessDfDefinitions(dfDefinitions)
+fields_to_keep <- get_allvarnames(dfDefinitions_processed)
+
+dfhtml <- read_ukb_metadata(fhtml)
+  
+  
+# extract columns used; 
+setwd("/Volumes/data/ukb/")
+ukb_df("ukb38326")
+
+d <- read_ukb_data(f,c("20002","20008:numeric"))
+
+dfDefinitions_processed$TS
 
 f="/Volumes/data/ukb/ukb38326.tab.head"
 #f="/Volumes/data/ukb/ukb38326.tab"
+fhtml="/Volumes/data/ukb/ukb38326.html"
 
 lst <- list()
 lst$df_sr <- read_ukb_data(f, fields_to_keep = c(default_ukb_fields()) )

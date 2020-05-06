@@ -247,16 +247,18 @@ ProcessDfDefinitions<-function(df,
 #' @export
 get_allvarnames <- function(dfDefinitions_processed){
   #  dfDefinitions_processed
-  VctAllUKBVDefinitionColumns=c("TS","SR","TS_RX","SR_RX","LAB") #set this variable to a selection of columns (dfDefinition columns) to be outputted by the _UKBV variable, default is 'VctAllUKBVDefinitionColumns=c("TS","SR","TS_RX","SR_RX","LAB")'
-  StrTSAgeColumn="TS_AGE_DIAG_COLNAME"
-
-  TScolumns = c(VctAllUKBVDefinitionColumns,StrTSAgeColumn)
+  VctAllUKBVDefinitionColumns=c("TS") #set this variable to a selection of columns (dfDefinition columns) to be outputted by the _UKBV variable, default is 'VctAllUKBVDefinitionColumns=c("TS","SR","TS_RX","SR_RX","LAB")'
+  TScolumns = "TS"
   defcols <- unlist(strsplit(na.omit(unname(unlist(dfDefinitions_processed[,c(TScolumns)]))),split=","))
-  defcols <- gsub("=.*","",defcols)
-  defcols <- unique(defcols)
+  defcols <- unlist(strsplit(chartr("[]", "()", defcols),"[()]"))
+  defcols <- gsub("(≥|=).*","",defcols)
+  defcols <- gsub("≥.*","",defcols)
+  defcols <- unique(defcols) ## need column classes....
 
-  SRcolumns<-c("n_20001_","n_20002_","n_20003_","n_20004_")
-  Othercolumns <- c("ts_53_","ts_40000_","n_40001_","n_40002_")
+
+  SRcolumns<-c("20001","20002","20004","20003")
+  SRdatecolumns <- c("20006","20008","20010")
+  Othercolumns <- c("53","40000","40001","40002") 
 
   allvarnames <- unique(c(defcols,SRcolumns,Othercolumns))
 

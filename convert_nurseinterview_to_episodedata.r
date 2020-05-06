@@ -4,52 +4,8 @@
 # load ukb data. -- memory map. 
 
 #install.packages("disk.frame")
-library(disk.frame)
 library(data.table)
 library(dplyr)
-
-# read SR data 
-
-read_ukb_data <- function(f, 
-                          fields_to_keep = c("20002","20008:numeric", #), #"20009", #non cancer codees, interpolated year, age
-                                             "20001","20006:numeric", #"20007", # cancer codes , interpolated year, 
-                                             "20004", "20010:numeric", #"20011"	
-                                             "20003")
-){
-  
-  ## ASSUMING INTEGER IF CLASS NOT PROVIDED
-  fields_to_keep.classes =unlist( lapply( strsplit(fields_to_keep,split=":"),function(x) {if(length(x)==1){x=c(x,"integer")};return(x[[2]])} ))
-  fields_to_keep = unlist(lapply(strsplit(fields_to_keep,split=":"),function(x) x[[1]]))
-  
-  if(!any(fields_to_keep %in% "53" )){
-    fields_to_keep <- c("53", fields_to_keep)
-    fields_to_keep.classes = c("character",fields_to_keep.classes)
-  }
-  
-  if(length(fields_to_keep.classes) != length(fields_to_keep)){
-    print("error, fields_to_keep.classes doesnt match fields_to_keep")
-    break
-  }
-  
-  
-  df_header <- names(fread( paste0('head -1 ',f ))) # read header to find positions and match colclasses.
-  df_header.colclasses <- rep("NULL",length(df_header))
-  for (i in 1:length(fields_to_keep)){
-    col <- df_header[grepl(paste(paste0("[^0-9]",fields_to_keep[i],"([^0-9])"),collapse="|"), df_header )]
-    df_header.colclasses[df_header %in% col] <- rep(fields_to_keep.classes[i],length(col))
-  }
-  
-  df_header.colclasses[df_header %in% "f.eid"] <- "character" # R
-  df_header.colclasses[df_header %in% "n_eid"] <- "character" # Stata
-  
-  
-  df <- fread( paste0(f ),header=T,colClasses = df_header.colclasses)#,select=cols.to_keep,colClasses = col.classes.to_keep)
-  print(format(object.size(df), units = "Gb"))
-  
-  return(df)
-}
-#col.classes[col.classes %in% "integer64"] <- "character" #integer64 not supported, unsupported in disk.frame? but not in data.table
-
 
 convert_year_to_date <- function(year){
   #https://stackoverflow.com/questions/29697436/how-to-convert-decimal-date-format-e-g-2011-580-to-normal-date-format
