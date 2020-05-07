@@ -1,4 +1,14 @@
 
+default_ukb_fields <- function(){
+ 
+  SRcolumns<-c("20001","20002","20004","20003")
+  SRdatecolumns <- c("20006","20008","20010")
+  Othercolumns <- c("53","40000","40001","40002") 
+  
+  c(SRcolumns,SRdatecolumns,Othercolumns)
+  
+}
+
 # Creates a variable name from the field description.
 #
 # @param data Field-to-description table from html file
@@ -63,21 +73,21 @@ read_ukb_metadata <- function(fhtml="/Volumes/data/ukb/ukb38326.html") {
     "Records" = "character",
     "Curve" = "character"
   )
-  
-  lst_html_tables <- XML::readHTMLTable(html_file)
+  print("reading .html")
+  lst_html_tables <- XML::readHTMLTable(fhtml)
   #lst_html_tables <- lapply(lst_html_tables,function(x) parse_html_tables(x) )
   
   df_meta <- lst_html_tables[[2]]
   df_meta$Type <- ReplaceNAWithNearestNonNAOnTheLeft(df_meta$Type)
   df_meta$Description <- ReplaceNAWithNearestNonNAOnTheLeft(df_meta$Description)
   df_meta$Description <- description_to_name(df_meta$Description)
-  df_meta$field.tab <- paste("f.", gsub("-", ".", df_meta$UDI), sep = "")
-  df_meta$field.showcase <- gsub("-.*$", "", df_meta[, "UDI"])
-  
+
   lookup.reference <- tibble::tibble(
+      field.number = df_meta$Column,
+      field.count = df_meta$Count,
       field.showcase = gsub("-.*$", "", df_meta[, "UDI"]),
       field.html = df_meta[, "UDI"],
-      field.tab = df_meta[,"field.tab"],
+      field.tab = paste("f.", gsub("-", ".", df_meta$UDI), sep = ""),
       field.description = df_meta[, "Description"],
       col.type = df_meta[, "Type"],
       col.name = ifelse(
@@ -88,9 +98,10 @@ read_ukb_metadata <- function(fhtml="/Volumes/data/ukb/ukb38326.html") {
           stringr::str_replace_all(field.html, c("-" = "_", "\\." = "_"))
         )
       ),
+      fread_column_type = col_type[df_meta$Type]
       
     )
-    
+   
     return(lookup.reference)
 }
 
@@ -99,39 +110,42 @@ read_ukb_metadata <- function(fhtml="/Volumes/data/ukb/ukb38326.html") {
 
 
 read_ukb_data <- function(f, 
-                          fields_to_keep = c("20002","20008:numeric", #), #"20009", #non cancer codees, interpolated year, age
-                                             "20001","20006:numeric", #"20007", # cancer codes , interpolated year, 
-                                             "20004", "20010:numeric", #"20011"	
-                                             "20003")
-){
+                          dfhtml,
+                          fields_to_keep = default_ukb_fields(),
+                                             n_threads="max-1") {
   
-  ## ASSUMING INTEGER IF CLASS NOT PROVIDED
-  fields_to_keep.classes =unlist( lapply( strsplit(fields_to_keep,split=":"),function(x) {if(length(x)==1){x=c(x,"integer")};return(x[[2]])} ))
-  fields_to_keep = unlist(lapply(strsplit(fields_to_keep,split=":"),function(x) x[[1]]))
-  
-  if(!any(fields_to_keep %in% "53" )){
-    fields_to_keep <- c("53", fields_to_keep)
-    fields_to_keep.classes = c("character",fields_to_keep.classes)
+  if (!exists("n_threads")){n_threads=1}
+    
+  if(!any(fields_to_keep %in% "eid" )){
+    fields_to_keep <- c("eid", fields_to_keep)
   }
+
+  fields_to_keep.tab <- dfhtml[dfhtml$field.showcase %in% fields_to_keep,]$field.tab
+  fields_to_keep.classes <- dfhtml[dfhtml$field.showcase %in% fields_to_keep,]$fread_column_type
   
-  if(length(fields_to_keep.classes) != length(fields_to_keep)){
+  
+  if(length(fields_to_keep.classes) != length(fields_to_keep.tab)){
     print("error, fields_to_keep.classes doesnt match fields_to_keep")
     break
   }
   
+  freadcolclasses <- rep("NULL",nrow(dfhtml))
+  freadcolclasses[which(dfhtml$field.tab %in% fields_to_keep.tab)] <- dfhtml[which(dfhtml$field.tab %in% fields_to_keep.tab),]$fread_column_type
+
   
-  df_header <- names(fread( paste0('head -1 ',f ))) # read header to find positions and match colclasses.
-  df_header.colclasses <- rep("NULL",length(df_header))
-  for (i in 1:length(fields_to_keep)){
-    col <- df_header[grepl(paste(paste0("[^0-9]",fields_to_keep[i],"([^0-9])"),collapse="|"), df_header )]
-    df_header.colclasses[df_header %in% col] <- rep(fields_to_keep.classes[i],length(col))
-  }
-  
-  df_header.colclasses[df_header %in% "f.eid"] <- "character" # R
-  df_header.colclasses[df_header %in% "n_eid"] <- "character" # Stata
-  
-  
-  df <- fread( paste0(f ),header=T,colClasses = df_header.colclasses)#,select=cols.to_keep,colClasses = col.classes.to_keep)
+  df <- fread( paste0(f ),
+               header=T,
+               colClasses = freadcolclasses,
+               sep = "\t",
+               showProgress = TRUE,
+               nThread = if(n_threads == "max-1") {
+                 max(1,parallel::detectCores()-1)
+               } else  if (n_threads == "dt") {
+                 data.table::getDTthreads()
+               } else if (is.numeric(n_threads)) {
+                 min(n_threads, parallel::detectCores())
+               } 
+               )#,select=cols.to_keep,colClasses = col.classes.to_keep)
   print(format(object.size(df), units = "Gb"))
   
   return(df)
@@ -139,39 +153,4 @@ read_ukb_data <- function(f,
 #col.classes[col.classes %in% "integer64"] <- "character" #integer64 not supported, unsupported in disk.frame? but not in data.table
 
 
-
-read_ukb_data_2 <- function(f,  fields_to_keep = c("20002","20008")){
-  
-  ## ASSUMING INTEGER IF CLASS NOT PROVIDED
-  fields_to_keep.classes =unlist( lapply( strsplit(fields_to_keep,split=":"),function(x) {if(length(x)==1){x=c(x,"integer")};return(x[[2]])} ))
-  fields_to_keep = unlist(lapply(strsplit(fields_to_keep,split=":"),function(x) x[[1]]))
-  
-  if(!any(fields_to_keep %in% "53" )){
-    fields_to_keep <- c("53", fields_to_keep)
-    fields_to_keep.classes = c("character",fields_to_keep.classes)
-  }
-  
-  if(length(fields_to_keep.classes) != length(fields_to_keep)){
-    print("error, fields_to_keep.classes doesnt match fields_to_keep")
-    break
-  }
-  
-  
-  df_header <- names(fread( paste0('head -1 ',f ))) # read header to find positions and match colclasses.
-  df_header.colclasses <- rep("NULL",length(df_header))
-  for (i in 1:length(fields_to_keep)){
-    col <- df_header[grepl(paste(paste0("[^0-9]",fields_to_keep[i],"([^0-9])"),collapse="|"), df_header )]
-    df_header.colclasses[df_header %in% col] <- rep("character",length(col))
-  }
-  
-  df_header.colclasses[df_header %in% "f.eid"] <- "character" # R
-  df_header.colclasses[df_header %in% "n_eid"] <- "character" # Stata
-  
-  
-  df <- fread( paste0(f ),header=T,colClasses = df_header.colclasses)#,select=cols.to_keep,colClasses = col.classes.to_keep)
-  print(format(object.size(df), units = "Gb"))
-  
-  return(df)
-}
-#col.classes[col.classes %in% "integer64"] <- "character" #integer64 not supported, unsupported in disk.frame? but not in data.table
 

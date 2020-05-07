@@ -123,11 +123,3 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   return(df_out)
 }
 
-
-default_ukb_fields <- function(){
-  c("20002","20008:numeric", #), #"20009", #non cancer codees, interpolated year, age
-    "20001","20006:numeric", #"20007", # cancer codes , interpolated year, 
-    "20004", "20010:numeric", #"20011"	
-    "20003",
-    "20009:numeric")
-}
