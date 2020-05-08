@@ -260,7 +260,7 @@ get_allvarnames <- function(dfDefinitions_processed){
   SRdatecolumns <- c("20006","20008","20010")
   Othercolumns <- c("53","40000","40001","40002") 
 
-  allvarnames <- unique(c(defcols,SRcolumns,Othercolumns))
+  allvarnames <- unique(c(defcols,SRcolumns,SRdatecolumns,Othercolumns))
 
   allvarnames<-gsub("[a-z]*?_","",allvarnames)
 

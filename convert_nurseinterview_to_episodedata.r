@@ -6,7 +6,7 @@
 #install.packages("disk.frame")
 library(data.table)
 library(dplyr)
-
+library(tictoc)
 convert_year_to_date <- function(year){
   #https://stackoverflow.com/questions/29697436/how-to-convert-decimal-date-format-e-g-2011-580-to-normal-date-format
   
@@ -22,7 +22,15 @@ convert_year_to_date <- function(year){
   return(out)
 }
 
-
+convert_col_to_integer <- function(col){
+  n <- length(which(is.na(col)))
+  col_int <-suppressWarnings(as.integer(col)) ## warning 
+  if (length(which(is.na(col_int))) > n){
+    return(col)
+  } else{
+    return(col_int)
+  }
+}
 
 convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002",field_sr_date = "20008",field_sr_date_type="interpolated_year",qc_treshold_year=10){
   # TODO: IF NA, then list first visit answered yes. 
@@ -62,10 +70,12 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
     if(length(diagfields)==0){print(paste0("no data on visit ",v));next}
     if(!is.null(field_sr_date)){diagdatefields = names(df_)[grepl(paste0("[^0-9]",field_sr_date,"[^0-9]",v),names(df_))]}
     visitdatefield = visitdatefields[v+1]
-    for (i in 1:length(diagfields)){ # for each occurence of diagfield, find the corresponding age and convert it to  date - code and rbind() to df_out. 
+    for (i in 1:length(diagfields)) { # for each occurence of diagfield, find the corresponding age and convert it to  date - code and rbind() to df_out. 
       #agefield = paste0("age_",v)
       diagfield = diagfields[i]
       if(!is.null(field_sr_date)){ diagdatefield = diagdatefields[i]} else {diagdatefield = "dummy"}
+      if( length(diagdatefields) == 1) { diagdatefield = diagdatefields } 
+      
       #print(paste0((diagfield), " - ", diagdatefield))
       if(all(is.na(df_[,diagfield,with=FALSE]))){next}
       df_sub <- df_[!is.na(get(diagfield) ),c(identifierfield,diagfield,diagdatefield,visitdatefield),with=FALSE]
@@ -79,18 +89,24 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   print("convert to dataframe")
   df_out <- data.table(df_out,stringsAsFactors=F)
   df_out <- df_out[, visitdate:=as.Date(visitdate)]
-  df_out <- df_out[, code:=as.integer(code)]
+  #df_out <- df_out[, code:=as.character(code)] #convert_col_to_integer(df_out$code) # df_out[, code:=as.integer(code)]
   df_out[, code:=lapply(.SD, trimws), .SDcols = "code"]
   df_out <- df_out[!code %in% "99999"]
+  df_out$code <- convert_col_to_integer(df_out$code)
   
   
-  if(!is.null(field_sr_date) & (field_sr_date_type=="interpolated_year"| field_sr_date_type=="interpolated_age" )) {
-    df_out <- df_out[, eventdate:=as.numeric(eventdate)] ## as number. interpolated age. 
-    df_out[eventdate <0,'eventdate']<-NA
+  if(!is.null(field_sr_date) & (field_sr_date_type=="interpolated_year"| field_sr_date_type=="interpolated_age" |  field_sr_date_type=="date" )) {
+
     if(field_sr_date_type=="interpolated_year") {
+      df_out <- df_out[, eventdate:=as.numeric(eventdate)] ## as number. interpolated year 
+      df_out[eventdate <0,'eventdate']<-NA
       df_out$eventdate <- as.Date(convert_year_to_date(df_out$eventdate))
     } else if (field_sr_date_type=="interpolated_age"){
+      df_out <- df_out[, eventdate:=as.numeric(eventdate)] ## as number. interpolated age. 
+      df_out[eventdate <0,'eventdate']<-NA
       df_out$eventdate = df_out[,"visitdate"] - (df_out[,"eventdate"]*daysinyear)
+    } else if (field_sr_date_type=="date"){
+      df_out = df_out[, eventdate:=as.Date(eventdate)]
     }
     # deduplicate, min/max/mean/sd <- not very efficient? 
     print("deduplicate")
@@ -103,7 +119,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
     df_out$eventdate <- dfout_extrastats$meandt
     df_out <- df_out[!duplicated(df_out[,c(identifierfield,"code","eventdate"),with=FALSE]),] #sorted on visit, so first occurence is always first visit. 
     
-  }  else{
+  }  else {
     df_out <- df_out[, eventdate:=as.Date(eventdate)]
   }
   
