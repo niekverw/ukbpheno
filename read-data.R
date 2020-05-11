@@ -203,8 +203,8 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   dfhesin_diag$eventdate <- dfhesin_diag$epistart
   dfhesin_diag[is.na(dfhesin_diag$eventdate),"eventdate"] <- dfhesin_diag[is.na(dfhesin_diag$eventdate),"admidate"]
   dfhesin_diag[is.na(dfhesin_diag$epiend),"epiend"] <- dfhesin_diag[is.na(dfhesin_diag$epiend),"disdate"]
-  dfhesin_oper$eventdate <- as.Date(as.character(dfhesin_oper$eventdate),format="%Y%m%d")
-  dfhesin_oper$epistart <- as.Date(as.character(dfhesin_oper$epistart),format="%Y%m%d")
+  dfhesin_diag$eventdate <- as.Date(as.character(dfhesin_diag$eventdate),format="%Y%m%d")
+  dfhesin_diag$epistart <- as.Date(as.character(dfhesin_diag$epistart),format="%Y%m%d")
   dfhesin_diag$epidur <- as.numeric(dfhesin_diag$eventdate - dfhesin_diag$epistart)
   dfhesin_diag$epidur[dfhesin_diag$epidur <0,] <- NA
   
