@@ -39,6 +39,10 @@ toc()
 
 tic("convert data")
 lst <- list()
+# HESIN (data is not unique for eid, code; could be used for reevents) contains duration 
+lst <- append(lst,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.primary + tte.hes.secondary
+
+
 # SELF REPORT (TIME TO EVENT DATA); data is unique (eid,code) contains first events, but also some without date, so can't say if its event. 
 lst$tte.sr_20002 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20002",field_sr_date = "20008",qc_treshold_year = 10) # non cancer
 lst$tte.sr_20001 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20001",field_sr_date = "20006",qc_treshold_year = 10) # cancer
@@ -49,11 +53,9 @@ lst$sr_medication <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagno
 lst$tte.sr_40001 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40001",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10) # operation
 ## secondary death, use only 1 date... 
 lst$tte.sr_40002 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10) # operation
-# HESIN (data is not unique for eid, code; could be used for reevents) contains duration 
 toc()
 
 
-lst <- append(lst,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.primary + tte.hes.secondary
 
 
 View(dfhes[(dfhes$level.x != dfhes$level.y) & !is.na(dfhes$level.x) & !is.na(dfhes$level.y),])
