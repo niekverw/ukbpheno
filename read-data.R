@@ -1,3 +1,4 @@
+library(matrixStats)
 
 default_ukb_fields <- function(){
   
@@ -138,21 +139,11 @@ read_ukb_data <- function(fukb,
                colClasses = freadcolclasses,
                sep = "\t",
                showProgress = TRUE)
-               # nThread = if(n_threads == "max") {
-               #   max(1,parallel::detectCores()-1)
-               # } else  if (n_threads == "dt") {
-               #   data.table::getDTthreads()
-               # } else if (is.numeric(n_threads)) {
-               #   min(n_threads, parallel::detectCores())
-               # }
-  #,select=cols.to_keep,colClasses = col.classes.to_keep)
   print(format(object.size(df), units = "Gb"))
   toc()
   
   # library(vroom)
-  # 
   # which(freadcolclasses !="NULL")
-  # 
   # tic("vroom")
   # df <- vroom(fukb,delim = "\t",col_types="", col_select =which(freadcolclasses !="NULL")  , progress=F) # which(freadcolclasses !="NULL")  #fields_to_keep.tab
   # toc()
@@ -162,5 +153,119 @@ read_ukb_data <- function(fukb,
 }
 #col.classes[col.classes %in% "integer64"] <- "character" #integer64 not supported, unsupported in disk.frame? but not in data.table
 
+
+
+
+
+#### NOT WORKING ON MACBOOK... ON CLUSTER THIS WORKED; BUT THEN I CAN'T SEEM TO LOAD THE DATA.. 
+convert_ukb_to_diskframe <- function(fukbtab,fhtml,outdir="diskframe/",rows_to_read=20000,ram_size=8) {
+  
+  library(disk.frame)
+  dfhtml <- read_ukb_metadata(fhtml)
+  rows_to_read=20000
+  ram_size=8
+  dfukb <- csv_to_disk.frame(fukbtab,
+                             nchunks = recommend_nchunks(sum(file.size(fukb)),ram_size=ram_size),
+                             in_chunk_size = rows_to_read,
+                             outdir = outdir,
+                             colClasses = as.vector(dfhtml$fread_column_type),
+                             col.names = dfhtml$field.tab, sep="\t")
+}
+# 
+# fukb="/data/pg-exp_cardio/UKBIO_database/12010_2019_10_31-38326/ukb38326.tab"
+# fhtml="/data/pg-exp_cardio/UKBIO_database/12010_2019_10_31-38326/ukb38326.html"
+# outdir='/data/pg-exp_cardio/UKBIO_database/12010_2019_10_31-38326/diskframe' #'/Volumes/data/ukb/diskframe'
+# #dfukb <- csv_to_disk.frame(fukb, in_chunk_size = 100,colClasses = freadcolclasses)
+# 
+# convert_ukb_to_diskframe(fukb,fhtml,outdir)
+# 
+# dfhtml[dfhtml$field.tab %in% 'f.4258.0.1',]
+
+
+read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
+  
+  
+  # read hesin
+  print("read hesin")
+  dfhesin <- (fread(fhesin,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
+  
+  # read diag
+  print("read diag")
+  dfdiag <- (fread(fhesin_diag,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
+  
+  # read oper
+  print("read oper")
+  dfoper <- (fread(fhesin_oper,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
+  dfoper$opdate <- as.integer(format(as.Date(as.character(dfoper$opdate),format="%d/%m/%Y"), "%Y%m%d")) # same format as dfhesin
+  
+  print("merging hesin + diagnosis")
+  dfhesin_diag <- merge(dfhesin,dfdiag,by = c("eid","ins_index"),all=T)
+  dfhesin_diag$eventdate <- dfhesin_diag$epistart
+  dfhesin_diag[is.na(dfhesin_diag$eventdate),"eventdate"] <- dfhesin_diag[is.na(dfhesin_diag$eventdate),"admidate"]
+  dfhesin_diag[is.na(dfhesin_diag$epiend),"epiend"] <- dfhesin_diag[is.na(dfhesin_diag$epiend),"disdate"]
+  dfhesin_diag$epidur <- as.numeric(dfhesin_diag$eventdate - dfhesin_diag$epistart)
+  dfhesin_diag$epidur[dfhesin_diag$epidur <0,] <- NA
+  
+  dfhesin_diag$event <- 1 
+  dfhesin_diag[is.na(dfhesin_diag$eventdate)]$event <- 0
+  dfhesin_diag <- dfhesin_diag[, event:=as.integer(event)]
+  
+  
+  print("merging hesin + operation") # for duration, take episode duration. 
+  dfhesin_oper <- merge(dfhesin,dfoper,by = c("eid","ins_index"),all=T)
+  dfhesin_oper$eventdate <- dfhesin_oper$opdate
+  dfhesin_diag[is.na(dfhesin_diag$epistart),"epistart"] <- dfhesin_diag[is.na(dfhesin_diag$epistart),"admidate"]
+  dfhesin_oper[is.na(dfhesin_oper$eventdate),"eventdate"] <- dfhesin_oper[is.na(dfhesin_oper$eventdate),"epistart"]
+  dfhesin_oper[is.na(dfhesin_oper$eventdate),"eventdate"] <- dfhesin_oper[is.na(dfhesin_oper$eventdate),"admidate"]
+  dfhesin_oper[is.na(dfhesin_oper$epiend),"epiend"] <- dfhesin_oper[is.na(dfhesin_oper$epiend),"disdate"]
+  dfhesin_oper <- dfhesin_oper[!is.na(dfhesin_oper$eventdate),]
+  
+  dfhesin_oper$eventdate <- as.Date(as.character(dfhesin_oper$eventdate),format="%Y%m%d")
+  dfhesin_oper$epistart <- as.Date(as.character(dfhesin_oper$epistart),format="%Y%m%d")
+  dfhesin_oper$epiend <- as.Date(as.character(dfhesin_oper$epiend),format="%Y%m%d")
+  dfhesin_oper$epidur <- as.numeric(dfhesin_oper$epiend-dfhesin_oper$epistart)
+  
+  dfhesin_oper[dfhesin_oper$epidur <0,]$epidur <- NA
+  
+  dfhesin_oper$event <- 1 
+  dfhesin_oper[is.na(dfhesin_oper$eventdate)]$event <- 0
+  dfhesin_oper <- dfhesin_oper[, event:=as.integer(event)]
+  
+  
+  tte.oper3.primary <- dfhesin_oper %>% filter(level==1 & !is.na(oper3))  %>% select(eid,epistart,epidur,oper3,event)  %>% rename(f.eid=eid,eventdate = epistart,epidur=epidur,code = oper3,event=event)  %>% as.data.table()
+  tte.oper4.primary <- dfhesin_oper %>% filter(level==1 & !is.na(oper4))  %>% select(eid,epistart,epidur,oper4,event)  %>% rename(f.eid=eid,eventdate = epistart,epidur=epidur,code = oper4,event=event)  %>% as.data.table()
+  tte.icd10.primary <- dfhesin_diag %>% filter( level==1 & !is.na(diag_icd10))  %>% select(eid,epistart,epidur,diag_icd10,event)  %>% rename(f.eid=eid,eventdate = epistart,epidur=epidur,code = diag_icd10,event=event)  %>% as.data.table()
+  tte.icd9.primary <- dfhesin_diag %>% filter( level==1 & !is.na(diag_icd9))  %>% select(eid,epistart,epidur,diag_icd9,event)  %>% rename(f.eid=eid,eventdate = epistart,epidur=epidur,code = diag_icd9,event=event)  %>% as.data.table()
+  
+  tte.oper3.secondary <- dfhesin_oper %>% filter(level==2 & !is.na(oper3))  %>% select(eid,epistart,epidur,oper3,event)  %>% rename(f.eid=eid,eventdate = epistart,epidur=epidur,code = oper3,event=event)  %>% as.data.table()
+  tte.oper4.secondary <- dfhesin_oper %>% filter(level==2 & !is.na(oper4))  %>% select(eid,epistart,epidur,oper4,event)  %>% rename(f.eid=eid,eventdate = epistart,epidur=epidur,code = oper4,event=event)  %>% as.data.table()
+  tte.icd10.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd10))  %>% select(eid,epistart,epidur,diag_icd10,event)  %>% rename(f.eid=eid,eventdate = epistart,epidur=epidur,code = diag_icd10,event=event)  %>% as.data.table()
+  tte.icd9.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd9))  %>% select(eid,epistart,epidur,diag_icd9,event)  %>% rename(f.eid=eid,eventdate = epistart,epidur=epidur,code = diag_icd9,event=event)  %>% as.data.table()
+  
+  
+  
+  
+  setkey(tte.oper3.primary,f.eid)    
+  setkey(tte.oper4.primary,f.eid)    
+  setkey(tte.icd10.primary,f.eid)    
+  setkey(tte.icd9.primary,f.eid)    
+  
+  setkey(tte.oper3.secondary,f.eid)    
+  setkey(tte.oper4.secondary,f.eid)    
+  setkey(tte.icd10.secondary,f.eid)    
+  setkey(tte.icd9.secondary,f.eid)    
+  
+  lst <- list(tte.oper3.primary = tte.oper3.primary, 
+              tte.oper4.primary = tte.oper4.primary,
+              tte.icd10.primary = tte.icd10.primary, 
+              tte.icd9.primary = tte.icd9.primary,
+              
+              tte.oper3.secondary = tte.oper3.secondary, 
+              tte.oper4.secondary = tte.oper4.secondary,
+              tte.icd10.secondary = tte.icd10.secondary, 
+              tte.icd9.secondary = tte.icd9.secondary)
+  return(lst)
+  
+}
 
 

@@ -129,7 +129,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   df_out[is.na(df_out$eventdate)]$event <- 0
   df_out[is.na(df_out$eventdate)]$eventdate <- df_out[is.na(df_out$eventdate)]$visitdate
   df_out <- df_out[,c(identifierfield,"code","eventdate","event"),with=FALSE]
-  setkey(df_out,code)    
+  setkey(df_out,f.eid)    
   
   #head(df_out)
   gc()
