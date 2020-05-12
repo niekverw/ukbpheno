@@ -188,64 +188,63 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   # read hesin
   print("read hesin")
   dfhesin <- (fread(fhesin,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
+  print("converting dates")
+  dfhesin$epistart <- as.Date(as.character(dfhesin$epistart),format="%Y%m%d")
+  dfhesin$admidate <- as.Date(as.character(dfhesin$admidate),format="%Y%m%d")
+  dfhesin$epiend <- as.Date(as.character(dfhesin$epiend),format="%Y%m%d")
+  dfhesin$disdate <- as.Date(as.character(dfhesin$disdate),format="%Y%m%d")
+  
+  dfhesin[is.na(dfhesin$epistart),"epistart"] <- dfhesin[is.na(dfhesin$epistart),"admidate"]
+  dfhesin[is.na(dfhesin$epiend),"epiend"] <- dfhesin[is.na(dfhesin$epiend),"disdate"]
+  dfhesin$epidur <- as.numeric(dfhesin$epiend - dfhesin$epistart )
+  dfhesin[dfhesin$epidur <0,]$epidur <- NA
+  
+  # dfhesin_oper[is.na(dfhesin_oper$eventdate),"eventdate"] <- dfhesin_oper[is.na(dfhesin_oper$eventdate),"epistart"]
+  # dfhesin_oper[is.na(dfhesin_oper$eventdate),"eventdate"] <- dfhesin_oper[is.na(dfhesin_oper$eventdate),"admidate"]
+  # dfhesin_oper[is.na(dfhesin_oper$epiend),"epiend"] <- dfhesin_oper[is.na(dfhesin_oper$epiend),"disdate"]
+  # 
+  # dfhesin_diag[is.na(dfhesin_diag$eventdate),"eventdate"] <- dfhesin_diag[is.na(dfhesin_diag$eventdate),"admidate"]
+  # dfhesin_diag[is.na(dfhesin_diag$epiend),"epiend"] <- dfhesin_diag[is.na(dfhesin_diag$epiend),"disdate"]
   
   # read diag
   print("read diag")
   dfdiag <- (fread(fhesin_diag,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
-  
-  # read oper
-  print("read oper")
-  dfoper <- (fread(fhesin_oper,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
-  dfoper$opdate <- as.integer(format(as.Date(as.character(dfoper$opdate),format="%d/%m/%Y"), "%Y%m%d")) # same format as dfhesin
-  
   print("merging hesin + diagnosis")
   dfhesin_diag <- merge(dfhesin,dfdiag,by = c("eid","ins_index"),all=T)
   dfhesin_diag$eventdate <- dfhesin_diag$epistart
-  dfhesin_diag[is.na(dfhesin_diag$eventdate),"eventdate"] <- dfhesin_diag[is.na(dfhesin_diag$eventdate),"admidate"]
-  dfhesin_diag[is.na(dfhesin_diag$epiend),"epiend"] <- dfhesin_diag[is.na(dfhesin_diag$epiend),"disdate"]
-  dfhesin_diag$eventdate <- as.Date(as.character(dfhesin_diag$eventdate),format="%Y%m%d")
-  dfhesin_diag$epistart <- as.Date(as.character(dfhesin_diag$epistart),format="%Y%m%d")
-  dfhesin_diag$epidur <- as.numeric(dfhesin_diag$eventdate - dfhesin_diag$epistart)
-  dfhesin_diag$epidur[dfhesin_diag$epidur <0,] <- NA
-  
   dfhesin_diag$event <- 1 
   dfhesin_diag[is.na(dfhesin_diag$eventdate)]$event <- 0
   dfhesin_diag <- dfhesin_diag[, event:=as.integer(event)]
-  
-  
+
+
+  # read oper
+  print("read oper")
+  dfoper <- (fread(fhesin_oper,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
+  dfoper$opdate <- as.Date(as.character(dfoper$opdate),format="%d/%m/%Y")
   print("merging hesin + operation") # for duration, take episode duration. 
   dfhesin_oper <- merge(dfhesin,dfoper,by = c("eid","ins_index"),all=T)
   dfhesin_oper$eventdate <- dfhesin_oper$opdate
-  dfhesin_diag[is.na(dfhesin_diag$epistart),"epistart"] <- dfhesin_diag[is.na(dfhesin_diag$epistart),"admidate"]
   dfhesin_oper[is.na(dfhesin_oper$eventdate),"eventdate"] <- dfhesin_oper[is.na(dfhesin_oper$eventdate),"epistart"]
-  dfhesin_oper[is.na(dfhesin_oper$eventdate),"eventdate"] <- dfhesin_oper[is.na(dfhesin_oper$eventdate),"admidate"]
-  dfhesin_oper[is.na(dfhesin_oper$epiend),"epiend"] <- dfhesin_oper[is.na(dfhesin_oper$epiend),"disdate"]
-  dfhesin_oper <- dfhesin_oper[!is.na(dfhesin_oper$eventdate),]
-  
-  dfhesin_oper$eventdate <- as.Date(as.character(dfhesin_oper$eventdate),format="%Y%m%d")
-  dfhesin_oper$epistart <- as.Date(as.character(dfhesin_oper$epistart),format="%Y%m%d")
-  dfhesin_oper$epiend <- as.Date(as.character(dfhesin_oper$epiend),format="%Y%m%d")
-  dfhesin_oper$epidur <- as.numeric(dfhesin_oper$epiend-dfhesin_oper$epistart)
-  
-  dfhesin_oper[dfhesin_oper$epidur <0,]$epidur <- NA
   
   dfhesin_oper$event <- 1 
   dfhesin_oper[is.na(dfhesin_oper$eventdate)]$event <- 0
   dfhesin_oper <- dfhesin_oper[, event:=as.integer(event)]
   
-  
-  tte.oper3.primary <- dfhesin_oper %>% filter(level==1 & !is.na(oper3))  %>% select(eid,epistart,epidur,oper3,event)  %>% rename(f.eid=eid,eventdate = epistart,epidur=epidur,code = oper3,event=event)  %>% as.data.table()
-  tte.oper4.primary <- dfhesin_oper %>% filter(level==1 & !is.na(oper4))  %>% select(eid,epistart,epidur,oper4,event)  %>% rename(f.eid=eid,eventdate = epistart,epidur=epidur,code = oper4,event=event)  %>% as.data.table()
-  tte.icd10.primary <- dfhesin_diag %>% filter( level==1 & !is.na(diag_icd10))  %>% select(eid,epistart,epidur,diag_icd10,event)  %>% rename(f.eid=eid,eventdate = epistart,epidur=epidur,code = diag_icd10,event=event)  %>% as.data.table()
-  tte.icd9.primary <- dfhesin_diag %>% filter( level==1 & !is.na(diag_icd9))  %>% select(eid,epistart,epidur,diag_icd9,event)  %>% rename(f.eid=eid,eventdate = epistart,epidur=epidur,code = diag_icd9,event=event)  %>% as.data.table()
-  
-  tte.oper3.secondary <- dfhesin_oper %>% filter(level==2 & !is.na(oper3))  %>% select(eid,epistart,epidur,oper3,event)  %>% rename(f.eid=eid,eventdate = epistart,epidur=epidur,code = oper3,event=event)  %>% as.data.table()
-  tte.oper4.secondary <- dfhesin_oper %>% filter(level==2 & !is.na(oper4))  %>% select(eid,epistart,epidur,oper4,event)  %>% rename(f.eid=eid,eventdate = epistart,epidur=epidur,code = oper4,event=event)  %>% as.data.table()
-  tte.icd10.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd10))  %>% select(eid,epistart,epidur,diag_icd10,event)  %>% rename(f.eid=eid,eventdate = epistart,epidur=epidur,code = diag_icd10,event=event)  %>% as.data.table()
-  tte.icd9.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd9))  %>% select(eid,epistart,epidur,diag_icd9,event)  %>% rename(f.eid=eid,eventdate = epistart,epidur=epidur,code = diag_icd9,event=event)  %>% as.data.table()
-  
-  
-  
+  dfhesin_oper %>% filter(level==1 & !is.na(oper3))  
+ 
+    
+    tte.oper3.primary <- dfhesin_oper %>% filter(level==1 & !is.na(oper3))  %>% select(eid,eventdate,epidur,oper3,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% as.data.table()
+    tte.oper4.primary <- dfhesin_oper %>% filter(level==1 & !is.na(oper4))  %>% select(eid,eventdate,epidur,oper4,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% as.data.table()
+    tte.icd10.primary <- dfhesin_diag %>% filter( level==1 & !is.na(diag_icd10))  %>% select(eid,eventdate,epidur,diag_icd10,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% as.data.table()
+    tte.icd9.primary <- dfhesin_diag %>% filter( level==1 & !is.na(diag_icd9))  %>% select(eid,eventdate,epidur,diag_icd9,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% as.data.table()
+    
+    tte.oper3.secondary <- dfhesin_oper %>% filter(level==2 & !is.na(oper3))  %>% select(eid,eventdate,epidur,oper3,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% as.data.table()
+    tte.oper4.secondary <- dfhesin_oper %>% filter(level==2 & !is.na(oper4))  %>% select(eid,eventdate,epidur,oper4,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% as.data.table()
+    tte.icd10.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd10))  %>% select(eid,eventdate,epidur,diag_icd10,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% as.data.table()
+    tte.icd9.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd9))  %>% select(eid,eventdate,epidur,diag_icd9,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% as.data.table()
+    
+    
+    
   
   setkey(tte.oper3.primary,f.eid)    
   setkey(tte.oper4.primary,f.eid)    
