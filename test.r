@@ -55,7 +55,6 @@ lst <- append(lst,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.p
 # GP (data is not unique for eid, code)
 toc(); toc()
 
-lst$tte.oper3.primary
 
 
 View(dfhes[(dfhes$level.x != dfhes$level.y) & !is.na(dfhes$level.x) & !is.na(dfhes$level.y),])

@@ -1,4 +1,6 @@
 library(matrixStats)
+library(fasttime)
+library(disk.frame)
 
 default_ukb_fields <- function(){
   
@@ -184,7 +186,7 @@ convert_ukb_to_diskframe <- function(fukbtab,fhtml,outdir="diskframe/",rows_to_r
 
 read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   
-  
+  ## TODO; use library(fasttime); fastPOSIXct(DT$start_date)
   # read hesin
   print("read hesin")
   dfhesin <- (fread(fhesin,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
@@ -198,14 +200,7 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   dfhesin[is.na(dfhesin$epiend),"epiend"] <- dfhesin[is.na(dfhesin$epiend),"disdate"]
   dfhesin$epidur <- as.numeric(dfhesin$epiend - dfhesin$epistart )
   dfhesin[dfhesin$epidur <0,]$epidur <- NA
-  
-  # dfhesin_oper[is.na(dfhesin_oper$eventdate),"eventdate"] <- dfhesin_oper[is.na(dfhesin_oper$eventdate),"epistart"]
-  # dfhesin_oper[is.na(dfhesin_oper$eventdate),"eventdate"] <- dfhesin_oper[is.na(dfhesin_oper$eventdate),"admidate"]
-  # dfhesin_oper[is.na(dfhesin_oper$epiend),"epiend"] <- dfhesin_oper[is.na(dfhesin_oper$epiend),"disdate"]
-  # 
-  # dfhesin_diag[is.na(dfhesin_diag$eventdate),"eventdate"] <- dfhesin_diag[is.na(dfhesin_diag$eventdate),"admidate"]
-  # dfhesin_diag[is.na(dfhesin_diag$epiend),"epiend"] <- dfhesin_diag[is.na(dfhesin_diag$epiend),"disdate"]
-  
+
   # read diag
   print("read diag")
   dfdiag <- (fread(fhesin_diag,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
@@ -215,7 +210,6 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   dfhesin_diag$event <- 1 
   dfhesin_diag[is.na(dfhesin_diag$eventdate)]$event <- 0
   dfhesin_diag <- dfhesin_diag[, event:=as.integer(event)]
-
 
   # read oper
   print("read oper")
@@ -230,21 +224,17 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   dfhesin_oper[is.na(dfhesin_oper$eventdate)]$event <- 0
   dfhesin_oper <- dfhesin_oper[, event:=as.integer(event)]
   
-  dfhesin_oper %>% filter(level==1 & !is.na(oper3))  
- 
-    
-    tte.oper3.primary <- dfhesin_oper %>% filter(level==1 & !is.na(oper3))  %>% select(eid,eventdate,epidur,oper3,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% as.data.table()
-    tte.oper4.primary <- dfhesin_oper %>% filter(level==1 & !is.na(oper4))  %>% select(eid,eventdate,epidur,oper4,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% as.data.table()
-    tte.icd10.primary <- dfhesin_diag %>% filter( level==1 & !is.na(diag_icd10))  %>% select(eid,eventdate,epidur,diag_icd10,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% as.data.table()
-    tte.icd9.primary <- dfhesin_diag %>% filter( level==1 & !is.na(diag_icd9))  %>% select(eid,eventdate,epidur,diag_icd9,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% as.data.table()
-    
-    tte.oper3.secondary <- dfhesin_oper %>% filter(level==2 & !is.na(oper3))  %>% select(eid,eventdate,epidur,oper3,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% as.data.table()
-    tte.oper4.secondary <- dfhesin_oper %>% filter(level==2 & !is.na(oper4))  %>% select(eid,eventdate,epidur,oper4,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% as.data.table()
-    tte.icd10.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd10))  %>% select(eid,eventdate,epidur,diag_icd10,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% as.data.table()
-    tte.icd9.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd9))  %>% select(eid,eventdate,epidur,diag_icd9,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% as.data.table()
-    
-    
-    
+  # filter + rename
+  tte.oper3.primary <- dfhesin_oper %>% filter(level==1 & !is.na(oper3))  %>% select(eid,eventdate,epidur,oper3,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% as.data.table()
+  tte.oper4.primary <- dfhesin_oper %>% filter(level==1 & !is.na(oper4))  %>% select(eid,eventdate,epidur,oper4,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% as.data.table()
+  tte.icd10.primary <- dfhesin_diag %>% filter( level==1 & !is.na(diag_icd10))  %>% select(eid,eventdate,epidur,diag_icd10,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% as.data.table()
+  tte.icd9.primary <- dfhesin_diag %>% filter( level==1 & !is.na(diag_icd9))  %>% select(eid,eventdate,epidur,diag_icd9,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% as.data.table()
+  
+  tte.oper3.secondary <- dfhesin_oper %>% filter(level==2 & !is.na(oper3))  %>% select(eid,eventdate,epidur,oper3,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% as.data.table()
+  tte.oper4.secondary <- dfhesin_oper %>% filter(level==2 & !is.na(oper4))  %>% select(eid,eventdate,epidur,oper4,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% as.data.table()
+  tte.icd10.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd10))  %>% select(eid,eventdate,epidur,diag_icd10,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% as.data.table()
+  tte.icd9.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd9))  %>% select(eid,eventdate,epidur,diag_icd9,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% as.data.table()
+  
   
   setkey(tte.oper3.primary,f.eid)    
   setkey(tte.oper4.primary,f.eid)    
@@ -270,3 +260,63 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
 }
 
 
+fgp = "/Volumes/data/ukb/gp_clinical.txt"
+
+read_gp_data <- function(fgp ){
+  library(disk.frame)
+
+  # loadGPTable <- function(UKbioDataset,
+  #                         gp_file,
+  #                         cols_tokeep=c("eid","event_dt","read_2","read_3"),
+  #                         cols_rename=c("n_eid","event_dt","read_2","read_3"),
+  #                         mindate = "1930-01-01",
+  #                         maxdate = "2021-01-01"
+  # ){
+  
+    mindate = as.Date("1930-01-01")
+    maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?. 
+    dfgp <- fread(cmd = paste("awk -F'\t'  '$6==\"\" && $7==\"\" && $7==\"\" {split($3, a, \"/\"); $3 = a[3]\"/\"a[2]\"/\"a[1];print $1,$3,$4,$5}' OFS='\t'",fgp) ,sep = "\t") #,select=cols_tokeep) ," | head -10000 "
+    #names(dfgp) <-  c("eid",	"data_provider",	"event_dt",	"read_2",	"read_3",	"value1","value2","value3")
+    names(dfgp) <-  c("eid",	"event_dt",	"read_2",	"read_3")
+    dfgp$event_dt <- format(fasttime::fastPOSIXct(dfgp$event_dt),format="%Y-%m-%d")
+  
+    
+    print(paste("missing dates for ", sum(is.na(dfgp$event_dt)),"of",nrow(dfgp),"entries = ",100*sum(is.na(dfgp$event_dt))/nrow(dfgp),"%, excluding these." ))
+    dfgp <- dfgp[!is.na(dfgp$event_dt),]
+    
+    print(paste("QC dates.. "))
+    dfgp <- subset(dfgp, event_dt > mindate ) # removing before 1930-ish.. some 1900, 1902, 1903 observations..
+    dfgp <- subset(dfgp, event_dt < maxdate ) # removing after today-ish.. some 2037 observations.
+    
+    
+    print(paste("#individuals",length(unique(dfgp$n_eid))))
+    
+    
+    #dfgp <- fread(cmd = paste("awk -F'\t'  '$6==\"\" && $7==\"\" && $7==\"\" {print $1,$3,$4,$5}' OFS='\t'",fgp) ,sep = "\t") #,select=cols_tokeep) ," | head -10000 "
+    #names(dfgp) <-  c("eid",	"event_dt",	"read_2",	"read_3")
+    
+    # 
+    # ram_size=8
+    # outdir = paste0(fgp,"_diskframe/")
+    # # if !diskframe
+    # dfgp <- csv_to_disk.frame(fgp,
+    #                            nchunks = recommend_nchunks(sum(file.size(fgp)),ram_size=ram_size),
+    #                            #in_chunk_size = rows_to_read,
+    #                            outdir = outdir,
+    #                            colClasses = c("integer","integer","string","string","string","string","string","string"),
+    #                            col.names = c("eid",	"data_provider",	"event_dt",	"read_2",	"read_3",	"value1","value2","value3"), sep="\t")
+    # 
+    # print(format(object.size(dfgp), units = "Mb"))
+    # 
+    # 
+    # ## doesntwork with diskframe??
+    # dfgp.dt <- as.data.table(dfgp) #[dfgp$value1=="" & dfgp$value2 =="" & dfgp$value3 =="",]
+    # dfgp.dt[dfgp.dt$value1=="" & dfgp.dt$value2 =="" & dfgp.dt$value3 =="",]
+    # dfgp.dt <- dfgp[dfgp$value1=="" & dfgp$value2 =="" & dfgp$value3 =="",]
+    # 
+    #; fastPOSIXct(DT$start_date)
+  
+    # hist( unique(dfgp$event_dt), "years", freq = TRUE)
+    # hist( dfgp$event_dt, "years", freq = TRUE,bars=100)
+    return(dfgp)
+  }
