@@ -14,7 +14,7 @@ Currently it only reads in the data and converts data into dataframes with 4-5 c
 - medication nurse interview
 
 ### Other data, e.g. yes/no, categorical without dates. 
-- touchscreen variables
+- touchscreen variables, sometimes corresponding age of diagnosis. 
 - abnormal biomarker cutoffs? 
 
 
