@@ -1,5 +1,8 @@
 # ukbpheno
 
+Sorry I hvent organized it, `run.r` is the base script that I use to test things; functions in different scripts, can easily convert it into R package
+
+
 ## data types
 ### Time to event data
 - HESIN: ICD9, ICD10, OPCS3, OPCS4. decide how to optionize with primary and secondary diagnoses. 
