@@ -1,12 +1,5 @@
+# function to load data. 
 
-
-
-# load ukb data. -- memory map. 
-
-#install.packages("disk.frame")
-library(data.table)
-library(dplyr)
-library(tictoc)
 convert_year_to_date <- function(year){
   #https://stackoverflow.com/questions/29697436/how-to-convert-decimal-date-format-e-g-2011-580-to-normal-date-format
   
@@ -43,6 +36,8 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   # qc_treshold_year=10
   
   # 
+  tic(paste("convert_nurseinterview_to_episodedata: ",field_sr_diagnosis))
+  
   if(!is.null(field_sr_date)) { if(field_sr_date==""){field_sr_date=NULL}} 
   if(is.null(field_sr_date))  { print("field_sr_date == NULL; qc_treshold_year and field_sr_date_type will not be used.") }
   daysinyear=365.25
@@ -135,7 +130,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   gc()
   print(format(object.size(df_out), units = "Mb"))
   
-  
+  toc()
   return(df_out)
 }
 

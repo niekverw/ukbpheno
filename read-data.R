@@ -1,6 +1,3 @@
-library(matrixStats)
-library(fasttime)
-library(disk.frame)
 
 default_ukb_fields <- function(){
   
@@ -58,6 +55,7 @@ parse_html_tables <- function(x){
 }
 
 read_ukb_metadata <- function(fhtml="/Volumes/data/ukb/ukb38326.html") {
+  tic(paste("read ukb html",fhtml))
   
   # fileset="ukb38326"
   # Column types as described by UKB
@@ -85,7 +83,7 @@ read_ukb_metadata <- function(fhtml="/Volumes/data/ukb/ukb38326.html") {
   df_meta$Description <- ReplaceNAWithNearestNonNAOnTheLeft(df_meta$Description)
   df_meta$Description <- description_to_name(df_meta$Description)
   
-  lookup.reference <- tibble::tibble(
+  df_meta <- tibble::tibble(
     field.number = df_meta$Column,
     field.count = as.numeric(df_meta$Count),
     field.showcase = gsub("-.*$", "", df_meta[, "UDI"]),
@@ -104,8 +102,8 @@ read_ukb_metadata <- function(fhtml="/Volumes/data/ukb/ukb38326.html") {
     fread_column_type = col_type[as.character(df_meta$Type)]
     
   )
-  
-  return(lookup.reference)
+  toc()
+  return(df_meta)
 }
 
 
@@ -115,7 +113,7 @@ read_ukb_metadata <- function(fhtml="/Volumes/data/ukb/ukb38326.html") {
 read_ukb_data <- function(fukb, 
                           dfhtml,
                           fields_to_keep = default_ukb_fields()) {
-  
+  tic(paste("read ukb data",fukb))
   if (!exists("n_threads")){n_threads=1}
   
   if(!any(fields_to_keep %in% "eid" )){
@@ -200,7 +198,7 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   dfhesin[is.na(dfhesin$epiend),"epiend"] <- dfhesin[is.na(dfhesin$epiend),"disdate"]
   dfhesin$epidur <- as.numeric(dfhesin$epiend - dfhesin$epistart )
   dfhesin[dfhesin$epidur <0,]$epidur <- NA
-
+  
   # read diag
   print("read diag")
   dfdiag <- (fread(fhesin_diag,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
@@ -210,7 +208,7 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   dfhesin_diag$event <- 1 
   dfhesin_diag[is.na(dfhesin_diag$eventdate)]$event <- 0
   dfhesin_diag <- dfhesin_diag[, event:=as.integer(event)]
-
+  
   # read oper
   print("read oper")
   dfoper <- (fread(fhesin_oper,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
@@ -262,61 +260,120 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
 
 fgp = "/Volumes/data/ukb/gp_clinical.txt"
 
-read_gp_data <- function(fgp ){
-  library(disk.frame)
+read_gp_clinical_data <- function(fgp){
+  tic(paste("read gp data",fgp))
+  mindate = as.Date("1930-01-01")
+  maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?. 
+  dfgp <- fread(cmd = paste("awk -F'\t'  '$6==\"\" && $7==\"\" && $7==\"\" {print $1,$3,$4,$5}' OFS='\t'",fgp) ,sep = "\t",
+                colClasses = c("integer","string","string","string")) #,select=cols_tokeep) ," | head -10000 "
+  #names(dfgp) <-  c("eid",	"data_provider",	"event_dt",	"read_2",	"read_3",	"value1","value2","value3")
+  names(dfgp) <-  c("eid",	"event_dt",	"read_2",	"read_3")
+  dfgp$event_dt <- as.Date(as.character(dfgp$event_dt),format="%d/%m/%Y")
+  #dfgp$event_dt <- format(fasttime::fastPOSIXct(dfgp$event_dt),format="%Y-%m-%d") # needs specific input format, making that format takes more time... 
+  
+  print(paste("missing dates for ", sum(is.na(dfgp$event_dt)),"of",nrow(dfgp),"entries = ",100*sum(is.na(dfgp$event_dt))/nrow(dfgp),"%, excluding these." ))
+  dfgp <- dfgp[!is.na(dfgp$event_dt),]
+  
+  print(paste("QC dates.. "))
+  #dfgp <- subset(dfgp, event_dt > mindate ) # removing before 1930-ish.. some 1900, 1902, 1903 observations..
+  dfgp <- subset(dfgp, event_dt < maxdate ) # removing after today-ish.. some 2037 observations.
+  print(paste("#individuals",length(unique(dfgp$n_eid))))
+  
+  dfgp$event <- 1
 
-  # loadGPTable <- function(UKbioDataset,
-  #                         gp_file,
-  #                         cols_tokeep=c("eid","event_dt","read_2","read_3"),
-  #                         cols_rename=c("n_eid","event_dt","read_2","read_3"),
-  #                         mindate = "1930-01-01",
-  #                         maxdate = "2021-01-01"
-  # ){
   
-    mindate = as.Date("1930-01-01")
-    maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?. 
-    dfgp <- fread(cmd = paste("awk -F'\t'  '$6==\"\" && $7==\"\" && $7==\"\" {split($3, a, \"/\"); $3 = a[3]\"/\"a[2]\"/\"a[1];print $1,$3,$4,$5}' OFS='\t'",fgp) ,sep = "\t") #,select=cols_tokeep) ," | head -10000 "
-    #names(dfgp) <-  c("eid",	"data_provider",	"event_dt",	"read_2",	"read_3",	"value1","value2","value3")
-    names(dfgp) <-  c("eid",	"event_dt",	"read_2",	"read_3")
-    dfgp$event_dt <- format(fasttime::fastPOSIXct(dfgp$event_dt),format="%Y-%m-%d")
   
-    
-    print(paste("missing dates for ", sum(is.na(dfgp$event_dt)),"of",nrow(dfgp),"entries = ",100*sum(is.na(dfgp$event_dt))/nrow(dfgp),"%, excluding these." ))
-    dfgp <- dfgp[!is.na(dfgp$event_dt),]
-    
-    print(paste("QC dates.. "))
-    dfgp <- subset(dfgp, event_dt > mindate ) # removing before 1930-ish.. some 1900, 1902, 1903 observations..
-    dfgp <- subset(dfgp, event_dt < maxdate ) # removing after today-ish.. some 2037 observations.
-    
-    
-    print(paste("#individuals",length(unique(dfgp$n_eid))))
-    
-    
-    #dfgp <- fread(cmd = paste("awk -F'\t'  '$6==\"\" && $7==\"\" && $7==\"\" {print $1,$3,$4,$5}' OFS='\t'",fgp) ,sep = "\t") #,select=cols_tokeep) ," | head -10000 "
-    #names(dfgp) <-  c("eid",	"event_dt",	"read_2",	"read_3")
-    
-    # 
-    # ram_size=8
-    # outdir = paste0(fgp,"_diskframe/")
-    # # if !diskframe
-    # dfgp <- csv_to_disk.frame(fgp,
-    #                            nchunks = recommend_nchunks(sum(file.size(fgp)),ram_size=ram_size),
-    #                            #in_chunk_size = rows_to_read,
-    #                            outdir = outdir,
-    #                            colClasses = c("integer","integer","string","string","string","string","string","string"),
-    #                            col.names = c("eid",	"data_provider",	"event_dt",	"read_2",	"read_3",	"value1","value2","value3"), sep="\t")
-    # 
-    # print(format(object.size(dfgp), units = "Mb"))
-    # 
-    # 
-    # ## doesntwork with diskframe??
-    # dfgp.dt <- as.data.table(dfgp) #[dfgp$value1=="" & dfgp$value2 =="" & dfgp$value3 =="",]
-    # dfgp.dt[dfgp.dt$value1=="" & dfgp.dt$value2 =="" & dfgp.dt$value3 =="",]
-    # dfgp.dt <- dfgp[dfgp$value1=="" & dfgp$value2 =="" & dfgp$value3 =="",]
-    # 
-    #; fastPOSIXct(DT$start_date)
+  tte.gpclincal.read3 <-  dfgp %>% filter(read_3 !="")  %>% select(eid,event_dt,read_3,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_3,event=event)  %>% as.data.table()
+  tte.gpclincal.read2 <-  dfgp %>% filter(read_2 !="")  %>% select(eid,event_dt,read_2,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% as.data.table()
   
-    # hist( unique(dfgp$event_dt), "years", freq = TRUE)
-    # hist( dfgp$event_dt, "years", freq = TRUE,bars=100)
-    return(dfgp)
-  }
+  lst <- list(tte.gpclincal.read2=tte.gpclincal.read2,tte.gpclincal.read3=tte.gpclincal.read3)
+  toc() #423.762 sec elapsed
+  return(lst)
+
+}
+
+#fgp <- "/Volumes/data/ukb/gp_scripts.txt"
+read_gp_script_data <- function(fgp){
+  
+  tic("read gp data")
+  mindate = as.Date("1930-01-01")
+  maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?. 
+  dfgp <- fread(fgp ,sep = "\t",colClasses = c("integer","integer","string","string","string","string","string","string")) #,select=cols_tokeep) ," | head -10000 "
+  #names(dfgp) <-  c("eid",	"data_provider",	"event_dt",	"read_2",	"read_3",	"value1","value2","value3")
+  
+  counts <- dfgp[, .N, by=.(read_2, dmd_code,bnf_code,drug_name)] # add unique per individual. 
+  
+  
+  dfgp[ dfgp$read_2!="" & dfgp$dmd_code !="",]
+  names(dfgp) <-  c("eid",	"event_dt",	"read_2",	"read_3")
+  dfgp$event_dt <- as.Date(as.character(dfgp$event_dt),format="%d/%m/%Y")
+  #dfgp$event_dt <- format(fasttime::fastPOSIXct(dfgp$event_dt),format="%Y-%m-%d") # needs specific input format, making that format takes more time... 
+  
+  print(paste("missing dates for ", sum(is.na(dfgp$event_dt)),"of",nrow(dfgp),"entries = ",100*sum(is.na(dfgp$event_dt))/nrow(dfgp),"%, excluding these." ))
+  dfgp <- dfgp[!is.na(dfgp$event_dt),]
+  
+  print(paste("QC dates.. "))
+  #dfgp <- subset(dfgp, event_dt > mindate ) # removing before 1930-ish.. some 1900, 1902, 1903 observations..
+  dfgp <- subset(dfgp, event_dt < maxdate ) # removing after today-ish.. some 2037 observations.
+  print(paste("#individuals",length(unique(dfgp$n_eid))))
+  
+  dfgp$event <- 1
+  
+  toc() #423.762 sec elapsed
+  
+  tte.gpclincal.read3 <-  dfgp %>% filter(read_3 !="")  %>% select(eid,event_dt,read_3,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_3,event=event)  %>% as.data.table()
+  tte.gpclincal.read2 <-  dfgp %>% filter(read_2 !="")  %>% select(eid,event_dt,read_2,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% as.data.table()
+  
+  lst <- list(tte.gpclincal.read2=tte.gpclincal.read2,tte.gpclincal.read3=tte.gpclincal.read3)
+  return(lst)
+  
+}
+
+
+
+#library(disk.frame)
+# tic("read gp data")
+# mindate = as.Date("1930-01-01")
+# maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?.
+# dfgp <- fread(cmd = paste("awk -F'\t'  '$6==\"\" && $7==\"\" && $7==\"\" {split($3, a, \"/\"); $3 = a[3]\"/\"a[2]\"/\"a[1];print $1,$3,$4,$5}' OFS='\t'",fgp) ,sep = "\t",
+#               colClasses = c("integer","string","string","string")) #,select=cols_tokeep) ," | head -10000 "
+# #names(dfgp) <-  c("eid",	"data_provider",	"event_dt",	"read_2",	"read_3",	"value1","value2","value3")
+# names(dfgp) <-  c("eid",	"event_dt",	"read_2",	"read_3")
+# dfgp$event_dt <- format(fasttime::fastPOSIXct(dfgp$event_dt),format="%Y-%m-%d")
+# toc() #636.492 sec elapsed
+# 
+
+# ####
+# # 
+# library(readxl)
+# fgpcoding.xls="/Users/niek/repos/ukbpheno/all_lkps_maps.xlsx"
+# dfgpcoding.xls.read_ctv3_lkp <- as.data.table(read_xlsx(fgpcoding.xls,sheet="read_ctv3_lkp",col_types = rep("text",4) ))
+# 
+# counts <- dfgp[, .N, by=.(read_2, read_3)]
+# counts <- merge (counts,dfgpcoding.xls.read_ctv3_lkp, by.x="read_3",by.y="read_code",all=TRUE)
+# dfgp <- fread(cmd = paste("awk -F'\t'  '$6==\"\" && $7==\"\" && $7==\"\" {print $1,$3,$4,$5}' OFS='\t'",fgp) ,sep = "\t") #,select=cols_tokeep) ," | head -10000 "
+# names(dfgp) <-  c("eid",	"event_dt",	"read_2",	"read_3")
+# 
+# 
+# ram_size=8
+# outdir = paste0(fgp,"_diskframe/")
+# # if !diskframe
+# dfgp <- csv_to_disk.frame(fgp,
+#                            nchunks = recommend_nchunks(sum(file.size(fgp)),ram_size=ram_size),
+#                            #in_chunk_size = rows_to_read,
+#                            outdir = outdir,
+#                            colClasses = c("integer","integer","string","string","string","string","string","string"),
+#                            col.names = c("eid",	"data_provider",	"event_dt",	"read_2",	"read_3",	"value1","value2","value3"), sep="\t")
+# 
+# print(format(object.size(dfgp), units = "Mb"))
+# 
+# 
+# ## doesntwork with diskframe??
+# dfgp.dt <- as.data.table(dfgp) #[dfgp$value1=="" & dfgp$value2 =="" & dfgp$value3 =="",]
+# dfgp.dt[dfgp.dt$value1=="" & dfgp.dt$value2 =="" & dfgp.dt$value3 =="",]
+# dfgp.dt <- dfgp[dfgp$value1=="" & dfgp$value2 =="" & dfgp$value3 =="",]
+# 
+#; fastPOSIXct(DT$start_date)
+
+# hist( unique(dfgp$event_dt), "years", freq = TRUE)
+# hist( dfgp$event_dt, "years", freq = TRUE,bars=100)
