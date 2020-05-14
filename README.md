@@ -1,6 +1,8 @@
 # ukbpheno
 
-Sorry I hvent organized it, `run.r` is the base script that I use to test things; functions in different scripts, can easily convert it into R package
+Sorry I hvent organized it, `run.r` is the base script that I use to test things; functions in different scripts, can easily convert it into R package. 
+
+Currently it only reads in the data and converts data into dataframes with 4-5 colums: Identifier, event-date, event-code, event (yes/no), episode-duration (optional) 
 
 
 ## data types
@@ -26,7 +28,6 @@ Given a visit-date or other date (e.g. date of  diagnosis) and some codes, calcu
 - days to death (secondary cause)
 - some number on severity? 
 - some number about if data looks strange? 
-
 
 
 --------
