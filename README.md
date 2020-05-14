@@ -11,7 +11,7 @@ Currently it only reads in the data and converts data into dataframes with 4-5 c
 - Primary care: clinical (ReadV2, CTV3) scripts(readv2, BNF, DMD) 
 - Death records 
 - Self report: non-cancer (20002 + 20009), cancer and operation. 
-- medication nurse interview (only first event available)
+- medication nurse interview
 
 ### Other data, e.g. yes/no, categorical without dates. 
 - touchscreen variables
