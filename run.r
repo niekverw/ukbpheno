@@ -43,7 +43,6 @@ lst$tte.sr_40001 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnos
 ## secondary death, use only 1 date... 
 lst$tte.sr_40002 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10) # operation
 # HESIN (data is not unique for eid, code; could be used for reevents) contains duration 
-toc();tic("convert HESIN data")
 lst <- append(lst,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.primary + tte.hes.secondary
 # GP 
 lst <- append(lst,read_gp_clinical_data(fgp=fgp_clinical ))
