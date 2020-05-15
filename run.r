@@ -48,7 +48,20 @@ lst <- append(lst,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.p
 lst <- append(lst,read_gp_clinical_data(fgp=fgp_clinical ))
 toc()
 
-# 
+
+
+
+
+counts <- lst$tte.icd10.primary[, .N, by=.(code)]
+unique(lst$tte.icd10.primary$code[grep(paste(sep="","^",dfDefinitions_processed$ICD10CODES[5], collapse='|'),lst$tte.icd10.primary$code)])
+
+#grepoper <-unlist( mclapply(  , function(col) grep(paste(sep="","^",VctCodes, collapse='|'), col, ignore.case=FALSE),mc.cores =detectCores()/2 ) ) ## PARALLEL of the above.
+
+
+ 
+
+# TODO GP SCRIPT
+# TODO TOUCSCHREEN? 
 
 # extract_case(dfDefinitions[1,],lst,dfukb[,c("f.eid", "f.53.0.0")] ) # extract case data. _per source (HESIN, NURSE-TOUCHSCREEN, GP, DEATH) and everything together? 
 # make venn diagram// stats 
