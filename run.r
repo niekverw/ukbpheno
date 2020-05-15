@@ -53,7 +53,7 @@ toc()
 
 
 counts <- lst$tte.icd10.primary[, .N, by=.(code)]
-unique(lst$tte.icd10.primary$code[grep(paste(sep="","^",strsplit(dfDefinitions_processed$ICD10CODES[8],",")[[1]], collapse='|^'),counts$code)])
+unique(lst$tte.icd10.primary$code[grep(paste(sep="","^",strsplit(dfDefinitions_processed$ICD10CODES[8],",")[[1]], collapse='|'),counts$code)])
 
 #grepoper <-unlist( mclapply(  , function(col) grep(paste(sep="","^",VctCodes, collapse='|'), col, ignore.case=FALSE),mc.cores =detectCores()/2 ) ) ## PARALLEL of the above.
 
