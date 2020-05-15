@@ -48,6 +48,11 @@ lst <- append(lst,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.p
 lst <- append(lst,read_gp_clinical_data(fgp=fgp_clinical ))
 toc()
 
+# 
+
+# extract_case(dfDefinitions[1,],lst,dfukb[,c("f.eid", "f.53.0.0")] ) # extract case data. _per source (HESIN, NURSE-TOUCHSCREEN, GP, DEATH) and everything together? 
+# make venn diagram// stats 
+
 # filter dfukb to reduce memory? dont need these fields anymore? 
 keep <- !names(dfukb) %in% dfhtml[dfhtml$field.showcase %in% c("20001","20002","20004","20003","20006","20008","20010","53","40000","40001","40002"),]$field.tab
 dfukb <- dfukb[,..keep]
