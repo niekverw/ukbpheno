@@ -51,22 +51,13 @@ toc()
 
 # meta data
 lst.counts <- lapply(lst, function(x) x[, .N, by=.(code)] )
+lst.counts$icd10 <- sumcounts(list(tte.hesin.icd10.primary=lst.counts$tte.hesin.icd10.primary,
+                                   tte.hesin.icd10.secondary=lst.counts$tte.hesin.icd10.secondary,
+                                   tte.death.icd10.primary=lst.counts$tte.death.icd10.primary,
+                                   tte.death.icd10.secondary=lst.counts$tte.death.icd10.secondary)) # sumcounts function  in read-data.R
 
-sumcounts <- function(dfs){
-dfs <- list(
-  lst.counts$tte.death.icd10.primary=lst.counts$tte.death.icd10.primary,
-  lst.counts$tte.death.icd10.secondary=lst.counts$tte.death.icd10.secondary,
-  lst.counts$tte.death.icd10.primary=lst.counts$tte.death.icd10.primary,
-  lst.counts$tte.death.icd10.secondary=lst.counts$tte.death.icd10.secondary)
-  df <- Reduce(function(...) merge(..., all = TRUE, by = "code"), dfs)
-  names(df)<-
-  icd10.counts <- as.data.table(cbind(df[,"code"],N=df[ ,rowSums(.SD,na.rm = T), .SDcols =names(df)[!names(df) %in% "code"] ]))
-  dfs <- list(lst.counts$tte.death.icd10.primary,lst.counts$tte.death.icd10.secondary,lst.counts$tte.death.icd10.primary,lst.counts$tte.death.icd10.secondary)
-  
-  df <- as.data.table(cbind(df[,"code"],N=df[ ,rowSums(.SD,na.rm = T), .SDcols =names(df)[!names(df) %in% "code"] ]))
-  return(df)
-}
-lst.counts$icd10 <- sumcounts(list(lst.counts$tte.death.icd10.primary,lst.counts$tte.death.icd10.secondary,lst.counts$tte.death.icd10.primary,lst.counts$tte.death.icd10.secondary))
+lst.counts$icd9 <- sumcounts(list(tte.hesin.icd9.primary=lst.counts$tte.hesin.icd9.primary,
+                                  tte.hesin.icd9.secondary=lst.counts$tte.hesin.icd9.secondary)) # sumcounts function in read-data.R
 
 # filter dfukb. 
 dfukb<- dfukb[,dfhtml[dfhtml$field.showcase %in% c("53",ukb_fields$nondefault_ukb_fields),]$field.tab,with=FALSE]
