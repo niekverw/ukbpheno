@@ -55,13 +55,16 @@ lst.counts$icd10 <- sumcounts(list(tte.hesin.icd10.primary=lst.counts$tte.hesin.
                                    tte.hesin.icd10.secondary=lst.counts$tte.hesin.icd10.secondary,
                                    tte.death.icd10.primary=lst.counts$tte.death.icd10.primary,
                                    tte.death.icd10.secondary=lst.counts$tte.death.icd10.secondary)) # sumcounts function  in read-data.R
-
 lst.counts$icd9 <- sumcounts(list(tte.hesin.icd9.primary=lst.counts$tte.hesin.icd9.primary,
                                   tte.hesin.icd9.secondary=lst.counts$tte.hesin.icd9.secondary)) # sumcounts function in read-data.R
+lst.counts$oper3 <- sumcounts(list(tte.hesin.oper3.primary=lst.counts$tte.hesin.oper3.primary,
+                                   tte.hesin.oper3.secondary=lst.counts$tte.hesin.oper3.secondary)) # sumcounts function in read-data.R
+lst.counts$oper4 <- sumcounts(list(tte.hesin.oper4.primary=lst.counts$tte.hesin.oper4.primary,
+                                   tte.hesin.oper4.secondary=lst.counts$tte.hesin.oper4.secondary)) # sumcounts function in read-data.R
+
 
 # filter dfukb. 
 dfukb<- dfukb[,dfhtml[dfhtml$field.showcase %in% c("53",ukb_fields$nondefault_ukb_fields),]$field.tab,with=FALSE]
-
 save(dfhtml,dfukb,lst,lst.counts,file=fukbphenodata)
 
 # codes.ts <- dfDefinitions_processed[1,]$TS
