@@ -337,7 +337,7 @@ sumcounts <- function(dfs){
   icd10.counts <- as.data.table(cbind(df[,"code"],N=df[ ,rowSums(.SD,na.rm = T), .SDcols =names(df)[!names(df) %in% "code"] ]))
   dfs <- list(lst.counts$tte.death.icd10.primary,lst.counts$tte.death.icd10.secondary,lst.counts$tte.death.icd10.primary,lst.counts$tte.death.icd10.secondary)
   
-  df <- as.data.table(cbind(df[,"code"],N=df[ ,rowSums(.SD,na.rm = T), .SDcols =names(df)[!names(df) %in% "code"] ]))
+  df <- as.data.table(cbind(df,N=df[ ,rowSums(.SD,na.rm = T), .SDcols =names(df)[!names(df) %in% "code"] ]))
   return(df)
 }
 
