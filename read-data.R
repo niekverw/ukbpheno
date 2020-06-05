@@ -1,11 +1,12 @@
 
 default_ukb_fields <- function(){
   
-  SRcolumns<-c("20001","20002","20004","20003")
-  SRdatecolumns <- c("20006","20008","20010")
-  Othercolumns <- c("53","40000","40001","40002") 
-  
-  c(SRcolumns,SRdatecolumns,Othercolumns)
+  SRfieldnames<-c("20001","20002","20004","20003")
+  SRdatefieldnames <- c("20006","20008","20010")
+  Deathfieldnames <- c("40000","40001","40002") 
+  Visitfieldnames <- c("53") 
+
+  c(SRfieldnames,SRdatefieldnames,Deathfieldnames,Visitfieldnames)
   
 }
 

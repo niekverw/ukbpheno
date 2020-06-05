@@ -29,7 +29,7 @@ fields_to_keep <- get_allvarnames(dfDefinitions_processed)
 
 # read ukb data from ukbconv (.html + .tab)
 dfhtml <- read_ukb_metadata(fhtml)
-dfukb <- read_ukb_data(fukbtab,dfhtml,fields_to_keep = fields_to_keep$Allfieldnames)
+dfukb <- read_ukb_data(fukbtab,dfhtml,fields_to_keep = fields_to_keep$all_ukb_fields)
 
 tic("converting data")
 lst <- list()

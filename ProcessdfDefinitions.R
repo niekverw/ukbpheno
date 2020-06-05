@@ -256,23 +256,15 @@ get_allvarnames <- function(dfDefinitions_processed){
   defcols <- unique(defcols) ## need column classes....
 
 
-  SRfieldnames<-c("20001","20002","20004","20003")
-  SRdatefieldnames <- c("20006","20008","20010")
-  Deathfieldnames <- c("40000","40001","40002") 
-  Visitfieldnames <- c("53") 
-  
-  Mandatoryfieldnames = unique(c(SRfieldnames,SRdatefieldnames,Deathfieldnames,Visitfieldnames))
-    
-  Allfieldnames <- unique(c(defcols,SRfieldnames,SRdatefieldnames,Deathfieldnames,Visitfieldnames))
-  Allfieldnames<-gsub("[a-z]*?_","",Allfieldnames)
-  Otherfieldnames <- Allfieldnames[!Allfieldnames %in% unique(c(SRfieldnames,SRdatefieldnames,Deathfieldnames,Visitfieldnames)) ] 
-  
+  allfiels <- unique(c(defcols,SRfieldnames,SRdatefieldnames,Deathfieldnames,Visitfieldnames))
+  allfiels<-gsub("[a-z]*?_","",allfiels)
+  nondefault_ukb_fields <- allfiels[!allfiels %in% default_ukb_fields() ] 
   
   
   return(
-    list(Allfieldnames=Allfieldnames,
-         Otherfieldnames=Otherfieldnames,
-         Mandatoryfieldnames=Mandatoryfieldnames)
+    list(all_ukb_fields=all_ukb_fields,
+         nondefault_ukb_fields=nondefault_ukb_fields,
+         default_ukb_fields=default_ukb_fields())
          )
 }
 
