@@ -8,20 +8,32 @@ library(dplyr)
 library(tictoc)
 require(XML)
 
-source("/Users/niek/repos/ukbpheno/convert_nurseinterview_to_episodedata.r")
-source("/Users/niek/repos/ukbpheno/ProcessdfDefinitions.R")
-source("/Users/niek/repos/ukbpheno/read-data.R")
+if (Sys.getenv("USER")=="niek"){
+  pheno_dir="/Users/niek/repos/ukbpheno/"
+  repo_dir="/Volumes/data/ukb/"
+}else if (Sys.getenv("USER")=="mw") {
+  pheno_dir="/home/mw/Analyses/Ukbpheno_data/"
+  repo_dir="/home/mw/Repos/ukbpheno/"
+}
 
-fukbtab = "/Volumes/data/ukb/ukb38326.tab"
-#fukbtab = "/Volumes/data/ukb/ukb38326.tab.head" # header only for testing. 
-fhtml = "/Volumes/data/ukb/ukb38326.html"
-fhesin="/Volumes/data/ukb/hesin.txt"
-fhesin_diag="/Volumes/data/ukb/hesin_diag.txt"
-fhesin_oper="/Volumes/data/ukb/hesin_oper.txt"
-fgp_clinical = "/Volumes/data/ukb/gp_clinical.txt"
-fdefinitions = "/Users/niek/repos/ukbpheno/definitions.tsv"
 
-fukbphenodata <- "/Volumes/data/ukb/ukbphenodata.Rdata" #where to store final object
+source(paste(repo_dir,"convert_nurseinterview_to_episodedata.r",sep=""))
+source(paste(repo_dir,"ProcessdfDefinitions.R",sep=""))
+source(paste(repo_dir,"read-data.R",sep=""))
+
+fukbtab = paste(pheno_dir,"ukb38326.tab",sep="") 
+# fukbtab = paste(pheno_dir,"ukb38326.tab.head",sep="") # header only for testing.
+
+
+fhtml = paste(pheno_dir,"ukb38326.html",sep="")
+fhesin=paste(pheno_dir,"hesin.txt",sep="")
+fhesin_diag=paste(pheno_dir,"hesin_diag.txt",sep="")
+fhesin_oper=paste(pheno_dir,"hesin_oper.txt")
+fgp_clinical =paste(pheno_dir,"gp_clinical.txt",sep="")
+fdefinitions = paste(repo_dir,"definitions.tsv",sep="")
+
+
+fukbphenodata <- paste(pheno_dir,"ukbphenodata.Rdata",sep="") #where to store final object
 # read definitions. 
 dfDefinitions <- fread(fdefinitions, colClasses = 'character', data.table = FALSE)
 dfDefinitions_processed <- ProcessDfDefinitions(dfDefinitions)
