@@ -234,25 +234,25 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   tte.icd9.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd9))  %>% select(eid,eventdate,epidur,diag_icd9,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% as.data.table()
   
   
-  setkey(tte.oper3.primary,f.eid)    
-  setkey(tte.oper4.primary,f.eid)    
-  setkey(tte.icd10.primary,f.eid)    
-  setkey(tte.icd9.primary,f.eid)    
+  setkey(tte.hesin.oper3.primary,f.eid)    
+  setkey(tte.hesin.oper4.primary,f.eid)    
+  setkey(tte.hesin.icd10.primary,f.eid)    
+  setkey(tte.hesin.icd9.primary,f.eid)    
   
-  setkey(tte.oper3.secondary,f.eid)    
-  setkey(tte.oper4.secondary,f.eid)    
-  setkey(tte.icd10.secondary,f.eid)    
-  setkey(tte.icd9.secondary,f.eid)    
+  setkey(tte.hesin.oper3.secondary,f.eid)    
+  setkey(tte.hesin.oper4.secondary,f.eid)    
+  setkey(tte.hesin.icd10.secondary,f.eid)    
+  setkey(tte.hesin.icd9.secondary,f.eid)    
   
-  lst <- list(tte.oper3.primary = tte.oper3.primary, 
-              tte.oper4.primary = tte.oper4.primary,
-              tte.icd10.primary = tte.icd10.primary, 
-              tte.icd9.primary = tte.icd9.primary,
+  lst <- list(tte.hesin.oper3.primary = tte.hesin.oper3.primary, 
+              tte.hesin.oper4.primary = tte.hesin.oper4.primary,
+              tte.hesin.icd10.primary = tte.hesin.icd10.primary, 
+              tte.hesin.icd9.primary = tte.hesin.icd9.primary,
               
-              tte.oper3.secondary = tte.oper3.secondary, 
-              tte.oper4.secondary = tte.oper4.secondary,
-              tte.icd10.secondary = tte.icd10.secondary, 
-              tte.icd9.secondary = tte.icd9.secondary)
+              tte.hesin.oper3.secondary = tte.hesin.oper3.secondary, 
+              tte.hesin.oper4.secondary = tte.hesin.oper4.secondary,
+              tte.hesin.icd10.secondary = tte.hesin.icd10.secondary, 
+              tte.hesin.icd9.secondary = tte.hesin.icd9.secondary)
   return(lst)
   
 }

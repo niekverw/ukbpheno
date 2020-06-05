@@ -68,9 +68,13 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
     for (i in 1:length(diagfields)) { # for each occurence of diagfield, find the corresponding age and convert it to  date - code and rbind() to df_out. 
       #agefield = paste0("age_",v)
       diagfield = diagfields[i]
-      if(!is.null(field_sr_date)){ diagdatefield = diagdatefields[i]} else {diagdatefield = "dummy"}
-      if( length(diagdatefields) == 1) { diagdatefield = diagdatefields } 
-      
+      if(!is.null(field_sr_date)){ 
+        diagdatefield = diagdatefields[i]
+        if( length(diagdatefields) == 1) { diagdatefield = diagdatefields } # in case of death (40001/2)
+      } else {
+          diagdatefield = "dummy" # e.g. incase of medication
+          }
+
       #print(paste0((diagfield), " - ", diagdatefield))
       if(all(is.na(df_[,diagfield,with=FALSE]))){next}
       df_sub <- df_[!is.na(get(diagfield) ),c(identifierfield,diagfield,diagdatefield,visitdatefield),with=FALSE]
