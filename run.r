@@ -64,7 +64,7 @@ lst.counts$oper4 <- sumcounts(list(tte.hesin.oper4.primary=lst.counts$tte.hesin.
 
 
 # filter dfukb. 
-dfukb<- dfukb[,dfhtml[dfhtml$field.showcase %in% c("53",ukb_fields$nondefault_ukb_fields),]$field.tab,with=FALSE]
+dfukb<- dfukb[,dfhtml[dfhtml$field.showcase %in% c("eid", "53",ukb_fields$nondefault_ukb_fields),]$field.tab,with=FALSE]
 # save 
 save(dfhtml,dfukb,lst,lst.counts,file=fukbphenodata)
 
