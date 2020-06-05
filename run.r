@@ -25,11 +25,11 @@ fukbphenodata <- "/Volumes/data/ukb/ukbphenodata.Rdata" #where to store final ob
 # read definitions. 
 dfDefinitions <- fread(fdefinitions, colClasses = 'character', data.table = FALSE)
 dfDefinitions_processed <- ProcessDfDefinitions(dfDefinitions)
-fields_to_keep <- get_allvarnames(dfDefinitions_processed)
+ukb_fields <- get_allvarnames(dfDefinitions_processed)
 
 # read ukb data from ukbconv (.html + .tab)
 dfhtml <- read_ukb_metadata(fhtml)
-dfukb <- read_ukb_data(fukbtab,dfhtml,fields_to_keep = fields_to_keep$all_ukb_fields)
+dfukb <- read_ukb_data(fukbtab,dfhtml,fields_to_keep = ukb_fields$all_ukb_fields)
 
 tic("converting data")
 lst <- list()
@@ -49,17 +49,36 @@ lst <- append(lst,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.p
 lst <- append(lst,read_gp_clinical_data(fgp=fgp_clinical ))
 toc()
 
+# meta data
+lst.counts <- lapply(lst, function(x) x[, .N, by=.(code)] )
+
+sumcounts <- function(dfs){
+dfs <- list(
+  lst.counts$tte.death.icd10.primary=lst.counts$tte.death.icd10.primary,
+  lst.counts$tte.death.icd10.secondary=lst.counts$tte.death.icd10.secondary,
+  lst.counts$tte.death.icd10.primary=lst.counts$tte.death.icd10.primary,
+  lst.counts$tte.death.icd10.secondary=lst.counts$tte.death.icd10.secondary)
+  df <- Reduce(function(...) merge(..., all = TRUE, by = "code"), dfs)
+  names(df)<-
+  icd10.counts <- as.data.table(cbind(df[,"code"],N=df[ ,rowSums(.SD,na.rm = T), .SDcols =names(df)[!names(df) %in% "code"] ]))
+  dfs <- list(lst.counts$tte.death.icd10.primary,lst.counts$tte.death.icd10.secondary,lst.counts$tte.death.icd10.primary,lst.counts$tte.death.icd10.secondary)
+  
+  df <- as.data.table(cbind(df[,"code"],N=df[ ,rowSums(.SD,na.rm = T), .SDcols =names(df)[!names(df) %in% "code"] ]))
+  return(df)
+}
+lst.counts$icd10 <- sumcounts(list(lst.counts$tte.death.icd10.primary,lst.counts$tte.death.icd10.secondary,lst.counts$tte.death.icd10.primary,lst.counts$tte.death.icd10.secondary))
+
 # filter dfukb. 
+dfukb<- dfukb[,dfhtml[dfhtml$field.showcase %in% c("53",ukb_fields$nondefault_ukb_fields),]$field.tab,with=FALSE]
 
-
-save(dfhtml,lst,fukbphenodata)
+save(dfhtml,dfukb,lst,lst.counts,file=fukbphenodata)
 
 # codes.ts <- dfDefinitions_processed[1,]$TS
 
 
 
 
-counts <- lst$tte.icd10.primary[, .N, by=.(code)]
+counts <- lst$tte.hesin.icd10.primary[, .N, by=.(code)]
 codes.icd10 <- dfDefinitions_processed$ICD10CODES[8]
 codes.icd10.expanded <- unique(lst$tte.icd10.primary$code[grep(paste(sep="","^",strsplit(codes.icd10,",")[[1]], collapse='|'),counts$code)])
 

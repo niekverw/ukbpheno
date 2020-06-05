@@ -256,9 +256,9 @@ get_allvarnames <- function(dfDefinitions_processed){
   defcols <- unique(defcols) ## need column classes....
 
 
-  allfiels <- unique(c(defcols,SRfieldnames,SRdatefieldnames,Deathfieldnames,Visitfieldnames))
-  allfiels<-gsub("[a-z]*?_","",allfiels)
-  nondefault_ukb_fields <- allfiels[!allfiels %in% default_ukb_fields() ] 
+  all_ukb_fields <- unique(c(defcols,default_ukb_fields()))
+  all_ukb_fields<-gsub("[a-z]*?_","",all_ukb_fields)
+  nondefault_ukb_fields <- all_ukb_fields[!all_ukb_fields %in% default_ukb_fields() ] 
   
   
   return(
