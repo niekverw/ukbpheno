@@ -9,8 +9,8 @@ library(tictoc)
 require(XML)
 
 if (Sys.getenv("USER")=="niek"){
-  pheno_dir="/Users/niek/repos/ukbpheno/"
-  repo_dir="/Volumes/data/ukb/"
+  repo_dir="/Users/niek/repos/ukbpheno/"
+  pheno_dir="/Volumes/data/ukb/"
 }else if (Sys.getenv("USER")=="mw") {
   pheno_dir="/home/mw/Analyses/Ukbpheno_data/"
   repo_dir="/home/mw/Repos/ukbpheno/"
@@ -28,7 +28,7 @@ fukbtab = paste(pheno_dir,"ukb38326.tab",sep="")
 fhtml = paste(pheno_dir,"ukb38326.html",sep="")
 fhesin=paste(pheno_dir,"hesin.txt",sep="")
 fhesin_diag=paste(pheno_dir,"hesin_diag.txt",sep="")
-fhesin_oper=paste(pheno_dir,"hesin_oper.txt")
+fhesin_oper=paste(pheno_dir,"hesin_oper.txt",sep="")
 fgp_clinical =paste(pheno_dir,"gp_clinical.txt",sep="")
 fdefinitions = paste(repo_dir,"definitions.tsv",sep="")
 
@@ -80,14 +80,17 @@ dfukb<- dfukb[,dfhtml[dfhtml$field.showcase %in% c("eid", "53",ukb_fields$nondef
 # save 
 save(dfhtml,dfukb,lst,lst.counts,file=fukbphenodata)
 
+
+
+
 # codes.ts <- dfDefinitions_processed[1,]$TS
 
 
+# 
+# 
 
-
-counts <- lst$tte.hesin.icd10.primary[, .N, by=.(code)]
 codes.icd10 <- dfDefinitions_processed$ICD10CODES[8]
-codes.icd10.expanded <- unique(lst$tte.icd10.primary$code[grep(paste(sep="","^",strsplit(codes.icd10,",")[[1]], collapse='|'),counts$code)])
+codes.icd10.expanded <- unique(lst.counts[['icd10']]$code[grep(paste(sep="","^",strsplit(codes.icd10,",")[[1]], collapse='|'),lst.counts$icd10$code)])
 
 #grepoper <-unlist( mclapply(  , function(col) grep(paste(sep="","^",VctCodes, collapse='|'), col, ignore.case=FALSE),mc.cores =detectCores()/2 ) ) ## PARALLEL of the above.
 
@@ -101,11 +104,11 @@ codes.icd10.expanded <- unique(lst$tte.icd10.primary$code[grep(paste(sep="","^",
 # make venn diagram// stats 
 
 # filter dfukb to reduce memory? dont need these fields anymore? 
-keep <- !names(dfukb) %in% dfhtml[dfhtml$field.showcase %in% c("20001","20002","20004","20003","20006","20008","20010","53","40000","40001","40002"),]$field.tab
-dfukb <- dfukb[,..keep]
+# keep <- !names(dfukb) %in% dfhtml[dfhtml$field.showcase %in% c("20001","20002","20004","20003","20006","20008","20010","53","40000","40001","40002"),]$field.tab
+# dfukb <- dfukb[,..keep]
 
 # # check object sizes
-print(format(object.size(lst), units = "Mb")) #"2014.1 Mb"
+# print(format(object.size(lst), units = "Mb")) #"2014.1 Mb"
 
 # 
 # View(dfhes[(dfhes$level.x != dfhes$level.y) & !is.na(dfhes$level.x) & !is.na(dfhes$level.y),])
