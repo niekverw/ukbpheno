@@ -77,6 +77,7 @@ PreProcessDfDefinitions<-function(df,VctAllColumns,VctColstoupper=NULL ){ # c("I
 
 #' @export
 FillInSRdefinitions<-function(df,Var="SR",cols=c("n_20001_","n_20002_","n_20004_") ) {
+  # 20001 cancer code, self reported; 20002 non-cancer illness, self reported; 20004 operation code
   ## fill in SR
   df[,Var]<-as.character(df[,Var])
   try(df[is.na( as.character(df[,Var])) ,][,Var] <- "",silent = T)
@@ -90,11 +91,11 @@ FillInSRdefinitions<-function(df,Var="SR",cols=c("n_20001_","n_20002_","n_20004_
     Columnmatches [grepl("NA",Columnmatches)]<-"" ### remove NAs..
     df[,Var]<-  paste(df[,Var],Columnmatches ,sep="," )
   }
-
+  print(df[,Var])
   ### trim commas:
   trim.commas <- function (x) gsub("(?<=[\\,])\\,*|^\\,+|\\,+$", "", x, perl=TRUE)
   df[,Var]<-trim.commas(df[,Var])
-
+  print(df[,Var])
 
   df<-ConvertFactorsToStringReplaceNAInDf(df)
 
@@ -108,7 +109,21 @@ CovertMednamesToUkbcoding<- function(StrRx){
   if(is.na(StrRx)) { return(NA)}
   VctRXstrings<-unlist(strsplit(StrRx,","))
   #VctRXstrings<-strsplit(df[!is.na(df$n_20003_),]$n_20003_,",")[[1]]
-  StrRxCodes<-paste(unique(unlist(lapply(VctRXstrings,  function(x) dfCodesheetREAD_SR.Coding[,"UKB.Coding"] [ grep(x,dfCodesheetREAD_SR.Coding[,"Meaning"] ,ignore.case=TRUE )]  ))),collapse=",")
+  # StrRxCodes<-paste(unique(unlist(lapply(VctRXstrings,  function(x) dfCodesheetREAD_SR.Coding[,"UKB.Coding"] [ grep(x,dfCodesheetREAD_SR.Coding[,"Meaning"] ,ignore.case=TRUE )]  ))),collapse=",")
+  # StrRxCodes<-paste(unique(unlist(lapply(VctRXstrings,  function(x) dfCodesheetREAD_SR.Coding[grep(x, Meaning,ignore.case=TRUE)][,"UKB.Coding"]    ))),collapse = ",")
+  # StrRxCodes <- paste(unique(unlist(lapply(VctRXstrings,   function(x) dfCodesheetREAD_SR.Coding[match(x, dfCodesheetREAD_SR.Coding$Meaning), "UKB.Coding"]  ))),collapse = ",")
+  # for each medication, only attempt to match string that cannot be converted to numeric, numeric assumed to be in ukb coding already
+  StrRxCodes <- paste(unique(unlist(lapply(VctRXstrings,function(x) { if(is.na(as.numeric(x))) dfCodesheetREAD_SR.Coding[match(x, dfCodesheetREAD_SR.Coding$Meaning), "UKB.Coding"]  else x }))),collapse = ",")
+  # check if codes exist
+  print(StrRxCodes)
+  StrRxCodes_c<-unlist(strsplit(StrRxCodes,","))
+  StrRxCodes_inCode<- StrRxCodes_c[StrRxCodes_c %in% dfCodesheetREAD_SR.Coding$UKB.Coding  ]
+  StrRxCodes_notInCode<- StrRxCodes_c[! StrRxCodes_c %in% dfCodesheetREAD_SR.Coding$UKB.Coding  ]
+  print("The following codes not found in UKB coding:")
+  print(StrRxCodes_notInCode)
+  StrRxCodes<-paste(StrRxCodes_inCode,collapse = ",")
+  
+  # inCodeBool<-unlist(lapply(unlist(strsplit(StrRxCodes,",")),function(x) x %in% dfCodesheetREAD_SR.Coding$UKB.Coding)))
   return(StrRxCodes)
 }
 
@@ -189,7 +204,11 @@ ProcessDfDefinitions<-function(df,
   ### HELPER FUNCTION TO CROSS CHECK EVERYTHING AND LOOKUPS, SHOULD GET A SEPERATE FUNCTION OUTSIDE OF EVERYTHING.
   #################################
   ###[unsupported] LOOKUP NAMES OF MEDICATION and put UKBIO.CODES in RX
-  # df$n_20003_<- paste(df$n_20003_, unlist(lapply( df$n_20003_, CovertMednamesToUkbcoding)))
+  print(df$n_20003_)
+  df$n_20003_<-unlist(lapply( df$n_20003_, CovertMednamesToUkbcoding))
+  # df$n_20003_<- paste(df$n_20003_, unlist(lapply( df$n_20003_, CovertMednamesToUkbcoding)),sep=",")
+  print(df$n_20003_)
+  
   # df<-FillInSRdefinitions(df,"SR_RX",c("n_20003_"))
   ### LOOKUP READ.CODES and put UKBIO.CODES in SR_RX
 

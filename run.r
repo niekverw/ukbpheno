@@ -21,8 +21,9 @@ source(paste(repo_dir,"convert_nurseinterview_to_episodedata.r",sep=""))
 source(paste(repo_dir,"ProcessdfDefinitions.R",sep=""))
 source(paste(repo_dir,"read-data.R",sep=""))
 
-fukbtab = paste(pheno_dir,"ukb38326.tab",sep="") 
+# fukbtab = paste(pheno_dir,"ukb38326.tab",sep="") 
 # fukbtab = paste(pheno_dir,"ukb38326.tab.head",sep="") # header only for testing.
+fukbtab = paste(pheno_dir,"ukb38326.tab.head300",sep="") # small subset only for testing.
 
 
 fhtml = paste(pheno_dir,"ukb38326.html",sep="")
@@ -31,12 +32,47 @@ fhesin_diag=paste(pheno_dir,"hesin_diag.txt",sep="")
 fhesin_oper=paste(pheno_dir,"hesin_oper.txt",sep="")
 fgp_clinical =paste(pheno_dir,"gp_clinical.txt",sep="")
 fdefinitions = paste(repo_dir,"definitions.tsv",sep="")
-
+fsr_coding=paste(repo_dir,"20003_coding4.tsv",sep="")
 
 fukbphenodata <- paste(pheno_dir,"ukbphenodata.Rdata",sep="") #where to store final object
+
+
+
+
+# write.table(dfCodesheetREAD_SR.Coding, file = "CodesheetREAD_SR.Coding", append = FALSE, quote = TRUE, sep = "\t",
+#             eol = "\n", na = "NA", dec = ".", row.names = FALSE,
+#             col.names = TRUE, qmethod = c("escape", "double"),
+#             fileEncoding = "")
+#  med field 20003 code table 
+dfCodesheetREAD_SR.Coding<-fread(fsr_coding)
+# remove all spaces in the meaning column
+cols_to_be_rectified <- names(dfCodesheetREAD_SR.Coding)[vapply(dfCodesheetREAD_SR.Coding, is.character, logical(1))]
+# use data.table https://stackoverflow.com/questions/20760547/removing-whitespace-from-a-whole-data-frame-in-r
+dfCodesheetREAD_SR.Coding[,c(cols_to_be_rectified) := lapply(.SD, function(x)gsub('\\s+', '', x)), .SDcols = cols_to_be_rectified]
+df[,c(cols_to_be_rectified) := lapply(.SD, function(x)gsub('\\s+', '', x)), .SDcols = cols_to_be_rectified]
+
+
+
 # read definitions. 
 dfDefinitions <- fread(fdefinitions, colClasses = 'character', data.table = FALSE)
 dfDefinitions_processed <- ProcessDfDefinitions(dfDefinitions)
+
+
+
+
+animal <- c('cat','snake','cat','pigeon','snake')
+
+map <- data.frame(find=c('cat','snake','pigeon'),replace=c('mammal','reptile','bird'))
+                  
+
+repl <- as.character(map$replace)
+names(repl) <- map$find
+animal2 <- revalue(animal, repl)
+animal <- as.character(map[match(animal, map$find), "replace"])
+animal
+
+
+
 ukb_fields <- get_allvarnames(dfDefinitions_processed)
 
 # read ukb data from ukbconv (.html + .tab)
