@@ -22,8 +22,8 @@ source(paste(repo_dir,"ProcessdfDefinitions.R",sep=""))
 source(paste(repo_dir,"read-data.R",sep=""))
 
 # fukbtab = paste(pheno_dir,"ukb38326.tab",sep="") 
-# fukbtab = paste(pheno_dir,"ukb38326.tab.head",sep="") # header only for testing.
-fukbtab = paste(pheno_dir,"ukb38326.tab.head300",sep="") # small subset only for testing.
+fukbtab = paste(pheno_dir,"ukb38326.tab.head",sep="") # header only for testing.
+# fukbtab = paste(pheno_dir,"ukb38326.tab.head300",sep="") # small subset only for testing.
 
 
 fhtml = paste(pheno_dir,"ukb38326.html",sep="")
@@ -33,8 +33,13 @@ fhesin_oper=paste(pheno_dir,"hesin_oper.txt",sep="")
 fgp_clinical =paste(pheno_dir,"gp_clinical.txt",sep="")
 fdefinitions = paste(repo_dir,"definitions.tsv",sep="")
 fsr_coding=paste(repo_dir,"20003_coding4.tsv",sep="")
+fcncr_coding=paste(repo_dir,"20001_coding3.tsv",sep="")
+fnoncncr_coding=paste(repo_dir,"20002_coding6.tsv",sep="")
+foper_coding=paste(repo_dir,"20004_coding5.tsv",sep="")
 
 fukbphenodata <- paste(pheno_dir,"ukbphenodata.Rdata",sep="") #where to store final object
+
+
 
 
 
@@ -45,11 +50,6 @@ fukbphenodata <- paste(pheno_dir,"ukbphenodata.Rdata",sep="") #where to store fi
 #             fileEncoding = "")
 #  med field 20003 code table 
 dfCodesheetREAD_SR.Coding<-fread(fsr_coding)
-# remove all spaces in the meaning column
-cols_to_be_rectified <- names(dfCodesheetREAD_SR.Coding)[vapply(dfCodesheetREAD_SR.Coding, is.character, logical(1))]
-# use data.table https://stackoverflow.com/questions/20760547/removing-whitespace-from-a-whole-data-frame-in-r
-dfCodesheetREAD_SR.Coding[,c(cols_to_be_rectified) := lapply(.SD, function(x)gsub('\\s+', '', x)), .SDcols = cols_to_be_rectified]
-df[,c(cols_to_be_rectified) := lapply(.SD, function(x)gsub('\\s+', '', x)), .SDcols = cols_to_be_rectified]
 
 
 
@@ -59,25 +59,17 @@ dfDefinitions_processed <- ProcessDfDefinitions(dfDefinitions)
 
 
 
-
-animal <- c('cat','snake','cat','pigeon','snake')
-
-map <- data.frame(find=c('cat','snake','pigeon'),replace=c('mammal','reptile','bird'))
-                  
-
-repl <- as.character(map$replace)
-names(repl) <- map$find
-animal2 <- revalue(animal, repl)
-animal <- as.character(map[match(animal, map$find), "replace"])
-animal
-
-
-
 ukb_fields <- get_allvarnames(dfDefinitions_processed)
+
+
 
 # read ukb data from ukbconv (.html + .tab)
 dfhtml <- read_ukb_metadata(fhtml)
+# TODO: unit of operation - phenotype such that read only required fields from the ukbxxxxx.tab file 
+# TODO: create a loop : for each definition in definitions ,  read ukbdata + fetch all required info + generate the variable 
 dfukb <- read_ukb_data(fukbtab,dfhtml,fields_to_keep = ukb_fields$all_ukb_fields)
+print(format(object.size(dfukb), units = "Gb"))
+ncol(dfukb)
 
 tic("converting data")
 lst <- list()

@@ -203,11 +203,11 @@ ProcessDfDefinitions<-function(df,
   #################################
   ### HELPER FUNCTION TO CROSS CHECK EVERYTHING AND LOOKUPS, SHOULD GET A SEPERATE FUNCTION OUTSIDE OF EVERYTHING.
   #################################
-  ###[unsupported] LOOKUP NAMES OF MEDICATION and put UKBIO.CODES in RX
-  print(df$n_20003_)
-  df$n_20003_<-unlist(lapply( df$n_20003_, CovertMednamesToUkbcoding))
-  # df$n_20003_<- paste(df$n_20003_, unlist(lapply( df$n_20003_, CovertMednamesToUkbcoding)),sep=",")
-  print(df$n_20003_)
+  # ###[unsupported] LOOKUP NAMES OF MEDICATION and put UKBIO.CODES in RX
+  # print(df$n_20003_)
+  # df$n_20003_<-unlist(lapply( df$n_20003_, CovertMednamesToUkbcoding))
+  # # df$n_20003_<- paste(df$n_20003_, unlist(lapply( df$n_20003_, CovertMednamesToUkbcoding)),sep=",")
+  # print(df$n_20003_)
   
   # df<-FillInSRdefinitions(df,"SR_RX",c("n_20003_"))
   ### LOOKUP READ.CODES and put UKBIO.CODES in SR_RX
