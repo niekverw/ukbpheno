@@ -186,7 +186,7 @@ ProcessDfDefinitions<-function(df,
                                VctColstoupper=c("ICD10CODES","ICD9CODES","OPCS4CODES","OPCS3CODES"),
                                fill_dependencies=T){
   
-  df<- dfDefinitions  #  df<- dfDefinitions2
+  #df<- dfDefinitions  #  df<- dfDefinitions2
   # VctAllColumns<-  c("TS", "SR", "TS_RX", "SR_RX", "LAB", "ICD10CODES", "ICD9CODES", "OPCS4CODES","OPCS3CODES", "TS_AGE_DIAG_COLNAME", "READCODES","CTV3", "n_20001_",    "n_20002_", "n_20003_", "n_20004_", "DEPENDENCY")
 
   #if(nrow(df)==1 ) {stop("please have more than 1 phenotype definition.")} ## check if excel file has more than 1 row.
