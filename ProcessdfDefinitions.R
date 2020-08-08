@@ -51,8 +51,11 @@ PreProcessDfDefinitions<-function(df,VctAllColumns,VctColstoupper=NULL ){ # c("I
   ## remove everything between brackets
   df[,VctAllColumns]<- data.frame(apply(df[,VctAllColumns], 2, function(y) gsub( " *\\(.*?\\) *", "", y)) )
   ### remove dots(.): names(df)
+  
   VctColumnsRemoveDots=c("ICD10CODES","ICD9CODES","OPCS4CODES","OPCS3CODES")
-  df[,VctColumnsRemoveDots]<- data.frame(apply(df[,VctColumnsRemoveDots],2,function(x) gsub(".", "", x, fixed = TRUE)))
+  if(any(colnames(df) %in% VctColumnsRemoveDots )){
+    df[,VctColumnsRemoveDots]<- data.frame(apply(df[,VctColumnsRemoveDots],2,function(x) gsub(".", "", x, fixed = TRUE)))
+  }
   ### remove spaces:
   df[,VctAllColumns]<- data.frame(apply(df[,VctAllColumns],2,function(x) gsub(" ", "", x, fixed = TRUE)))
   ### remove trailing commas:
