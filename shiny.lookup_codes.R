@@ -37,7 +37,7 @@ dfCodesheet.READ <- merge(dfCodesheet.READ,dfCodesheet.read_v2_UKBmeds,by="read_
 dfCodesheet.READ <- merge(dfCodesheet.READ,dfCodesheet.read_v2_lkp,by="read_code",all=T)
 dfCodesheet.READ <- unique(dfCodesheet.READ)
 colnames(dfCodesheet.READ) <- c("READ","CTV3","ICD10","ICD9","OPCS4","n_20003","text")
-
+dfCodesheet.READ$source="READ"
 ##############################
 ##### READ V3
 dfCodesheet.read_ctv3_readv2 <- as.data.frame(read_xlsx(fcoding.xls,sheet="read_ctv3_read_v2"))[,c(1,5)]
@@ -57,6 +57,7 @@ dfCodesheet.CTV3 <- merge(dfCodesheet.CTV3,dfCodesheet.read_ctv3_lkp,by="read_co
 dfCodesheet.CTV3 <- unique(dfCodesheet.CTV3)
 colnames(dfCodesheet.CTV3) <- c("CTV3","READ","ICD10","ICD9","OPCS4","text")
 dfCodesheet.CTV3$n_20003 <- NA
+dfCodesheet.CTV3$source="CTV3"
 
 ####### ICD10
 dfCodesheet.icd10_icd9<- as.data.frame(read_xlsx(fcoding.xls,sheet="icd9_icd10"))[,c(3,1)]
@@ -74,6 +75,7 @@ dfCodesheet.ICD10$READ <- NA
 dfCodesheet.ICD10$CTV3 <- NA
 dfCodesheet.ICD10$OPCS4 <- NA
 dfCodesheet.ICD10$n_20003 <- NA
+dfCodesheet.ICD10$source="ICD10"
 
 ####### # ICD9 depscription, dfCodesheet.icd9_lkp
 dfCodesheet.icd9_lkp <- as.data.frame(read_xlsx(fcoding.xls,sheet="icd9_lkp")) # certainly not complete!
@@ -89,6 +91,7 @@ dfCodesheet.ICD9$READ <- NA
 dfCodesheet.ICD9$CTV3 <- NA
 dfCodesheet.ICD9$OPCS4 <- NA
 dfCodesheet.ICD9$n_20003 <- NA
+dfCodesheet.ICD9$source="ICD9"
 
 ###### OPCS4
 dfCodesheet.OPCS4.coding240 <- data.frame(fread("data/OPCS4.coding240.tsv"))[,c(1,2)]
@@ -99,14 +102,14 @@ dfCodesheet.OPCS4$ICD9 <- NA
 dfCodesheet.OPCS4$READ <- NA
 dfCodesheet.OPCS4$CTV3 <- NA
 dfCodesheet.OPCS4$n_20003 <- NA
-
+dfCodesheet.OPCS4$source="OPCS4"
 #####  FINAL OBJECT. 
 LstdfCodesheets <- list(
-  READ = dfCodesheet.READ[,c("READ", "CTV3", "ICD10", "ICD9", "OPCS4", "n_20003", "text")],
-  CTV3 = dfCodesheet.CTV3[,c("READ", "CTV3", "ICD10", "ICD9", "OPCS4","n_20003", "text")],
-  ICD10 = dfCodesheet.ICD10[,c("READ", "CTV3", "ICD10", "ICD9", "OPCS4","n_20003", "text")],
-  ICD9 = dfCodesheet.ICD9[,c("READ", "CTV3", "ICD10", "ICD9", "OPCS4","n_20003", "text")],
-  OPCS4 = dfCodesheet.OPCS4[,c("READ", "CTV3", "ICD10", "ICD9", "OPCS4","n_20003", "text")],
+  READ = dfCodesheet.READ[,c("READ", "CTV3", "ICD10", "ICD9", "OPCS4", "n_20003", "text","source")],
+  CTV3 = dfCodesheet.CTV3[,c("READ", "CTV3", "ICD10", "ICD9", "OPCS4","n_20003", "text","source")],
+  ICD10 = dfCodesheet.ICD10[,c("READ", "CTV3", "ICD10", "ICD9", "OPCS4","n_20003", "text","source")],
+  ICD9 = dfCodesheet.ICD9[,c("READ", "CTV3", "ICD10", "ICD9", "OPCS4","n_20003", "text","source")],
+  OPCS4 = dfCodesheet.OPCS4[,c("READ", "CTV3", "ICD10", "ICD9", "OPCS4","n_20003", "text","source")],
   ALL = rbind(dfCodesheet.READ,dfCodesheet.CTV3,dfCodesheet.ICD10,dfCodesheet.ICD9,dfCodesheet.OPCS4)
 )
 ########################################
@@ -226,6 +229,7 @@ df <- df[,c("TRAIT","DESCRIPTION", "ICD10CODES","ICD9CODES","READCODES","CTV3COD
 # DO IIT FOR 1 ROW suggest codes for 1 selected row. 
 irow=8
 row <- df[irow,]
+row$OPCS4CODES <- "K02"
 row_exp <- codes
 row_exp$ICD10CODES <- expand_clean_codes(col =row$ICD10CODES, from.code="ICD10",description.id='text',lookuptable = LstdfCodesheets["ICD10"][[1]],add_description=F)
 row_exp$ICD9CODES <- expand_clean_codes(col =row$ICD9CODES, from.code="ICD9",description.id='text',lookuptable = LstdfCodesheets["ICD9"][[1]],add_description=F)
@@ -238,7 +242,7 @@ row_annot$ICD10CODES <- expand_clean_codes(col =row$ICD10CODES, from.code="ICD10
 row_annot$ICD9CODES <- expand_clean_codes(col =row$ICD9CODES, from.code="ICD9",description.id='text',lookuptable = LstdfCodesheets["ICD9"][[1]],add_description=T)
 row_annot$READCODES <- expand_clean_codes(col =row$READCODES, from.code="READ",description.id='text',lookuptable = LstdfCodesheets["READ"][[1]],add_description=T)
 row_annot$CTV3CODES <- expand_clean_codes(col =row$CTV3CODES, from.code="CTV3",description.id='text',lookuptable = LstdfCodesheets["CTV3"][[1]],add_description=T)
-row_annot$OPCS4CODES <- expand_clean_codes(col =row$OPCS4CODES, from.code="OPCS4",description.id='text',lookuptable = LstdfCodesheets["OPCS3"][[1]],add_description=T)
+row_annot$OPCS4CODES <- expand_clean_codes(col =row$OPCS4CODES, from.code="OPCS4",description.id='text',lookuptable = LstdfCodesheets["OPCS4"][[1]],add_description=T)
 
 
 
@@ -296,7 +300,8 @@ ui <- fluidPage(
         tabPanel("ICD9",  DT::dataTableOutput("table_oICD9")),
         tabPanel("READ",  DT::dataTableOutput("table_oREAD")),
         tabPanel("CTV3",  DT::dataTableOutput("table_oCTV3")),
-        tabPanel("OPCS4",  DT::dataTableOutput("table_oOPCS4"))
+        tabPanel("OPCS4",  DT::dataTableOutput("table_oOPCS4")),
+        tabPanel("raw_data",  DT::dataTableOutput("table_oraw"))
         
         
         
@@ -310,7 +315,7 @@ server <- function(input, output) {
 
   
     observeEvent(input$goButton, {
-    
+    showModal(modalDialog( "please wait" ,easyClose = FALSE,footer=NULL))
     row <- data.frame(ICD10CODES=input$iICD10,
                ICD9CODES=input$iICD9,
                READCODES=input$iREAD,
@@ -322,14 +327,14 @@ server <- function(input, output) {
     row_exp$ICD9CODES <- expand_clean_codes(col =row$ICD9CODES, from.code="ICD9",description.id='text',lookuptable = LstdfCodesheets["ICD9"][[1]],add_description=F)
     row_exp$READCODES <- expand_clean_codes(col =row$READCODES, from.code="READ",description.id='text',lookuptable = LstdfCodesheets["READ"][[1]],add_description=F)
     row_exp$CTV3CODES <- expand_clean_codes(col =row$CTV3CODES, from.code="CTV3",description.id='text',lookuptable =  LstdfCodesheets["CTV3"][[1]],add_description=F)
-    row_exp$OPCS4CODES <- expand_clean_codes(col =row$OPCS4CODES, from.code="OPCS4",description.id='text',lookuptable =  LstdfCodesheets["OPCS3"][[1]],add_description=F)
+    row_exp$OPCS4CODES <- expand_clean_codes(col =row$OPCS4CODES, from.code="OPCS4",description.id='text',lookuptable =  LstdfCodesheets["OPCS4"][[1]],add_description=F)
     
-    row_annot <- row
-    row_annot$ICD10CODES <- expand_clean_codes(col =row$ICD10CODES, from.code="ICD10",description.id='text',lookuptable = LstdfCodesheets["ICD10"][[1]],add_description=T)
-    row_annot$ICD9CODES <- expand_clean_codes(col =row$ICD9CODES, from.code="ICD9",description.id='text',lookuptable = LstdfCodesheets["ICD9"][[1]],add_description=T)
-    row_annot$READCODES <- expand_clean_codes(col =row$READCODES, from.code="READ",description.id='text',lookuptable = LstdfCodesheets["READ"][[1]],add_description=T)
-    row_annot$CTV3CODES <- expand_clean_codes(col =row$CTV3CODES, from.code="CTV3",description.id='text',lookuptable = LstdfCodesheets["CTV3"][[1]],add_description=T)
-    row_annot$OPCS4CODES <- expand_clean_codes(col =row$OPCS4CODES, from.code="OPCS4",description.id='text',lookuptable = LstdfCodesheets["OPCS3"][[1]],add_description=T)
+    # row_annot <- row
+    # row_annot$ICD10CODES <- expand_clean_codes(col =row$ICD10CODES, from.code="ICD10",description.id='text',lookuptable = LstdfCodesheets["ICD10"][[1]],add_description=T)
+    # row_annot$ICD9CODES <- expand_clean_codes(col =row$ICD9CODES, from.code="ICD9",description.id='text',lookuptable = LstdfCodesheets["ICD9"][[1]],add_description=T)
+    # row_annot$READCODES <- expand_clean_codes(col =row$READCODES, from.code="READ",description.id='text',lookuptable = LstdfCodesheets["READ"][[1]],add_description=T)
+    # row_annot$CTV3CODES <- expand_clean_codes(col =row$CTV3CODES, from.code="CTV3",description.id='text',lookuptable = LstdfCodesheets["CTV3"][[1]],add_description=T)
+    # row_annot$OPCS4CODES <- expand_clean_codes(col =row$OPCS4CODES, from.code="OPCS4",description.id='text',lookuptable = LstdfCodesheets["OPCS4"][[1]],add_description=T)
     
     codes.lookup <- lookup_codes(row_exp,df.lookup=LstdfCodesheets$ALL)
     codes.lookup_annot <- sapply(names(codes.lookup),function(y) sapply( codes.lookup[[y]], function(x) add.description.to.codes(Str=x,code.id=y,  
@@ -351,24 +356,34 @@ server <- function(input, output) {
                                                                                                                               lookuptable = LstdfCodesheets[y][[1]],
                                                                                                                               add_description=T
     )))
-    
+    convert_lookup_to_df <- function(codes,input=row_exp$ICD10CODES){
+      codes_ <- sapply(strsplit(unname(codes)," "),function(x) x[1]) 
+      df <- data.frame(codes=names(codes), expanded_codes=unname(codes),new=!codes_ %in% strsplit(input,split = ",")[[1]])
+      df
+    }
     output$table_oICD10 = DT::renderDataTable({
-      as.data.frame(codes.lookup_expannot$ICD10)
+      convert_lookup_to_df(codes.lookup_expannot$ICD10,row_exp$ICD10CODES)
+      
     })
     output$table_oICD9 = DT::renderDataTable({
-      as.data.frame(codes.lookup_expannot$ICD9)
+      convert_lookup_to_df(codes.lookup_expannot$ICD9,row_exp$ICD9CODES)
     })
     output$table_oREAD = DT::renderDataTable({
-      as.data.frame(codes.lookup_expannot$READ)
+      convert_lookup_to_df(codes.lookup_expannot$READ,row_exp$READCODES)
+    })
+    output$table_oCTV3 = DT::renderDataTable({
+      convert_lookup_to_df(codes.lookup_expannot$CTV3,row_exp$CTV3CODES)
     })
     output$table_oOPCS4 = DT::renderDataTable({
-      as.data.frame(codes.lookup_expannot$OPCS4)
+      convert_lookup_to_df(codes.lookup_expannot$OPCS4,row_exp$OPCS4CODES)
     })
    # data.frame(x="123",t="asd")
-    
+    removeModal()
   })
 
-  
+  output$table_oraw = DT::renderDataTable({
+    LstdfCodesheets$ALL
+  })
   #output$oICD10 <- renderText({ })
 }
 shinyApp(ui, server)
