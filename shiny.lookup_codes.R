@@ -371,6 +371,7 @@ ui <- fluidPage(
         tabPanel("OPCS4",  DT::dataTableOutput("table_oOPCS4")),
         tabPanel("n_20003",  DT::dataTableOutput("table_on_20003")),
         tabPanel("output",
+                 checkboxInput(inputId = "iIncludetext", "include description", FALSE),
                  h4("ICD10"),textOutput("codes_oICD10"),
                  h4("ICD9"),textOutput("codes_oICD9"),
                  h4("READ"),textOutput("codes_oREAD"),
@@ -455,27 +456,53 @@ server <- function(input, output) {
   
   output$codes_oICD10 <- renderPrint({
     s = input$table_oICD10_rows_selected
-    paste(values_lookup$codes.lookup.shinyready$ICD10[s,]$c_text,collapse=", ")
+    if(input$iIncludetext){
+     paste(values_lookup$codes.lookup.shinyready$ICD10[s,]$c_text,collapse=", ")
+  } else{
+    paste(values_lookup$codes.lookup.shinyready$ICD10[s,]$codes,collapse=", ")
+  }
+  
   })
   output$codes_oICD9 <- renderPrint({
     s = input$table_oICD9_rows_selected
-    paste(values_lookup$codes.lookup.shinyready$ICD9[s,]$c_text,collapse=", ")
+    if(input$iIncludetext){
+      paste(values_lookup$codes.lookup.shinyready$ICD9[s,]$c_text,collapse=", ")
+    } else {
+      paste(values_lookup$codes.lookup.shinyready$ICD9[s,]$codes,collapse=", ")
+    }
+    
   })
   output$codes_oREAD <- renderPrint({
     s = input$table_oREAD_rows_selected
-    paste(values_lookup$codes.lookup.shinyready$READ[s,]$c_text,collapse=", ")
+    if(input$iIncludetext){
+      paste(values_lookup$codes.lookup.shinyready$READ[s,]$c_text,collapse=", ")
+    } else{
+      paste(values_lookup$codes.lookup.shinyready$READ[s,]$codes,collapse=", ")
+    }
   })
   output$codes_oCTV3 <- renderPrint({
     s = input$table_oCTV3_rows_selected
-    paste(values_lookup$codes.lookup.shinyready$CTV3[s,]$c_text,collapse=", ")
+    if(input$iIncludetext){
+      paste(values_lookup$codes.lookup.shinyready$CTV3[s,]$c_text,collapse=", ")
+    } else {
+      paste(values_lookup$codes.lookup.shinyready$CTV3[s,]$codes,collapse=", ")
+    }
   })
   output$codes_oOPCS4 <- renderPrint({
     s = input$table_oOPCS4_rows_selected
-    paste(values_lookup$codes.lookup.shinyready$OPCS4[s,]$c_text,collapse=", ")
+    if(input$iIncludetext){
+      paste(values_lookup$codes.lookup.shinyready$OPCS4[s,]$c_text,collapse=", ")
+    } else {
+      paste(values_lookup$codes.lookup.shinyready$OPCS4[s,]$codes,collapse=", ")
+    }
   })
   output$codes_on_20003 <- renderPrint({
     s = input$table_on_20003_rows_selected
-    paste(values_lookup$codes.lookup.shinyready$n_20003[s,]$c_text,collapse=", ")
+    if(input$iIncludetext){
+      paste(values_lookup$codes.lookup.shinyready$n_20003[s,]$c_text,collapse=", ")
+    } else {
+      paste(values_lookup$codes.lookup.shinyready$n_20003[s,]$codes,collapse=", ")
+    }
   })
   
 # 
