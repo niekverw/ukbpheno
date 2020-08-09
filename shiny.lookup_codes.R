@@ -251,7 +251,7 @@ lookup_list_in_df <- function(lst,df.lookup){
   for (i in 1:length(lst)){
     lookup=na.omit(lst[i][[1]])
     d <- df.lookup[ df.lookup[,get(names(lst[i]) )] %in% lookup ,] %>% unique()
-    if(nrow(d)>1) d$source = names(lst[i])
+    #if(nrow(d)>1) d$source = names(lst[i])
     df.all<-rbind(df.all,d)
     
   }
@@ -317,6 +317,7 @@ lookup_codes <- function(codes=row, LstdfCodesheets=LstdfCodesheets,expand_input
 ##### LOAD DATA. 
 ########################################
 LstdfCodesheets <- load_data()
+gc()
 ########################################
 ##### STAND ALONE EXAMPLE FOR 1 ROW. 
 ########################################
@@ -328,12 +329,12 @@ names(df) <- sub(pattern = "CODES",replacement = "",names(df) )
 df <- df[,c("TRAIT","DESCRIPTION", "ICD10","ICD9","READ","CTV3","OPCS4")]
 
 # DO IIT FOR 1 ROW suggest codes for 1 selected row. 
-irow=13 #12 #3#12
+irow=1 #12 #3#12
 row <- df[irow,]
 #row$OPCS4 <- "K02"
 codes.lookup <- lookup_codes(codes = row,LstdfCodesheets=LstdfCodesheets,expand_input=T)
 
-
+codes.lookup$df_lookup
 #### SHINY: 
 
 
@@ -342,20 +343,20 @@ library(DT)
 # Define UI for app that draws a histogram ----
 ui <- fluidPage(
   # App title ----
-  titlePanel("Hello Shiny!"),
+  titlePanel("UKB code explorer"),
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
     # Sidebar panel for inputs ----
     sidebarPanel(
       # Input: Slider for the number of bins ----
-      textAreaInput(inputId="iICD10", label="ICD10", value = "I421,I422", width = NULL, placeholder = NULL),
-      textAreaInput(inputId="iICD9", label="ICD9", value = "4251", width = NULL, placeholder = NULL),
+      textAreaInput(inputId="iICD10", label="ICD10", value = "Z951", width = NULL, placeholder = NULL),
+      textAreaInput(inputId="iICD9", label="ICD9", value = "", width = NULL, placeholder = NULL),
       textAreaInput(inputId="iREAD", label="READ", value = "", width = NULL, placeholder = NULL),
       textAreaInput(inputId="iCTV3", label="CTV3", value = "", width = NULL, placeholder = NULL),
-      textAreaInput(inputId="iOPCS4", label="OPCS4", value = "", width = NULL, placeholder = NULL),
+      textAreaInput(inputId="iOPCS4", label="OPCS4", value = "K40,K41,K42,K43,K44,K45,K46", width = NULL, placeholder = NULL),
       checkboxInput(inputId = "iExpandcodes", "Expand codes, e.g. I50 -> I501,I502, etc.  ", FALSE),
       actionButton("goButton", "Go!"),
-      HTML("<br><br>note; this is a tryout - for exploration, translations are not reliable.")
+      HTML("<br><br>note; this is a tryout - for exploration, translations are not reliable. - BNF/DMD not included.")
     ),
     # Main panel for displaying outputs ----
     mainPanel(
@@ -404,10 +405,10 @@ server <- function(input, output) {
     
     
     convert_lookup_to_df <- function(codes,input_c=row_exp$ICD10){
-      df <- data.frame(codes=codes$c,text=codes$text,c_text=codes$c_text, new=codes$c %in% input_c)
+      df <- data.frame(codes=codes$c,text=codes$text,c_text=codes$c_text, input=codes$c %in% input_c)
 
       if(nrow(df)==0){
-        df <- data.frame(codes="",text="",c_text="",new=FALSE)
+        df <- data.frame(codes="",text="",c_text="",input=FALSE)
       }
       return(df)
     }
@@ -417,36 +418,36 @@ server <- function(input, output) {
     dtoptions=list(pageLength = 25, info = FALSE,lengthMenu = list(c(25,50,100,200, -1), c("25","50","100","200", "All"))) 
 
     output$table_oICD10 = DT::renderDataTable({
-      values_lookup$codes.lookup.shinyready$ICD10[,c(1,2)]
+      values_lookup$codes.lookup.shinyready$ICD10[,c(1,2,4)]
     },options=dtoptions,
-    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$ICD10$new) ))
+    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$ICD10$input) ))
     
     output$table_oICD9 = DT::renderDataTable({
-      values_lookup$codes.lookup.shinyready$ICD9[,c(1,2)]
+      values_lookup$codes.lookup.shinyready$ICD9[,c(1,2,4)]
     },options=dtoptions,
-    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$ICD9$new) ))
+    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$ICD9$input) ))
     
     
     output$table_oREAD = DT::renderDataTable({
-      values_lookup$codes.lookup.shinyready$READ[,c(1,2)]
+      values_lookup$codes.lookup.shinyready$READ[,c(1,2,4)]
     },options=dtoptions,
-    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$READ$new) ))
+    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$READ$input) ))
     
     output$table_oCTV3 = DT::renderDataTable({
-      values_lookup$codes.lookup.shinyready$CTV3[,c(1,2)]
+      values_lookup$codes.lookup.shinyready$CTV3[,c(1,2,4)]
     },options=dtoptions,
-    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$CTV3$new) ))
+    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$CTV3$input) ))
     
     
     output$table_oOPCS4 = DT::renderDataTable({
-      values_lookup$codes.lookup.shinyready$OPCS4[,c(1,2)]
+      values_lookup$codes.lookup.shinyready$OPCS4[,c(1,2,4)]
     },options=dtoptions,
-    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$OPCS4$new) ))
+    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$OPCS4$input) ))
     
     output$table_on_20003 = DT::renderDataTable({
-      values_lookup$codes.lookup.shinyready$n_20003[,c(1,2)]
+      values_lookup$codes.lookup.shinyready$n_20003[,c(1,2,4)]
     },options=dtoptions,
-    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$n_20003$new) ))
+    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$n_20003$input) ))
     
    # data.frame(x="123",t="asd")
     removeModal()
