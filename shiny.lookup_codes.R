@@ -275,7 +275,7 @@ lookup_codes <- function(codes=row, LstdfCodesheets=LstdfCodesheets,expand_input
   # codes=row
   fromcodes = c("ICD10","ICD9","READ","CTV3","OPCS4","n_20003")
   cols=c( "ICD10", "ICD9", "READ", "CTV3","OPCS4","n_20003")
-  
+  codes <- PreProcessDfDefinitions( df=codes,VctAllColumns = cols ,VctColstoupper=NULL)
   input=codes
   if(expand_input){
     for(code in fromcodes){
@@ -283,14 +283,9 @@ lookup_codes <- function(codes=row, LstdfCodesheets=LstdfCodesheets,expand_input
       if(is.null(codes[[code]])){next}
       codes[[code]] <- expand_clean_codes(col = codes[[code]] , from.code=code,description.id='text',lookuptable = LstdfCodesheets[code][[1]],add_description=F)
     }
-    # row$ICD10 <- expand_clean_codes(col =row$ICD10, from.code="ICD10",description.id='text',lookuptable = LstdfCodesheets["ICD10"][[1]],add_description=F)
-    # row$ICD9 <- expand_clean_codes(col =row$ICD9, from.code="ICD9",description.id='text',lookuptable = LstdfCodesheets["ICD9"][[1]],add_description=F)
-    # row$READ <- expand_clean_codes(col =row$READ, from.code="READ",description.id='text',lookuptable = LstdfCodesheets["READ"][[1]],add_description=F)
-    # row$CTV3 <- expand_clean_codes(col =row$CTV3, from.code="CTV3",description.id='text',lookuptable =  LstdfCodesheets["CTV3"][[1]],add_description=F)
-    # row$OPCS4 <- expand_clean_codes(col =row$OPCS4, from.code="OPCS4",description.id='text',lookuptable =  LstdfCodesheets["OPCS4"][[1]],add_description=F)
-  }
-  r <- PreProcessDfDefinitions( df=codes,VctAllColumns = cols ,VctColstoupper=NULL)
-  c <- sapply(r[cols],function(x) unique(unlist(strsplit(x,","))))
+    }
+  
+  c <- sapply(codes[cols],function(x) unique(unlist(strsplit(x,","))))
   
   df_lookup <- lookup_list_in_df(lst = c,df.lookup = LstdfCodesheets$ALL)
   lst_lookup <- apply(df_lookup[,fromcodes,with=FALSE],2,function(x) c(na.omit(unique(x)) ))
