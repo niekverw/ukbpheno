@@ -316,7 +316,8 @@ lookup_codes <- function(codes=row, LstdfCodesheets=LstdfCodesheets,expand_input
 ########################################
 ##### LOAD DATA. 
 ########################################
-LstdfCodesheets <- load_data()
+if(!exists("LstdfCodesheets")){ LstdfCodesheets <- load_data() }
+
 gc()
 ########################################
 ##### STAND ALONE EXAMPLE FOR 1 ROW. 
@@ -325,11 +326,10 @@ gc()
 dfDefinitions_file="definitions.tsv"
 df = data.frame(fread(dfDefinitions_file))
 df <- ProcessDfDefinitions(df=df,fill_dependencies = F)
-names(df) <- sub(pattern = "CODES",replacement = "",names(df) )
 df <- df[,c("TRAIT","DESCRIPTION", "ICD10","ICD9","READ","CTV3","OPCS4")]
 
 # DO IIT FOR 1 ROW suggest codes for 1 selected row. 
-irow=1 #12 #3#12
+irow=13 #12 #3#12
 row <- df[irow,]
 #row$OPCS4 <- "K02"
 codes.lookup <- lookup_codes(codes = row,LstdfCodesheets=LstdfCodesheets,expand_input=T)
@@ -349,11 +349,11 @@ ui <- fluidPage(
     # Sidebar panel for inputs ----
     sidebarPanel(
       # Input: Slider for the number of bins ----
-      textAreaInput(inputId="iICD10", label="ICD10", value = "Z951", width = NULL, placeholder = NULL),
+      textAreaInput(inputId="iICD10", label="ICD10", value = "Z951 (cabg)", width = NULL, placeholder = NULL),
       textAreaInput(inputId="iICD9", label="ICD9", value = "", width = NULL, placeholder = NULL),
       textAreaInput(inputId="iREAD", label="READ", value = "", width = NULL, placeholder = NULL),
       textAreaInput(inputId="iCTV3", label="CTV3", value = "", width = NULL, placeholder = NULL),
-      textAreaInput(inputId="iOPCS4", label="OPCS4", value = "K40,K41,K42,K43,K44,K45,K46", width = NULL, placeholder = NULL),
+      textAreaInput(inputId="iOPCS4", label="OPCS4", value = "K40,K41,K43,K44,K45,K46(cabg),K471(endarterectomy),K49, K50,K75 (pci)", width = NULL, placeholder = NULL),
       checkboxInput(inputId = "iExpandcodes", "Expand codes, e.g. I50 -> I501,I502, etc.  ", FALSE),
       actionButton("goButton", "Go!"),
       HTML("<br><br>note; this is a tryout - for exploration, translations are not reliable. - BNF/DMD not included.")

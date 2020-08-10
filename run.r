@@ -32,10 +32,10 @@ fhesin_diag=paste(pheno_dir,"hesin_diag.txt",sep="")
 fhesin_oper=paste(pheno_dir,"hesin_oper.txt",sep="")
 fgp_clinical =paste(pheno_dir,"gp_clinical.txt",sep="")
 fdefinitions = paste(repo_dir,"definitions.tsv",sep="")
-fsr_coding=paste(repo_dir,"20003_coding4.tsv",sep="")
-fcncr_coding=paste(repo_dir,"20001_coding3.tsv",sep="")
-fnoncncr_coding=paste(repo_dir,"20002_coding6.tsv",sep="")
-foper_coding=paste(repo_dir,"20004_coding5.tsv",sep="")
+fsr_coding=paste(repo_dir,"data/20003_coding4.tsv",sep="")
+fcncr_coding=paste(repo_dir,"data/20001_coding3.tsv",sep="")
+fnoncncr_coding=paste(repo_dir,"data/20002_coding6.tsv",sep="")
+foper_coding=paste(repo_dir,"data/20004_coding5.tsv",sep="")
 
 fukbphenodata <- paste(pheno_dir,"ukbphenodata.Rdata",sep="") #where to store final object
 

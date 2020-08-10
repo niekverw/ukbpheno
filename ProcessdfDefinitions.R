@@ -36,7 +36,7 @@ CheckDuplicateTRAITS<-function(df){
 
 
 #' @export
-PreProcessDfDefinitions<-function(df,VctAllColumns,VctColstoupper=NULL ){ # c("ICD10CODES","ICD9CODES","OPCS4CODES","OPCS3CODES")
+PreProcessDfDefinitions<-function(df,VctAllColumns,VctColstoupper=NULL ){ # c("ICD10","ICD9","OPCS4","OPCS3")
 ## df<-dfDefinitions
   # check if nrows==1
   checkr=0
@@ -51,7 +51,7 @@ PreProcessDfDefinitions<-function(df,VctAllColumns,VctColstoupper=NULL ){ # c("I
   ## remove everything between brackets
   df[,VctAllColumns]<- data.frame(apply(df[,VctAllColumns], 2, function(y) gsub( " *\\(.*?\\) *", "", y)) )
   ### remove dots(.): names(df)
-  VctColumnsRemoveDots=c("ICD10CODES","ICD9CODES","OPCS4CODES","OPCS3CODES")
+  VctColumnsRemoveDots=c("ICD10","ICD9","OPCS4","OPCS3")
   VctColumnsRemoveDots <-VctColumnsRemoveDots[VctColumnsRemoveDots %in% colnames(df)]
   df[,VctColumnsRemoveDots]<- data.frame(apply(df[,VctColumnsRemoveDots],2,function(x) gsub(".", "", x, fixed = TRUE)))
   ### remove spaces:
@@ -77,7 +77,7 @@ PreProcessDfDefinitions<-function(df,VctAllColumns,VctColstoupper=NULL ){ # c("I
 }
 
 #' @export
-FillInSRdefinitions<-function(df,Var="SR",cols=c("n_20001_","n_20002_","n_20004_") ) {
+FillInSRdefinitions<-function(df,Var="SR",cols=c("n_20001","n_20002","n_20004") ) {
   # 20001 cancer code, self reported; 20002 non-cancer illness, self reported; 20004 operation code
   ## fill in SR
   df[,Var]<-as.character(df[,Var])
@@ -109,7 +109,7 @@ CovertMednamesToUkbcoding<- function(StrRx){
   StrRx<-as.character(StrRx)
   if(is.na(StrRx)) { return(NA)}
   VctRXstrings<-unlist(strsplit(StrRx,","))
-  #VctRXstrings<-strsplit(df[!is.na(df$n_20003_),]$n_20003_,",")[[1]]
+  #VctRXstrings<-strsplit(df[!is.na(df$n_20003),]$n_20003,",")[[1]]
   # StrRxCodes<-paste(unique(unlist(lapply(VctRXstrings,  function(x) dfCodesheetREAD_SR.Coding[,"UKB.Coding"] [ grep(x,dfCodesheetREAD_SR.Coding[,"Meaning"] ,ignore.case=TRUE )]  ))),collapse=",")
   # StrRxCodes<-paste(unique(unlist(lapply(VctRXstrings,  function(x) dfCodesheetREAD_SR.Coding[grep(x, Meaning,ignore.case=TRUE)][,"UKB.Coding"]    ))),collapse = ",")
   # StrRxCodes <- paste(unique(unlist(lapply(VctRXstrings,   function(x) dfCodesheetREAD_SR.Coding[match(x, dfCodesheetREAD_SR.Coding$Meaning), "UKB.Coding"]  ))),collapse = ",")
@@ -134,7 +134,7 @@ CovertReadcodesToSelfReportedUkbCoding<- function(StrRx){
   StrRx<-as.character(StrRx)
   if(is.na(StrRx)) { return(NA)}
   VctRXstrings<-unlist(strsplit(StrRx,","))
-  #VctRXstrings<-strsplit(df[!is.na(df$n_20003_),]$n_20003_,",")[[1]]
+  #VctRXstrings<-strsplit(df[!is.na(df$n_20003),]$n_20003,",")[[1]]
   StrRxCodes<-paste(unique(unlist(lapply(VctRXstrings,  function(x) dfCodesheetREAD_SR.Coding[,"UKB.Coding"] [ grep(paste("^", x,sep=""),dfCodesheetREAD_SR.Coding[,"READ.CODE"] ,ignore.case=TRUE )]  ))),collapse=",")
   return(StrRxCodes)
 }
@@ -149,7 +149,7 @@ ReduceRedundancyDf<- function(df){ ### NOT really nessesary
 
 
 # DfDefinitions<-read.table("/Users/niekverw/Downloads/ex",sep="\t",header=T)
-#columns<-c("ICD10CODES","ICD9CODES","OPCS4CODES","OPCS3CODES","TOUCHSCREEN","TS_AGE_DIAG_COLNAME","SELFREPORTED","MEDICATION","LAB")
+#columns<-c("ICD10","ICD9","OPCS4","OPCS3","TOUCHSCREEN","TS_AGE_DIAG_COLNAME","SELFREPORTED","MEDICATION","LAB")
 # print(dfDefinitions)
 #dfDefinitionstmp2<-ProcessDfDefinitions(dfDefinitions,columns)
 
@@ -169,29 +169,32 @@ ReduceRedundancyDf<- function(df){ ### NOT really nessesary
 #' #
 #' #VctAllColumns contains all column names of interest, so that it can ignore everything else.
 #' #20001, 20002 and 20004 go into SR
-#' #READCODES and 20003 is parsed into RX
+#' #READ and 20003 is parsed into RX
 #' #
 #' #
 #' #
-#' VctAllColumns<-  c("TS", "SR", "TS_RX", "SR_RX", "LAB", "ICD10CODES", "ICD9CODES", "OPCS4CODES","OPCS3CODES", "TS_AGE_DIAG_COLNAME", "READCODES","CTV3CODES","BNFCODES","DMDCODES", "n_20001_",    "n_20002_", "n_20003_", "n_20004_", "DEPENDENCY")
+#' VctAllColumns<-  c("TS", "SR", "TS_RX", "SR_RX", "LAB", "ICD10", "ICD9", "OPCS4","OPCS3", "TS_AGE_DIAG_COLNAME", "READ","CTV3","BNF","DMD", "n_20001",    "n_20002", "n_20003", "n_20004", "DEPENDENCY")
 #' ProcessDfDefinitions(dfDefinitions,VctAllColumns)
 #'
 #' @export
 ProcessDfDefinitions<-function(df,
                                VctAllColumns=c("TS",
-                                               "ICD10CODES", "ICD9CODES", "OPCS4CODES","OPCS3CODES",
-                                               "READCODES", "CTV3CODES",
-                                               "BNFCODES","DMDCODES",
-                                               "n_20001_",    "n_20002_", "n_20003_", "n_20004_",
+                                               "ICD10", "ICD9", "OPCS4","OPCS3",
+                                               "READ", "CTV3",
+                                               "BNF","DMD",
+                                               "n_20001",    "n_20002", "n_20003", "n_20004",
                                                "DEPENDENCY"),
-                               VctColstoupper=c("ICD10CODES","ICD9CODES","OPCS4CODES","OPCS3CODES"),
+                               VctColstoupper=c("ICD10","ICD9","OPCS4","OPCS3"),
                                fill_dependencies=T){
   
   #df<- dfDefinitions  #  df<- dfDefinitions2
-  # VctAllColumns<-  c("TS", "SR", "TS_RX", "SR_RX", "LAB", "ICD10CODES", "ICD9CODES", "OPCS4CODES","OPCS3CODES", "TS_AGE_DIAG_COLNAME", "READCODES","CTV3", "n_20001_",    "n_20002_", "n_20003_", "n_20004_", "DEPENDENCY")
+  # VctAllColumns<-  c("TS", "SR", "TS_RX", "SR_RX", "LAB", "ICD10", "ICD9", "OPCS4","OPCS3", "TS_AGE_DIAG_COLNAME", "READ","CTV3", "n_20001",    "n_20002", "n_20003", "n_20004", "DEPENDENCY")
 
   #if(nrow(df)==1 ) {stop("please have more than 1 phenotype definition.")} ## check if excel file has more than 1 row.
   df <- data.frame(df)
+  names(df) <- sub(pattern = "CODES",replacement = "",names(df) )
+    names(df) <- sub(pattern = "_$",replacement = "",names(df) ) # "n_20002_" --> "n_20002"
+
   df <- PreProcessDfDefinitions(df,VctAllColumns,VctColstoupper=VctColstoupper)
   if(any(!VctAllColumns %in% names(df))) print(paste("WARNING missing columns:", paste(VctAllColumns[!VctAllColumns %in% names(df)],collapse=", ")))
 
@@ -204,24 +207,24 @@ ProcessDfDefinitions<-function(df,
   #################################
   ### HELPER FUNCTION TO CROSS CHECK EVERYTHING AND LOOKUPS, SHOULD GET A SEPERATE FUNCTION OUTSIDE OF EVERYTHING.
   #################################
-  # ###[unsupported] LOOKUP NAMES OF MEDICATION and put UKBIO.CODES in RX
-  # print(df$n_20003_)
-  # df$n_20003_<-unlist(lapply( df$n_20003_, CovertMednamesToUkbcoding))
-  # # df$n_20003_<- paste(df$n_20003_, unlist(lapply( df$n_20003_, CovertMednamesToUkbcoding)),sep=",")
-  # print(df$n_20003_)
+  # ###[unsupported] LOOKUP NAMES OF MEDICATION and put UKBIO. in RX
+  # print(df$n_20003)
+  # df$n_20003<-unlist(lapply( df$n_20003, CovertMednamesToUkbcoding))
+  # # df$n_20003<- paste(df$n_20003, unlist(lapply( df$n_20003, CovertMednamesToUkbcoding)),sep=",")
+  # print(df$n_20003)
   
-  # df<-FillInSRdefinitions(df,"SR_RX",c("n_20003_"))
-  ### LOOKUP READ.CODES and put UKBIO.CODES in SR_RX
+  # df<-FillInSRdefinitions(df,"SR_RX",c("n_20003"))
+  ### LOOKUP READ. and put UKBIO. in SR_RX
 
   #################################
   ### FILL SR fields with  _2000X_ 'helper' columns;
   #################################
-  #df<-FillInSRdefinitions(df,"SR",c("n_20001_","n_20002_","n_20004_"))
-  #df<-FillInSRdefinitions(df,"SR_RX",c("n_20003_"))
-  #df[,c("n_20001_","n_20002_","n_20004_","n_20003_")] <- NA
-  #VctAllColumns <- VctAllColumns[!VctAllColumns %in% c("n_20001_","n_20002_","n_20004_","n_20003_")]
+  #df<-FillInSRdefinitions(df,"SR",c("n_20001","n_20002","n_20004"))
+  #df<-FillInSRdefinitions(df,"SR_RX",c("n_20003"))
+  #df[,c("n_20001","n_20002","n_20004","n_20003")] <- NA
+  #VctAllColumns <- VctAllColumns[!VctAllColumns %in% c("n_20001","n_20002","n_20004","n_20003")]
 
-  ### lookup ICD10/9/OPER and put into READCODES and CTV3:
+  ### lookup ICD10/9/OPER and put into READ and CTV3:
   # ....? I can lookup everything in everything to make everything more complete
 
 
@@ -290,15 +293,15 @@ get_allvarnames <- function(dfDefinitions_processed){
 
 
 #' @export
-convert_readv2_to_ukbmedication<-function(Vctn_20003_,Vctreadcodes){
-  # Vctn_20003_ <- dfDefinitions$n_20003_
-  # Vctreadcodes <- dfDefinitions$READCODES
+convert_readv2_to_ukbmedication<-function(Vctn_20003,Vctreadcodes){
+  # Vctn_20003 <- dfDefinitions$n_20003
+  # Vctreadcodes <- dfDefinitions$READ
 
   Vctreadcodes=PreProcessDfDefinitions(data.frame(Vctreadcodes=Vctreadcodes),VctAllColumns="Vctreadcodes",VctColstoupper=F)
-  Vctn_20003_=PreProcessDfDefinitions(data.frame(Vctn_20003_=Vctn_20003_),VctAllColumns="Vctn_20003_",VctColstoupper=F)
+  Vctn_20003=PreProcessDfDefinitions(data.frame(Vctn_20003=Vctn_20003),VctAllColumns="Vctn_20003",VctColstoupper=F)
 
-  Vctn_20003_ <- paste(Vctn_20003_, unlist(lapply( Vctreadcodes, CovertReadcodesToSelfReportedUkbCoding)),sep=",")
-  Vctn_20003_ <- unlist(lapply(Vctn_20003_,function(x) {  x = unique(strsplit(x,"," )[[1]]); if(length(x)==1 & x[1] =="NA"){ return("NA")} else{ return( paste(x[x != "NA"],collapse=",") )} }))
-  return(Vctn_20003_)
+  Vctn_20003 <- paste(Vctn_20003, unlist(lapply( Vctreadcodes, CovertReadcodesToSelfReportedUkbCoding)),sep=",")
+  Vctn_20003 <- unlist(lapply(Vctn_20003,function(x) {  x = unique(strsplit(x,"," )[[1]]); if(length(x)==1 & x[1] =="NA"){ return("NA")} else{ return( paste(x[x != "NA"],collapse=",") )} }))
+  return(Vctn_20003)
 }
 
