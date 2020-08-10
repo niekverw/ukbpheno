@@ -1,4 +1,5 @@
 # https://termbrowser.nhs.uk/?perspective=full&conceptId1=404684003&edition=uk-edition&release=v20200610&server=https://termbrowser.nhs.uk/sct-browser-api/snomed&langRefset=999001261000000100,999000691000001104
+# snomedbrowser.com
 setwd("/Users/niek/repos/ukbpheno")
 setwd("/srv/shiny-server/ukbpheno")
 
@@ -373,8 +374,8 @@ ui <- fluidPage(
                  h4("CTV3"),textOutput("codes_oCTV3"),
                  h4("OPCS4"),textOutput("codes_oOPCS4"),
                  h4("n_20003"),textOutput("codes_on_20003")
-                 )
-        #tabPanel("raw_data",  DT::dataTableOutput("table_oraw"))
+                 ),
+        tabPanel("lookuptable",  DT::dataTableOutput("table_oraw"))
         
         
         
@@ -415,34 +416,34 @@ server <- function(input, output) {
 
     output$table_oICD10 = DT::renderDataTable({
       values_lookup$codes.lookup.shinyready$ICD10[,c(1,2,4)]
-    },options=dtoptions,
+    },filter = "top",options=dtoptions,
     selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$ICD10$input) ))
     
     output$table_oICD9 = DT::renderDataTable({
       values_lookup$codes.lookup.shinyready$ICD9[,c(1,2,4)]
-    },options=dtoptions,
+    },filter = "top",options=dtoptions,
     selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$ICD9$input) ))
     
     
     output$table_oREAD = DT::renderDataTable({
       values_lookup$codes.lookup.shinyready$READ[,c(1,2,4)]
-    },options=dtoptions,
+    },filter = "top",options=dtoptions,
     selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$READ$input) ))
     
     output$table_oCTV3 = DT::renderDataTable({
       values_lookup$codes.lookup.shinyready$CTV3[,c(1,2,4)]
-    },options=dtoptions,
+    },filter = "top",options=dtoptions,
     selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$CTV3$input) ))
     
     
     output$table_oOPCS4 = DT::renderDataTable({
       values_lookup$codes.lookup.shinyready$OPCS4[,c(1,2,4)]
-    },options=dtoptions,
+    },filter = "top",options=dtoptions,
     selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$OPCS4$input) ))
     
     output$table_on_20003 = DT::renderDataTable({
       values_lookup$codes.lookup.shinyready$n_20003[,c(1,2,4)]
-    },options=dtoptions,
+    },filter = "top",options=dtoptions,
     selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$n_20003$input) ))
     
    # data.frame(x="123",t="asd")
@@ -501,9 +502,9 @@ server <- function(input, output) {
   })
   
 # 
-#   output$table_oraw = DT::renderDataTable({
-#     LstdfCodesheets$ALL
-#   })
+  output$table_oraw = DT::renderDataTable({
+    LstdfCodesheets$ALL
+  },filter = "top")
   #output$oICD10 <- renderText({ })
 }
 shinyApp(ui, server)
