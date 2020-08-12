@@ -7,13 +7,15 @@ library(data.table)
 library(dplyr)
 library(tictoc)
 require(XML)
+require(stringr)
+require(disk.frame)
 
 if (Sys.getenv("USER")=="niek"){
   repo_dir="/Users/niek/repos/ukbpheno/"
   pheno_dir="/Volumes/data/ukb/"
-}else if (Sys.getenv("USER")=="mw") {
-  pheno_dir="/home/mw/Analyses/Ukbpheno_data/"
-  repo_dir="/home/mw/Repos/ukbpheno/"
+}else if (Sys.getenv("USER")=="ming") {
+  pheno_dir="/home/ming/UKB/Ukbpheno_data/"
+  repo_dir="/home/ming/Repos/ukbpheno/"
 }
 
 
@@ -64,6 +66,7 @@ ukb_fields <- get_allvarnames(dfDefinitions_processed)
 
 
 # read ukb data from ukbconv (.html + .tab)
+# 9 columns in dfhtml: "field.number","field.count","field.showcase","field.html","field.tab","field.description","col.type","col.name","fread_column_type"
 dfhtml <- read_ukb_metadata(fhtml)
 # TODO: unit of operation - phenotype such that read only required fields from the ukbxxxxx.tab file 
 # TODO: create a loop : for each definition in definitions ,  read ukbdata + fetch all required info + generate the variable 
