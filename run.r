@@ -17,7 +17,8 @@ if (Sys.getenv("USER")=="niek"){
   pheno_dir="/home/ming/UKB/Ukbpheno_data/"
   repo_dir="/home/ming/Repos/ukbpheno/"
 }
-
+pheno_dir="/home/mw/Analyses/Ukbpheno_data/"
+repor_dir="/home/mw/Repos/ukbpheno"
 
 source(paste(repo_dir,"convert_nurseinterview_to_episodedata.r",sep=""))
 source(paste(repo_dir,"ProcessdfDefinitions.R",sep=""))
@@ -38,6 +39,11 @@ fsr_coding=paste(repo_dir,"data/20003_coding4.tsv",sep="")
 fcncr_coding=paste(repo_dir,"data/20001_coding3.tsv",sep="")
 fnoncncr_coding=paste(repo_dir,"data/20002_coding6.tsv",sep="")
 foper_coding=paste(repo_dir,"data/20004_coding5.tsv",sep="")
+fdeath_portal=paste(pheno_dir,"death.txt",sep="")
+fdeath_cause_portal=paste(pheno_dir,"death_cause.txt",sep="")
+
+
+
 
 fukbphenodata <- paste(pheno_dir,"ukbphenodata.Rdata",sep="") #where to store final object
 
@@ -82,10 +88,18 @@ lst$tte.sr.20001 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnos
 lst$tte.sr.20004 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20004",field_sr_date = "20010",qc_treshold_year = 10) # operation
 # MEDICATION (data is not unique for eid, code)
 lst$sr.20003 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20003",field_sr_date = "",qc_treshold_year = 10) 
-# DEATH RECORDS
-lst$tte.death.icd10.primary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40001",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10) # operation
+# DEATH REGISTRY REPORT
+lst$tte.death.icd10.primary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40001",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10) # death
 ## secondary death, use only 1 date... 
-lst$tte.death.icd10.secondary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10) # operation
+lst$tte.death.icd10.secondary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10) # death
+# DEATH from data portal , same data as the main dataset but more up to date, refer document DeathLinkage
+lst_dth<-read_death_data(fdeath_portal,fdeath_cause_portal)
+# merge the records
+lst$tte.death.icd10.primary <-union(lst_dth$primary,lst$tte.death.icd10.primary)
+lst$tte.death.icd10.secondary <-union(lst_dth$secondary,lst$tte.death.icd10.secondary)
+
+
+
 # HESIN (data is not unique for eid, code; could be used for reevents) contains duration 
 lst <- append(lst,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.primary + tte.hes.secondary
 # GP 

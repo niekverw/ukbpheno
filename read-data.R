@@ -360,6 +360,48 @@ sumcounts <- function(dfs){
 }
 
 
+
+
+read_death_data <- function(fdeath_portal, fdeath_cause_portal){
+  tic(paste("read death data",fdeath_portal,"&",fdeath_cause_portal))
+  mindate = as.Date("1930-01-01")
+  maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?. 
+  
+  # read file
+  death.portal=fread(fdeath_portal)
+  death.cause.portal=fread(fdeath_cause_portal)
+  #  each record uniquely identified by the eid (encoded identifier) of the participant and the instance index (ins_index) of the record
+  dfdeath<-merge(death.portal,death.cause.portal,by=c("eid","ins_index"))
+  # level indicate primary or secondary cause
+  dfdeath<-select(dfdeath,eid , cause_icd10, date_of_death,level)
+  names(dfdeath) <- c("f.eid","code","eventdate","level")  
+  # class change for consistency
+  dfdeath <- dfdeath[, f.eid:=as.character(f.eid)]
+  # note the difference in format of the date between tables 
+  dfdeath <- dfdeath[, eventdate:=as.Date(eventdate,format="%d/%m/%Y")]
+  dfdeath <- subset(dfdeath, eventdate < maxdate ) # remove deaths that occurs after today
+  
+  # parse primary and secondary cause; add event flag with all considered valid; drop col level
+  dfdeath.primary<-dfdeath %>% filter(level ==1 ) %>% mutate (event=1) %>% select(f.eid , code, eventdate,event)
+  dfdeath.primary <- dfdeath.primary[, event:=as.integer(event)]
+  
+  dfdeath.secondary<-dfdeath %>% filter(level ==2 ) %>% mutate (event=1) %>% select(f.eid , code, eventdate,event)
+  dfdeath.secondary <- dfdeath.secondary[, event:=as.integer(event)]
+  
+  toc()
+  
+  lst_death <- list("primary" = dfdeath.primary, "secondary" = dfdeath.secondary)
+  return(lst_death)
+  
+}
+
+
+
+
+
+
+
+
 #library(disk.frame)
 # tic("read gp data")
 # mindate = as.Date("1930-01-01")
