@@ -17,28 +17,28 @@ if (Sys.getenv("USER")=="niek"){
   pheno_dir="/home/ming/UKB/Ukbpheno_data/"
   repo_dir="/home/ming/Repos/ukbpheno/"
 }
-pheno_dir="/home/mw/Analyses/Ukbpheno_data/"
-repor_dir="/home/mw/Repos/ukbpheno"
+
 
 source(paste(repo_dir,"convert_nurseinterview_to_episodedata.r",sep=""))
 source(paste(repo_dir,"ProcessdfDefinitions.R",sep=""))
 source(paste(repo_dir,"read-data.R",sep=""))
 
 # fukbtab = paste(pheno_dir,"ukb38326.tab",sep="") 
-fukbtab = paste(pheno_dir,"ukb38326.tab.head",sep="") # header only for testing.
+fukbtab = paste(pheno_dir,"ukb41823.tab.head10k",sep="") # header only for testing.
 # fukbtab = paste(pheno_dir,"ukb38326.tab.head300",sep="") # small subset only for testing.
 
 
-fhtml = paste(pheno_dir,"ukb38326.html",sep="")
+fhtml = paste(pheno_dir,"ukb41823.html",sep="")
 fhesin=paste(pheno_dir,"hesin.txt",sep="")
 fhesin_diag=paste(pheno_dir,"hesin_diag.txt",sep="")
 fhesin_oper=paste(pheno_dir,"hesin_oper.txt",sep="")
 fgp_clinical =paste(pheno_dir,"gp_clinical.txt",sep="")
+# fgp_scripts =paste(pheno_dir,"gp_scripts.txt",sep="") 
 fdefinitions = paste(repo_dir,"definitions.tsv",sep="")
-fsr_coding=paste(repo_dir,"data/20003_coding4.tsv",sep="")
-fcncr_coding=paste(repo_dir,"data/20001_coding3.tsv",sep="")
-fnoncncr_coding=paste(repo_dir,"data/20002_coding6.tsv",sep="")
-foper_coding=paste(repo_dir,"data/20004_coding5.tsv",sep="")
+fsr_coding=paste(repo_dir,"data/20003.coding4.tsv",sep="")
+fcncr_coding=paste(repo_dir,"data/20001.coding3.tsv",sep="")
+fnoncncr_coding=paste(repo_dir,"data/20002.coding6.tsv",sep="")
+foper_coding=paste(repo_dir,"data/20004.coding5.tsv",sep="")
 fdeath_portal=paste(pheno_dir,"death.txt",sep="")
 fdeath_cause_portal=paste(pheno_dir,"death_cause.txt",sep="")
 
@@ -94,15 +94,19 @@ lst$tte.death.icd10.primary <- convert_nurseinterview_to_episodedata(dfukb,field
 lst$tte.death.icd10.secondary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10) # death
 # DEATH from data portal , same data as the main dataset but more up to date, refer document DeathLinkage
 lst_dth<-read_death_data(fdeath_portal,fdeath_cause_portal)
-# merge the records
+# merge the records   dplyr union
 lst$tte.death.icd10.primary <-union(lst_dth$primary,lst$tte.death.icd10.primary)
 lst$tte.death.icd10.secondary <-union(lst_dth$secondary,lst$tte.death.icd10.secondary)
-
+rm(lst_dth)
 
 
 # HESIN (data is not unique for eid, code; could be used for reevents) contains duration 
+# add 8 lists from HES data primary/secondary x oper3/oper4/icd9/icd10 , with columns eid,eventdate,epidur,<diag>,event
 lst <- append(lst,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.primary + tte.hes.secondary
+
+
 # GP 
+# add 2 lists with read2 /read3
 lst <- append(lst,read_gp_clinical_data(fgp=fgp_clinical ))
 toc()
 

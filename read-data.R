@@ -200,11 +200,11 @@ convert_ukb_to_diskframe <- function(fukbtab,fhtml,outdir="diskframe/",rows_to_r
 # 
 # dfhtml[dfhtml$field.tab %in% 'f.4258.0.1',]
 
-
+#  refer HES Data Dictionary Document ID:141140
 read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   
   ## TODO; use library(fasttime); fastPOSIXct(DT$start_date)
-  # read hesin
+  # read hesin, extract event date 
   print("read hesin")
   dfhesin <- (fread(fhesin,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
   print("converting dates")
@@ -212,12 +212,15 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   dfhesin$admidate <- as.Date(as.character(dfhesin$admidate),format="%Y%m%d")
   dfhesin$epiend <- as.Date(as.character(dfhesin$epiend),format="%Y%m%d")
   dfhesin$disdate <- as.Date(as.character(dfhesin$disdate),format="%Y%m%d")
-  
+  # if start and end date not available for episode, replace with admission and discharge date respectively 
   dfhesin[is.na(dfhesin$epistart),"epistart"] <- dfhesin[is.na(dfhesin$epistart),"admidate"]
   dfhesin[is.na(dfhesin$epiend),"epiend"] <- dfhesin[is.na(dfhesin$epiend),"disdate"]
+  # recompute epidur explicitly, a very small proportion (0.003%) of episodes crossing HES data-year have erroneous entry 
   dfhesin$epidur <- as.numeric(dfhesin$epiend - dfhesin$epistart )
+  # sanity check
   dfhesin[dfhesin$epidur <0,]$epidur <- NA
-  
+
+ 
   # read diag
   print("read diag")
   dfdiag <- (fread(fhesin_diag,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
@@ -225,19 +228,23 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   dfhesin_diag <- merge(dfhesin,dfdiag,by = c("eid","ins_index"),all=T)
   dfhesin_diag$eventdate <- dfhesin_diag$epistart
   dfhesin_diag$event <- 1 
+  # mark those without epistart date , ~0.001%  
   dfhesin_diag[is.na(dfhesin_diag$eventdate)]$event <- 0
   dfhesin_diag <- dfhesin_diag[, event:=as.integer(event)]
   
   # read oper
   print("read oper")
   dfoper <- (fread(fhesin_oper,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
+  # note date format differ from main hesin table
   dfoper$opdate <- as.Date(as.character(dfoper$opdate),format="%d/%m/%Y")
   print("merging hesin + operation") # for duration, take episode duration. 
   dfhesin_oper <- merge(dfhesin,dfoper,by = c("eid","ins_index"),all=T)
   dfhesin_oper$eventdate <- dfhesin_oper$opdate
+  # take epistart date from main HESIN table if opdate not available
   dfhesin_oper[is.na(dfhesin_oper$eventdate),"eventdate"] <- dfhesin_oper[is.na(dfhesin_oper$eventdate),"epistart"]
   
   dfhesin_oper$event <- 1 
+  # mark those without a date 
   dfhesin_oper[is.na(dfhesin_oper$eventdate)]$event <- 0
   dfhesin_oper <- dfhesin_oper[, event:=as.integer(event)]
   
@@ -277,15 +284,19 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
 }
 
 
-fgp = "/Volumes/data/ukb/gp_clinical.txt"
-
+# refer to doc primary_care_data
 read_gp_clinical_data <- function(fgp){
   tic(paste("read gp data",fgp))
+  # records potentially erroneous have date changed to 01/01/1901 (occured before birth), 02/02/1902 (occured on DOB), 03/03/1903 (same year as DOB), 07/07/2037 (occured after the time of extraction)
   mindate = as.Date("1930-01-01")
   maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?. 
-  dfgp <- fread(cmd = paste("awk -F'\t'  '$6==\"\" && $7==\"\" && $7==\"\" {print $1,$3,$4,$5}' OFS='\t'",fgp) ,sep = "\t",
+  # in current structure of gp_clinical.txt
+  # $1 eid $3 event_dt $4 read_2 $5 read3
+  # $2 data_provider  $6 - $8 are free-text fields "value" entries differ depending on the data source 
+  dfgp <- fread(cmd = paste("awk -F'\t'  '$6==\"\" && $7==\"\" && $8==\"\" {print $1,$3,$4,$5}' OFS='\t'",fgp) ,sep = "\t",
                 colClasses = c("integer","string","string","string")) #,select=cols_tokeep) ," | head -10000 "
   #names(dfgp) <-  c("eid",	"data_provider",	"event_dt",	"read_2",	"read_3",	"value1","value2","value3")
+  
   names(dfgp) <-  c("eid",	"event_dt",	"read_2",	"read_3")
   dfgp$event_dt <- as.Date(as.character(dfgp$event_dt),format="%d/%m/%Y")
   #dfgp$event_dt <- format(fasttime::fastPOSIXct(dfgp$event_dt),format="%Y-%m-%d") # needs specific input format, making that format takes more time... 
@@ -294,13 +305,13 @@ read_gp_clinical_data <- function(fgp){
   dfgp <- dfgp[!is.na(dfgp$event_dt),]
   
   print(paste("QC dates.. "))
-  #dfgp <- subset(dfgp, event_dt > mindate ) # removing before 1930-ish.. some 1900, 1902, 1903 observations..
+  dfgp <- subset(dfgp, event_dt > mindate ) # removing before 1930-ish.. some 1900, 1902, 1903 observations..
   dfgp <- subset(dfgp, event_dt < maxdate ) # removing after today-ish.. some 2037 observations.
   print(paste("#individuals",length(unique(dfgp$n_eid))))
   
   dfgp$event <- 1
 
-  
+  #  parse versions
   
   tte.gpclincal.read3 <-  dfgp %>% filter(read_3 !="")  %>% select(eid,event_dt,read_3,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_3,event=event)  %>% as.data.table()
   tte.gpclincal.read2 <-  dfgp %>% filter(read_2 !="")  %>% select(eid,event_dt,read_2,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% as.data.table()
@@ -311,15 +322,17 @@ read_gp_clinical_data <- function(fgp){
 
 }
 
-#fgp <- "/Volumes/data/ukb/gp_scripts.txt"
 read_gp_script_data <- function(fgp){
   
-  tic("read gp data")
+  tic("read gp prescription data")
   mindate = as.Date("1930-01-01")
   maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?. 
   dfgp <- fread(fgp ,sep = "\t",colClasses = c("integer","integer","string","string","string","string","string","string")) #,select=cols_tokeep) ," | head -10000 "
   #names(dfgp) <-  c("eid",	"data_provider",	"event_dt",	"read_2",	"read_3",	"value1","value2","value3")
-  
+  # eid	data_provider	issue_date	read_2	bnf_code	dmd_code	drug_name	quantity
+  # note BNF codings are used differently between data sources i.e. Scotland / England TPP, refer to official doc
+  # DMD used in England Vision, note one prescription may be described differently and coded differently
+  # TODO standardize med codes:  varies in length (how to deal with this?), some with "." in between (strip all dots?)
   counts <- dfgp[, .N, by=.(read_2, dmd_code,bnf_code,drug_name)] # add unique per individual. 
   
   
@@ -338,7 +351,7 @@ read_gp_script_data <- function(fgp){
   
   dfgp$event <- 1
   
-  toc() #423.762 sec elapsed
+  toc() 
   
   tte.gpclincal.read3 <-  dfgp %>% filter(read_3 !="")  %>% select(eid,event_dt,read_3,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_3,event=event)  %>% as.data.table()
   tte.gpclincal.read2 <-  dfgp %>% filter(read_2 !="")  %>% select(eid,event_dt,read_2,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% as.data.table()
