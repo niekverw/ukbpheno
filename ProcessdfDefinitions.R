@@ -267,10 +267,13 @@ ProcessDfDefinitions<-function(df,
   #write.table(df,paste(dfDefinitions_file,".processed.tsv",sep=""),quote = FALSE,row.names = FALSE,sep="\t")
 }
 
+
+
 #' @export
 get_allvarnames <- function(dfDefinitions_processed){
   #  dfDefinitions_processed
   VctAllUKBVDefinitionColumns=c("TS") #set this variable to a selection of columns (dfDefinition columns) to be outputted by the _UKBV variable, default is 'VctAllUKBVDefinitionColumns=c("TS","SR","TS_RX","SR_RX","LAB")'
+  # TS(Touchscreen) in definition
   TScolumns = "TS"
   defcols <- unlist(strsplit(na.omit(unname(unlist(dfDefinitions_processed[,c(TScolumns)]))),split=","))
   defcols <- unlist(strsplit(chartr("[]", "()", defcols),"[()]"))
