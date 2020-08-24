@@ -143,10 +143,13 @@ View(lst$tte.death.icd10.primary)
 View(dfDefinitions_processed)
 # 
 # 
+View(lst)
+head(lst$tte.sr.20004)
+
 
 codes.icd10 <- dfDefinitions_processed$ICD10CODES[8]
 codes.icd10.expanded <- unique(lst.counts[['icd10']]$code[grep(paste(sep="","^",strsplit(codes.icd10,",")[[1]], collapse='|'),lst.counts$icd10$code)])
-
+head(lst$tte.gpclincal.read2)
 #grepoper <-unlist( mclapply(  , function(col) grep(paste(sep="","^",VctCodes, collapse='|'), col, ignore.case=FALSE),mc.cores =detectCores()/2 ) ) ## PARALLEL of the above.
 
 
