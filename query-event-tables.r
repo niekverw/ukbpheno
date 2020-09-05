@@ -42,13 +42,13 @@ get_all_events <- function (definitions,lst_dfs=lst,datatable_defCol_pair=defaul
     classification=datatable_defCol_pair %>% filter(datasource == x) %>% pull(classification)
     datatype=datatable_defCol_pair %>% filter(datasource == x) %>% pull(datatype)
     codes <- to_datatype(strsplit(definitions[,classification],split = ",")[[1]],datatype)
-    lst_dfs[[x]][.(codes)]
+    lst_dfs[[x]][.(codes),nomatch=NULL] # nomatch is important, otherwise it will return row with NA if it didnt find the code (but which on the other hand may also maybe good to keep track?? )
+    
   } )
   # name the dfs in list
   names(all_event_lst)<-names(lst_dfs)
   # remove empty dfs frame list 
   all_event_lst <- all_event_lst[lapply(all_event_lst,nrow)>0]
-  # some data frames still have NA's>???should check why that is
   
   # set key to be eid
   all_event_lst<-lapply(all_event_lst,function(x) {

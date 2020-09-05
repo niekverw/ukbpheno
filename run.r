@@ -119,8 +119,7 @@ save(dfhtml,dfukb,lst,lst.counts,file=fukbphenodata)
 ##########################################
 ## test: 
 dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,datatable_defCol_pair=default_datatable_defCol_pair(),lst.counts = lst.counts)
-test <- get_all_events(dfDefinitions_processed_expanded[9,],lst) #list of 11 dfs 
-# some dfs are NA on every column, not sure why that is.. 
+test <- get_all_events(dfDefinitions_processed_expanded[8,],lst) #list of 11 dfs 
 
 
 # print(format(object.size(lst), units = "Mb")) #"2014.1 Mb"
