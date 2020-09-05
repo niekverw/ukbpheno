@@ -29,10 +29,10 @@ fukbtab = paste(pheno_dir,"ukb41823.tab.head10k",sep="") # header only for testi
 
 
 fhtml = paste(pheno_dir,"ukb41823.html",sep="")
-fhesin=paste(pheno_dir,"hesin.txt_",sep="")
-fhesin_diag=paste(pheno_dir,"hesin_diag.txt_",sep="")
-fhesin_oper=paste(pheno_dir,"hesin_oper.txt_",sep="")
-fgp_clinical =paste(pheno_dir,"gp_clinical.txt_",sep="")
+fhesin=paste(pheno_dir,"hesin.txt",sep="")
+fhesin_diag=paste(pheno_dir,"hesin_diag.txt",sep="")
+fhesin_oper=paste(pheno_dir,"hesin_oper.txt",sep="")
+fgp_clinical =paste(pheno_dir,"gp_clinical.txt",sep="")
 # fgp_scripts =paste(pheno_dir,"gp_scripts.txt",sep="") 
 fdefinitions = paste(repo_dir,"definitions.tsv",sep="")
 fsr_coding=paste(repo_dir,"data/20003.coding4.tsv",sep="")

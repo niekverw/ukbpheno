@@ -226,9 +226,9 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
    
  
   # read diag
-  print("read diag")
+  message("read diag")
   dfdiag <- (fread(fhesin_diag,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
-  print("merging hesin + diagnosis")
+  message("merging hesin + diagnosis")
   dfhesin_diag <- merge(dfhesin,dfdiag,by = c("eid","ins_index"),all=T)
   dfhesin_diag$eventdate <- dfhesin_diag$epistart
   dfhesin_diag$event <- 1 
@@ -237,11 +237,11 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   dfhesin_diag <- dfhesin_diag[, event:=as.integer(event)]
   
   # read oper
-  print("read oper")
+  message("read oper")
   dfoper <- (fread(fhesin_oper,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
   # note date format differ from main hesin table
   dfoper$opdate <- as.Date(as.character(dfoper$opdate),format="%d/%m/%Y")
-  print("merging hesin + operation") # for duration, take episode duration. 
+  message("merging hesin + operation") # for duration, take episode duration. 
   dfhesin_oper <- merge(dfhesin,dfoper,by = c("eid","ins_index"),all=T)
   dfhesin_oper$eventdate <- dfhesin_oper$opdate
   # take epistart date from main HESIN table if opdate not available
@@ -292,6 +292,7 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
 # refer to doc primary_care_data
 read_gp_clinical_data <- function(fgp){
   tic(paste("read gp data",fgp))
+  message(paste("read gp data",fgp))
   # records potentially erroneous have date changed to 01/01/1901 (occured before birth), 02/02/1902 (occured on DOB), 03/03/1903 (same year as DOB), 07/07/2037 (occured after the time of extraction)
   mindate = as.Date("1930-01-01")
   maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?. 
@@ -299,25 +300,24 @@ read_gp_clinical_data <- function(fgp){
   # $1 eid $3 event_dt $4 read_2 $5 read3
   # $2 data_provider  $6 - $8 are free-text fields "value" entries differ depending on the data source 
   dfgp <- fread(cmd = paste("awk -F'\t'  '$6==\"\" && $7==\"\" && $8==\"\" {print $1,$3,$4,$5}' OFS='\t'",fgp) ,sep = "\t",
-                colClasses = c("integer","string","string","string")) #,select=cols_tokeep) ," | head -10000 "
+                colClasses = c("integer","character","character","character")) #,select=cols_tokeep) 
   #names(dfgp) <-  c("eid",	"data_provider",	"event_dt",	"read_2",	"read_3",	"value1","value2","value3")
   
   names(dfgp) <-  c("eid",	"event_dt",	"read_2",	"read_3")
   dfgp$event_dt <- as.Date(as.character(dfgp$event_dt),format="%d/%m/%Y")
   #dfgp$event_dt <- format(fasttime::fastPOSIXct(dfgp$event_dt),format="%Y-%m-%d") # needs specific input format, making that format takes more time... 
   
-  print(paste("missing dates for ", sum(is.na(dfgp$event_dt)),"of",nrow(dfgp),"entries = ",100*sum(is.na(dfgp$event_dt))/nrow(dfgp),"%, excluding these." ))
+  message(paste("missing dates for ", sum(is.na(dfgp$event_dt)),"of",nrow(dfgp),"entries = ",100*sum(is.na(dfgp$event_dt))/nrow(dfgp),"%, excluding these." ))
   dfgp <- dfgp[!is.na(dfgp$event_dt),]
   
-  print(paste("QC dates.. "))
+  message(paste("QC dates.. "))
   dfgp <- subset(dfgp, event_dt > mindate ) # removing before 1930-ish.. some 1900, 1902, 1903 observations..
   dfgp <- subset(dfgp, event_dt < maxdate ) # removing after today-ish.. some 2037 observations.
-  print(paste("#individuals in gp clinical:",length(unique(dfgp$eid))))
+  message(paste("#individuals in gp clinical:",length(unique(dfgp$eid))))
   
   dfgp$event <- 1
 
   #  parse versions
-  
   tte.gpclincal.read3 <-  dfgp %>% filter(read_3 !="")  %>% select(eid,event_dt,read_3,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_3,event=event)  %>% as.data.table()
   tte.gpclincal.read2 <-  dfgp %>% filter(read_2 !="")  %>% select(eid,event_dt,read_2,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% as.data.table()
   
