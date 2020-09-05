@@ -205,9 +205,9 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   
   ## TODO; use library(fasttime); fastPOSIXct(DT$start_date)
   # read hesin, extract event date 
-  print("read hesin")
+  message(paste0("read hesin: "),fhesin)
   dfhesin <- (fread(fhesin,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
-  print("converting dates")
+  message("converting dates")
   dfhesin$epistart <- as.Date(as.character(dfhesin$epistart),format="%Y%m%d")
   dfhesin$admidate <- as.Date(as.character(dfhesin$admidate),format="%Y%m%d")
   dfhesin$epiend <- as.Date(as.character(dfhesin$epiend),format="%Y%m%d")
@@ -226,7 +226,7 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
    
  
   # read diag
-  message("read diag")
+  message(paste0("read diag: ",fhesin_diag))
   dfdiag <- (fread(fhesin_diag,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
   message("merging hesin + diagnosis")
   dfhesin_diag <- merge(dfhesin,dfdiag,by = c("eid","ins_index"),all=T)
@@ -237,7 +237,7 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   dfhesin_diag <- dfhesin_diag[, event:=as.integer(event)]
   
   # read oper
-  message("read oper")
+  message(paste0("read oper: ",fhesin_oper))
   dfoper <- (fread(fhesin_oper,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
   # note date format differ from main hesin table
   dfoper$opdate <- as.Date(as.character(dfoper$opdate),format="%d/%m/%Y")
@@ -264,15 +264,15 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   tte.hesin.icd9.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd9))  %>% select(eid,eventdate,epidur,diag_icd9,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% as.data.table()
   
   
-  setkey(tte.hesin.oper3.primary,f.eid)    
-  setkey(tte.hesin.oper4.primary,f.eid)    
-  setkey(tte.hesin.icd10.primary,f.eid)    
-  setkey(tte.hesin.icd9.primary,f.eid)    
+  setkey(tte.hesin.oper3.primary,code)    
+  setkey(tte.hesin.oper4.primary,code)    
+  setkey(tte.hesin.icd10.primary,code)    
+  setkey(tte.hesin.icd9.primary,code)    
   
-  setkey(tte.hesin.oper3.secondary,f.eid)    
-  setkey(tte.hesin.oper4.secondary,f.eid)    
-  setkey(tte.hesin.icd10.secondary,f.eid)    
-  setkey(tte.hesin.icd9.secondary,f.eid)    
+  setkey(tte.hesin.oper3.secondary,code)    
+  setkey(tte.hesin.oper4.secondary,code)    
+  setkey(tte.hesin.icd10.secondary,code)    
+  setkey(tte.hesin.icd9.secondary,code)    
   
   lst <- list(tte.hesin.oper3.primary = tte.hesin.oper3.primary, 
               tte.hesin.oper4.primary = tte.hesin.oper4.primary,
@@ -321,6 +321,8 @@ read_gp_clinical_data <- function(fgp){
   tte.gpclincal.read3 <-  dfgp %>% filter(read_3 !="")  %>% select(eid,event_dt,read_3,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_3,event=event)  %>% as.data.table()
   tte.gpclincal.read2 <-  dfgp %>% filter(read_2 !="")  %>% select(eid,event_dt,read_2,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% as.data.table()
   
+  setkey(tte.gpclincal.read2,code)    
+  setkey(tte.gpclincal.read3,code)    
   lst <- list(tte.gpclincal.read2=tte.gpclincal.read2,tte.gpclincal.read3=tte.gpclincal.read3)
   toc() #423.762 sec elapsed
   return(lst)
@@ -428,7 +430,9 @@ read_death_data <- function(fdeath_portal, fdeath_cause_portal){
   
   dfdeath.secondary<-dfdeath %>% filter(level ==2 ) %>% mutate (event=1) %>% select(f.eid , code, eventdate,event)
   dfdeath.secondary <- dfdeath.secondary[, event:=as.integer(event)]
-  
+
+  setkey(dfdeath.primary,code)    
+  setkey(dfdeath.secondary,code)    
   toc()
   
   lst_death <- list("primary" = dfdeath.primary, "secondary" = dfdeath.secondary)

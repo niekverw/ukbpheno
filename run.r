@@ -23,7 +23,7 @@ source(paste(repo_dir,"convert_nurseinterview_to_episodedata.r",sep=""))
 source(paste(repo_dir,"ProcessdfDefinitions.R",sep=""))
 source(paste(repo_dir,"read-data.R",sep=""))
 
-# fukbtab = paste(pheno_dir,"ukb38326.tab",sep="") 
+fukbtab = paste(pheno_dir,"ukb41823.tab",sep="") 
 fukbtab = paste(pheno_dir,"ukb41823.tab.head10k",sep="") # header only for testing.
 # fukbtab = paste(pheno_dir,"ukb38326.tab.head300",sep="") # small subset only for testing.
 
@@ -126,14 +126,12 @@ lst.counts$oper4 <- sumcounts(list(tte.hesin.oper4.primary=lst.counts$tte.hesin.
                                    tte.hesin.oper4.secondary=lst.counts$tte.hesin.oper4.secondary)) # sumcounts function in read-data.R
 
 # View(lst.counts$icd10)
-
 # filter dfukb. 
 # retain identifier , visitdates and additional fields needed for definitions besides default (as cols in file)
 dfukb<- dfukb[,dfhtml[dfhtml$field.showcase %in% c("eid", "53",ukb_fields$nondefault_ukb_fields),]$field.tab,with=FALSE]
-
-
 # save 
 save(dfhtml,dfukb,lst,lst.counts,file=fukbphenodata)
+
 
 View(lst$tte.death.icd10.primary)
 
