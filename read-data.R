@@ -208,10 +208,10 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   message(paste0("read hesin: "),fhesin)
   dfhesin <- (fread(fhesin,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
   message("converting dates")
-  dfhesin$epistart <- as.Date(as.character(dfhesin$epistart),format="%Y%m%d")
-  dfhesin$admidate <- as.Date(as.character(dfhesin$admidate),format="%Y%m%d")
-  dfhesin$epiend <- as.Date(as.character(dfhesin$epiend),format="%Y%m%d")
-  dfhesin$disdate <- as.Date(as.character(dfhesin$disdate),format="%Y%m%d")
+  dfhesin$epistart <- as.Date(as.character(dfhesin$epistart),format="%d/%m/%Y") #"%Y%m%d")
+  dfhesin$admidate <- as.Date(as.character(dfhesin$admidate),format="%d/%m/%Y")
+  dfhesin$epiend <- as.Date(as.character(dfhesin$epiend),format="%d/%m/%Y")
+  dfhesin$disdate <- as.Date(as.character(dfhesin$disdate),format="%d/%m/%Y")
   # if start and end date not available for episode, replace with admission and discharge date respectively 
   dfhesin[is.na(dfhesin$epistart),"epistart"] <- dfhesin[is.na(dfhesin$epistart),"admidate"]
   dfhesin[is.na(dfhesin$epiend),"epiend"] <- dfhesin[is.na(dfhesin$epiend),"disdate"]
