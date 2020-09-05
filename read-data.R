@@ -263,7 +263,7 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   tte.hesin.icd10.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd10))  %>% select(eid,eventdate,epidur,diag_icd10,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% as.data.table()
   tte.hesin.icd9.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd9))  %>% select(eid,eventdate,epidur,diag_icd9,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% as.data.table()
   
-  
+  message("setkey(code)")
   setkey(tte.hesin.oper3.primary,code)    
   setkey(tte.hesin.oper4.primary,code)    
   setkey(tte.hesin.icd10.primary,code)    
@@ -321,6 +321,7 @@ read_gp_clinical_data <- function(fgp){
   tte.gpclincal.read3 <-  dfgp %>% filter(read_3 !="")  %>% select(eid,event_dt,read_3,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_3,event=event)  %>% as.data.table()
   tte.gpclincal.read2 <-  dfgp %>% filter(read_2 !="")  %>% select(eid,event_dt,read_2,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% as.data.table()
   
+  message("setkey(code)")
   setkey(tte.gpclincal.read2,code)    
   setkey(tte.gpclincal.read3,code)    
   lst <- list(tte.gpclincal.read2=tte.gpclincal.read2,tte.gpclincal.read3=tte.gpclincal.read3)
@@ -430,7 +431,8 @@ read_death_data <- function(fdeath_portal, fdeath_cause_portal){
   
   dfdeath.secondary<-dfdeath %>% filter(level ==2 ) %>% mutate (event=1) %>% select(f.eid , code, eventdate,event)
   dfdeath.secondary <- dfdeath.secondary[, event:=as.integer(event)]
-
+  
+  message("setkey(code)")
   setkey(dfdeath.primary,code)    
   setkey(dfdeath.secondary,code)    
   toc()

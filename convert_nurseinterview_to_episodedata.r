@@ -65,7 +65,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   df_out <-  matrix(ncol=5, nrow=0) # initiate output 
   
   for (v in 0:(visits-1)){ # for each visit, 
-    print(paste0("querying visit ",v))
+    message(paste0("querying visit ",v))
     diagfields = names(df_)[grepl(paste0("[^0-9]",field_sr_diagnosis,"[^0-9]",v),names(df_))]
     if(length(diagfields)==0){print(paste0("no data on visit ",v));next}
 
@@ -96,7 +96,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
     
   }
   
-  print("convert to dataframe")
+  message("convert to dataframe")
   # df_out contains all visits , each row in df_out is a event
   df_out <- data.table(df_out,stringsAsFactors=F)
   df_out <- df_out[, visitdate:=as.Date(visitdate)]
@@ -125,8 +125,8 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
       df_out = df_out[, eventdate:=as.Date(eventdate)]
     }
   
-    # deduplicate, min/max/mean/sd <- not very efficient? 
-    print("deduplicate")
+    # deduplicate, min/max/mean/sd <- not very efficient?!! 
+    message("deduplicate")
     # for each code in the same participant, compute min(oldest record)/max(newest record)/mean date
     dfout_extrastats<- df_out %>% group_by(!!as.name(identifierfield),code) %>%
       mutate(mindt = min(eventdate, na.rm = TRUE),maxdt = max(eventdate, na.rm = TRUE),meandt = mean(eventdate, na.rm = TRUE))
@@ -151,6 +151,8 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   # take visitdate as event date
   df_out[is.na(df_out$eventdate)]$eventdate <- df_out[is.na(df_out$eventdate)]$visitdate
   df_out <- df_out[,c(identifierfield,"code","eventdate","event"),with=FALSE]
+  
+  message("setkey(code)")
   setkey(df_out,code)    
   
   #head(df_out)

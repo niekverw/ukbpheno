@@ -114,62 +114,47 @@ toc()
 # returns a new variable with the number of rows per code
 lst.counts <- lapply(lst, function(x) x[, .N, by=.(code)] )
 
-lst.counts$icd10 <- sumcounts(list(tte.hesin.icd10.primary=lst.counts$tte.hesin.icd10.primary,
+lst.counts$ICD10 <- sumcounts(list(tte.hesin.icd10.primary=lst.counts$tte.hesin.icd10.primary,
                                    tte.hesin.icd10.secondary=lst.counts$tte.hesin.icd10.secondary,
                                    tte.death.icd10.primary=lst.counts$tte.death.icd10.primary,
                                    tte.death.icd10.secondary=lst.counts$tte.death.icd10.secondary)) # sumcounts function  in read-data.R
-lst.counts$icd9 <- sumcounts(list(tte.hesin.icd9.primary=lst.counts$tte.hesin.icd9.primary,
+lst.counts$ICD9 <- sumcounts(list(tte.hesin.icd9.primary=lst.counts$tte.hesin.icd9.primary,
                                   tte.hesin.icd9.secondary=lst.counts$tte.hesin.icd9.secondary)) # sumcounts function in read-data.R
-lst.counts$oper3 <- sumcounts(list(tte.hesin.oper3.primary=lst.counts$tte.hesin.oper3.primary,
+lst.counts$OPER3 <- sumcounts(list(tte.hesin.oper3.primary=lst.counts$tte.hesin.oper3.primary,
                                    tte.hesin.oper3.secondary=lst.counts$tte.hesin.oper3.secondary)) # sumcounts function in read-data.R
-lst.counts$oper4 <- sumcounts(list(tte.hesin.oper4.primary=lst.counts$tte.hesin.oper4.primary,
+lst.counts$OPER4 <- sumcounts(list(tte.hesin.oper4.primary=lst.counts$tte.hesin.oper4.primary,
                                    tte.hesin.oper4.secondary=lst.counts$tte.hesin.oper4.secondary)) # sumcounts function in read-data.R
 
 # View(lst.counts$icd10)
-# filter dfukb. 
-# retain identifier , visitdates and additional fields needed for definitions besides default (as cols in file)
-dfukb<- dfukb[,dfhtml[dfhtml$field.showcase %in% c("eid", "53",ukb_fields$nondefault_ukb_fields),]$field.tab,with=FALSE]
+
+# to dataset make more lean: retain identifier , visitdates and additional fields needed for definitions besides default (as cols in file)
+#dfukb<- dfukb[,dfhtml[dfhtml$field.showcase %in% c("eid", "53",ukb_fields$nondefault_ukb_fields),]$field.tab,with=FALSE]
 # save 
 save(dfhtml,dfukb,lst,lst.counts,file=fukbphenodata)
-
-
-View(lst$tte.death.icd10.primary)
-
-
+# load(fukbphenodata)
 # codes.ts <- dfDefinitions_processed[1,]$TS
 
+
 View(dfDefinitions_processed)
-# 
-# 
-View(lst)
-head(lst$tte.sr.20004)
 
+##### test:
+### get a vector with definitions: 
+Vctdef <- dfDefinitions_processed[10,c("TRAIT","DESCRIPTION", unique(default_datatable_defCol_pair()))]
 
-codes.icd10 <- dfDefinitions_processed$ICD10CODES[8]
-codes.icd10.expanded <- unique(lst.counts[['icd10']]$code[grep(paste(sep="","^",strsplit(codes.icd10,",")[[1]], collapse='|'),lst.counts$icd10$code)])
-head(lst$tte.gpclincal.read2)
-#grepoper <-unlist( mclapply(  , function(col) grep(paste(sep="","^",VctCodes, collapse='|'), col, ignore.case=FALSE),mc.cores =detectCores()/2 ) ) ## PARALLEL of the above.
+### ICD10 expand first using counts, then use datatable lookup:
+lookupquery <- strsplit(Vctdef[["ICD10"]],split = ",")[[1]] 
+lookuptarget <- lst.counts[['ICD10']][,get("code")] 
+lookupquery <- grep( paste(sep="","^",lookupquery, collapse='|'),lookuptarget,ignore.case = T,value = T)
+lst[["tte.hesin.icd10.secondary"]][.(lookupquery) ] 
 
+### note that self reported data is numeric: maybe we can store this in default_datatable_defCol_pair
+lookupquery <- as.numeric(strsplit(Vctdef[["n_20002"]],split = ",")[[1]])
+lst[["tte.sr.20002"]][.(lookupquery)] ## lookup multiple codes super fast. 
 
- 
-
-# TODO GP SCRIPT
-# TODO TOUCSCHREEN? 
-
-# extract_case(dfDefinitions[1,],lst,dfukb[,c("f.eid", "f.53.0.0")] ) # extract case data. _per source (HESIN, NURSE-TOUCHSCREEN, GP, DEATH) and everything together? 
-# make venn diagram// stats 
-
-# filter dfukb to reduce memory? dont need these fields anymore? 
-# keep <- !names(dfukb) %in% dfhtml[dfhtml$field.showcase %in% c("20001","20002","20004","20003","20006","20008","20010","53","40000","40001","40002"),]$field.tab
-# dfukb <- dfukb[,..keep]
 
 # # check object sizes
 # print(format(object.size(lst), units = "Mb")) #"2014.1 Mb"
 
-# 
-# View(dfhes[(dfhes$level.x != dfhes$level.y) & !is.na(dfhes$level.x) & !is.na(dfhes$level.y),])
-# View(dfukb[,grepl("4000", names(dfukb)),with=FALSE ])
-# 
 # # TOUCSCHREEN Self reported, unstructured. leave this unstructured? 
 # # "6150=1[3627]" # (field == code (age))
 # # "3581≥0[3581]" #Menopause, only age. 
