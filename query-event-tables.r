@@ -57,18 +57,18 @@ get_all_events <- function (definitions,lst_dfs=lst,datatable_defCol_pair=defaul
   
   return (all_event_lst)
 }
-
-dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,datatable_defCol_pair=default_datatable_defCol_pair(),lst.counts = lst.counts)
-test<-get_all_events(dfDefinitions_processed_expanded[9,],lst) #list of 11 dfs 
-
-key(test$tte.death.icd10.secondary)
-
-
-
-# lst_datatables=lst
-colnames(dfDefinitions_processed)[c(1,11:28)]
-
-# TODO TS 
+# 
+# dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,datatable_defCol_pair=default_datatable_defCol_pair(),lst.counts = lst.counts)
+# test<-get_all_events(dfDefinitions_processed_expanded[9,],lst) #list of 11 dfs 
+# 
+# key(test$tte.death.icd10.secondary)
+# 
+# 
+# 
+# # lst_datatables=lst
+# colnames(dfDefinitions_processed)[c(1,11:28)]
+# 
+# # TODO TS 
 
 
 process_ts_cols<- function(trait,df_ukb,dfDefinitions_processed_=NULL){

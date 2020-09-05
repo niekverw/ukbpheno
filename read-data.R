@@ -127,7 +127,7 @@ read_ukb_metadata <- function(fhtml="/Volumes/data/ukb/ukb38326.html") {
 
 
 
-read_ukb_data <- function(fukb, 
+read_ukb_tabdata <- function(fukb, 
                           dfhtml,
                           fields_to_keep = default_ukb_fields()) {
   tic(paste("read ukb data",fukb))
