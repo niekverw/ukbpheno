@@ -393,7 +393,7 @@ read_gp_script_data <- function(fgp){
 }
 
 sumcounts <- function(dfs){
-  
+
   df <- suppressWarnings(Reduce(function(...) merge(..., all = TRUE, by = "code"), dfs))
   names(df)<-c("code",names(dfs))
   icd10.counts <- as.data.table(cbind(df[,"code"],N=df[ ,rowSums(.SD,na.rm = T), .SDcols =names(df)[!names(df) %in% "code"] ]))
@@ -403,6 +403,25 @@ sumcounts <- function(dfs){
   return(df)
 }
 
+get_lst_counts <- function(lst){
+  lst.counts <- lapply(lst, function(x) x[, .N, by=.(code)] )
+  
+  lst.counts.aggregate <- list()
+  for (c in unique(default_datatable_defCol_pair())){
+    
+    print(c)
+    cols <- names(default_datatable_defCol_pair()[default_datatable_defCol_pair()==c])
+    if(any(names(lst.counts) %in% cols)){
+      i.na <- which(is.na(names(lst.counts[cols])))
+      if(length(i.na)>0) {message(paste("WARNING unavailable: ", cols[i.na])); cols <- cols[-i.na] }
+      lst.counts.aggregate[[c]] <- sumcounts(lst.counts[cols])
+    } else{
+      message(glue::glue("{col} not found in lst.counts"))
+    }
+    
+  }
+  return(lst.counts.aggregate)
+}
 
 
 

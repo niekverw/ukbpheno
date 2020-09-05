@@ -98,47 +98,23 @@ lst_dth<-read_death_data(fdeath_portal,fdeath_cause_portal)
 lst$tte.death.icd10.primary <-union(lst_dth$primary,lst$tte.death.icd10.primary)
 lst$tte.death.icd10.secondary <-union(lst_dth$secondary,lst$tte.death.icd10.secondary)
 rm(lst_dth)
-
-
 # HESIN (data is not unique for eid, code; could be used for reevents) contains duration 
 # add 8 lists from HES data primary/secondary x oper3/oper4/icd9/icd10 , with columns eid,eventdate,epidur,<diag>,event
 lst <- append(lst,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.primary + tte.hes.secondary
-
-
-# GP 
-# add 2 lists with read2 /read3
+# GP # add 2 lists with read2 /read3
 lst <- append(lst,read_gp_clinical_data(fgp=fgp_clinical ))
 toc()
 
-# meta data
-# returns a new variable with the number of rows per code
-lst.counts <- lapply(lst, function(x) x[, .N, by=.(code)] )
-
-lst.counts$ICD10 <- sumcounts(list(tte.hesin.icd10.primary=lst.counts$tte.hesin.icd10.primary,
-                                   tte.hesin.icd10.secondary=lst.counts$tte.hesin.icd10.secondary,
-                                   tte.death.icd10.primary=lst.counts$tte.death.icd10.primary,
-                                   tte.death.icd10.secondary=lst.counts$tte.death.icd10.secondary)) # sumcounts function  in read-data.R
-lst.counts$ICD9 <- sumcounts(list(tte.hesin.icd9.primary=lst.counts$tte.hesin.icd9.primary,
-                                  tte.hesin.icd9.secondary=lst.counts$tte.hesin.icd9.secondary)) # sumcounts function in read-data.R
-lst.counts$OPER3 <- sumcounts(list(tte.hesin.oper3.primary=lst.counts$tte.hesin.oper3.primary,
-                                   tte.hesin.oper3.secondary=lst.counts$tte.hesin.oper3.secondary)) # sumcounts function in read-data.R
-lst.counts$OPER4 <- sumcounts(list(tte.hesin.oper4.primary=lst.counts$tte.hesin.oper4.primary,
-                                   tte.hesin.oper4.secondary=lst.counts$tte.hesin.oper4.secondary)) # sumcounts function in read-data.R
-
-# View(lst.counts$icd10)
-
+# generate meta data dynamically,  returns a list with the number of rows per code based on default_datatable_defCol_pair()
+lst.counts <- get_lst_counts(lst)
+# View(lst.counts$ICD10)
 # to dataset make more lean: retain identifier , visitdates and additional fields needed for definitions besides default (as cols in file)
 #dfukb<- dfukb[,dfhtml[dfhtml$field.showcase %in% c("eid", "53",ukb_fields$nondefault_ukb_fields),]$field.tab,with=FALSE]
 # save 
 save(dfhtml,dfukb,lst,lst.counts,file=fukbphenodata)
-# load(fukbphenodata)
-# codes.ts <- dfDefinitions_processed[1,]$TS
-
-
-View(dfDefinitions_processed)
 
 ##### test:
-### get a vector with definitions: 
+### get a vector with definitions to use as input. 
 Vctdef <- dfDefinitions_processed[10,c("TRAIT","DESCRIPTION", unique(default_datatable_defCol_pair()))]
 
 ### ICD10 expand first using counts, then use datatable lookup:
