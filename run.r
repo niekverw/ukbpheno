@@ -70,7 +70,7 @@ dfDefinitions_processed <- ProcessDfDefinitions(dfDefinitions)
 ukb_fields <- get_allvarnames(dfDefinitions_processed)
 
 
-
+##### > loading data <- put in a function ? 
 # read ukb data from ukbconv (.html + .tab)
 # 9 columns in dfhtml: "field.number","field.count","field.showcase","field.html","field.tab","field.description","col.type","col.name","fread_column_type"
 dfhtml <- read_ukb_metadata(fhtml)
@@ -97,47 +97,44 @@ lst_dth<-read_death_data(fdeath_portal,fdeath_cause_portal)
 # merge the records   dplyr union
 lst$tte.death.icd10.primary <-union(lst_dth$primary,lst$tte.death.icd10.primary)
 lst$tte.death.icd10.secondary <-union(lst_dth$secondary,lst$tte.death.icd10.secondary)
+setkey(lst$tte.death.icd10.primary,'code')
+setkey(lst$tte.death.icd10.secondary,'code')
 rm(lst_dth)
 # HESIN (data is not unique for eid, code; could be used for reevents) contains duration 
 # add 8 lists from HES data primary/secondary x oper3/oper4/icd9/icd10 , with columns eid,eventdate,epidur,<diag>,event
 lst <- append(lst,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.primary + tte.hes.secondary
 # GP # add 2 lists with read2 /read3
 lst <- append(lst,read_gp_clinical_data(fgp=fgp_clinical ))
+lst<-lapply(lst,function(x) {setkey(x,code) }) # double check that everything has the same setkey. 
 toc()
 
 # generate meta data dynamically,  returns a list with the number of rows per code based on default_datatable_defCol_pair()
-lst.counts <- get_lst_counts(lst)
+lst.counts <- get_lst_counts(lst,datatable_defCol_pair = default_datatable_defCol_pair() )
 # View(lst.counts$ICD10)
 # to dataset make more lean: retain identifier , visitdates and additional fields needed for definitions besides default (as cols in file)
 #dfukb<- dfukb[,dfhtml[dfhtml$field.showcase %in% c("eid", "53",ukb_fields$nondefault_ukb_fields),]$field.tab,with=FALSE]
 # save 
 save(dfhtml,dfukb,lst,lst.counts,file=fukbphenodata)
 
-##### test:
-### get a vector with definitions to use as input. 
-Vctdef <- dfDefinitions_processed[10,]
-### ICD10 expand first using counts, then use datatable lookup:
-lookupquery <- strsplit(Vctdef[["ICD10"]],split = ",")[[1]] 
-lookuptarget <- lst.counts[['ICD10']][,get("code")] 
-lookupquery <- grep( paste(sep="","^",lookupquery, collapse='|'),lookuptarget,ignore.case = T,value = T)
-lst[["tte.hesin.icd10.primary"]][.(lookupquery) ]
-
-### note that self reported data is numeric: maybe we can store this in default_datatable_defCol_pair
-lookupquery <- as.numeric(strsplit(Vctdef[["n_20002"]],split = ",")[[1]])
-lst[["tte.sr.20002"]][.(lookupquery)] ## lookup multiple codes super fast. 
+#load(fukbphenodata)
+##### I changed your code a little bit with this  principle:
+# ### 1) get a vector with definitions to use as input. 
+# definitions <- dfDefinitions_processed[10,]
+# ### 2)   expand ICD codes  using the counts, now incorporated in the function expand_dfDefinitions_processed()
+# lookupquery <- strsplit(definitions[["ICD10"]],split = ",")[[1]] 
+# lookuptarget <- lst.counts[['ICD10']][,get("code")] 
+# lookupquery <- grep( paste(sep="","^",lookupquery, collapse='|'),lookuptarget,ignore.case = T,value = T)
+# ### 3) then use datatable lookup:
+# lst[["tte.hesin.icd10.primary"]][.(lookupquery) ]
 
 
-# # check object sizes
+# Here it is formalized: 
+dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,datatable_defCol_pair=default_datatable_defCol_pair(),lst.counts = lst.counts)
+test <- get_all_events(dfDefinitions_processed_expanded[9,],lst) #list of 11 dfs 
+# some dfs are NA on every column, not sure why that is.. 
+
+
 # print(format(object.size(lst), units = "Mb")) #"2014.1 Mb"
-
-# # TOUCSCHREEN Self reported, unstructured. leave this unstructured? 
-# # "6150=1[3627]" # (field == code (age))
-# # "3581≥0[3581]" #Menopause, only age. 
-# # 6153_=5 # anticonception
-# # 20110=4 (Bowel cancer),20107=4, 20111=4 # family history. 
-# lst$df_6150 <- read_ukb_data(f, fields_to_keep = c("6150","3627:numeric")) 
-# 
-
 
 
 

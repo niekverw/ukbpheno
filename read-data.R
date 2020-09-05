@@ -403,14 +403,15 @@ sumcounts <- function(dfs){
   return(df)
 }
 
-get_lst_counts <- function(lst){
+get_lst_counts <- function(lst,datatable_defCol_pair=default_datatable_defCol_pair() ) {
+  print("counting")
   lst.counts <- lapply(lst, function(x) x[, .N, by=.(code)] )
   
   lst.counts.aggregate <- list()
-  for (c in unique(default_datatable_defCol_pair())){
+  for (c in unique(datatable_defCol_pair)){
     
     print(c)
-    cols <- names(default_datatable_defCol_pair()[default_datatable_defCol_pair()==c])
+    cols <- names(datatable_defCol_pair[datatable_defCol_pair==c])
     if(any(names(lst.counts) %in% cols)){
       i.na <- which(is.na(names(lst.counts[cols])))
       if(length(i.na)>0) {message(paste("WARNING unavailable: ", cols[i.na])); cols <- cols[-i.na] }
