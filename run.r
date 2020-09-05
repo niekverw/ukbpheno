@@ -115,13 +115,12 @@ save(dfhtml,dfukb,lst,lst.counts,file=fukbphenodata)
 
 ##### test:
 ### get a vector with definitions to use as input. 
-Vctdef <- dfDefinitions_processed[10,c("TRAIT","DESCRIPTION", unique(default_datatable_defCol_pair()))]
-
+Vctdef <- dfDefinitions_processed[10,]
 ### ICD10 expand first using counts, then use datatable lookup:
 lookupquery <- strsplit(Vctdef[["ICD10"]],split = ",")[[1]] 
 lookuptarget <- lst.counts[['ICD10']][,get("code")] 
 lookupquery <- grep( paste(sep="","^",lookupquery, collapse='|'),lookuptarget,ignore.case = T,value = T)
-View(lst[["tte.hesin.icd10.primary"]][.(lookupquery) ] )
+lst[["tte.hesin.icd10.primary"]][.(lookupquery) ]
 
 ### note that self reported data is numeric: maybe we can store this in default_datatable_defCol_pair
 lookupquery <- as.numeric(strsplit(Vctdef[["n_20002"]],split = ",")[[1]])
