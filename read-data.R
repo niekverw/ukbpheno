@@ -391,7 +391,7 @@ read_gp_script_data <- function(fgp){
 
 sumcounts <- function(dfs){
   
-  df <- Reduce(function(...) merge(..., all = TRUE, by = "code"), dfs)
+  df <- suppressWarnings(Reduce(function(...) merge(..., all = TRUE, by = "code"), dfs))
   names(df)<-c("code",names(dfs))
   icd10.counts <- as.data.table(cbind(df[,"code"],N=df[ ,rowSums(.SD,na.rm = T), .SDcols =names(df)[!names(df) %in% "code"] ]))
   dfs <- list(lst.counts$tte.death.icd10.primary,lst.counts$tte.death.icd10.secondary,lst.counts$tte.death.icd10.primary,lst.counts$tte.death.icd10.secondary)
