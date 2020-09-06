@@ -126,7 +126,7 @@ save(dfhtml,dfukb,lst.data,lst.counts,file=fukbphenodata)
 ## test: 
 dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,datatable_defCol_pair=default_datatable_defCol_pair(),lst.counts = lst.counts)
 all_event_dt <- get_all_events(dfDefinitions_processed_expanded[12,],lst.data) #list of 11 dfs 
-all_event_dt[, .(count = .N, sum.event = sum(event,na.rm = T),sum.epidur= sum(epidur,na.rm = T),mean.epidur= mean(epidur,na.rm = T)), by = f.eid]
+all_event_dt[, .(count = .N, sum.event = sum(event,na.rm = T),sum.epidur= sum(epidur,na.rm = T),mean.epidur= mean(epidur,na.rm = T),max.epidur= max(epidur,na.rm=T)), by = f.eid]
 
 
 # print(format(object.size(lst.data), units = "Mb")) #"2014.1 Mb"
