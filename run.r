@@ -98,18 +98,17 @@ toc()
 # generate meta data dynamically,  returns a list with the number of rows per code based on default_datatable_defCol_pair()
 lst.counts <- get_lst_counts(lst.data,datatable_defCol_pair = default_datatable_defCol_pair() )
 ##########################################
-# View(lst.counts$ICD10)
+##########################################
+#### We should make it into one data-object, which will make things more dynamic.
+### ukb.data.object <- list(data=lst.data,lst.counts=lst.counts,settings=default_datatable_defCol_pair())
+### lst.counts <- NULL
+### lst.data <- NULL
+
 # to dataset make more lean: retain identifier , visitdates and additional fields needed for definitions besides default (as cols in file)
 #dfukb<- dfukb[,dfhtml[dfhtml$field.showcase %in% c("eid", "53",ukb_fields$nondefault_ukb_fields),]$field.tab,with=FALSE]
 # save 
 save(dfhtml,dfukb,lst.data,lst.counts,file=fukbphenodata)
 
-##########################################
-#### We should make it into one data-object, which will make things more dynamic. 
-#### Should we use somethinig like 'S3 class', I'm not sure what the advantage is   ??
-### ukb.data.object <- list(data=lst.data,lst.counts=lst.counts,settings=default_datatable_defCol_pair())
-### lst.counts <- NULL
-### lst.data <- NULL
 ##########################################
 #load(fukbphenodata)
 ##### I changed get_all_events() code a little bit with this  principle:
@@ -126,7 +125,8 @@ save(dfhtml,dfukb,lst.data,lst.counts,file=fukbphenodata)
 ##########################################
 ## test: 
 dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,datatable_defCol_pair=default_datatable_defCol_pair(),lst.counts = lst.counts)
-test <- get_all_events(dfDefinitions_processed_expanded[8,],lst.data) #list of 11 dfs 
+all_event_dt <- get_all_events(dfDefinitions_processed_expanded[12,],lst.data) #list of 11 dfs 
+all_event_dt[, .(count = .N, sum.event = sum(event,na.rm = T),sum.epidur= sum(epidur,na.rm = T)), by = f.eid] 
 
 
 # print(format(object.size(lst.data), units = "Mb")) #"2014.1 Mb"

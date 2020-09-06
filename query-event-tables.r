@@ -51,11 +51,9 @@ get_all_events <- function (definitions,lst_dfs=lst,datatable_defCol_pair=defaul
   all_event_lst <- all_event_lst[lapply(all_event_lst,nrow)>0]
   
   # set key to be eid
-  all_event_lst<-lapply(all_event_lst,function(x) {
-    setkey(x,f.eid)    
-  })
-  
-  return (all_event_lst)
+  all_event_dt <- plyr::ldply(all_event_lst, data.frame) %>% as.data.table()
+  setkey(all_event_dt,f.eid)    
+  return (all_event_dt)
 }
 # 
 # dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,datatable_defCol_pair=default_datatable_defCol_pair(),lst.counts = lst.counts)
