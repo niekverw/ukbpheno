@@ -136,8 +136,8 @@ stats.codes <- all_event_dt[, .(count=.N,sum.event = sum(event,na.rm = T),sum.ep
 stats.codes <- stats.codes %>% dplyr::group_by(classification, code) %>% summarise(count=n() )
 stats.codes <- stats.codes %>% arrange(count)
 stats.codes$rank <- 1:nrow(stats.codes)
-ggplot(stats.codes, aes(rank, (count),label=code,color=classification)) + geom_point() + ylim(-((max(stats.codes$count))/3),NA)  + geom_text_repel(size =3,segment.size=0.5)
-ggplot(stats.codes, aes(rank, (count),label=code,color=classification)) + scale_y_continuous(trans='log2') + geom_point()   + geom_text_repel(size =3,segment.size=0.5)
+ggplot(stats.codes, aes(rank, count,label=code,color=classification)) + geom_point() + ylim(-((max(stats.codes$count))/3),NA)  + geom_text_repel(size =3,segment.size=0.5)
+ggplot(stats.codes, aes(rank, count,label=code,color=classification)) + scale_y_continuous(trans='log2') + geom_point()   + geom_text_repel(size =3,segment.size=0.5)
 
 # show co-occurences of codes 
 
