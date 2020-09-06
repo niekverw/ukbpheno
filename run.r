@@ -62,47 +62,54 @@ print(format(object.size(dfukb), units = "Gb"))
 #################################################################################### \
 # Should we put the following in a function?
 tic("converting data")
-lst <- list()
+lst.data <- list()
 ##########################################
 # SELF REPORT (TIME TO EVENT DATA); data is unique (eid,code) contains first events, but also some without date, so can't say if its event. 
-lst$tte.sr.20002 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20002",field_sr_date = "20008",qc_treshold_year = 10) # non cancer
-lst$tte.sr.20001 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20001",field_sr_date = "20006",qc_treshold_year = 10) # cancer
-lst$tte.sr.20004 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20004",field_sr_date = "20010",qc_treshold_year = 10) # operation
+lst.data$tte.sr.20002 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20002",field_sr_date = "20008",qc_treshold_year = 10) # non cancer
+lst.data$tte.sr.20001 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20001",field_sr_date = "20006",qc_treshold_year = 10) # cancer
+lst.data$tte.sr.20004 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20004",field_sr_date = "20010",qc_treshold_year = 10) # operation
 ##########################################
 # MEDICATION (data is not unique for eid, code)
-lst$sr.20003 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20003",field_sr_date = "",qc_treshold_year = 10) 
+lst.data$sr.20003 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20003",field_sr_date = "",qc_treshold_year = 10) 
 ##########################################
 # DEATH REGISTRY REPORT
-lst$tte.death.icd10.primary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40001",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10) # death
+lst.data$tte.death.icd10.primary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40001",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10) # death
 ## secondary death, use only 1 date... 
-lst$tte.death.icd10.secondary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10) # death
+lst.data$tte.death.icd10.secondary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10) # death
 # DEATH from data portal , same data as the main dataset but more up to date, refer document DeathLinkage
-lst_dth<-read_death_data(fdeath_portal,fdeath_cause_portal)
+lst.data_dth<-read_death_data(fdeath_portal,fdeath_cause_portal)
 # merge the records   dplyr union
-lst$tte.death.icd10.primary <-union(lst_dth$primary,lst$tte.death.icd10.primary)
-lst$tte.death.icd10.secondary <-union(lst_dth$secondary,lst$tte.death.icd10.secondary)
-setkey(lst$tte.death.icd10.primary,'code')
-setkey(lst$tte.death.icd10.secondary,'code')
-rm(lst_dth)
+lst.data$tte.death.icd10.primary <-union(lst.data_dth$primary,lst.data$tte.death.icd10.primary)
+lst.data$tte.death.icd10.secondary <-union(lst.data_dth$secondary,lst.data$tte.death.icd10.secondary)
+setkey(lst.data$tte.death.icd10.primary,'code')
+setkey(lst.data$tte.death.icd10.secondary,'code')
+rm(lst.data_dth)
 ##########################################
 # HESIN (data is not unique for eid, code; could be used for reevents) contains duration 
 # add 8 lists from HES data primary/secondary x oper3/oper4/icd9/icd10 , with columns eid,eventdate,epidur,<diag>,event
-lst <- append(lst,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.primary + tte.hes.secondary
+lst.data <- append(lst.data,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.primary + tte.hes.secondary
 # GP # add 2 lists with read2 /read3
-lst <- append(lst,read_gp_clinical_data(fgp=fgp_clinical ))
-lst<-lapply(lst,function(x) {setkey(x,code) }) # double check that everything has the same setkey. 
+lst.data <- append(lst.data,read_gp_clinical_data(fgp=fgp_clinical ))
+lst.data<-lapply(lst.data,function(x) {setkey(x,code) }) # double check that everything has the same setkey. 
 ##########################################
 toc()
 
 ##########################################
 # generate meta data dynamically,  returns a list with the number of rows per code based on default_datatable_defCol_pair()
-lst.counts <- get_lst_counts(lst,datatable_defCol_pair = default_datatable_defCol_pair() )
+lst.counts <- get_lst_counts(lst.data,datatable_defCol_pair = default_datatable_defCol_pair() )
 ##########################################
 # View(lst.counts$ICD10)
 # to dataset make more lean: retain identifier , visitdates and additional fields needed for definitions besides default (as cols in file)
 #dfukb<- dfukb[,dfhtml[dfhtml$field.showcase %in% c("eid", "53",ukb_fields$nondefault_ukb_fields),]$field.tab,with=FALSE]
 # save 
-save(dfhtml,dfukb,lst,lst.counts,file=fukbphenodata)
+save(dfhtml,dfukb,lst.data,lst.counts,file=fukbphenodata)
+
+##########################################
+#### We should make it into one data-object, which will make things more dynamic. 
+#### Should we use somethinig like 'S3 class', I'm not sure what the advantage is   ??
+### ukb.data.object <- list(data=lst.data,lst.counts=lst.counts,settings=default_datatable_defCol_pair())
+### lst.counts <- NULL
+### lst.data <- NULL
 ##########################################
 #load(fukbphenodata)
 ##### I changed get_all_events() code a little bit with this  principle:
@@ -113,16 +120,16 @@ save(dfhtml,dfukb,lst,lst.counts,file=fukbphenodata)
 # lookuptarget <- lst.counts[['ICD10']][,get("code")] 
 # lookupquery <- grep( paste(sep="","^",lookupquery, collapse='|'),lookuptarget,ignore.case = T,value = T)
 # ### 3) then use datatable lookup:
-# lst[["tte.hesin.icd10.primary"]][.(lookupquery) ]
+# lst.data[["tte.hesin.icd10.primary"]][.(lookupquery) ]
 
 
 ##########################################
 ## test: 
 dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,datatable_defCol_pair=default_datatable_defCol_pair(),lst.counts = lst.counts)
-test <- get_all_events(dfDefinitions_processed_expanded[8,],lst) #list of 11 dfs 
+test <- get_all_events(dfDefinitions_processed_expanded[8,],lst.data) #list of 11 dfs 
 
 
-# print(format(object.size(lst), units = "Mb")) #"2014.1 Mb"
+# print(format(object.size(lst.data), units = "Mb")) #"2014.1 Mb"
 
 
 

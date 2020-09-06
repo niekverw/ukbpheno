@@ -403,21 +403,21 @@ sumcounts <- function(dfs){
   return(df)
 }
 
-get_lst_counts <- function(lst,datatable_defCol_pair=default_datatable_defCol_pair() ) {
+get_lst_counts <- function(lst.data,datatable_defCol_pair=default_datatable_defCol_pair() ) {
   print("counting")
-  lst.counts <- lapply(lst, function(x) x[, .N, by=.(code)] )
+  lst.counts <- lapply(lst.data, function(x) x[, .N, by=.(code)] )
   
   lst.counts.aggregate <- list()
-  for (c in unique(datatable_defCol_pair)){
+  for (c in unique(datatable_defCol_pair$classification)){
     
     print(c)
-    cols <- names(datatable_defCol_pair[datatable_defCol_pair==c])
-    if(any(names(lst.counts) %in% cols)){
-      i.na <- which(is.na(names(lst.counts[cols])))
-      if(length(i.na)>0) {message(paste("WARNING unavailable: ", cols[i.na])); cols <- cols[-i.na] }
-      lst.counts.aggregate[[c]] <- sumcounts(lst.counts[cols])
+    dfs <- datatable_defCol_pair[datatable_defCol_pair$classification %in% c,'datasource']
+    if(any(names(lst.counts) %in% dfs)){
+      i.na <- which(is.na(names(lst.counts[dfs])))
+      if(length(i.na)>0) {message(paste("WARNING unavailable: ", dfs[i.na])); dfs <- dfs[-i.na] }
+      lst.counts.aggregate[[c]] <- sumcounts(lst.counts[dfs])
     } else{
-      message(glue::glue("{col} not found in lst.counts"))
+      message(glue::glue("{c} not found in lst.counts"))
     }
     
   }
