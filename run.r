@@ -137,7 +137,7 @@ stats.codes <- stats.codes %>% dplyr::group_by(classification, code) %>% summari
 stats.codes <- stats.codes %>% arrange(count)
 stats.codes$i <- 1:nrow(stats.codes)
 ggplot(stats.codes, aes(i, (count),label=code,color=classification)) + xlab("code") + geom_point() + ylim(-((max(stats.codes$count))/3),NA)  + geom_text_repel(size =3,segment.size=0.5)
-ggplot(stats.codes, aes(i, log10(count),label=code,color=classification)) + xlab("code") + geom_point() + ylim(-(log10(max(stats.codes$count))/3),NA)  + geom_text_repel(size =3,segment.size=0.5)
+ggplot(stats.codes, aes(i, (count),label=code,color=classification)) + scale_y_continuous(trans='log2',) + xlab("code") + geom_point()   + geom_text_repel(size =3,segment.size=0.5)
 
 # show co-occurences of codes 
 
