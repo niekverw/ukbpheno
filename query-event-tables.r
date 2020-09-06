@@ -52,6 +52,7 @@ get_all_events <- function (definitions,lst_dfs=lst,datatable_defCol_pair=defaul
   
   # set key to be eid
   all_event_dt <- plyr::ldply(all_event_lst, data.frame) %>% as.data.table()
+  all_event_dt$classification <- datatable_defCol_pair[match(all_event_dt$.id ,datatable_defCol_pair$datasource),]$classification
   setkey(all_event_dt,f.eid)    
   return (all_event_dt)
 }

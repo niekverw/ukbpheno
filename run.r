@@ -8,6 +8,8 @@ library(dplyr)
 library(tictoc)
 require(XML)
 require(stringr)
+library(ggplot2)
+library(ggrepel)
 
 if (Sys.getenv("USER")=="niek"){
   repo_dir="/Users/niek/repos/ukbpheno/"
@@ -123,10 +125,22 @@ save(dfhtml,dfukb,lst.data,lst.counts,file=fukbphenodata)
 
 
 ##########################################
-## test: 
+## analyse 1 definition
 dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,datatable_defCol_pair=default_datatable_defCol_pair(),lst.counts = lst.counts)
 all_event_dt <- get_all_events(dfDefinitions_processed_expanded[12,],lst.data) #list of 11 dfs 
-all_event_dt[, .(count = .N, sum.event = sum(event,na.rm = T),sum.epidur= sum(epidur,na.rm = T),mean.epidur= mean(epidur,na.rm = T),max.epidur= max(epidur,na.rm=T)), by = f.eid]
+all_event_dt[, .(count = .N, sum.event = sum(event,na.rm = T),sum.epidur= sum(epidur,na.rm = T),median.epidur= median(epidur,na.rm = T),max.epidur= max(epidur,na.rm=T)), by = f.eid]
+
+
+# show stats on codes
+stats.codes <- all_event_dt[, .(count=.N,sum.event = sum(event,na.rm = T),sum.epidur= sum(epidur,na.rm = T),median.epidur= median(epidur,na.rm = T),max.epidur= max(epidur,na.rm=T) ), keyby=list(f.eid,classification, code)]
+stats.codes <- stats.codes %>% dplyr::group_by(classification, code) %>% summarise(count=n() )
+stats.codes <- stats.codes %>% arrange(count)
+stats.codes$i <- 1:nrow(stats.codes)
+ggplot(stats.codes, aes(i, (count),label=code,color=classification)) + xlab("code") + geom_point() + ylim(-((max(stats.codes$count))/3),NA)  + geom_text_repel(size =3,segment.size=0.5)
+ggplot(stats.codes, aes(i, log10(count),label=code,color=classification)) + xlab("code") + geom_point() + ylim(-(log10(max(stats.codes$count))/3),NA)  + geom_text_repel(size =3,segment.size=0.5)
+
+# show co-occurences of codes 
+
 
 
 # print(format(object.size(lst.data), units = "Mb")) #"2014.1 Mb"
