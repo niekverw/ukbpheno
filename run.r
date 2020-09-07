@@ -15,9 +15,12 @@ if (Sys.getenv("USER")=="niek"){
   repo_dir="/Users/niek/repos/ukbpheno/"
   pheno_dir="/Volumes/data/ukb/"
 }else if (Sys.getenv("USER")=="ming") {
-  pheno_dir="/home/ming/UKB/Ukbpheno_data/"
-  repo_dir="/home/ming/Repos/ukbpheno/"
+  pheno_dir="/home/mw/Analyses/Ukbpheno_data/"
+  repo_dir="/home/mw/Repos/ukbpheno/"
 }
+
+
+
 
 source(paste(repo_dir,"convert_nurseinterview_to_episodedata.r",sep=""))
 source(paste(repo_dir,"ProcessdfDefinitions.R",sep=""))
@@ -61,6 +64,9 @@ dfhtml <- read_ukb_metadata(fhtml)
 dfukb <- read_ukb_tabdata(fukbtab,dfhtml,fields_to_keep = dfDefinitions_ukb_fields$all_ukb_fields)
 print(format(object.size(dfukb), units = "Gb"))
 
+
+
+
 #################################################################################### \
 # Should we put the following in a function?
 tic("converting data")
@@ -99,6 +105,7 @@ toc()
 ##########################################
 # generate meta data dynamically,  returns a list with the number of rows per code based on default_datatable_defCol_pair()
 lst.counts <- get_lst_counts(lst.data,datatable_defCol_pair = default_datatable_defCol_pair() )
+
 ##########################################
 ##########################################
 #### We should make it into one data-object, which will make things more dynamic.

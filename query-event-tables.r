@@ -70,16 +70,24 @@ get_all_events <- function (definitions,lst_dfs=lst,datatable_defCol_pair=defaul
 # # TODO TS 
 
 
-process_ts_cols<- function(trait,df_ukb,dfDefinitions_processed_=NULL){
+# TS per trait
+process_ts_cols<- function(trait,df_ukb,dfDefinitions_processed=NULL){
   # default ,maybe parameter not needed at all? 
-  if(is.null(dfDefinitions_processed_)) {
-    dfDefinitions_processed_<- dfDefinitions_processed
+  if(is.null(dfDefinitions_processed)) {
+    dfDefinitions_processed<- dfDefinitions_processed
   } 
   # look up the fields needed in ts
+  trait<-"HxHrt"
+  df_ukb<-dfukb
+  
+  
   ts_col<-dfDefinitions_processed[dfDefinitions_processed$TRAIT=="HxHrt",]$TS
   # parse fields
-  ts_conditions<-unlist(strsplit(ts_col,","))
+  ts_conditions<-unlist(strsplit(ts_col,","))   #"20110=1"       "20107=1[3894]" "20111<=1" 
+  ts_conditions
   # clean out extra characters that was not removed in process definition function
+  
+  
   # str_extract from stringr  , extract only the conditions
   ts_cols<-str_extract(ts_conditions,"\\d+[=|<|>][=]*\\d+")   # "20110=1"  "20107=1"  "20111<=1"
   # extract the fields for selectiion dfukb
@@ -93,8 +101,14 @@ process_ts_cols<- function(trait,df_ukb,dfDefinitions_processed_=NULL){
   # create a list to store the result
   ts_lst<-list()
   # for each field listed in ts
-  for (col in ts_cols) {
+  for (col in ts_conditions) {
     # parse the field and condition 
+    col<-"20107=1[3894]"
+    
+    # optional col for age of diagnosis specified in bracket []  
+    # https://stackoverflow.com/questions/52061753/r-capturing-string-inside-brackets
+    regmatches(col, regexpr("\\[\\K[^][]*", col,perl = TRUE))
+    
     field_prefix<-str_extract(col,"\\d+")
     cdn<-str_extract(col,"[=|<|>][=]*\\d+")
     # replace to logical equal
