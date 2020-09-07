@@ -25,7 +25,7 @@ convert_col_to_integer <- function(col){
   }
 }
 
-convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002",field_sr_date = "20008",field_sr_date_type="interpolated_year",qc_treshold_year=10){
+convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20001",field_sr_date = "20006",field_sr_date_type="interpolated_year",qc_treshold_year=10){
   # TODO: IF NA, then list first visit answered yes. 
   # 
   # df = lst$df_sr # data.table
@@ -145,7 +145,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
 
   # record which can be set as an event or not (when no event_date is reported, only visit)
   df_out$event <- 2
-  df_out[year(df_out$eventdate) == year(df_out$visitdate),]$event <- 0 # exclude as event if the event happend in the same year as the visit
+  df_out[df_out$eventdate > df_out$visitdate,] <- df_out[df_out$eventdate > df_out$visitdate,]$visitdate
   df_out <- df_out[, event:=as.integer(event)]
   # mark record without valid event date with 0
   df_out[is.na(df_out$eventdate)]$event <- 0
