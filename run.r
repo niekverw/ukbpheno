@@ -214,12 +214,12 @@ get_incidence_prevalence <- function(all_event_dt,reference_date,include_seconda
   #system.time({ df[df$event>0][,.(first_diagnosis_days=min(days,na.rm=T) ), by=f.eid] }) # <- fast..
   #df[df$event>0][df[, .I[which.max(days)], by=f.eid]$V1] # <- aanother way.. 
   first_diagnosis_days <- df[df$event>0][,.(first_diagnosis_days=min(days,na.rm=T) ), by=f.eid] # 
-  View(Reduce(function(...) merge(..., all = TRUE,by='f.eid'), list(df,
-                                                                    Hxd,
-                                                                    Fud,
-                                                                    unique(dfHx[,c("f.eid","Hx")]),
-                                                                    unique(dfFu[,c("f.eid","Fu")]),
-                                                                    first_diagnosis_days)))
+  # View(Reduce(function(...) merge(..., all = TRUE,by='f.eid'), list(df,
+  #                                                                   Hxd,
+  #                                                                   Fud,
+  #                                                                   unique(dfHx[,c("f.eid","Hx")]),
+  #                                                                   unique(dfFu[,c("f.eid","Fu")]),
+  #                                                                   first_diagnosis_days)))
 
   df <- Reduce(function(...) merge(..., all = TRUE,by='f.eid'), list( Hxd,
                                                                 Fud,
