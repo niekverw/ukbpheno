@@ -154,14 +154,14 @@ stats.coocurrence <- table(all_event_dt[,c("f.eid" ,"classification")])
 stats.coocurrence[stats.coocurrence>0] <-1
 mat <- crossprod(as.matrix(stats.coocurrence))     
 mat <- floor(t(mat * 100 / diag(mat)))                 # calculate the percentage
-pheatmap::pheatmap(mat,display_numbers=mat )
+pheatmap::pheatmap(mat,display_numbers=mat,cluster_cols = F,cluster_rows = F )
 
 # show co-occurences of codes
 stats.coocurrence <- table(all_event_dt[,c("f.eid" ,"code")])
 stats.coocurrence[stats.coocurrence>0] <-1
 mat <- crossprod(as.matrix(stats.coocurrence))     
 mat <- floor(t(mat * 100 / diag(mat)))                 # calculate the percentage
-pheatmap::pheatmap(mat,fontsize = 6)
+pheatmap::pheatmap(mat,fontsize = 6,cluster_cols = F,cluster_rows = F)
 
 
 reshape(d,direction = 'wide',v.names='classification',idvar='f.eid',timevar='value')
