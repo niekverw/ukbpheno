@@ -121,17 +121,6 @@ lst.counts <- get_lst_counts(lst.data,datatable_defCol_pair = default_datatable_
 save(dfhtml,dfukb,lst.data,lst.counts,file=fukbphenodata)
 # load(fukbphenodata)
 ##########################################
-#load(fukbphenodata)
-##### I changed get_all_events() code a little bit with this  principle:
-# ### 1) get a vector with definitions to use as input. 
-# definitions <- dfDefinitions_processed[10,]
-# ### 2)   expand ICD codes  using the counts, now incorporated in the function expand_dfDefinitions_processed()
-# lookupquery <- strsplit(definitions[["ICD10"]],split = ",")[[1]] 
-# lookuptarget <- lst.counts[['ICD10']][,get("code")] 
-# lookupquery <- grep( paste(sep="","^",lookupquery, collapse='|'),lookuptarget,ignore.case = T,value = T)
-# ### 3) then use datatable lookup:
-# lst.data[["tte.hesin.icd10.primary"]][.(lookupquery) ]
-
 
 ##########################################
 ## analyse 1 definition
