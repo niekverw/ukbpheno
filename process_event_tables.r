@@ -29,7 +29,7 @@ get_stats_for_events <- function(all_event_dt){
   
   # filter on codes that with co-occurence of at least 10% to reduce sparseness and make clustering more informative. 
   stats.codes.cooccur.filtered.table <- stats.codes.cooccur.table[rowMaxs(stats.codes.cooccur.table,na.rm=T)>10,colMaxs(stats.codes.cooccur.table,na.rm=T)>10]
-  stats.codes.cooccur.filtered.p <- pheatmap::pheatmap( stats.codes.cooccur.table.filtered  ,fontsize = 6)
+  stats.codes.cooccur.filtered.p <- pheatmap::pheatmap( stats.codes.cooccur.table.filtered  ,fontsize = 6,,cluster_cols = F)
   
   return(list(stats.codes.summary.table = stats.codes.summary.table,
          stats.codes.summary.p = stats.codes.summary.p,
