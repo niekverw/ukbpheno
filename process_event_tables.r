@@ -10,7 +10,7 @@ get_stats_for_events <- function(all_event_dt){
   stats.codes.summary.p <- ggarrange(p1,p2,nrow = 1, ncol = 2,common.legend = TRUE)
   
   # show co-occurences of classifications 
-  stats.coocurrence <- table(all_event_dt[,c("f.eid" ,"classification")])
+  stats.coocurrence <- table(all_event_dt[,c("f.eid" ,"classification")])#[1:10,]
   stats.coocurrence[stats.coocurrence>0] <-1
   mat <- crossprod(as.matrix(stats.coocurrence))     
   mat <- floor(t(mat * 100 / diag(mat)))                 # calculate the percentage
