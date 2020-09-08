@@ -14,6 +14,7 @@ get_stats_for_events <- function(all_event_dt){
   stats.coocurrence[stats.coocurrence>0] <-1
   mat <- crossprod(as.matrix(stats.coocurrence))     
   mat <- floor(t(mat * 100 / diag(mat)))                 # calculate the percentage
+  diag(mat) <- NA
   stats.class.cooccur.table <- mat
   stats.class.cooccur.p <- pheatmap::pheatmap(mat,display_numbers=mat,cluster_cols = F,cluster_rows = F )
   
@@ -22,15 +23,21 @@ get_stats_for_events <- function(all_event_dt){
   stats.coocurrence[stats.coocurrence>0] <-1
   mat <- crossprod(as.matrix(stats.coocurrence))     
   mat <- floor(t(mat * 100 / diag(mat)))                 # calculate the percentage
+  diag(mat) <- NA
   stats.codes.cooccur.table <- mat
   stats.codes.cooccur.p <- pheatmap::pheatmap(mat,fontsize = 6,cluster_cols = F,cluster_rows = F)
+  
+  # filter on codes that with co-occurence of at least 10% to reduce sparseness and make clustering more informative. 
+  stats.codes.cooccur.filtered.table <- stats.codes.cooccur.table[rowMaxs(stats.codes.cooccur.table,na.rm=T)>10,colMaxs(stats.codes.cooccur.table,na.rm=T)>10]
+  stats.codes.cooccur.filtered.p <- pheatmap::pheatmap( stats.codes.cooccur.table.filtered  ,fontsize = 6)
   
   return(list(stats.codes.summary.table = stats.codes.summary.table,
          stats.codes.summary.p = stats.codes.summary.p,
          stats.class.cooccur.table = stats.class.cooccur.table,
          stats.class.cooccur.p = stats.class.cooccur.p,
          stats.codes.cooccur.table = stats.codes.cooccur.table,
-         stats.codes.cooccur.p = stats.codes.cooccur.p))
+         stats.codes.cooccur.p = stats.codes.cooccur.p,
+         stats.codes.cooccur.filtered.p = stats.codes.cooccur.filtered.p))
 }
 
 ### get prevalence (move this.. )
