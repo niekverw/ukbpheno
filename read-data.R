@@ -5,8 +5,8 @@ default_ukb_fields <- function(){
   SRdatefieldnames <- c("20006","20008","20010")
   Deathfieldnames <- c("40000","40001","40002") 
   Visitfieldnames <- c("53") 
-
-  c(SRfieldnames,SRdatefieldnames,Deathfieldnames,Visitfieldnames)
+  Birthfieldnames <- c("34","52")
+  c(SRfieldnames,SRdatefieldnames,Deathfieldnames,Visitfieldnames,Birthfieldnames)
   
 }
 

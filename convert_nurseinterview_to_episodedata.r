@@ -43,7 +43,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   daysinyear=365.25
   field_visit_date="53"
   # vector with name of the identifier col 
-  identifierfield = names(df)[grepl("eid", names(df))]
+  # identifierfield = f.eid #names(df)[grepl("eid", names(df))]
   #  vector with names of all visit cols : "f.53.0.0" "f.53.1.0" "f.53.2.0" "f.53.3.0"
   visitdatefields = names(df)[grepl(paste0("[^0-9]",field_visit_date,"[^0-9]"), names(df))]
   
@@ -54,7 +54,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   visits = length(visitdatefields) #sum(grepl("53_", names(df)))
   
   # only need n_eid, visit dates and diag-codes + age-of-diag
-  columns_to_keep = c(identifierfield,
+  columns_to_keep = c("f.eid",
                       visitdatefields,
                       srdiagnosisfields, 
                       srdiagnosisdatefields
@@ -88,10 +88,10 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
       #  empty diagnosis column
       if(all(is.na(df_[,diagfield,with=FALSE]))){next}
       # for rows with non-empty current diagfield, select identifier,diagfield,diagdatefield,visitdatefield 
-      df_sub <- df_[!is.na(get(diagfield) ),c(identifierfield,diagfield,diagdatefield,visitdatefield),with=FALSE]
+      df_sub <- df_[!is.na(get(diagfield) ),c("f.eid",diagfield,diagdatefield,visitdatefield),with=FALSE]
       df_sub$visit <- v
-      names(df_sub) <- c(identifierfield,"code","eventdate","visitdate","visit")
-      df_out <- rbind(df_out,as.matrix(df_sub[,c(identifierfield,"code","eventdate","visit","visitdate"),with=FALSE]))
+      names(df_sub) <- c("f.eid","code","eventdate","visitdate","visit")
+      df_out <- rbind(df_out,as.matrix(df_sub[,c("f.eid","code","eventdate","visit","visitdate"),with=FALSE]))
     }
     
   }
@@ -129,8 +129,11 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
     # deduplicate, min/max/mean/sd <- not very efficient?!! 
     message("deduplicate")
     # for each code in the same participant, compute min(oldest record)/max(newest record)/mean date
-    dfout_extrastats<- df_out %>% group_by(!!as.name(identifierfield),code) %>%
-      mutate(mindt = min(eventdate, na.rm = TRUE),maxdt = max(eventdate, na.rm = TRUE),meandt = mean(eventdate, na.rm = TRUE))
+    #### slow: # dfout_extrastats <- df_out %>% group_by(f.eid,code) %>% mutate(mindt = min(eventdate, na.rm = TRUE),maxdt = max(eventdate, na.rm = TRUE),meandt = mean(eventdate, na.rm = TRUE))
+    setkey(df_out,f.eid,code)
+    dfout_extrastats <- df_out[, .(mindt= min(eventdate,na.rm = T),maxdt= max(eventdate,na.rm = T),meandt= mean(eventdate,na.rm=T) ), keyby=list(f.eid,code)]
+    dfout_extrastats <- merge(df_out[,c('f.eid','code','eventdate')] ,dfout_extrastats,by=c('f.eid','code'))
+    
     # time between oldest and newest record in unit of year
     dfout_extrastats$diffdt <- (dfout_extrastats$maxdt - dfout_extrastats$mindt)/daysinyear
     # if this time difference is larger than qc threshold , mark NA in meandt
@@ -138,7 +141,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
     dfout_extrastats[dfout_extrastats$diffdt > 0,]
     #  take meandt as the event date , i.e. duplicate records with time difference > qc threshold will be changed to NA 
     df_out$eventdate <- dfout_extrastats$meandt
-    df_out <- df_out[!duplicated(df_out[,c(identifierfield,"code","eventdate"),with=FALSE]),] #sorted on visit, so first occurence is always first visit. 
+    df_out <- df_out[!duplicated(df_out[,c("f.eid","code","eventdate"),with=FALSE]),] #sorted on visit, so first occurence is always first visit. 
     
   }  else {
     df_out <- df_out[, eventdate:=as.Date(eventdate)]
@@ -152,7 +155,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   df_out[is.na(df_out$eventdate)]$event <- 0
   # take visitdate as event date
   df_out[is.na(df_out$eventdate)]$eventdate <- df_out[is.na(df_out$eventdate)]$visitdate
-  df_out <- df_out[,c(identifierfield,"code","eventdate","event"),with=FALSE]
+  df_out <- df_out[,c("f.eid","code","eventdate","event"),with=FALSE]
   
   message("setkey(code)")
   setkey(df_out,code)    

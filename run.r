@@ -11,6 +11,7 @@ require(stringr)
 library(ggplot2)
 library(ggrepel)
 library(ggpubr)
+library(pheatmap)
 
 if (Sys.getenv("USER")=="niek"){
   repo_dir="/Users/niek/repos/ukbpheno/"
@@ -140,7 +141,7 @@ lst.counts <- get_lst_counts(lst.data,datatable_defCol_pair = default_datatable_
 # to dataset make more lean: retain identifier , visitdates and additional fields needed for definitions besides default (as cols in file)
 #dfukb<- dfukb[,dfhtml[dfhtml$field.showcase %in% c("eid", "53",ukb_fields$nondefault_ukb_fields),]$field.tab,with=FALSE]
 # save 
-save(dfhtml,dfukb,lst.data,lst.counts,file=fukbphenodata)
+save(dfhtml,dfukb,lst.data,lst.data.settings,lst.counts,file=fukbphenodata)
 # load(fukbphenodata)
 ##########################################
 
