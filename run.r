@@ -103,7 +103,7 @@ lst.data <- append(lst.data,read_gp_clinical_data(fgp=fgp_clinical ))
 lst.data<-lapply(lst.data,function(x) {setkey(x,code) }) # double check that everything has the same setkey. 
 ##########################################
 
-lst.settings <- data.frame(fread("datasource	classification	datatype	expand_codes	diagnosis	ignore.case
+lst.data.settings <- data.frame(fread("datasource	classification	datatype	expand_codes	diagnosis	ignore.case
 tte.sr.20002	n_20002	numeric	0	1	FALSE
 tte.sr.20001	n_20001	numeric	0	1	FALSE
 tte.sr.20004	n_20004	numeric	0	1	FALSE
