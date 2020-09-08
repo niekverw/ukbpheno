@@ -44,12 +44,6 @@ fdefinitions = paste(repo_dir,"definitions.tsv",sep="")
 fdeath_portal=paste(pheno_dir,"death.txt",sep="")
 fdeath_cause_portal=paste(pheno_dir,"death_cause.txt",sep="")
 
-# ### These aren't used, are they? 
-# fsr_coding=paste(repo_dir,"data/20003.coding4.tsv",sep="")
-# fcncr_coding=paste(repo_dir,"data/20001.coding3.tsv",sep="")
-# fnoncncr_coding=paste(repo_dir,"data/20002.coding6.tsv",sep="")
-# foper_coding=paste(repo_dir,"data/20004.coding5.tsv",sep="")
-
 fukbphenodata <- paste(pheno_dir,"ukbphenodata.Rdata",sep="") #where to store final object
 
 ##########################################
@@ -66,9 +60,6 @@ dfhtml <- read_ukb_metadata(fhtml)
 # TODO: create a loop : for each definition in definitions ,  read ukbdata + fetch all required info + generate the variable 
 dfukb <- read_ukb_tabdata(fukbtab,dfhtml,fields_to_keep = dfDefinitions_ukb_fields$all_ukb_fields)
 print(format(object.size(dfukb), units = "Gb"))
-
-
-
 
 #################################################################################### \
 # Should we put the following in a function?
@@ -130,14 +121,6 @@ toc()
 ##########################################
 # generate meta data dynamically,  returns a list with the number of rows per code based on default_datatable_defCol_pair()
 lst.counts <- get_lst_counts(lst.data,datatable_defCol_pair = default_datatable_defCol_pair() )
-
-##########################################
-##########################################
-#### We should make it into one data-object, which will make things more dynamic.
-### ukb.data.object <- list(data=lst.data,lst.counts=lst.counts,settings=default_datatable_defCol_pair())
-### lst.counts <- NULL
-### lst.data <- NULL
-
 # to dataset make more lean: retain identifier , visitdates and additional fields needed for definitions besides default (as cols in file)
 #dfukb<- dfukb[,dfhtml[dfhtml$field.showcase %in% c("eid", "53",ukb_fields$nondefault_ukb_fields),]$field.tab,with=FALSE]
 # save 
@@ -154,11 +137,4 @@ all_event_dt.stats <- get_stats_for_events(all_event_dt)
 all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
 
 
-
-
-  
 # print(format(object.size(lst.data), units = "Mb")) #"2014.1 Mb"
-
-
-
-
