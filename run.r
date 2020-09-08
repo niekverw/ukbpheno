@@ -102,6 +102,28 @@ lst.data <- append(lst.data,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) 
 lst.data <- append(lst.data,read_gp_clinical_data(fgp=fgp_clinical ))
 lst.data<-lapply(lst.data,function(x) {setkey(x,code) }) # double check that everything has the same setkey. 
 ##########################################
+
+lst.settings <- data.frame(fread("datasource	classification	datatype	expand_codes	diagnosis	ignore.case
+tte.sr.20002	n_20002	numeric	0	1	FALSE
+tte.sr.20001	n_20001	numeric	0	1	FALSE
+tte.sr.20004	n_20004	numeric	0	1	FALSE
+sr.20003	n_20003	numeric	0	1	FALSE
+tte.death.icd10.primary	ICD10	character	1	1	TRUE
+tte.death.icd10.secondary	ICD10	character	1	2	TRUE
+tte.hesin.oper3.primary	OPCS3	character	1	1	TRUE
+tte.hesin.oper3.secondary	OPCS3	character	1	2	TRUE
+tte.hesin.oper4.primary	OPCS4	character	1	1	TRUE
+tte.hesin.oper4.secondary	OPCS4	character	1	2	TRUE
+tte.hesin.icd10.primary	ICD10	character	1	1	TRUE
+tte.hesin.icd10.secondary	ICD10	character	1	2	TRUE
+tte.hesin.icd9.primary	ICD9	character	1	1	TRUE
+tte.hesin.icd9.secondary	ICD9	character	1	2	TRUE
+tte.gpclincal.read2	READ	character	0	2	FALSE
+tte.gpclincal.read3	CTV3	character	0	2	FALSE
+tte.gpscript.dmd.england	DMD	character	0	2	FALSE
+tte.gpscript.bnf.england	BNF	character	0	2	FALSE
+tte.gpscript.bnf.scotland	BNF	character	0	2	FALSE
+tte.gpscript.read2.wales	READ	character	1	2	FALSE"))
 toc()
 
 ##########################################
