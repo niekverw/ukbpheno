@@ -131,7 +131,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
     # for each code in the same participant, compute min(oldest record)/max(newest record)/mean date
     #### slow: # dfout_extrastats <- df_out %>% group_by(f.eid,code) %>% mutate(mindt = min(eventdate, na.rm = TRUE),maxdt = max(eventdate, na.rm = TRUE),meandt = mean(eventdate, na.rm = TRUE))
     setkey(df_out,f.eid,code)
-    dfout_extrastats <- df_out[, .(mindt= min(eventdate,na.rm = T),maxdt= max(eventdate,na.rm = T),meandt= mean(eventdate,na.rm=T) ), keyby=list(f.eid,code)]
+    dfout_extrastats <- suppressWarnings(df_out[, .(mindt= min(eventdate,na.rm = T),maxdt= max(eventdate,na.rm = T),meandt= mean(eventdate,na.rm=T) ), keyby=list(f.eid,code)])
     dfout_extrastats <- merge(df_out[,c('f.eid','code','eventdate')] ,dfout_extrastats,by=c('f.eid','code'))
     
     # time between oldest and newest record in unit of year
