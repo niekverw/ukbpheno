@@ -117,6 +117,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
       # negative time = not meaningful. Refer coding 13
       df_out[eventdate <0,'eventdate']<-NA
       df_out$eventdate <- as.Date(convert_year_to_date(df_out$eventdate))
+      
     } else if (field_sr_date_type=="interpolated_age"){
       # TODO change here! Add year /month of birth to default ukb fields to enable this
       df_out <- df_out[, eventdate:=as.numeric(eventdate)] ## as number. interpolated age. 
@@ -125,7 +126,8 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
     } else if (field_sr_date_type=="date"){
       df_out = df_out[, eventdate:=as.Date(eventdate)]
     }
-  
+    df_out[df_out$eventdate > df_out$visitdate,] <- df_out[df_out$eventdate > df_out$visitdate,]$visitdate
+    
     # deduplicate, min/max/mean/sd <- not very efficient?!! 
     message("deduplicate")
     # for each code in the same participant, compute min(oldest record)/max(newest record)/mean date
@@ -141,6 +143,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
     dfout_extrastats[dfout_extrastats$diffdt > 0,]
     #  take meandt as the event date , i.e. duplicate records with time difference > qc threshold will be changed to NA 
     df_out$eventdate <- dfout_extrastats$meandt
+    df_out <- df_out[order(df_out$visitdate),]
     df_out <- df_out[!duplicated(df_out[,c("f.eid","code","eventdate"),with=FALSE]),] #sorted on visit, so first occurence is always first visit. 
     
   }  else {
@@ -149,7 +152,6 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
 
   # record which can be set as an event or not (when no event_date is reported, only visit)
   df_out$event <- 2
-  df_out[year(df_out$eventdate) == year(df_out$visitdate),]$event <- 0 # exclude as event if the event happend in the same year as the visit
   df_out <- df_out[, event:=as.integer(event)]
   # mark record without valid event date with 0
   df_out[is.na(df_out$eventdate)]$event <- 0
