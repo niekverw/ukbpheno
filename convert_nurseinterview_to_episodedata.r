@@ -132,15 +132,11 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
       df_out$eventdate <- as.Date(convert_year_to_date(df_out$eventdate))
       
     } else if (field_sr_date_type=="interpolated_age"){
-      # TODO change here! Add year /month of birth to default ukb fields to enable this
       df_out <- df_out[, eventdate:=as.numeric(eventdate)] ## as number. interpolated age. 
       df_out[eventdate <0,'eventdate']<-NA
       # interpolate the event date as birth + age of diagnosis
       df_out$eventdate = df_out[,"birthyearmonth"] + (df_out[,"eventdate"]*daysinyear)
       
-      
-      
-      df_out$eventdate = df_out[,"visitdate"] - (df_out[,"eventdate"]*daysinyear)
     } else if (field_sr_date_type=="date"){
       df_out = df_out[, eventdate:=as.Date(eventdate)]
     }
