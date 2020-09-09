@@ -16,7 +16,7 @@ library(pheatmap)
 if (Sys.getenv("USER")=="niek"){
   repo_dir="/Users/niek/repos/ukbpheno/"
   pheno_dir="/Volumes/data/ukb/"
-}else if (Sys.getenv("USER")=="ming") {
+}else if (Sys.getenv("USER")=="mw") {
   pheno_dir="/home/mw/Analyses/Ukbpheno_data/"
   repo_dir="/home/mw/Repos/ukbpheno/"
 }
