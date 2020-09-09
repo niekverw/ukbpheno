@@ -150,7 +150,6 @@ convert_touchscreen_to_episodedata_pertrait<- function(trait,df,dfDefinitiontabl
   df_out <- df_out[, birthyearmonth:=as.Date(birthyearmonth)]
   
   
-  #TODO add the  34 and 52  and change in nurseinterview as well
   # compute the event date from visitdate and age of diagnosis
   df_out <- df_out[, eventdate:=as.numeric(eventdate)] 
   # negative age not meaningful

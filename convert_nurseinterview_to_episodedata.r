@@ -53,16 +53,29 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   if(!is.null(field_sr_date)){srdiagnosisdatefields = names(df)[grepl(field_sr_date, names(df))]} else srdiagnosisdatefields=NULL
   visits = length(visitdatefields) #sum(grepl("53_", names(df)))
   
+  # need for calculating diagdate from age of diagnosis
+  field_birth_year ="34"
+  field_birth_month="52"
+  birthyearfield = names(df)[grepl(paste0("[^0-9]",field_birth_year,"[^0-9]"), names(df))]
+  birthmonthfield = names(df)[grepl(paste0("[^0-9]",field_birth_month,"[^0-9]"), names(df))]
+  identifierfield = names(df)[grepl("eid", names(df))]
+  
+  
+  
   # only need n_eid, visit dates and diag-codes + age-of-diag
-  columns_to_keep = c("f.eid",
+  columns_to_keep = c(identifierfield,
                       visitdatefields,
                       srdiagnosisfields, 
-                      srdiagnosisdatefields
+                      srdiagnosisdatefields,
+                      birthyearfield,
+                      birthmonthfield
   )
   # data.table - Setting with = FALSE disables the ability to refer to columns as if they are variables
   df_ <- df[,columns_to_keep,with=FALSE]
-  df_$dummy <- NA
-  df_out <-  matrix(ncol=5, nrow=0) # initiate output 
+  df_$dummy <- NA  
+  df_$birthdt = as.Date(as.character(paste(df_[[birthyearfield]],df_[[birthmonthfield]], 1, sep = "-")),format="%Y-%m-%d")
+
+  df_out <-  matrix(ncol=6, nrow=0) # initiate output 
   
   for (v in 0:(visits-1)){ # for each visit, 
     message(paste0("querying visit ",v))
@@ -88,10 +101,10 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
       #  empty diagnosis column
       if(all(is.na(df_[,diagfield,with=FALSE]))){next}
       # for rows with non-empty current diagfield, select identifier,diagfield,diagdatefield,visitdatefield 
-      df_sub <- df_[!is.na(get(diagfield) ),c("f.eid",diagfield,diagdatefield,visitdatefield),with=FALSE]
+      df_sub <- df_[!is.na(get(diagfield) ),c("f.eid",diagfield,diagdatefield,visitdatefield,"birthdt"),with=FALSE]
       df_sub$visit <- v
-      names(df_sub) <- c("f.eid","code","eventdate","visitdate","visit")
-      df_out <- rbind(df_out,as.matrix(df_sub[,c("f.eid","code","eventdate","visit","visitdate"),with=FALSE]))
+      names(df_sub) <- c("f.eid","code","eventdate","visitdate","birthyearmonth","visit")
+      df_out <- rbind(df_out,as.matrix(df_sub[,c("f.eid","code","eventdate","visit","visitdate","birthyearmonth"),with=FALSE]))
     }
     
   }
@@ -122,10 +135,16 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
       # TODO change here! Add year /month of birth to default ukb fields to enable this
       df_out <- df_out[, eventdate:=as.numeric(eventdate)] ## as number. interpolated age. 
       df_out[eventdate <0,'eventdate']<-NA
+      # interpolate the event date as birth + age of diagnosis
+      df_out$eventdate = df_out[,"birthyearmonth"] + (df_out[,"eventdate"]*daysinyear)
+      
+      
+      
       df_out$eventdate = df_out[,"visitdate"] - (df_out[,"eventdate"]*daysinyear)
     } else if (field_sr_date_type=="date"){
       df_out = df_out[, eventdate:=as.Date(eventdate)]
     }
+    # remove rounding error from interpolation 
     df_out[df_out$eventdate > df_out$visitdate,] <- df_out[df_out$eventdate > df_out$visitdate,]$visitdate
     
     # deduplicate, min/max/mean/sd <- not very efficient?!! 
