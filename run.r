@@ -137,7 +137,7 @@ all_event_dt.stats <- get_stats_for_events(all_event_dt)
 all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
 View(all_event_dt.summary %>% filter(is.na(Hx) & is.na(Fu)))
 
-
+all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,reference_date = NULL)
 print(format(object.size(lst.data), units = "Mb")) #"2014.1 Mb"
 
 

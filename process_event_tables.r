@@ -86,7 +86,7 @@ get_incidence_prevalence <- function(all_event_dt,
   } 
   ### History
   dfHx <- df[days<=0]
-  Hx_days <- dfHx[event>0][, .(Hx_days=min(days,na.rm=T) ), keyby=list(f.eid)]
+  Hx_days <- suppressWarnings( dfHx[event>0][, .(Hx_days=min(days,na.rm=T) ), keyby=list(f.eid)] )
   dfHx[,Hx:=1]
   
   ### Future
@@ -95,7 +95,7 @@ get_incidence_prevalence <- function(all_event_dt,
                (days>(0+window_fu_days_mask) & event==1 & (f.eid %in% dfHx$Hx) & .id %in% sources_recurrence_events ) |
                (days>(0+window_fu_days_mask) & event==2  & (!f.eid %in% dfHx$Hx)) ]
   dfFu[,Fu:=1] #unique(dfFu$f.eid)
-  Fu_days <- dfFu[,.(Fu_days= min(days,na.rm=T) ), keyby=list(f.eid)]
+  Fu_days <- suppressWarnings( dfFu[,.(Fu_days= min(days,na.rm=T) ), keyby=list(f.eid)] )
   
   ### age of diagnosis
   #system.time({ df %>% filter(event>0) %>% group_by(f.eid) %>% summarise(first_diagnosis_days=min(days)) }) # <- slow.. 
@@ -108,7 +108,7 @@ get_incidence_prevalence <- function(all_event_dt,
   dfRef[,Ref:=1]
   
   ## some other stats, and to include event==0 individuals:
-  stats <- all_event_dt[, .(count = .N,sum.epidur= sum(epidur,na.rm = T),median.epidur= median(epidur,na.rm = T),max.epidur= max(epidur,na.rm=T)), by = f.eid]
+  stats <- suppressWarnings( all_event_dt[, .(count = .N,sum.epidur= sum(epidur,na.rm = T),median.epidur= median(epidur,na.rm = T),max.epidur= max(epidur,na.rm=T)), by = f.eid] )
   stats[is.infinite(stats$max.epidur),]$max.epidur <-NA
   
   # test <- Reduce(function(...) merge(..., all = TRUE,by='f.eid'), list(df,
