@@ -141,6 +141,7 @@ View(all_event_dt.summary %>% filter(is.na(Hx) & is.na(Fu)))
 all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,reference_date = NULL,window_fu_days_mask = 15)
 hist(all_event_dt.summary %>% pull(Fu_days) %>% as.numeric,breaks=100)
 hist(all_event_dt.summary %>% filter(Fu_days<100) %>% pull(Fu_days) %>% as.numeric,breaks=100)
+hist(all_event_dt.summary$reference_date,breaks=200)
 print(format(object.size(lst.data), units = "Mb")) #"2014.1 Mb"
 
 
