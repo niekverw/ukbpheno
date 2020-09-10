@@ -46,7 +46,7 @@ get_incidence_prevalence <- function(all_event_dt,reference_date,
                                      datatable_defCol_pair = default_datatable_defCol_pair(),
                                      return_dates=FALSE,
                                      window_ref_days_include=0,##  indicate number of days around the reference date (visit) that should be used to indicates if individuals had the event on the reference date. For example, relevant if you want to know if participant took medication on the visit 
-                                     window_fu_days_mask=0 ## indicates aa number of days that should be masked from the future visits; e.g. only count events after 10 days from the reference visit to avoid events related to the reference date. 
+                                     window_fu_days_mask=0 ## indicates number of days that future events should not be counted; e.g. you could only count events after 10 days from the reference visit to avoid events related to the reference date. e.g. you could also use it to only count events after X years, in order to avoid assesment bias.
                                      ) {
   # event==0, event cannot be used forr age - of - diagnosiis or new events.
   # event==1, event can be used for any type of future events, as it is based on ICD10 type of data 
