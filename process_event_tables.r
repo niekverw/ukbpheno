@@ -41,7 +41,8 @@ get_stats_for_events <- function(all_event_dt){
 }
 
 ### get prevalence (move this.. )
-get_incidence_prevalence <- function(all_event_dt,reference_date,
+get_incidence_prevalence <- function(all_event_dt,
+                                     reference_date,
                                      include_secondary_recurrence=FALSE,
                                      datatable_defCol_pair = default_datatable_defCol_pair(),
                                      return_dates=FALSE,
@@ -105,6 +106,7 @@ get_incidence_prevalence <- function(all_event_dt,reference_date,
   stats <- all_event_dt[, .(count = .N,sum.epidur= sum(epidur,na.rm = T),median.epidur= median(epidur,na.rm = T),max.epidur= max(epidur,na.rm=T)), by = f.eid]
   stats[is.infinite(stats$max.epidur),]$max.epidur <-NA
   
+  df.referencedate <- data.table(f.eid=names(reference_date), reference_date=reference_date)
   # test <- Reduce(function(...) merge(..., all = TRUE,by='f.eid'), list(df,
   #                                                                      Hx_days,
   #                                                                      Fu_days,
@@ -112,9 +114,12 @@ get_incidence_prevalence <- function(all_event_dt,reference_date,
   #                                                                      unique(dfFu[,c("f.eid","Fu")]),
   #                                                                      unique(dfRef[,c("f.eid","Ref")]),
   #                                                                      first_diagnosis_days,
+  #                                                                      df.referencedate
   #                                                                      stats)
   # )
   # View(test)
+  
+  
   
   all_event_dt.summary <- Reduce(function(...) merge(..., all = TRUE,by='f.eid'), list( 
   stats,
@@ -123,7 +128,8 @@ get_incidence_prevalence <- function(all_event_dt,reference_date,
   unique(dfHx[,c("f.eid","Hx")]),
   unique(dfFu[,c("f.eid","Fu")]),
   unique(dfRef[,c("f.eid","Ref")]),
-  first_diagnosis_days
+  first_diagnosis_days,
+  df.referencedate
   ))
     
   all_event_dt.summary[,Any:=1]
