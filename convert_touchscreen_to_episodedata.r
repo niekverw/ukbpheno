@@ -32,11 +32,25 @@
 #   
 # }
 
+get_ts_cols<-function(dfDefinitiontable,trait=NULL){
+  # per trait
+  # touchscreen col in processed definition table  # example "20110=1,20107=1[3894], 20111<=1" 
+  ts_col<-dfDefinitiontable[dfDefinitiontable$TRAIT==trait,]$TS
+  # parse touchscreen fields
+  ts_conditions<-unlist(strsplit(ts_col,","))   #"20110=1"  "20107=1[3894]" "20111<=1" 
+  
+  # if trait is null get all traits 
+  if (is.null(trait)){
+    ts_conditions<-unlist(sapply(dfDefinitions_processed$TS,function(x) unique(strsplit(x,","))))
+    ts_conditions <- ts_conditions[!is.na(ts_conditions)]
+    
+  }
+  
+  return(ts_conditions)
+}
 
-
-# TS per trait
-convert_touchscreen_to_episodedata_pertrait<- function(trait,df,dfDefinitiontable,qc_treshold_year=10){
-  print(paste("process",trait,sep=" ") )
+# df<-dfukb
+convert_touchscreen_to_episodedata<- function(df,dfDefinitiontable,trait=NULL,qc_treshold_year=10){
   tic()
   # default ,maybe parameter not needed at all? 
   if(is.null(dfDefinitiontable)) {
@@ -56,22 +70,23 @@ convert_touchscreen_to_episodedata_pertrait<- function(trait,df,dfDefinitiontabl
   birthyearfield = names(df)[grepl(paste0("[^0-9]",field_birth_year,"[^0-9]"), names(df))]
   birthmonthfield = names(df)[grepl(paste0("[^0-9]",field_birth_month,"[^0-9]"), names(df))]
   
-
-  # touchscreen col in processed definition table  # example "20110=1,20107=1[3894], 20111<=1" 
-  ts_col<-dfDefinitiontable[dfDefinitiontable$TRAIT==trait,]$TS
-  print(ts_col)
-  # parse touchscreen fields
-  ts_conditions<-unlist(strsplit(ts_col,","))   #"20110=1"  "20107=1[3894]" "20111<=1" 
+  # trait<-"Mps"
+  ts_conditions<-get_ts_cols(dfDefinitiontable,trait = trait)
+  # print(ts_col)
+  print(paste("Fields:",ts_conditions,sep=" ") )
   
   df_out <-  matrix(ncol=6, nrow=0) # initiate output 
   
   # for each field listed in ts
   for (col in ts_conditions) {
-    print(paste("process field",col,sep=" "))
+    # col<-"3581≥0[3581]"
+    print(paste("process touchscreen data for",col,sep=" "))
     # parse the field and condition 
-    cdn<-str_extract(col,"[=|<|>][=]*\\d+")
+    cdn<-str_extract(col,"[=|<|>|≥|≤|!][=]*\\d+")
     # replace one equal sign to logical equal if needed
     cdn<-gsub("^={1}","==",cdn)
+    cdn<-gsub("^≥",">=",cdn)
+    cdn<-gsub("^≤","<=",cdn)
     
     field_ts_diagnosis<-str_extract(col,"\\d+")
     tsdiagnosisfields = names(df)[grepl( paste0("[^0-9]",field_ts_diagnosis,"[^0-9]"), names(df))]
@@ -105,11 +120,11 @@ convert_touchscreen_to_episodedata_pertrait<- function(trait,df,dfDefinitiontabl
     # v=0
     message(paste0("querying visit ",v))
     # f.xxxxx.v.0-9
-    diagfields = names(df_)[grepl(paste0("[^0-9]",field_ts_diagnosis,"[^0-9]",v),names(df_))]
+    diagfields =unique(names(df_)[grepl(paste0("[^0-9]",field_ts_diagnosis,"[^0-9]",v),names(df_))])
     
     
     if(length(diagfields)==0){print(paste0("no data on visit ",v));next}
-    if(!is.null(tsdiagnosisdatefields)){diagdatefields = names(df_)[grepl(paste0("[^0-9]",age_diagnosis_col,"[^0-9]",v),names(df_))]}
+    if(!is.null(tsdiagnosisdatefields)){diagdatefields = unique(names(df_)[grepl(paste0("[^0-9]",age_diagnosis_col,"[^0-9]",v),names(df_))])}
     # f.53.v.0 
     visitdatefield = visitdatefields[v+1]
     # for each occurence of diagfield, find the corresponding age and convert it to  date - code and rbind() to df_out. 
@@ -125,6 +140,9 @@ convert_touchscreen_to_episodedata_pertrait<- function(trait,df,dfDefinitiontabl
       # diagfield example f.xxxxx.v.i
       # for rows with non-empty current diagfield, select identifier,diagfield,diagdatefield,visitdatefield 
       df_sub <- df_[!is.na(get(diagfield) ),c(identifierfield,diagfield,diagdatefield,visitdatefield,"birthdt"),with=FALSE]
+      # in case diagfield == diagdatefield
+      colnames(df_sub)[3] <- paste(diagdatefield,"_",sep="")
+
       # find rows that fulfil the condition
       cdn_exp <-paste(diagfield,cdn,sep="") #"f.xxxxx.v.i ==1"
       
@@ -210,8 +228,10 @@ convert_touchscreen_to_episodedata_pertrait<- function(trait,df,dfDefinitiontabl
 }
   
   
-test<-  convert_touchscreen_to_episodedata_pertrait("HxHrt",dfukb,dfDefinitions_processed)
+test<-  convert_touchscreen_to_episodedata(dfukb,dfDefinitions_processed,"HxHrt")
+test<-  convert_touchscreen_to_episodedata(dfukb,dfDefinitions_processed)
 
-# TODO is it necessary to deduplicate the records having different codes e.g. for HxHrt "20110=1,20107=1[3894],20111<=1" participant may have cumulative records from any of fields
-  
 
+
+# TODO  accept individual field + condition 
+#  TODO add event=0 and event date=visit date
