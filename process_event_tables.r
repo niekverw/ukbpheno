@@ -64,10 +64,15 @@ get_incidence_prevalence <- function(all_event_dt,
   
   
   # 4139206
-  df.ref <- data.frame(reference_date)
-  df.ref$pid <- rownames(df.ref)
+  if(!is.null(reference_date)){
+    df_referencedate <- data.table(reference_date)
+    df_referencedate$f.eid <- rownames(df_referencedate)
+  } else{
+    message("no reference_date given, taking the first available event as reference")
+    df_referencedate <- all_event_dt[,.(reference_date= min(eventdate,na.rm = T)),by=f.eid]
+  }
   
-  df <- merge(all_event_dt,df.ref,by.x = 'f.eid' , by.y='pid',all.x = T) %>% arrange(eventdate) %>% as.data.table()
+  df <- merge(all_event_dt,df_referencedate,by = 'f.eid',all.x = T) %>% arrange(eventdate) %>% as.data.table()
   df <- df %>% filter(!is.na(reference_date)) # comment out if missing f.eids is fixed. 
   
   df$days <- df$eventdate - df$reference_date
@@ -106,7 +111,6 @@ get_incidence_prevalence <- function(all_event_dt,
   stats <- all_event_dt[, .(count = .N,sum.epidur= sum(epidur,na.rm = T),median.epidur= median(epidur,na.rm = T),max.epidur= max(epidur,na.rm=T)), by = f.eid]
   stats[is.infinite(stats$max.epidur),]$max.epidur <-NA
   
-  df.referencedate <- data.table(f.eid=names(reference_date), reference_date=reference_date)
   # test <- Reduce(function(...) merge(..., all = TRUE,by='f.eid'), list(df,
   #                                                                      Hx_days,
   #                                                                      Fu_days,
@@ -129,7 +133,7 @@ get_incidence_prevalence <- function(all_event_dt,
   unique(dfFu[,c("f.eid","Fu")]),
   unique(dfRef[,c("f.eid","Ref")]),
   first_diagnosis_days,
-  df.referencedate
+  df_referencedate
   ))
     
   all_event_dt.summary[,Any:=1]
