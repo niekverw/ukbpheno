@@ -45,7 +45,8 @@ get_incidence_prevalence <- function(all_event_dt,reference_date,
                                      include_secondary_recurrence=FALSE,
                                      datatable_defCol_pair = default_datatable_defCol_pair(),
                                      return_dates=FALSE,
-                                     window_ref_event=0 ##  indicate number of days around the reference date (visit) that should be used to indicates if individuals had the event on the reference date. For example, relevant if you want to know if participant took medication on the visit 
+                                     window_ref_days_include=0,##  indicate number of days around the reference date (visit) that should be used to indicates if individuals had the event on the reference date. For example, relevant if you want to know if participant took medication on the visit 
+                                     window_fu_days_mask=0 ## indicates aa number of days that should be masked from the future visits; e.g. only count events after 10 days from the reference visit to avoid events related to the reference date. 
                                      ) {
   # event==0, event cannot be used forr age - of - diagnosiis or new events.
   # event==1, event can be used for any type of future events, as it is based on ICD10 type of data 
@@ -83,9 +84,10 @@ get_incidence_prevalence <- function(all_event_dt,reference_date,
   dfHx[,Hx:=1]
   
   ### Future
-  dfFu <- df[  ((days>(0) & event==1) & (!f.eid %in% dfHx$Hx)) |
-               (days>(0) & event==1 & (f.eid %in% dfHx$Hx) & .id %in% sources_recurrence_events ) |
-               (days>(0) & event==2  & (!f.eid %in% dfHx$Hx)) ]
+  # window_fu_days_mask
+  dfFu <- df[  ((days>(0+window_fu_days_mask) & event==1) & (!f.eid %in% dfHx$Hx)) |
+               (days>(0+window_fu_days_mask) & event==1 & (f.eid %in% dfHx$Hx) & .id %in% sources_recurrence_events ) |
+               (days>(0+window_fu_days_mask) & event==2  & (!f.eid %in% dfHx$Hx)) ]
   dfFu[,Fu:=1] #unique(dfFu$f.eid)
   Fu_days <- dfFu[,.(Fu_days= min(days,na.rm=T) ), keyby=list(f.eid)]
   
@@ -96,7 +98,7 @@ get_incidence_prevalence <- function(all_event_dt,reference_date,
   first_diagnosis_days <- df[df$event>0][,.(first_diagnosis_days=min(days,na.rm=T) ), by=f.eid] # 
   
   ### Data if participant had event/med  reference date (visit);+/- x day 
-  dfRef <- df[df$eventdate>=(df$reference_date-window_ref_event) & df$eventdate<=(df$reference_date+window_ref_event),c("f.eid")]
+  dfRef <- df[df$eventdate>=(df$reference_date-window_ref_days_include) & df$eventdate<=(df$reference_date+window_ref_days_include),c("f.eid")]
   dfRef[,Ref:=1]
   
   ## some other stats, and to include event==0 individuals:
