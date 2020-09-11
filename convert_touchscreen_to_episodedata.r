@@ -50,7 +50,7 @@ get_ts_cols<-function(dfDefinitiontable,trait=NULL){
 }
 
 # df<-dfukb
-convert_touchscreen_to_episodedata<- function(df,dfDefinitiontable,trait=NULL,qc_treshold_year=10){
+convert_touchscreen_to_episodedata<- function(df,dfDefinitiontable=NULL,ts_conditions=NULL,qc_treshold_year=10){
   tic()
   # default ,maybe parameter not needed at all? 
   if(is.null(dfDefinitiontable)) {
@@ -70,10 +70,16 @@ convert_touchscreen_to_episodedata<- function(df,dfDefinitiontable,trait=NULL,qc
   birthyearfield = names(df)[grepl(paste0("[^0-9]",field_birth_year,"[^0-9]"), names(df))]
   birthmonthfield = names(df)[grepl(paste0("[^0-9]",field_birth_month,"[^0-9]"), names(df))]
   
+  
   # trait<-"Mps"
-  ts_conditions<-get_ts_cols(dfDefinitiontable,trait = trait)
+  if (is.null(ts_conditions)){
+    print("All touchscreen fields from definition table")
+    ts_conditions<-get_ts_cols(dfDefinitiontable,trait =NULL)
+  } else {
+    print(paste("Input fields:",ts_conditions,sep=" ") )
+    
+  }
   # print(ts_col)
-  print(paste("Fields:",ts_conditions,sep=" ") )
   
   df_out <-  matrix(ncol=6, nrow=0) # initiate output 
   
@@ -84,10 +90,9 @@ convert_touchscreen_to_episodedata<- function(df,dfDefinitiontable,trait=NULL,qc
     # parse the field and condition 
     cdn<-str_extract(col,"[=|<|>|≥|≤|!][=]*\\d+")
     # replace one equal sign to logical equal if needed
-    cdn<-gsub("^={1}","==",cdn)
+    cdn<-gsub("^={1,2}","==",cdn)
     cdn<-gsub("^≥",">=",cdn)
     cdn<-gsub("^≤","<=",cdn)
-    
     field_ts_diagnosis<-str_extract(col,"\\d+")
     tsdiagnosisfields = names(df)[grepl( paste0("[^0-9]",field_ts_diagnosis,"[^0-9]"), names(df))]
     
@@ -198,10 +203,9 @@ convert_touchscreen_to_episodedata<- function(df,dfDefinitiontable,trait=NULL,qc
   
   
   
-  
   # record which can be set as an event or not (when no event_date is reported, only visit)
-  # 3 touchscreen derived event date
-  df_out$event <- 3
+  
+  df_out$event <- 2
   
   # take visitdate as event date
   df_out[is.na(df_out$eventdate)]$eventdate <- df_out[is.na(df_out$eventdate)]$visitdate
@@ -212,6 +216,11 @@ convert_touchscreen_to_episodedata<- function(df,dfDefinitiontable,trait=NULL,qc
   df_out <- df_out[, event:=as.integer(event)]
   # mark record without valid event date with 0
   df_out[is.na(df_out$eventdate)]$event <- 0
+  # add all visit dates as event=0 dates 
+  df_out_visit <- df_out
+  df_out_visit$event<-0
+  df_out_visit$eventdate <- df_out_visit$visitdate
+  df_out<- unique(rbind(df_out,df_out_visit))
   
   df_out <- df_out[,c("f.eid","code","eventdate","event"),with=FALSE]
   
@@ -226,12 +235,10 @@ convert_touchscreen_to_episodedata<- function(df,dfDefinitiontable,trait=NULL,qc
 
   
 }
+
   
-  
-test<-  convert_touchscreen_to_episodedata(dfukb,dfDefinitions_processed,"HxHrt")
-test<-  convert_touchscreen_to_episodedata(dfukb,dfDefinitions_processed)
+test<-  convert_touchscreen_to_episodedata(dfukb,dfDefinitions_processed,"6150==1[3894]") # "1 Mb" 1.013 sec elapsed
+test<-  convert_touchscreen_to_episodedata(dfukb,dfDefinitions_processed)  #"31.3 Mb" 10.349 sec elapsed
 
 
 
-# TODO  accept individual field + condition 
-#  TODO add event=0 and event date=visit date
