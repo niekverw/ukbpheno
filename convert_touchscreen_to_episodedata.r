@@ -1,4 +1,4 @@
-# 
+library(tic) # 
 # # !!!!!!!backward imputation is problematic!!!!
 # harmonize_agediag_bycols<-function (df,tsdiagnosisdatefields,qc_treshold_year=10){
 #   # Age of diagnosis should not change across visits 
@@ -32,31 +32,19 @@
 #   
 # }
 
-get_ts_cols<-function(dfDefinitiontable,trait=NULL){
-  # per trait
-  # touchscreen col in processed definition table  # example "20110=1,20107=1[3894], 20111<=1" 
-  ts_col<-dfDefinitiontable[dfDefinitiontable$TRAIT==trait,]$TS
-  # parse touchscreen fields
-  ts_conditions<-unlist(strsplit(ts_col,","))   #"20110=1"  "20107=1[3894]" "20111<=1" 
-  
-  # if trait is null get all traits 
-  if (is.null(trait)){
-    ts_conditions<-unlist(sapply(dfDefinitions_processed$TS,function(x) unique(strsplit(x,","))))
-    ts_conditions <- ts_conditions[!is.na(ts_conditions)]
-    
-  }
-  
-  return(ts_conditions)
+format_ts_conditions<-function(ts_conditions=dfDefinitions_processed$TS){
+  unique(c(na.omit(unlist(strsplit(ts_conditions,",")))))   #"20110=1"  "20107=1[3894]" "20111<=1" 
 }
 
 # df<-dfukb
-convert_touchscreen_to_episodedata<- function(df,dfDefinitiontable=NULL,ts_conditions=NULL,qc_treshold_year=10){
+convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_processed$TS,qc_treshold_year=10){
   tic()
-  # default ,maybe parameter not needed at all? 
-  if(is.null(dfDefinitiontable)) {
-    dfDefinitiontable<- dfDefinitions_processed
-  } 
+  ts_conditions <- format_ts_conditions(ts_conditions)
+  print(paste("Input fields:",ts_conditions,sep=" ") )
+  
+  
   daysinyear=365.25
+  
   # visit date code
   field_visit_date="53"
   # vector with name of the identifier col 
@@ -69,18 +57,8 @@ convert_touchscreen_to_episodedata<- function(df,dfDefinitiontable=NULL,ts_condi
   field_birth_month="52"
   birthyearfield = names(df)[grepl(paste0("[^0-9]",field_birth_year,"[^0-9]"), names(df))]
   birthmonthfield = names(df)[grepl(paste0("[^0-9]",field_birth_month,"[^0-9]"), names(df))]
-  
-  
-  # trait<-"Mps"
-  if (is.null(ts_conditions)){
-    print("All touchscreen fields from definition table")
-    ts_conditions<-get_ts_cols(dfDefinitiontable,trait =NULL)
-  } else {
-    print(paste("Input fields:",ts_conditions,sep=" ") )
-    
-  }
-  # print(ts_col)
-  
+
+
   df_out <-  matrix(ncol=6, nrow=0) # initiate output 
   
   # for each field listed in ts
@@ -201,21 +179,14 @@ convert_touchscreen_to_episodedata<- function(df,dfDefinitiontable=NULL,ts_condi
   df_out <- df_out[!duplicated(df_out[,c("f.eid","code","eventdate"),with=FALSE]),] #sorted on visit, so first occurence is always first visit. 
   
   
-  
-  
   # record which can be set as an event or not (when no event_date is reported, only visit)
-  
   df_out$event <- 2
-  
-  # take visitdate as event date
-  df_out[is.na(df_out$eventdate)]$eventdate <- df_out[is.na(df_out$eventdate)]$visitdate
-  # same 
-  # df_out$eventdate<-fcoalesce(df_out$eventdate,df_out$visitdate)
-  
-  df_out[df_out$eventdate ==df_out$visitdate,]$event <- 0 # eventdate not meaningful for time to event computation
   df_out <- df_out[, event:=as.integer(event)]
   # mark record without valid event date with 0
   df_out[is.na(df_out$eventdate)]$event <- 0
+  # take visitdate as event date
+  df_out[is.na(df_out$eventdate)]$eventdate <- df_out[is.na(df_out$eventdate)]$visitdate
+  
   # add all visit dates as event=0 dates 
   df_out_visit <- df_out
   df_out_visit$event<-0
@@ -237,8 +208,8 @@ convert_touchscreen_to_episodedata<- function(df,dfDefinitiontable=NULL,ts_condi
 }
 
   
-test<-  convert_touchscreen_to_episodedata(dfukb,dfDefinitions_processed,"6150==1[3894]") # "1 Mb" 1.013 sec elapsed
-test<-  convert_touchscreen_to_episodedata(dfukb,dfDefinitions_processed)  #"31.3 Mb" 10.349 sec elapsed
+test<-  convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions_processed$TS[5]) # "1 Mb" 1.013 sec elapsed
+test<-  convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions_processed$TS)  #"31.3 Mb" 10.349 sec elapsed
 
 
 
