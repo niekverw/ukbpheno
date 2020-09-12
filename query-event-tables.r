@@ -35,22 +35,24 @@ to_datatype <- function(vct=c(),datatype){
   return(vct)
 }
 
-get_all_events <- function (definitions,lst_dfs=lst,datatable_defCol_pair=default_datatable_defCol_pair()){
+get_all_events <- function (definition,lst.data=lst.data,datatable_defCol_pair=default_datatable_defCol_pair()){
   # definitions=dfDefinitions_processed_expanded[9,]
   # look up for all dataframes in list
-  if(nrow(definitions)>1){
+  if(nrow(definition)>1){
     message("ERROR: Provide one definition")
     return(NULL)
   }
-  all_event_lst<-lapply(names(lst_dfs), function(x) {
+  message(paste("querying the following classifications: " ,paste(names(definition)[names(definition) %in% datatable_defCol_pair$classification],collapse=", ")))
+  
+  all_event_lst<-lapply(names(lst.data), function(x) {
     classification=datatable_defCol_pair %>% filter(datasource == x) %>% pull(classification)
     datatype=datatable_defCol_pair %>% filter(datasource == x) %>% pull(datatype)
-    codes <- to_datatype(strsplit(definitions[,classification],split = ",")[[1]],datatype)
-    lst_dfs[[x]][.(codes),nomatch=NULL] # nomatch is important, otherwise it will return row with NA if it didnt find the code (but which on the other hand may also maybe good to keep track?? )
+    codes <- to_datatype(strsplit(definition[,classification],split = ",")[[1]],datatype)
+    lst.data[[x]][.(codes),nomatch=NULL] # nomatch is important, otherwise it will return row with NA if it didnt find the code (but which on the other hand may also maybe good to keep track?? )
     
   } )
   # name the dfs in list
-  names(all_event_lst)<-names(lst_dfs)
+  names(all_event_lst)<-names(lst.data)
   # remove empty dfs frame list 
   all_event_lst <- all_event_lst[lapply(all_event_lst,nrow)>0]
   
