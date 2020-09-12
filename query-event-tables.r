@@ -38,6 +38,10 @@ to_datatype <- function(vct=c(),datatype){
 get_all_events <- function (definitions,lst_dfs=lst,datatable_defCol_pair=default_datatable_defCol_pair()){
   # definitions=dfDefinitions_processed_expanded[9,]
   # look up for all dataframes in list
+  if(nrow(definitions)>1){
+    message("ERROR: Provide one definition")
+    return(NULL)
+  }
   all_event_lst<-lapply(names(lst_dfs), function(x) {
     classification=datatable_defCol_pair %>% filter(datasource == x) %>% pull(classification)
     datatype=datatable_defCol_pair %>% filter(datasource == x) %>% pull(datatype)
