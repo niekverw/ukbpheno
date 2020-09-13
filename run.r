@@ -92,6 +92,9 @@ rm(lst.data_dth)
 lst.data <- append(lst.data,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.primary + tte.hes.secondary
 # GP # add 2 lists with read2 /read3
 lst.data <- append(lst.data,read_gp_clinical_data(fgp=fgp_clinical ))
+#TS
+lst.data$ts <- convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions_processed$TS)
+
 lst.data<-lapply(lst.data,function(x) {setkey(x,code) }) # double check that everything has the same setkey. 
 ##########################################
 
@@ -115,7 +118,8 @@ tte.gpclincal.read3	CTV3	character	0	2	FALSE
 tte.gpscript.dmd.england	DMD	character	0	2	FALSE
 tte.gpscript.bnf.england	BNF	character	0	2	FALSE
 tte.gpscript.bnf.scotland	BNF	character	0	2	FALSE
-tte.gpscript.read2.wales	READ	character	1	2	FALSE"))
+tte.gpscript.read2.wales	READ	character	1	2	FALSE
+ts	TS	character	0	1	TRUE"))
 toc()
 
 ##########################################
@@ -131,9 +135,11 @@ save(dfhtml,dfukb,lst.data,lst.data.settings,lst.counts,file=fukbphenodata)
 ##########################################
 ## analyse 1 definition
 ##########################################
+# dfDefinitions_processed_expanded[12,]$TRAIT #"Cad"
+# expand the definitions as exact match much faster 
 dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,datatable_defCol_pair=default_datatable_defCol_pair(),lst.counts = lst.counts)
-all_event_dt <- get_all_events(dfDefinitions_processed_expanded[12,],lst.data) #list of 11 dfs 
-all_event_dt.stats <- get_stats_for_events(all_event_dt)
+all_event_dt <- get_all_events(dfDefinitions_processed_expanded[12,],lst.data)  #all collapsed to 1 datatable
+all_event_dt.stats <- get_stats_for_events(all_event_dt) #should generate several plots
 all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
 View(all_event_dt.summary %>% filter(is.na(Hx) & is.na(Fu)))
 

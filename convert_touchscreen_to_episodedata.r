@@ -1,4 +1,5 @@
-library(tic) # 
+# library(tic) # library(tictoc)? 
+
 # # !!!!!!!backward imputation is problematic!!!!
 # harmonize_agediag_bycols<-function (df,tsdiagnosisdatefields,qc_treshold_year=10){
 #   # Age of diagnosis should not change across visits 
@@ -68,9 +69,9 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
     # parse the field and condition 
     cdn<-str_extract(col,"[=|<|>|≥|≤|!][=]*\\d+")
     # replace one equal sign to logical equal if needed
-    cdn<-gsub("^={1,2}","==",cdn)
-    cdn<-gsub("^≥",">=",cdn)
-    cdn<-gsub("^≤","<=",cdn)
+    cdn<-gsub("\\b[=]+\\b","==",cdn)
+    cdn<-gsub("\\b[≥]\\b",">=",cdn)
+    cdn<-gsub("\\b[≤]\\b","<=",cdn)
     field_ts_diagnosis<-str_extract(col,"\\d+")
     tsdiagnosisfields = names(df)[grepl( paste0("[^0-9]",field_ts_diagnosis,"[^0-9]"), names(df))]
     
@@ -208,8 +209,8 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
 }
 
   
-test<-  convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions_processed$TS[5]) # "1 Mb" 1.013 sec elapsed
-test<-  convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions_processed$TS)  #"31.3 Mb" 10.349 sec elapsed
+# test<-  convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions_processed$TS[5]) # "1 Mb" 1.013 sec elapsed
+# test<-  convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions_processed$TS)  #"31.3 Mb" 10.349 sec elapsed
 
 
 

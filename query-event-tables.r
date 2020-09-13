@@ -25,15 +25,27 @@ tte.gpclincal.read3	CTV3	character	0	2	FALSE
 tte.gpscript.dmd.england	DMD	character	0	2	FALSE
 tte.gpscript.bnf.england	BNF	character	0	2	FALSE
 tte.gpscript.bnf.scotland	BNF	character	0	2	FALSE
-tte.gpscript.read2.wales	READ	character	1	2	FALSE"))
+tte.gpscript.read2.wales	READ	character	1	2	FALSE
+ts	TS	character	0	1	TRUE"))
 }
-
 
 to_datatype <- function(vct=c(),datatype){
   if(datatype=='numeric'){return(as.numeric(vct)) }
   if(datatype=='character'){return(as.character(vct)) }
   return(vct)
 }
+
+
+process_ts_col <-function (definitions){
+  # remove square bracket
+  definitions$TS<-  gsub( " *\\[.*?\\] *", "", definitions$TS)
+  # replace single equal sign = to == /larger/less symbol    ;\\b word boundary
+  definitions$TS<-gsub("\\b[=]+\\b","==",definitions$TS,perl=TRUE)
+  definitions$TS<-gsub("\\b[≥]\\b",">=",definitions$TS,perl=TRUE)
+  definitions$TS<-gsub("\\b[≤]\\b","<=",definitions$TS,perl=TRUE)
+  return(definitions)
+}
+
 
 get_all_events <- function (definition,lst.data=lst.data,datatable_defCol_pair=default_datatable_defCol_pair()){
   # definitions=dfDefinitions_processed_expanded[9,]
@@ -43,6 +55,9 @@ get_all_events <- function (definition,lst.data=lst.data,datatable_defCol_pair=d
     return(NULL)
   }
   message(paste("querying the following classifications: " ,paste(names(definition)[names(definition) %in% datatable_defCol_pair$classification],collapse=", ")))
+  
+  # TS needs cleaning
+  definitions<-process_ts_col(definitions)
   
   all_event_lst<-lapply(names(lst.data), function(x) {
     classification=datatable_defCol_pair %>% filter(datasource == x) %>% pull(classification)
@@ -64,8 +79,7 @@ get_all_events <- function (definition,lst.data=lst.data,datatable_defCol_pair=d
 }
 # 
 # dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,datatable_defCol_pair=default_datatable_defCol_pair(),lst.counts = lst.counts)
-# test<-get_all_events(dfDefinitions_processed_expanded[9,],lst) #list of 11 dfs 
-# 
+# test<-get_all_events(dfDefinitions_processed_expanded[9,],lst) 
 # key(test$tte.death.icd10.secondary)
 # 
 # 
@@ -73,36 +87,7 @@ get_all_events <- function (definition,lst.data=lst.data,datatable_defCol_pair=d
 # # lst_datatables=lst
 # colnames(dfDefinitions_processed)[c(1,11:28)]
 # 
-# # TODO TS 
 
-
-
-
-# 
-# ts_cols<-dfDefinitions_processed[dfDefinitions_processed$TRAIT=="Cad",]$TS
-# ts_cols #"6150=1[3894]"
-# ts_cols<-c(ts_cols,"615=1") #"6150=1[3894]" "615=1"  
-# ts_cols_<-sub("=.*", "", ts_cols) # "6150"  "615"
-# #  immediately followed by non-digit \\D+  to avoid partial match of field number?
-# ts_cols<-paste(unlist(ts_cols_),"\\D+", sep="",collapse="|") #"6150\\D+|615\\D+"
-# ts_cols
-# df_ts <- dfukb %>% select(matches(ts_cols))  # 12 vars f.6150.x.x
-# test <- dfukb %>% select(matches("6150|615")) #28 vars with also f.6153.x.x
-
-
-
-
-#   # data.table version                  
-# df[, grep("ABC", names(df)), with = FALSE]
-#                     
-# ts_conds<-dfDefinitions_processed[dfDefinitions_processed$TRAIT=="Cad",]$TS
-# ts_conds<-sub("\\[.*", "", ts_conds)
-# ts_conds<-c(ts_conds,"615=1")
-# 
-# value
-# strsplit(ts_conds, "[=]")
-# [[1]]
-# 
 
 # TODO composite phenotype from multiple sources get_all_events + TS
 # simple count
