@@ -4,7 +4,10 @@ get_stats_for_events <- function(all_event_dt){
   stats.codes <- stats.codes %>% dplyr::group_by(classification, code) %>% summarise(count=n() )
   stats.codes <- stats.codes %>% arrange(count)
   stats.codes$rank <- 1:nrow(stats.codes)
+  png("test.png")
   p1 <- ggplot(stats.codes, aes(rank, count,label=code,color=classification)) + geom_point() + ylim(-((max(stats.codes$count))/3),NA)  + geom_text_repel(size =3,segment.size=0.5)
+  p1
+  dev.off()
   p2 <- ggplot(stats.codes, aes(rank, count,label=code,color=classification)) + scale_y_continuous(trans='log2') + geom_point()   + geom_text_repel(size =3,segment.size=0.5)
   stats.codes.summary.table <- stats.codes
   stats.codes.summary.p <- ggarrange(p1,p2,nrow = 1, ncol = 2,common.legend = TRUE)
@@ -16,8 +19,17 @@ get_stats_for_events <- function(all_event_dt){
   mat <- floor(t(mat * 100 / diag(mat)))                 # calculate the percentage
   diag(mat) <- NA
   stats.class.cooccur.table <- mat
-  stats.class.cooccur.p <- pheatmap::pheatmap(mat,display_numbers=mat,cluster_cols = F,cluster_rows = F )
   
+  # stats.class.cooccur.p <- pheatmap::pheatmap(mat,display_numbers=mat,cluster_cols = F,cluster_rows = F )
+  # #########ggplot2 implementation of the heatmap##########################################################################
+  longData<- reshape2::melt(mat)
+  names(longData)<- c("Code_presence","Code_occur","%")
+  stats.class.cooccur.p <- ggplot(longData, aes(x = Code_occur , y =Code_presence,fill=`%`)) +
+    geom_tile()+
+    scale_fill_distiller(palette = "RdYlBu",na.value = "grey85") +
+    labs(x="Classfication of co-occurence", y="Classification present",title="Co-occurence of diagnosis by sources",caption = "[In the presence of row, column coexists with row by %]") +
+    geom_text(aes(label = `%`)) 
+ # ########################################################################################################################
   # show co-occurences of codes
   stats.coocurrence <- table(all_event_dt[,c("f.eid" ,"code")])
   stats.coocurrence[stats.coocurrence>0] <-1
@@ -25,19 +37,54 @@ get_stats_for_events <- function(all_event_dt){
   mat <- floor(t(mat * 100 / diag(mat)))                 # calculate the percentage
   diag(mat) <- NA
   stats.codes.cooccur.table <- mat
-  stats.codes.cooccur.p <- pheatmap::pheatmap(mat,fontsize = 6,cluster_cols = F,cluster_rows = F)
   
+  
+  # stats.codes.cooccur.p <- pheatmap::pheatmap(mat,fontsize = 6,cluster_cols = F,cluster_rows = F)
   # filter on codes that with co-occurence of at least 10% to reduce sparseness and make clustering more informative. 
   stats.codes.cooccur.filtered.table <- stats.codes.cooccur.table[rowMaxs(stats.codes.cooccur.table,na.rm=T)>10,colMaxs(stats.codes.cooccur.table,na.rm=T)>10]
-  stats.codes.cooccur.filtered.p <- pheatmap::pheatmap( stats.codes.cooccur.filtered.table  ,fontsize = 6)
+  # stats.codes.cooccur.filtered.p <- pheatmap::pheatmap( stats.codes.cooccur.filtered.table  ,fontsize = 6)
+  # ########## ggplot implementation#################################################################################
+  # Create ggplot version dendrogram from ggdendro
+  code.dendro <- as.dendrogram(hclust(d = dist(x = stats.codes.cooccur.filtered.table)))
+  ddata_x <- dendro_data(code.dendro)
+  # to colour leaves by classifications
+  lab_gp <- label(ddata_x)
+  lab_gp$group <- stats.codes[match(lab_gp$label,stats.codes$code),]$classification
+  stats.codes.cooccur.filtered.p.dendro <- ggplot(segment(ddata_x)) +
+    geom_segment(aes(x=x, y=y+10, xend=xend, yend=yend+10)) +  geom_text(data=label(ddata_x),
+                 aes(label=label, x=x, y=-5, colour=lab_gp$group),size =3,angle=45)   +theme(axis.line=element_blank(),
+         axis.text.x=element_blank(),
+         axis.text.y=element_blank(),
+         axis.ticks=element_blank(),
+         axis.title.x=element_blank(),  
+         axis.title.y=element_blank(),
+           # legend.position="none",
+         panel.background=element_blank(),
+         panel.border=element_blank(),
+         panel.grid.major=element_blank(),
+         panel.grid.minor=element_blank(),
+         plot.background=element_blank())
+  # ggplot version heatmap
+  # code.order <- order.dendrogram(code.dendro) 
+  # TODO maker heatmap ordered like dendrogram?
+  longData<- reshape2::melt(stats.codes.cooccur.filtered.table)
+  names(longData)<- c("Code_presence","Code_occur","%")
+  stats.codes.cooccur.filtered.p.heat <- ggplot(longData, aes(x = Code_occur , y =Code_presence,fill=`%`)) +
+    geom_tile()+
+    scale_fill_distiller(palette = "RdYlBu",na.value = "grey85") +
+    labs(x="Code of co-occurence", y="Code present",title="Co-occurence of diagnosis code",caption = "[In the presence of row, column coexists with row by %]") + theme(axis.text.x = element_text(angle = 45))
+###############################################################################################################  
+  
   
   return(list(stats.codes.summary.table = stats.codes.summary.table,
          stats.codes.summary.p = stats.codes.summary.p,
          stats.class.cooccur.table = stats.class.cooccur.table,
          stats.class.cooccur.p = stats.class.cooccur.p,
          stats.codes.cooccur.table = stats.codes.cooccur.table,
-         stats.codes.cooccur.p = stats.codes.cooccur.p,
-         stats.codes.cooccur.filtered.p = stats.codes.cooccur.filtered.p))
+         # stats.codes.cooccur.p = stats.codes.cooccur.p,
+         # stats.codes.cooccur.filtered.p = stats.codes.cooccur.filtered.p,
+         stats.codes.cooccur.filtered.p.dendro = stats.codes.cooccur.filtered.p.dendro,
+         stats.codes.cooccur.filtered.p.heat = stats.codes.cooccur.filtered.p.heat))
 }
 
 ### get prevalence (move this.. )

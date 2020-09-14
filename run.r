@@ -12,6 +12,7 @@ library(ggplot2)
 library(ggrepel)
 library(ggpubr)
 library(pheatmap)
+library(ggdendro)
 
 if (Sys.getenv("USER")=="niek"){
   repo_dir="/Users/niek/repos/ukbpheno/"
@@ -138,8 +139,16 @@ save(dfhtml,dfukb,lst.data,lst.data.settings,lst.counts,file=fukbphenodata)
 # dfDefinitions_processed_expanded[12,]$TRAIT #"Cad"
 # expand the definitions as exact match much faster 
 dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,datatable_defCol_pair=default_datatable_defCol_pair(),lst.counts = lst.counts)
+
 all_event_dt <- get_all_events(dfDefinitions_processed_expanded[12,],lst.data)  #all collapsed to 1 datatable
+dev.off()
+rm(all_event_dt.stats)
 all_event_dt.stats <- get_stats_for_events(all_event_dt) #should generate several plots
+all_event_dt.stats$stats.codes.summary.p
+all_event_dt.stats$stats.class.cooccur.p
+all_event_dt.stats$stats.codes.cooccur.filtered.p.dendro
+all_event_dt.stats$stats.codes.cooccur.filtered.p.heat
+
 all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
 View(all_event_dt.summary %>% filter(is.na(Hx) & is.na(Fu)))
 
@@ -150,5 +159,5 @@ hist(all_event_dt.summary %>% filter(Fu_days<100) %>% pull(Fu_days) %>% as.numer
 hist(all_event_dt.summary$reference_date,breaks=200)
 print(format(object.size(lst.data), units = "Mb")) #"2014.1 Mb"
 
-
+all_event_dt.summary
 
