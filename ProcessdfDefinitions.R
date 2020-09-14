@@ -60,6 +60,11 @@ PreProcessDfDefinitions<-function(df,VctAllColumns,VctColstoupper=NULL ){ # c("I
   trim.commas <- function (x) gsub("(?<=[\\,])\\,*|^\\,+|\\,+$", "", x, perl=TRUE)
   df[,VctAllColumns]<- data.frame(apply(df[,VctAllColumns],2,function(x) trim.commas(x)))
 
+  ### replace one equal sign to logical equal if needed
+  VctCustomFields="TS"
+  df[,VctCustomFields]<-gsub("\\b[=]+\\b","==",df[,VctCustomFields],perl=TRUE)
+  df[,VctCustomFields]<-gsub("\\b[≥]\\b",">=",df[,VctCustomFields],perl=TRUE)
+  df[,VctCustomFields]<-gsub("\\b[≤]\\b","<=",df[,VctCustomFields],perl=TRUE)
 
   if(length(VctColstoupper)==1){
     df[,VctColstoupper] <- toupper(df[,VctColstoupper])
@@ -68,6 +73,7 @@ PreProcessDfDefinitions<-function(df,VctAllColumns,VctColstoupper=NULL ){ # c("I
     df[,VctColstoupper] <- apply(df[,VctColstoupper],2,toupper)
   }
 
+  
   df<-ConvertFactorsToStringReplaceNAInDf(df) #### CONVERT FACTOR TO STRING
 
   if(checkr==1){df<-df[1,]}

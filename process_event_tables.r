@@ -66,7 +66,7 @@ get_incidence_prevalence <- function(all_event_dt,
   # 4139206
   if(!is.null(reference_date)){
     df_referencedate <- data.table(reference_date)
-    df_referencedate$f.eid <- rownames(df_referencedate)
+    df_referencedate$f.eid <- names(reference_date)
   } else{
     message("no reference_date given, taking the first available event as reference")
     df_referencedate <- all_event_dt[,.(reference_date= min(eventdate,na.rm = T)),by=f.eid]
@@ -132,10 +132,11 @@ get_incidence_prevalence <- function(all_event_dt,
   unique(dfHx[,c("f.eid","Hx")]),
   unique(dfFu[,c("f.eid","Fu")]),
   unique(dfRef[,c("f.eid","Ref")]),
-  first_diagnosis_days,
-  df_referencedate
+  first_diagnosis_days
   ))
     
+  all_event_dt.summary <- merge(all_event_dt.summary,df_referencedate,all.x=T,by="f.eid")
+  
   all_event_dt.summary[,Any:=1]
   
   

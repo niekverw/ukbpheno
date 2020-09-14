@@ -33,23 +33,17 @@
 #   
 # }
 
-format_ts_conditions<-function(ts_conditions=dfDefinitions_processed$TS){
-  unique(c(na.omit(unlist(strsplit(ts_conditions,",")))))   #"20110=1"  "20107=1[3894]" "20111<=1" 
-}
-
 # df<-dfukb
 convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_processed$TS,qc_treshold_year=10){
   tic()
-  ts_conditions <- format_ts_conditions(ts_conditions)
+  ts_conditions <- unique(c(na.omit(unlist(strsplit(ts_conditions,",")))))
   print(paste("Input fields:",ts_conditions,sep=" ") )
   
-  
   daysinyear=365.25
-  
   # visit date code
   field_visit_date="53"
   # vector with name of the identifier col 
-  identifierfield = names(df)[grepl("eid", names(df))]
+  identifierfield = "f.eid"
   #  vector with names of all visit cols : "f.53.0.0" "f.53.1.0" "f.53.2.0" "f.53.3.0"
   visitdatefields = names(df)[grepl(paste0("[^0-9]",field_visit_date,"[^0-9]"), names(df))]
   visits = length(visitdatefields) #sum(grepl("53_", names(df)))
@@ -68,10 +62,6 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
     print(paste("process touchscreen data for",col,sep=" "))
     # parse the field and condition 
     cdn<-str_extract(col,"[=|<|>|≥|≤|!][=]*\\d+")
-    # replace one equal sign to logical equal if needed
-    cdn<-gsub("\\b[=]+\\b","==",cdn)
-    cdn<-gsub("\\b[≥]\\b",">=",cdn)
-    cdn<-gsub("\\b[≤]\\b","<=",cdn)
     field_ts_diagnosis<-str_extract(col,"\\d+")
     tsdiagnosisfields = names(df)[grepl( paste0("[^0-9]",field_ts_diagnosis,"[^0-9]"), names(df))]
     
@@ -129,12 +119,12 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
 
       # find rows that fulfil the condition
       cdn_exp <-paste(diagfield,cdn,sep="") #"f.xxxxx.v.i ==1"
-      
+
       df_sub<- df_sub %>% filter(eval((parse(text=cdn_exp))))
       # if no rows fulfil the condition
       if (nrow(df_sub)==0){next}
       # replace the diagfield content with the condition
-      df_sub[[diagfield]]<-paste(field_ts_diagnosis,cdn,sep="")
+      df_sub[[diagfield]]<-col #paste(field_ts_diagnosis,cdn,sep="")
       # add visit instance
       df_sub$visit <- v
       names(df_sub) <- c("f.eid","code","eventdate","visitdate","birthyearmonth","visit")

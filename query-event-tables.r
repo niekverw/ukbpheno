@@ -36,17 +36,6 @@ to_datatype <- function(vct=c(),datatype){
 }
 
 
-process_ts_col <-function (definitions){
-  # remove square bracket
-  definitions$TS<-  gsub( " *\\[.*?\\] *", "", definitions$TS)
-  # replace single equal sign = to == /larger/less symbol    ;\\b word boundary
-  definitions$TS<-gsub("\\b[=]+\\b","==",definitions$TS,perl=TRUE)
-  definitions$TS<-gsub("\\b[≥]\\b",">=",definitions$TS,perl=TRUE)
-  definitions$TS<-gsub("\\b[≤]\\b","<=",definitions$TS,perl=TRUE)
-  return(definitions)
-}
-
-
 get_all_events <- function (definition,lst.data=lst.data,datatable_defCol_pair=default_datatable_defCol_pair()){
   # definitions=dfDefinitions_processed_expanded[9,]
   # look up for all dataframes in list
@@ -55,9 +44,6 @@ get_all_events <- function (definition,lst.data=lst.data,datatable_defCol_pair=d
     return(NULL)
   }
   message(paste("querying the following classifications: " ,paste(names(definition)[names(definition) %in% datatable_defCol_pair$classification],collapse=", ")))
-  
-  # TS needs cleaning
-  definitions<-process_ts_col(definitions)
   
   all_event_lst<-lapply(names(lst.data), function(x) {
     classification=datatable_defCol_pair %>% filter(datasource == x) %>% pull(classification)
