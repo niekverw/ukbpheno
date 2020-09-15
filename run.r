@@ -30,6 +30,7 @@ source(paste(repo_dir,"ProcessdfDefinitions.R",sep=""))
 source(paste(repo_dir,"read-data.R",sep=""))
 source(paste(repo_dir,"query-event-tables.r",sep=""))
 source(paste(repo_dir,"process_event_tables.r",sep=""))
+source(paste(repo_dir,"convert_touchscreen_to_episodedata.r",sep=""))
 
 fukbtab = paste(pheno_dir,"ukb41823.tab",sep="") 
 fukbtab = paste(pheno_dir,"ukb41823.tab.head10k",sep="") # header only for testing.
@@ -51,6 +52,7 @@ fukbphenodata <- paste(pheno_dir,"ukbphenodata.Rdata",sep="") #where to store fi
 # read definitions. 
 dfDefinitions <- fread(fdefinitions, colClasses = 'character', data.table = FALSE)
 dfDefinitions_processed <- ProcessDfDefinitions(dfDefinitions)
+#  N_6150_ > N6150
 dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions_processed)
 ########################################## 
 # > loading data
@@ -132,17 +134,23 @@ lst.counts <- get_lst_counts(lst.data,datatable_defCol_pair = default_datatable_
 save(dfhtml,dfukb,lst.data,lst.data.settings,lst.counts,file=fukbphenodata)
 # load(fukbphenodata)
 ##########################################
-
+View(lst.data$ts)
+unique(lst.data$ts$code)
 ##########################################
 ## analyse 1 definition
 ##########################################
-# dfDefinitions_processed_expanded[12,]$TRAIT #"Cad"
+# dfDefinitions_processed_expanded[20,]$TRAIT #"Cad"
 # expand the definitions as exact match much faster 
 dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,datatable_defCol_pair=default_datatable_defCol_pair(),lst.counts = lst.counts)
+#all collapsed to 1 datatable
+all_event_dt <- get_all_events(dfDefinitions_processed_expanded[14,],lst.data)   #MI
+# all_event_dt <- get_all_events(dfDefinitions_processed_expanded[8,],lst.data)  #DmT2
+# all_event_dt <- get_all_events(dfDefinitions_processed_expanded[17,],lst.data)  #Ht #all collapsed to 1 datatable
+# all_event_dt <- get_all_events(dfDefinitions_processed_expanded[9,],lst.data)  #DmT2
 
-all_event_dt <- get_all_events(dfDefinitions_processed_expanded[12,],lst.data)  #all collapsed to 1 datatable
-dev.off()
-rm(all_event_dt.stats)
+dfDefinitions_processed_expanded[14,]$TS
+gc()
+
 all_event_dt.stats <- get_stats_for_events(all_event_dt) #should generate several plots
 all_event_dt.stats$stats.codes.summary.p
 all_event_dt.stats$stats.class.cooccur.p

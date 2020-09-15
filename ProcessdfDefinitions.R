@@ -289,7 +289,7 @@ get_allvarnames <- function(dfDefinitions_processed){
 
 
   all_ukb_fields <- unique(c(defcols,default_ukb_fields()))
-  all_ukb_fields<-gsub("[a-z]*?_","",all_ukb_fields)
+  all_ukb_fields<-gsub("[a-zA-Z]*?_","",all_ukb_fields)
   nondefault_ukb_fields <- all_ukb_fields[!all_ukb_fields %in% default_ukb_fields() ] 
   
   
