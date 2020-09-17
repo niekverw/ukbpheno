@@ -404,15 +404,15 @@ sumcounts <- function(dfs){
 
 
 
-get_lst_counts <- function(lst.data,datatable_defCol_pair=default_datatable_defCol_pair() ) {
+get_lst_counts <- function(lst.data,lst.data.settings=lst.data.settings ) {
   print("counting")
   lst.counts <- lapply(lst.data, function(x) x[, .N, by=.(code)] )
   
   lst.counts.aggregate <- list()
-  for (c in unique(datatable_defCol_pair$classification)){
+  for (c in unique(lst.data.settings$classification)){
     
     print(c)
-    dfs <- datatable_defCol_pair[datatable_defCol_pair$classification %in% c,'datasource']
+    dfs <- lst.data.settings[lst.data.settings$classification %in% c,'datasource']
     if(any(names(lst.counts) %in% dfs)){
       i.na <- which(is.na(names(lst.counts[dfs])))
       if(length(i.na)>0) {message(paste("WARNING unavailable: ", dfs[i.na])); dfs <- dfs[-i.na] }
