@@ -89,9 +89,9 @@ get_stats_for_events <- function(all_event_dt){
 
 ### get prevalence (move this.. )
 get_incidence_prevalence <- function(all_event_dt,
-                                     reference_date,
+                                     lst.data.settings,
+                                     reference_date=NULL,
                                      include_secondary_recurrence=FALSE,
-                                     lst.data.settings = lst.data.settings,
                                      return_dates=FALSE,
                                      window_ref_days_include=0,##  indicate number of days around the reference date (visit) that should be used to indicates if individuals had the event on the reference date. For example, relevant if you want to know if participant took medication on the visit 
                                      window_fu_days_mask=0 ## indicates number of days that future events should not be counted; e.g. you could only count events after 10 days from the reference visit to avoid events related to the reference date. e.g. you could also use it to only count events after X years, in order to avoid assesment bias.
@@ -119,18 +119,20 @@ get_incidence_prevalence <- function(all_event_dt,
     df_referencedate <- all_event_dt[,.(reference_date= min(eventdate,na.rm = T)),by=f.eid]
   }
   
-  df <- merge(all_event_dt,df_referencedate,by = 'f.eid',all.x = T) %>% arrange(eventdate) %>% as.data.table()
-  df <- df %>% filter(!is.na(reference_date)) # comment out if missing f.eids is fixed. 
-  
-  df$days <- df$eventdate - df$reference_date
-  setkey(df,days) # i don't know why, but setkey was alreaday on f.eid and cannot refresh..
-  setkey(df,f.eid)
-  
   if(include_secondary_recurrence){
     sources_recurrence_events <- lst.data.settings$datasource
   } else {
     sources_recurrence_events <- lst.data.settings %>% filter(diagnosis==1) %>% pull(datasource)
   } 
+  
+  
+  df <- merge(all_event_dt,df_referencedate,by = 'f.eid',all.x = T) %>% arrange(eventdate) %>% as.data.table()
+  df <- df %>% filter(!is.na(reference_date)) # comment out if missing f.eids is fixed. 
+
+  df$days <- df$eventdate - df$reference_date
+  setkey(df,days) # i don't know why, but setkey was alreaday on f.eid and cannot refresh..
+  setkey(df,f.eid)
+
   ### History
   dfHx <- df[days<=0]
   Hx_days <- suppressWarnings( dfHx[event>0][, .(Hx_days=min(days,na.rm=T) ), keyby=list(f.eid)] )
@@ -171,21 +173,18 @@ get_incidence_prevalence <- function(all_event_dt,
   # View(test)
   
   
-  
   all_event_dt.summary <- Reduce(function(...) merge(..., all = TRUE,by='f.eid'), list( 
-  stats,
-  Hx_days,
-  Fu_days,
-  unique(dfHx[,c("f.eid","Hx")]),
-  unique(dfFu[,c("f.eid","Fu")]),
-  unique(dfRef[,c("f.eid","Ref")]),
-  first_diagnosis_days
+      stats,
+      Hx_days,
+      Fu_days,
+      unique(dfHx[,c("f.eid","Hx")]),
+      unique(dfFu[,c("f.eid","Fu")]),
+      unique(dfRef[,c("f.eid","Ref")]),
+      first_diagnosis_days
   ))
     
   all_event_dt.summary <- merge(all_event_dt.summary,df_referencedate,all.x=T,by="f.eid")
-  
   all_event_dt.summary[,Any:=1]
-  
   
   return(all_event_dt.summary)
 }
