@@ -317,15 +317,15 @@ convert_readv2_to_ukbmedication<-function(Vctn_20003,Vctreadcodes){
 
 #' @export
 ## expand definition codes based on the ccodes that are available in the raw data (using lst.counts).
-## datatable_defCol_pair() includes settings that should be used, e.g. if ICD10 should be looked up case sensitive or not (incase of READ cases are important, dotts should also NOT be interpreted)
-expand_dfDefinitions_processed <- function(dfDefinitions_processed,datatable_defCol_pair,lst.counts){
-  classifications <- datatable_defCol_pair %>% filter(expand_codes==1) %>% pull (classification) %>% unique()
+## lst.data.settings includes settings that should be used, e.g. if ICD10 should be looked up case sensitive or not (incase of READ cases are important, dotts should also NOT be interpreted)
+expand_dfDefinitions_processed <- function(dfDefinitions_processed,lst.data.settings,lst.counts){
+  classifications <- lst.data.settings %>% filter(expand_codes==1) %>% pull (classification) %>% unique()
   for (c in classifications){
     
   for (r in 1:nrow(dfDefinitions_processed)){ # for loops just as fast as apply in this case.. 
     VctStr = unlist(strsplit(dfDefinitions_processed[r,c],",")) 
     lookuptable = lst.counts[[c]]
-    ignore.case = unique(datatable_defCol_pair[datatable_defCol_pair$classification %in% c,'ignore.case'])[1]
+    ignore.case = unique(lst.data.settings[lst.data.settings$classification %in% c,'ignore.case'])[1]
     
     Str_expanded <- paste(unique(unlist(
       lapply(VctStr,  function(x)  lookuptable$code [ grep(paste("^", x,sep=""),lookuptable$code ,ignore.case=ignore.case )])

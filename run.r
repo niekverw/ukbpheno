@@ -52,18 +52,13 @@ fukbphenodata <- paste(pheno_dir,"ukbphenodata.Rdata",sep="") #where to store fi
 # read definitions. 
 dfDefinitions <- fread(fdefinitions, colClasses = 'character', data.table = FALSE)
 dfDefinitions_processed <- ProcessDfDefinitions(dfDefinitions)
-#  N_6150_ > N6150
-dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions_processed)
+dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions_processed) ## regarding downstream functions, what happens if å field is not present, will we get an error? 
 ########################################## 
 # > loading data
 # read ukb data from ukbconv (.html + .tab)
-# 9 columns in dfhtml: "field.number","field.count","field.showcase","field.html","field.tab","field.description","col.type","col.name","fread_column_type"
-dfhtml <- read_ukb_metadata(fhtml)
-# TODO: unit of operation - phenotype such that read only required fields from the ukbxxxxx.tab file 
-# TODO: create a loop : for each definition in definitions ,  read ukbdata + fetch all required info + generate the variable 
+dfhtml <- read_ukb_metadata(fhtml) # 9 columns in dfhtml: "field.number","field.count","field.showcase","field.html","field.tab","field.description","col.type","col.name","fread_column_type"
 dfukb <- read_ukb_tabdata(fukbtab,dfhtml,fields_to_keep = dfDefinitions_ukb_fields$all_ukb_fields)
 print(format(object.size(dfukb), units = "Gb"))
-
 #################################################################################### \
 # Should we put the following in a function?
 tic("converting data")
@@ -126,10 +121,8 @@ ts	TS	character	0	1	TRUE"))
 toc()
 
 ##########################################
-# generate meta data dynamically,  returns a list with the number of rows per code based on default_datatable_defCol_pair()
-lst.counts <- get_lst_counts(lst.data,datatable_defCol_pair = default_datatable_defCol_pair() )
-# to dataset make more lean: retain identifier , visitdates and additional fields needed for definitions besides default (as cols in file)
-#dfukb<- dfukb[,dfhtml[dfhtml$field.showcase %in% c("eid", "53",ukb_fields$nondefault_ukb_fields),]$field.tab,with=FALSE]
+# generate meta data dynamically,  returns a list with the number of rows per code based on lst.data.settings
+lst.counts <- get_lst_counts(lst.data,lst.data.settings = lst.data.settings)
 # save 
 save(dfhtml,dfukb,lst.data,lst.data.settings,lst.counts,file=fukbphenodata)
 # load(fukbphenodata)
@@ -141,7 +134,7 @@ unique(lst.data$ts$code)
 ##########################################
 # dfDefinitions_processed_expanded[20,]$TRAIT #"Cad"
 # expand the definitions as exact match much faster 
-dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,datatable_defCol_pair=default_datatable_defCol_pair(),lst.counts = lst.counts)
+dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,lst.data.settings=lst.data.settings,lst.counts = lst.counts)
 #all collapsed to 1 datatable
 all_event_dt <- get_all_events(dfDefinitions_processed_expanded[14,],lst.data)   #MI
 # all_event_dt <- get_all_events(dfDefinitions_processed_expanded[8,],lst.data)  #DmT2

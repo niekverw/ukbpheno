@@ -91,7 +91,7 @@ get_stats_for_events <- function(all_event_dt){
 get_incidence_prevalence <- function(all_event_dt,
                                      reference_date,
                                      include_secondary_recurrence=FALSE,
-                                     datatable_defCol_pair = default_datatable_defCol_pair(),
+                                     lst.data.settings = lst.data.settings,
                                      return_dates=FALSE,
                                      window_ref_days_include=0,##  indicate number of days around the reference date (visit) that should be used to indicates if individuals had the event on the reference date. For example, relevant if you want to know if participant took medication on the visit 
                                      window_fu_days_mask=0 ## indicates number of days that future events should not be counted; e.g. you could only count events after 10 days from the reference visit to avoid events related to the reference date. e.g. you could also use it to only count events after X years, in order to avoid assesment bias.
@@ -127,9 +127,9 @@ get_incidence_prevalence <- function(all_event_dt,
   setkey(df,f.eid)
   
   if(include_secondary_recurrence){
-    sources_recurrence_events <- datatable_defCol_pair$datasource
+    sources_recurrence_events <- lst.data.settings$datasource
   } else {
-    sources_recurrence_events <- datatable_defCol_pair %>% filter(diagnosis==1) %>% pull(datasource)
+    sources_recurrence_events <- lst.data.settings %>% filter(diagnosis==1) %>% pull(datasource)
   } 
   ### History
   dfHx <- df[days<=0]
