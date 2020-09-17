@@ -151,7 +151,7 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
   
   
   # remove rounding error from interpolation 
-  df_out[df_out$eventdate > df_out$visitdate,] <- df_out[df_out$eventdate > df_out$visitdate,]$visitdate
+  df_out[df_out$eventdate > df_out$visitdate,'eventdate'] <- df_out[df_out$eventdate > df_out$visitdate,]$visitdate
   
   # deduplicate
   message("deduplicate")

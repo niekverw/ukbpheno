@@ -140,8 +140,8 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
     } else if (field_sr_date_type=="date"){
       df_out = df_out[, eventdate:=as.Date(eventdate)]
     }
-    # remove rounding error from interpolation 
-    df_out[df_out$eventdate > df_out$visitdate,] <- df_out[df_out$eventdate > df_out$visitdate,]$visitdate
+    # remove rounding error from interpolation
+    df_out[df_out$eventdate > df_out$visitdate,'eventdate'] <- df_out[df_out$eventdate > df_out$visitdate,]$visitdate
     
     # deduplicate, min/max/mean/sd <- not very efficient?!! 
     message("deduplicate")
