@@ -241,7 +241,14 @@ ProcessDfDefinitions<-function(df,
 
       if(!is.na(row$Include_in_cases)){
         # parse the dependent traits
+        # row<-dfDefinitions[19,]
+        
         VctInclude_in_casess<-unlist(strsplit(row$Include_in_cases,","))
+        # remove space
+        VctInclude_in_casess<-  gsub(" ", "", VctInclude_in_casess)
+        # remove brackets if applicable
+        VctInclude_in_casess<- gsub( " *\\(.*?\\) *", "", VctInclude_in_casess)
+        
         # for each trait in dependent traits
         for (StrInclude_in_cases in VctInclude_in_casess) {
           # break self-referencing loop
