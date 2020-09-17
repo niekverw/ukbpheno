@@ -283,7 +283,7 @@ get_allvarnames <- function(dfDefinitions_processed){
   TScolumns = "TS"
   defcols <- unlist(strsplit(na.omit(unname(unlist(dfDefinitions_processed[,c(TScolumns)]))),split=","))
   defcols <- unlist(strsplit(chartr("[]", "()", defcols),"[()]"))
-  defcols <- gsub("(≥|=).*","",defcols)
+  defcols <- gsub("(≥|=|>|<).*","",defcols)
   defcols <- gsub("≥.*","",defcols)
   defcols <- unique(defcols) ## need column classes....
 
