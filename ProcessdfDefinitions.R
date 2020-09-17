@@ -179,7 +179,7 @@ ReduceRedundancyDf<- function(df){ ### NOT really nessesary
 #' #
 #' #
 #' #
-#' VctAllColumns<-  c("TS", "SR", "TS_RX", "SR_RX", "LAB", "ICD10", "ICD9", "OPCS4","OPCS3", "TS_AGE_DIAG_COLNAME", "READ","CTV3","BNF","DMD", "n_20001",    "n_20002", "n_20003", "n_20004", "DEPENDENCY")
+#' VctAllColumns<-  c("TS", "SR", "TS_RX", "SR_RX", "LAB", "ICD10", "ICD9", "OPCS4","OPCS3", "TS_AGE_DIAG_COLNAME", "READ","CTV3","BNF","DMD", "n_20001",    "n_20002", "n_20003", "n_20004", "Include_in_cases")
 #' ProcessDfDefinitions(dfDefinitions,VctAllColumns)
 #'
 #' @export
@@ -189,12 +189,12 @@ ProcessDfDefinitions<-function(df,
                                                "READ", "CTV3",
                                                "BNF","DMD",
                                                "n_20001",    "n_20002", "n_20003", "n_20004",
-                                               "DEPENDENCY"),
+                                               "Include_in_cases"),
                                VctColstoupper=c("ICD10","ICD9","OPCS4","OPCS3"),
                                fill_dependencies=T){
   
   #df<- dfDefinitions  #  df<- dfDefinitions2
-  # VctAllColumns<-  c("TS", "SR", "TS_RX", "SR_RX", "LAB", "ICD10", "ICD9", "OPCS4","OPCS3", "TS_AGE_DIAG_COLNAME", "READ","CTV3", "n_20001",    "n_20002", "n_20003", "n_20004", "DEPENDENCY")
+  # VctAllColumns<-  c("TS", "SR", "TS_RX", "SR_RX", "LAB", "ICD10", "ICD9", "OPCS4","OPCS3", "TS_AGE_DIAG_COLNAME", "READ","CTV3", "n_20001",    "n_20002", "n_20003", "n_20004", "Include_in_cases")
 
   #if(nrow(df)==1 ) {stop("please have more than 1 phenotype definition.")} ## check if excel file has more than 1 row.
   df <- data.frame(df)
@@ -232,40 +232,46 @@ ProcessDfDefinitions<-function(df,
 
   ### lookup ICD10/9/OPER and put into READ and CTV3:
   # ....? I can lookup everything in everything to make everything more complete
-
-
+  head(df$Include_in_cases)
+  df<-dfDefinitions
+  # Include_in_cases : formerly DEPENDENCY for composite trait
   repeat {
     for(i in 1:nrow(df)) {
       row <- df[i,]
 
-      if(!is.na(row$DEPENDENCY)){
-        VctDEPENDENCYs<-unlist(strsplit(row$DEPENDENCY,","))
+      if(!is.na(row$Include_in_cases)){
+        # parse the dependent traits
+        VctInclude_in_casess<-unlist(strsplit(row$Include_in_cases,","))
+        # for each trait in dependent traits
+        for (StrInclude_in_cases in VctInclude_in_casess) {
+          # break self-referencing loop
+          if(row$TRAIT == StrInclude_in_cases) {stop("Include_in_cases is same as trait.")}
+          #  retrieve the row for the dependent trait
+          targetrow<-df[df$TRAIT==StrInclude_in_cases,]
+          print(StrInclude_in_cases)
+          if(nrow(targetrow)==0){stop(paste('Include_in_cases: "',StrInclude_in_cases,'" not found in traits ',row$TRAIT,sep="")) }
 
-        for (StrDEPENDENCY in VctDEPENDENCYs) {
-          if(row$TRAIT == StrDEPENDENCY) {stop("Dependency is same as trait.")}
-          targetrow<-df[df$TRAIT==StrDEPENDENCY,]
-          if(nrow(targetrow)==0){stop(paste('Dependency: "',StrDEPENDENCY,'" not found in traits ',row$TRAIT,sep="")) }
-
-          if( is.na(targetrow["DEPENDENCY"])){
+          if( is.na(targetrow["Include_in_cases"])){
+            # for each data field, add the corresponding codes in the 
             for(col in VctAllColumns){
-              Vctcol<-unique( unlist(strsplit( c(df[i,col],df[df$TRAIT==StrDEPENDENCY,col]) ,",")) )
+              Vctcol<-unique( unlist(strsplit( c(df[i,col],df[df$TRAIT==StrInclude_in_cases,col]) ,",")) )
 
               df[i,col]<-pasteRemoveNA(Vctcol ,collapse=",",na.rm=T)
             }
-            # remove DEPENDENCY that was just filled in:
-            #df[i,"DEPENDENCY"]<-gsub(paste(StrDEPENDENCY,sep=""),"",df[i,"DEPENDENCY"],fixed=TRUE,ignore.case=FALSE)
+            # remove Include_in_cases that was just filled in:
+            #df[i,"Include_in_cases"]<-gsub(paste(StrInclude_in_cases,sep=""),"",df[i,"Include_in_cases"],fixed=TRUE,ignore.case=FALSE)
 
-            # remove DEPENDENCY that was just filled in:
-            LstTmpDependencies<- unlist(strsplit(VctDEPENDENCYs,","))
-            df[i,"DEPENDENCY"]<-paste( LstTmpDependencies [! LstTmpDependencies  %in%  StrDEPENDENCY] ,sep="",collapse = ",")
+            # remove Include_in_cases that was just filled in:
+            LstTmpDependencies<- unlist(strsplit(VctInclude_in_casess,","))
+            df[i,"Include_in_cases"]<-paste( LstTmpDependencies [! LstTmpDependencies  %in%  StrInclude_in_cases] ,sep="",collapse = ",")
 
-            df[i,"DEPENDENCY"]<-gsub("^,*|(?<=,),|,*$", "", df[i,"DEPENDENCY"], perl=T)
-            if(df[i,"DEPENDENCY"]==""){df[i,"DEPENDENCY"]<-NA} ## if empty replace with NA
+            df[i,"Include_in_cases"]<-gsub("^,*|(?<=,),|,*$", "", df[i,"Include_in_cases"], perl=T)
+            if(df[i,"Include_in_cases"]==""){df[i,"Include_in_cases"]<-NA} ## if empty replace with NA
           }
         }
       }
     }
-    if( length(unique(is.na(df$DEPENDENCY)))==1 ) break
+    if( length(unique(is.na(df$Include_in_cases)))==1 ) break
   }
 
   return(ConvertFactorsToStringReplaceNAInDf(df))
