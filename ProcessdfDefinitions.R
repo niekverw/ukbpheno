@@ -44,8 +44,9 @@ PreProcessDfDefinitions<-function(df,VctAllColumns,VctColstoupper=NULL ){ # c("I
   if(nrow(df)==1){df<-rbind(df,df);checkr=1}
   if(ncol(df)==1 & length(VctAllColumns)==1){df<-cbind(df,df);checkc=1; names(df)<-c(VctAllColumns,"tmp"); VctAllColumns=c(VctAllColumns,"tmp") }
 
-  ## for the names: remove everything between dots (R converts symbols to dots "(,.-)/" etc )
-  names(df) <- gsub( " *\\..*?\\. *", "", names(df) )
+  ## for the names: remove everything between dots (R converts symbols to dots "(,.-)/" etc ) <- this is due to data.frame(check.names= TRUE) in ProcessDfDefinitions, set to FALSE
+  # names(df) <- gsub( " *\\..*?\\. *", "", names(df) )
+  
   ## add missing columns
   df[, VctAllColumns[!VctAllColumns %in% colnames(df)]] <- NA
   ## remove everything between brackets
@@ -61,7 +62,7 @@ PreProcessDfDefinitions<-function(df,VctAllColumns,VctColstoupper=NULL ){ # c("I
   df[,VctAllColumns]<- data.frame(apply(df[,VctAllColumns],2,function(x) trim.commas(x)))
 
   ### replace one equal sign to logical equal if needed
-  VctCustomFields="TS"
+  VctCustomFields="TS.Touchscreen"
   df[,VctCustomFields]<-gsub("\\b[=]+\\b","==",df[,VctCustomFields],perl=TRUE)
   df[,VctCustomFields]<-gsub("\\b[≥]\\b",">=",df[,VctCustomFields],perl=TRUE)
   df[,VctCustomFields]<-gsub("\\b[≤]\\b","<=",df[,VctCustomFields],perl=TRUE)
@@ -83,7 +84,7 @@ PreProcessDfDefinitions<-function(df,VctAllColumns,VctColstoupper=NULL ){ # c("I
 }
 
 #' @export
-FillInSRdefinitions<-function(df,Var="SR",cols=c("n_20001","n_20002","n_20004") ) {
+FillInSRdefinitions<-function(df,Var="SR",cols=c("f.20001","f.20002","f.20004") ) {
   # 20001 cancer code, self reported; 20002 non-cancer illness, self reported; 20004 operation code
   ## fill in SR
   df[,Var]<-as.character(df[,Var])
@@ -184,11 +185,11 @@ ReduceRedundancyDf<- function(df){ ### NOT really nessesary
 #'
 #' @export
 ProcessDfDefinitions<-function(df,
-                               VctAllColumns=c("TS",
+                               VctAllColumns=c("TS(Touchscreen)",
                                                "ICD10", "ICD9", "OPCS4","OPCS3",
                                                "READ", "CTV3",
                                                "BNF","DMD",
-                                               "n_20001",    "n_20002", "n_20003", "n_20004",
+                                               "f.20001(sr_cancer)",    "f.20002(sr_noncancer)", "f.20003(sr_med)", "f.20004(sr_oper)",
                                                "Include_in_cases"),
                                VctColstoupper=c("ICD10","ICD9","OPCS4","OPCS3"),
                                fill_dependencies=T){
@@ -197,11 +198,17 @@ ProcessDfDefinitions<-function(df,
   # VctAllColumns<-  c("TS", "SR", "TS_RX", "SR_RX", "LAB", "ICD10", "ICD9", "OPCS4","OPCS3", "TS_AGE_DIAG_COLNAME", "READ","CTV3", "n_20001",    "n_20002", "n_20003", "n_20004", "Include_in_cases")
 
   #if(nrow(df)==1 ) {stop("please have more than 1 phenotype definition.")} ## check if excel file has more than 1 row.
-  df <- data.frame(df)
-  names(df) <- sub(pattern = "CODES",replacement = "",names(df) )
-    names(df) <- sub(pattern = "_$",replacement = "",names(df) ) # "n_20002_" --> "n_20002"
+  
 
+  df <- data.frame(df,check.names = FALSE)
+  names(df) <- sub(pattern = "CODES",replacement = "",names(df) )
+  names(df) <- sub(pattern = "_$",replacement = "",names(df) ) # "n_20002_" --> "n_20002"
+  # replace bracket with dot 
+  names(df) <- gsub( "([^.*])\\((.*)\\)", "\\1.\\2", names(df))
+  VctAllColumns <-   gsub( "([^.*])\\((.*)\\)", "\\1.\\2", VctAllColumns)
+  
   df <- PreProcessDfDefinitions(df,VctAllColumns,VctColstoupper=VctColstoupper)
+  
   if(any(!VctAllColumns %in% names(df))) print(paste("WARNING missing columns:", paste(VctAllColumns[!VctAllColumns %in% names(df)],collapse=", ")))
 
   #################################
@@ -232,8 +239,8 @@ ProcessDfDefinitions<-function(df,
 
   ### lookup ICD10/9/OPER and put into READ and CTV3:
   # ....? I can lookup everything in everything to make everything more complete
-  head(df$Include_in_cases)
-  df<-dfDefinitions
+  # head(df$Include_in_cases)
+  
   # Include_in_cases : formerly DEPENDENCY for composite trait
   repeat {
     for(i in 1:nrow(df)) {
