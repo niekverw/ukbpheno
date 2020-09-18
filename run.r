@@ -49,7 +49,19 @@ fukbphenodata <- paste(pheno_dir,"ukbphenodata.Rdata",sep="") #where to store fi
 ##########################################
 # read definitions. 
 dfDefinitions <- fread(fdefinitions, colClasses = 'character', data.table = FALSE)
+#TODO 
+###please check if they work as expected and/or there is some bug?
+# especially if it is a good idea to keep non empty rows for CaseExclude/Pop/ControlExclude????
 dfDefinitions_processed <- ProcessDfDefinitions(dfDefinitions)
+View(dfDefinitions_processed$dfCaseInclude)
+View(dfDefinitions_processed$dfCaseExclude)
+View(dfDefinitions_processed$dfPop)
+View(dfDefinitions_processed$dfControlExclude)
+
+
+
+
+
 ########################################## 
 # Prepare UKB data: 
 # read ukb data from ukbconv (.html + .tab) 

@@ -62,7 +62,7 @@ PreProcessDfDefinitions<-function(df,VctAllColumns,VctColstoupper=NULL ){ # c("I
   df[,VctAllColumns]<- data.frame(apply(df[,VctAllColumns],2,function(x) trim.commas(x)))
 
   ### replace one equal sign to logical equal if needed
-  VctCustomFields="TS.Touchscreen"
+  VctCustomFields="TS"
   df[,VctCustomFields]<-gsub("\\b[=]+\\b","==",df[,VctCustomFields],perl=TRUE)
   df[,VctCustomFields]<-gsub("\\b[≥]\\b",">=",df[,VctCustomFields],perl=TRUE)
   df[,VctCustomFields]<-gsub("\\b[≤]\\b","<=",df[,VctCustomFields],perl=TRUE)
@@ -199,14 +199,18 @@ ProcessDfDefinitions<-function(df,
 
   #if(nrow(df)==1 ) {stop("please have more than 1 phenotype definition.")} ## check if excel file has more than 1 row.
   
-
+  
+  # list to store dfCaseInclude,dfCaseExclude,dfPopulation,dfControlExclude
+  lst.def<- list()
   df <- data.frame(df,check.names = FALSE)
   names(df) <- sub(pattern = "CODES",replacement = "",names(df) )
   names(df) <- sub(pattern = "_$",replacement = "",names(df) ) # "n_20002_" --> "n_20002"
   # replace bracket with dot 
-  names(df) <- gsub( "([^.*])\\((.*)\\)", "\\1.\\2", names(df))
-  VctAllColumns <-   gsub( "([^.*])\\((.*)\\)", "\\1.\\2", VctAllColumns)
-  
+  # names(df) <- gsub( "([^.*])\\((.*)\\)", "\\1.\\2", names(df))
+  # VctAllColumns <-   gsub( "([^.*])\\((.*)\\)", "\\1.\\2", VctAllColumns)
+  # remove bracket and everything in it
+  names(df) <- gsub( "\\(.*\\)", "", names(df))
+  VctAllColumns <-   gsub( "\\(.*\\)", "", VctAllColumns)
   df <- PreProcessDfDefinitions(df,VctAllColumns,VctColstoupper=VctColstoupper)
   
   if(any(!VctAllColumns %in% names(df))) print(paste("WARNING missing columns:", paste(VctAllColumns[!VctAllColumns %in% names(df)],collapse=", ")))
@@ -242,57 +246,91 @@ ProcessDfDefinitions<-function(df,
   # head(df$Include_in_cases)
   
   # Include_in_cases : formerly DEPENDENCY for composite trait
-  repeat {
-    for(i in 1:nrow(df)) {
-      row <- df[i,]
-
-      if(!is.na(row$Include_in_cases)){
-        # parse the dependent traits
-        # row<-dfDefinitions[19,]
-        
-        VctInclude_in_casess<-unlist(strsplit(row$Include_in_cases,","))
-        # remove space
-        VctInclude_in_casess<-  gsub(" ", "", VctInclude_in_casess)
-        # remove brackets if applicable
-        VctInclude_in_casess<- gsub( " *\\(.*?\\) *", "", VctInclude_in_casess)
-        
-        # for each trait in dependent traits
-        for (StrInclude_in_cases in VctInclude_in_casess) {
-          # break self-referencing loop
-          if(row$TRAIT == StrInclude_in_cases) {stop("Include_in_cases is same as trait.")}
-          #  retrieve the row for the dependent trait
-          targetrow<-df[df$TRAIT==StrInclude_in_cases,]
-          print(StrInclude_in_cases)
-          if(nrow(targetrow)==0){stop(paste('Include_in_cases: "',StrInclude_in_cases,'" not found in traits ',row$TRAIT,sep="")) }
-
-          if( is.na(targetrow["Include_in_cases"])){
-            # for each data field, add the corresponding codes in the 
-            for(col in VctAllColumns){
-              Vctcol<-unique( unlist(strsplit( c(df[i,col],df[df$TRAIT==StrInclude_in_cases,col]) ,",")) )
-
-              df[i,col]<-pasteRemoveNA(Vctcol ,collapse=",",na.rm=T)
-            }
-            # remove Include_in_cases that was just filled in:
-            #df[i,"Include_in_cases"]<-gsub(paste(StrInclude_in_cases,sep=""),"",df[i,"Include_in_cases"],fixed=TRUE,ignore.case=FALSE)
-
-            # remove Include_in_cases that was just filled in:
-            LstTmpDependencies<- unlist(strsplit(VctInclude_in_casess,","))
-            df[i,"Include_in_cases"]<-paste( LstTmpDependencies [! LstTmpDependencies  %in%  StrInclude_in_cases] ,sep="",collapse = ",")
-
-            df[i,"Include_in_cases"]<-gsub("^,*|(?<=,),|,*$", "", df[i,"Include_in_cases"], perl=T)
-            if(df[i,"Include_in_cases"]==""){df[i,"Include_in_cases"]<-NA} ## if empty replace with NA
-          }
-        }
-      }
-    }
-    if( length(unique(is.na(df$Include_in_cases)))==1 ) break
-  }
-
-  return(ConvertFactorsToStringReplaceNAInDf(df))
+  # the while loop rewritten to a function to be run 4 times
+  # the CASE table will be concat to the main table because one will be counted if they have any of the codes ?
+  lst.def$dfCaseInclude<-parseIncludeExcludeCol(df,"Include_in_cases",concat_to_df = TRUE)
+  #  the case exclusion table is separate as it will be used to substract/filter the CASE table ?
+  lst.def$dfCaseExclude<-parseIncludeExcludeCol(df,"Exclude_from_cases",concat_to_df = FALSE)
+  #  the study population table and control exclusion tables for filtering CASE & CONTROL
+  lst.def$dfPop<-parseIncludeExcludeCol(df,"Study_population",concat_to_df = FALSE)
+  lst.def$dfControlExclude<-parseIncludeExcludeCol(df,"Exclude_from_controls",concat_to_df = FALSE)
+ 
+  lst.def<-lapply(lst.def,function(x)ConvertFactorsToStringReplaceNAInDf(x))
+  
+  return(lst.def)
 
   #write.table(df,paste(dfDefinitions_file,".processed.tsv",sep=""),quote = FALSE,row.names = FALSE,sep="\t")
 }
 
+
+
+parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE){ 
+  col_to_update=13:ncol(df)# keep columns up to description, change if definition table changes
+  # result dataframe with non-empty rows in the corresponding inclusion/exclusion criteria
+  dfInEx<-df[!(df[[InExCol]] == "" |is.na(df[[InExCol]])),]
+  print(paste(nrow(dfInEx),"traits with dependent trait in",InExCol,sep=" "))
+  dfInEx[,col_to_update]<-NA
+  # each composite trait with dependencies is a tree as chain of dependency is possible
+  # recursively add all codes of nodes on the tree to its parent until root is reached 
+  repeat {
+    for(i in 1:nrow(df)) {
+      row <- df[i,]
+      # maybe this not needed but somehow stuck once in a loop where !is.na(row[[InExCol]] ==TRUE && if( is.na(targetrow[InExCol])) ==FALSE (so the set to NA was never reached) ?????????
+      if(df[i,InExCol]==""| is.na(df[i,InExCol])) {df[i,InExCol]<-NA}
+      
+      # row
+      if(!is.na(row[[InExCol]])){
+        # parse the dependent traits
+        VctInEx<-unlist(strsplit(row[[InExCol]],","))
+        # remove space
+        VctInEx<-  gsub(" ", "", VctInEx)
+        # remove brackets if applicable
+        VctInEx<- gsub( " *\\(.*?\\) *", "", VctInEx)
+        
+        # for each trait in dependent traits
+        for (StrInEx in VctInEx) {
+          # break self-referencing loop
+          if(row$TRAIT == StrInEx) {stop("Dependency trait is same as trait.Please check for circular reference of traits.")}
+          #  retrieve the row for the dependent trait
+          targetrow<-df[df$TRAIT==StrInEx,]
+          # print(StrInEx)
+          if(nrow(targetrow)==0){stop(paste('Dependent trait: "',StrInEx,'" not found in traits ',row$TRAIT,sep="")) }
+          # print("is.na(targetrow[InExCol])")
+          # print(is.na(targetrow[InExCol]))
+          # if this target trait is a leaf in the tree  i.e itself contains no dependency, start attaching its code to its parent
+          
+          if( is.na(targetrow[InExCol])){
+            # for each classification/data source, add the corresponding codes in the 
+            for(col in VctAllColumns){
+              Vctcol<-unique( unlist(strsplit( c(df[i,col],df[df$TRAIT==StrInEx,col]) ,",")) )
+              if (concat_to_df==TRUE){
+                # if to concat codes to the input df
+                df[i,col]<-pasteRemoveNA(Vctcol ,collapse=",",na.rm=T)
+                } else{
+                # else put in dfInEx 
+              dfInEx[i,col]<-pasteRemoveNA(Vctcol ,collapse=",",na.rm=T)
+                }
+            }
+            # remove InExCol that was just filled in:
+            #df[i,"InExCol"]<-gsub(paste(StrInclude_in_case,sep=""),"",df[i,"Include_in_cases"],fixed=TRUE,ignore.case=FALSE)
+            # remove InExCol trait that was just filled in 
+            LstTmpDependencies<- unlist(strsplit(VctInEx,","))
+            
+            df[i,InExCol]<-paste( LstTmpDependencies [! LstTmpDependencies  %in%  StrInEx] ,sep="",collapse = ",")
+            
+            df[i,InExCol]<-gsub("^,*|(?<=,),|,*$", "", df[i,InExCol], perl=T)
+            if(df[i,InExCol]==""){df[i,InExCol]<-NA} ## if empty replace with NA
+          }
+        }
+      }
+    }
+    if( length(unique(is.na(df[[InExCol]])))==1 ) break
+  }
+  if (concat_to_df==TRUE){
+    return(df)
+  }else{return (dfInEx)
+    }
+}
 
 
 #' @export
@@ -303,7 +341,7 @@ get_allvarnames <- function(dfDefinitions_processed){
   TScolumns = "TS"
   defcols <- unlist(strsplit(na.omit(unname(unlist(dfDefinitions_processed[,c(TScolumns)]))),split=","))
   defcols <- unlist(strsplit(chartr("[]", "()", defcols),"[()]"))
-  defcols <- gsub("(≥|=|>|<).*","",defcols)
+  defcols <- gsub("(≥|≤|=|>|<).*","",defcols)
   defcols <- gsub("≥.*","",defcols)
   defcols <- unique(defcols) ## need column classes....
 
