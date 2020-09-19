@@ -248,12 +248,12 @@ ProcessDfDefinitions<-function(df,
   # Include_in_cases : formerly DEPENDENCY for composite trait
   # the while loop rewritten to a function to be run 4 times
   # the CASE table will be concat to the main table because one will be counted if they have any of the codes ?
-  lst.def$dfCaseInclude<-parseIncludeExcludeCol(df,"Include_in_cases",concat_to_df = TRUE)
+  lst.def$Include_in_cases<-parseIncludeExcludeCol(df,"Include_in_cases",concat_to_df = TRUE,VctAllColumns=VctAllColumns)
   #  the case exclusion table is separate as it will be used to substract/filter the CASE table ?
-  lst.def$dfCaseExclude<-parseIncludeExcludeCol(df,"Exclude_from_cases",concat_to_df = FALSE)
+  lst.def$Exclude_from_cases<-parseIncludeExcludeCol(df,"Exclude_from_cases",concat_to_df = FALSE,VctAllColumns=VctAllColumns)
   #  the study population table and control exclusion tables for filtering CASE & CONTROL
-  lst.def$dfPop<-parseIncludeExcludeCol(df,"Study_population",concat_to_df = FALSE)
-  lst.def$dfControlExclude<-parseIncludeExcludeCol(df,"Exclude_from_controls",concat_to_df = FALSE)
+  lst.def$Study_population<-parseIncludeExcludeCol(df,"Study_population",concat_to_df = FALSE,VctAllColumns=VctAllColumns)
+  lst.def$Exclude_from_controls<-parseIncludeExcludeCol(df,"Exclude_from_controls",concat_to_df = FALSE,VctAllColumns=VctAllColumns)
  
   lst.def<-lapply(lst.def,function(x)ConvertFactorsToStringReplaceNAInDf(x))
   
@@ -264,8 +264,8 @@ ProcessDfDefinitions<-function(df,
 
 
 
-parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE){ 
-  col_to_update=13:ncol(df)# keep columns up to description, change if definition table changes
+parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE,VctAllColumns){ 
+  col_to_update=VctAllColumns # keep columns up to description, change if definition table changes
   # result dataframe with non-empty rows in the corresponding inclusion/exclusion criteria
   dfInEx<-df[!(df[[InExCol]] == "" |is.na(df[[InExCol]])),]
   print(paste(nrow(dfInEx),"traits with dependent trait in",InExCol,sep=" "))
