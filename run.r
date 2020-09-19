@@ -49,19 +49,7 @@ fukbphenodata <- paste(pheno_dir,"ukbphenodata.Rdata",sep="") #where to store fi
 ##########################################
 # read definitions. 
 dfDefinitions <- fread(fdefinitions, colClasses = 'character', data.table = FALSE)
-#TODO 
-###please check if they work as expected and/or there is some bug?
-# especially if it is a good idea to keep non empty rows for CaseExclude/Pop/ControlExclude????
 dfDefinitions_processed <- ProcessDfDefinitions(dfDefinitions)
-View(dfDefinitions_processed$dfCaseInclude)
-View(dfDefinitions_processed$dfCaseExclude)
-View(dfDefinitions_processed$dfPop)
-View(dfDefinitions_processed$dfControlExclude)
-
-
-
-
-
 ########################################## 
 # Prepare UKB data: 
 # read ukb data from ukbconv (.html + .tab) 
@@ -69,13 +57,13 @@ tic("converting data")
 # ukb's .tab meta data
 dfhtml <- read_ukb_metadata(fhtml) # 9 columns in dfhtml: "field.number","field.count","field.showcase","field.html","field.tab","field.description","col.type","col.name","fread_column_type"
 # ukb's .tab file; extract only relevant fields 
-dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions_processed) ## regarding downstream functions, what happens if å field is not present, will we get an error? 
+dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions_processed$Definitions) ## regarding downstream functions, what happens if å field is not present, will we get an error? 
 dfukb <- read_ukb_tabdata(fukbtab,dfhtml,fields_to_keep = dfDefinitions_ukb_fields$all_ukb_fields) # 439.52 sec
 print(format(object.size(dfukb), units = "Gb"))
 # converting data
 lst.data <- list()
 # touscreen, which uses information from the dfDefinitions_processed (event==2: only the first occurence is an event)
-lst.data$ts <- convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions_processed$TS)
+lst.data$ts <- convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions_processed$Definitions$TS)
 # self reported data  (event==2: only the first occurence is an event)
 lst.data$tte.sr.20001 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20001",field_sr_date = "20006",qc_treshold_year = 10) # cancer
 lst.data$tte.sr.20002 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20002",field_sr_date = "20008",qc_treshold_year = 10) # non cancer
@@ -96,16 +84,15 @@ lst.data <- append(lst.data,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) 
 # primary care, gp  (event==1)
 lst.data <- append(lst.data,read_gp_clinical_data(fgp=fgp_clinical )) # 462.085 
 # setkey on code. 
-lst.data<-lapply(lst.data,function(x) {setkey(x,code) }) # double check that everything has the same setkey. 
 toc() #  1111.306 sec elapsed, 18min. 
 
 # load lst.data.settings
 lst.data.settings <- data.frame(fread("
     datasource classification  datatype  expand_codes  diagnosis ignore.case
-    tte.sr.20002  n_20002 numeric 0 1 FALSE
-    tte.sr.20001  n_20001 numeric 0 1 FALSE
-    tte.sr.20004  n_20004 numeric 0 1 FALSE
-    sr.20003  n_20003 numeric 0 1 FALSE
+    tte.sr.20002  f.20002 numeric 0 1 FALSE
+    tte.sr.20001  f.20001 numeric 0 1 FALSE
+    tte.sr.20004  f.20004 numeric 0 1 FALSE
+    sr.20003  f.20003 numeric 0 1 FALSE
     tte.death.icd10.primary ICD10 character 1 1 TRUE
     tte.death.icd10.secondary ICD10 character 1 2 TRUE
     tte.hesin.oper3.primary OPCS3 character 1 1 TRUE
@@ -134,9 +121,9 @@ save(dfhtml,dfukb,lst.data,lst.data.settings,lst.counts,file=fukbphenodata)
 ## analyse 1 definition
 ##########################################
 # expand the definitions based on the data that is loaded
-dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,lst.data.settings=lst.data.settings,lst.counts = lst.counts)
+dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed$Definitions,lst.data.settings=lst.data.settings,lst.counts = lst.counts)
 #all collapsed to 1 datatable
-all_event_dt <- get_all_events(dfDefinitions_processed_expanded[14,],lst.data)   #MI
+all_event_dt <- get_all_events(dfDefinitions_processed_expanded[14,],lst.data,lst.data.settings)   #MI
 # all_event_dt <- get_all_events(dfDefinitions_processed_expanded[8,],lst.data)  #DmT2
 # all_event_dt <- get_all_events(dfDefinitions_processed_expanded[17,],lst.data)  #Ht #all collapsed to 1 datatable
 # all_event_dt <- get_all_events(dfDefinitions_processed_expanded[9,],lst.data)  #DmT2
@@ -148,11 +135,11 @@ all_event_dt.stats$stats.codes.cooccur.filtered.p.dendro
 all_event_dt.stats$stats.codes.cooccur.filtered.p.heat
 
 # get incidence/prevalence from baseline
-all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
+all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,lst.data.settings, reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
 View(all_event_dt.summary %>% filter(is.na(Hx) & is.na(Fu)))
 
 # get occcurence  from first event and recurrence of primary events: 
-all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,lst.data.settings=lst.data.settings,reference_date = NULL,window_fu_days_mask = 15)
+all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,lst.data.settings,reference_date = NULL,window_fu_days_mask = 15)
 hist(all_event_dt.summary %>% pull(Fu_days) %>% as.numeric,breaks=100)
 hist(all_event_dt.summary %>% filter(Fu_days<100) %>% pull(Fu_days) %>% as.numeric,breaks=100)
 hist(all_event_dt.summary$reference_date,breaks=200)

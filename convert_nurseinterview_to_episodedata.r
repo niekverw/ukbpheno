@@ -181,10 +181,9 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   
   df_out <- df_out[,c("f.eid","code","eventdate","event"),with=FALSE]
   
-  message("setkey(code)")
   setkey(df_out,code)    
-  
-  #head(df_out)
+  df_out[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid']
+
   gc()
   print(format(object.size(df_out), units = "Mb"))
   

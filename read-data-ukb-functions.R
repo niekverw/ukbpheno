@@ -173,33 +173,6 @@ read_ukb_tabdata <- function(fukb,
 #col.classes[col.classes %in% "integer64"] <- "character" #integer64 not supported, unsupported in disk.frame? but not in data.table
 
 
-
-
-
-#### NOT WORKING ON MACBOOK... ON CLUSTER THIS WORKED; BUT THEN I CAN'T SEEM TO LOAD THE DATA.. 
-convert_ukb_to_diskframe <- function(fukbtab,fhtml,outdir="diskframe/",rows_to_read=20000,ram_size=8) {
-  
-  library(disk.frame)
-  dfhtml <- read_ukb_metadata(fhtml)
-  rows_to_read=20000
-  ram_size=8
-  dfukb <- csv_to_disk.frame(fukbtab,
-                             nchunks = recommend_nchunks(sum(file.size(fukb)),ram_size=ram_size),
-                             in_chunk_size = rows_to_read,
-                             outdir = outdir,
-                             colClasses = as.vector(dfhtml$fread_column_type),
-                             col.names = dfhtml$field.tab, sep="\t")
-}
-# 
-# fukb="/data/pg-exp_cardio/UKBIO_database/12010_2019_10_31-38326/ukb38326.tab"
-# fhtml="/data/pg-exp_cardio/UKBIO_database/12010_2019_10_31-38326/ukb38326.html"
-# outdir='/data/pg-exp_cardio/UKBIO_database/12010_2019_10_31-38326/diskframe' #'/Volumes/data/ukb/diskframe'
-# #dfukb <- csv_to_disk.frame(fukb, in_chunk_size = 100,colClasses = freadcolclasses)
-# 
-# convert_ukb_to_diskframe(fukb,fhtml,outdir)
-# 
-# dfhtml[dfhtml$field.tab %in% 'f.4258.0.1',]
-
 #  refer HES Data Dictionary Document ID:141140
 read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   
@@ -263,17 +236,7 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   tte.hesin.icd10.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd10))  %>% select(eid,eventdate,epidur,diag_icd10,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% as.data.table()
   tte.hesin.icd9.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd9))  %>% select(eid,eventdate,epidur,diag_icd9,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% as.data.table()
   
-  message("setkey(code)")
-  setkey(tte.hesin.oper3.primary,code)    
-  setkey(tte.hesin.oper4.primary,code)    
-  setkey(tte.hesin.icd10.primary,code)    
-  setkey(tte.hesin.icd9.primary,code)    
-  
-  setkey(tte.hesin.oper3.secondary,code)    
-  setkey(tte.hesin.oper4.secondary,code)    
-  setkey(tte.hesin.icd10.secondary,code)    
-  setkey(tte.hesin.icd9.secondary,code)    
-  
+
   lst <- list(tte.hesin.oper3.primary = tte.hesin.oper3.primary, 
               tte.hesin.oper4.primary = tte.hesin.oper4.primary,
               tte.hesin.icd10.primary = tte.hesin.icd10.primary, 
@@ -283,6 +246,9 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
               tte.hesin.oper4.secondary = tte.hesin.oper4.secondary,
               tte.hesin.icd10.secondary = tte.hesin.icd10.secondary, 
               tte.hesin.icd9.secondary = tte.hesin.icd9.secondary)
+
+  lst <- lapply(lst,function(x) {setkey(x,code) })
+  lst <- lapply(lst,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
   return(lst)
   
 }
@@ -320,11 +286,11 @@ read_gp_clinical_data <- function(fgp){
   #  parse versions
   tte.gpclincal.read3 <-  dfgp %>% filter(read_3 !="")  %>% select(eid,event_dt,read_3,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_3,event=event)  %>% as.data.table()
   tte.gpclincal.read2 <-  dfgp %>% filter(read_2 !="")  %>% select(eid,event_dt,read_2,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% as.data.table()
+   
   
-  message("setkey(code)")
-  setkey(tte.gpclincal.read2,code)    
-  setkey(tte.gpclincal.read3,code)    
   lst <- list(tte.gpclincal.read2=tte.gpclincal.read2,tte.gpclincal.read3=tte.gpclincal.read3)
+  lst <- lapply(lst,function(x) {setkey(x,code) })
+  lst <- lapply(lst,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
   toc() #423.762 sec elapsed
   return(lst)
 
@@ -387,6 +353,8 @@ read_gp_script_data <- function(fgp){
   
   
   lst <- list(tte.gpscript.bnf.england=tte.gpscript.bnf.england,tte.gpscript.bnf.england=tte.gpscript.bnf.england,tte.gpscript.bnf.scotland=tte.gpscript.bnf.scotland,tte.gpscript.read2.wales=tte.gpscript.read2.wales)
+  lst <- lapply(lst,function(x) {setkey(x,code) })
+  lst <- lapply(lst,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
   toc() #423.762 sec elapsed
   return(lst)
 
@@ -453,12 +421,12 @@ read_death_data <- function(fdeath_portal, fdeath_cause_portal){
   dfdeath.secondary<-dfdeath %>% filter(level ==2 ) %>% mutate (event=1) %>% select(f.eid , code, eventdate,event)
   dfdeath.secondary <- dfdeath.secondary[, event:=as.integer(event)]
   
-  message("setkey(code)")
-  setkey(dfdeath.primary,code)    
-  setkey(dfdeath.secondary,code)    
   toc()
   
   lst_death <- list("primary" = dfdeath.primary, "secondary" = dfdeath.secondary)
+  message("setkey(code)")
+  lst_death <- lapply(lst_death,function(x) {setkey(x,code) })
+  lst_death <- lapply(lst,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
   return(lst_death)
   
 }

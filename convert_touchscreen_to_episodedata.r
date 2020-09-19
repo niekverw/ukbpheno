@@ -185,9 +185,8 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
   df_out<- unique(rbind(df_out,df_out_visit))
   
   df_out <- df_out[,c("f.eid","code","eventdate","event"),with=FALSE]
-  
-  message("setkey(code)")
   setkey(df_out,code)    
+  df_out[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid']
   
   gc()
   print(format(object.size(df_out), units = "Mb"))
