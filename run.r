@@ -121,7 +121,7 @@ save(dfhtml,dfukb,lst.data,lst.data.settings,lst.counts,file=fukbphenodata)
 ## analyse 1 definition
 ##########################################
 # expand the definitions based on the data that is loaded
-dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed$Definitions,lst.data.settings=lst.data.settings,lst.counts = lst.counts)
+dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,lst.data.settings=lst.data.settings,lst.counts = lst.counts)
 #all collapsed to 1 datatable
 all_event_dt <- get_all_events(dfDefinitions_processed_expanded[14,],lst.data,lst.data.settings)   #MI
 # all_event_dt <- get_all_events(dfDefinitions_processed_expanded[8,],lst.data)  #DmT2
