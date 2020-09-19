@@ -194,7 +194,7 @@ ProcessDfDefinitions<-function(df,
                                VctColstoupper=c("ICD10","ICD9","OPCS4","OPCS3"),
                                fill_dependencies=T){
   
-  #df<- dfDefinitions  #  df<- dfDefinitions2
+  # df<- dfDefinitions  #  df<- dfDefinitions2
   # VctAllColumns<-  c("TS", "SR", "TS_RX", "SR_RX", "LAB", "ICD10", "ICD9", "OPCS4","OPCS3", "TS_AGE_DIAG_COLNAME", "READ","CTV3", "n_20001",    "n_20002", "n_20003", "n_20004", "Include_in_cases")
 
   #if(nrow(df)==1 ) {stop("please have more than 1 phenotype definition.")} ## check if excel file has more than 1 row.
@@ -250,10 +250,10 @@ ProcessDfDefinitions<-function(df,
   # the CASE table will be concat to the main table because one will be counted if they have any of the codes ?
   lst.def$Include_in_cases<-parseIncludeExcludeCol(df,"Include_in_cases",concat_to_df = TRUE,VctAllColumns=VctAllColumns)
   #  the case exclusion table is separate as it will be used to substract/filter the CASE table ?
-  lst.def$Exclude_from_cases<-parseIncludeExcludeCol(df,"Exclude_from_cases",concat_to_df = FALSE,VctAllColumns=VctAllColumns)
+  lst.def$Exclude_from_cases<-parseIncludeExcludeCol(lst.def$Include_in_cases,"Exclude_from_cases",concat_to_df = FALSE,VctAllColumns=VctAllColumns)
   #  the study population table and control exclusion tables for filtering CASE & CONTROL
   lst.def$Study_population<-parseIncludeExcludeCol(df,"Study_population",concat_to_df = FALSE,VctAllColumns=VctAllColumns)
-  lst.def$Exclude_from_controls<-parseIncludeExcludeCol(df,"Exclude_from_controls",concat_to_df = FALSE,VctAllColumns=VctAllColumns)
+  lst.def$Exclude_from_controls<-parseIncludeExcludeCol(df=lst.def$Include_in_cases,InExCol = "Exclude_from_controls",concat_to_df = FALSE,VctAllColumns=VctAllColumns)
  
   lst.def<-lapply(lst.def,function(x)ConvertFactorsToStringReplaceNAInDf(x))
   
@@ -304,11 +304,11 @@ parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE,VctAllColumns)
             for(col in VctAllColumns){
               Vctcol<-unique( unlist(strsplit( c(df[i,col],df[df$TRAIT==StrInEx,col]) ,",")) )
               if (concat_to_df==TRUE){
-                # if to concat codes to the input df
-                df[i,col]<-pasteRemoveNA(Vctcol ,collapse=",",na.rm=T)
+                  # if to concat codes to the input df
+                  df[i,col]<-pasteRemoveNA(Vctcol ,collapse=",",na.rm=T)
                 } else{
-                # else put in dfInEx 
-              dfInEx[i,col]<-pasteRemoveNA(Vctcol ,collapse=",",na.rm=T)
+                  # else put in dfInEx 
+                  dfInEx[i,col]<-pasteRemoveNA(Vctcol ,collapse=",",na.rm=T)
                 }
             }
             # remove InExCol that was just filled in:
