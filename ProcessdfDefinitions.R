@@ -180,7 +180,7 @@ ReduceRedundancyDf<- function(df){ ### NOT really nessesary
 #' #
 #' #
 #' #
-#' VctAllColumns<-  c("TS", "SR", "TS_RX", "SR_RX", "LAB", "ICD10", "ICD9", "OPCS4","OPCS3", "TS_AGE_DIAG_COLNAME", "READ","CTV3","BNF","DMD", "n_20001",    "n_20002", "n_20003", "n_20004", "Include_in_cases")
+#' VctAllColumns<-  c("TS", "SR", "TS_RX", "SR_RX", "LAB", "ICD10", "ICD9", "OPCS4","OPCS3", "TS_AGE_DIAG_COLNAME", "READ","CTV3","BNF","DMD", "n_20001",    "n_20002", "n_20003", "n_20004", "Include_definitions")
 #' ProcessDfDefinitions(dfDefinitions,VctAllColumns)
 #'
 #' @export
@@ -189,19 +189,12 @@ ProcessDfDefinitions<-function(df,
                                                "ICD10", "ICD9", "OPCS4","OPCS3",
                                                "READ", "CTV3",
                                                "BNF","DMD",
-                                               "f.20001(sr_cancer)",    "f.20002(sr_noncancer)", "f.20003(sr_med)", "f.20004(sr_oper)",
-                                               "Include_in_cases"),
+                                               "f.20001(sr_cancer)",    "f.20002(sr_noncancer)", "f.20003(sr_med)", "f.20004(sr_oper)"
+                                               ),
                                VctColstoupper=c("ICD10","ICD9","OPCS4","OPCS3"),
                                fill_dependencies=T){
   
   # df<- dfDefinitions  #  df<- dfDefinitions2
-  # VctAllColumns<-  c("TS", "SR", "TS_RX", "SR_RX", "LAB", "ICD10", "ICD9", "OPCS4","OPCS3", "TS_AGE_DIAG_COLNAME", "READ","CTV3", "n_20001",    "n_20002", "n_20003", "n_20004", "Include_in_cases")
-
-  #if(nrow(df)==1 ) {stop("please have more than 1 phenotype definition.")} ## check if excel file has more than 1 row.
-  
-  
-  # list to store dfCaseInclude,dfCaseExclude,dfPopulation,dfControlExclude
-  lst.def<- list()
   df <- data.frame(df,check.names = FALSE)
   names(df) <- sub(pattern = "CODES",replacement = "",names(df) )
   names(df) <- sub(pattern = "_$",replacement = "",names(df) ) # "n_20002_" --> "n_20002"
@@ -221,50 +214,27 @@ ProcessDfDefinitions<-function(df,
   # 2 zoekt per dependency in die rij de bijpassende rijen voor elke dependency  erbij en plakt die naast elkaar (inclusief de dependencies van de dependencies).
   # 4) dan delete hij de depenencies die hij ingevuld heeft # dit op repeat tot dat er geen dependencies meer zijn en alles is ingevuld.
   if(fill_dependencies==F){return(return(ConvertFactorsToStringReplaceNAInDf(df)))}
-  #################################
-  ### HELPER FUNCTION TO CROSS CHECK EVERYTHING AND LOOKUPS, SHOULD GET A SEPERATE FUNCTION OUTSIDE OF EVERYTHING.
-  #################################
-  # ###[unsupported] LOOKUP NAMES OF MEDICATION and put UKBIO. in RX
-  # print(df$n_20003)
-  # df$n_20003<-unlist(lapply( df$n_20003, CovertMednamesToUkbcoding))
-  # # df$n_20003<- paste(df$n_20003, unlist(lapply( df$n_20003, CovertMednamesToUkbcoding)),sep=",")
-  # print(df$n_20003)
-  
-  # df<-FillInSRdefinitions(df,"SR_RX",c("n_20003"))
-  ### LOOKUP READ. and put UKBIO. in SR_RX
 
-  #################################
-  ### FILL SR fields with  _2000X_ 'helper' columns;
-  #################################
-  #df<-FillInSRdefinitions(df,"SR",c("n_20001","n_20002","n_20004"))
-  #df<-FillInSRdefinitions(df,"SR_RX",c("n_20003"))
-  #df[,c("n_20001","n_20002","n_20004","n_20003")] <- NA
-  #VctAllColumns <- VctAllColumns[!VctAllColumns %in% c("n_20001","n_20002","n_20004","n_20003")]
-
-  ### lookup ICD10/9/OPER and put into READ and CTV3:
-  # ....? I can lookup everything in everything to make everything more complete
-  # head(df$Include_in_cases)
-  
-  # Include_in_cases : formerly DEPENDENCY for composite trait
+  # Include_definitions : formerly DEPENDENCY for composite trait
   # the while loop rewritten to a function to be run 4 times
   # the CASE table will be concat to the main table because one will be counted if they have any of the codes ?
-  lst.def$Include_in_cases<-parseIncludeExcludeCol(df,"Include_in_cases",concat_to_df = TRUE,VctAllColumns=VctAllColumns)
-  #  the case exclusion table is separate as it will be used to substract/filter the CASE table ?
-  lst.def$Exclude_from_cases <- lookup.codes(df=lst.def$Include_in_cases,lookupcolumn = "Exclude_from_cases")
+  df<-parseIncludeExcludeCol(df,"Include_definitions",concat_to_df = TRUE,VctAllColumns=VctAllColumns)
+  lst.dfs<- list()
+  lst.dfs$Definitions <- df[,c("TRAIT","DESCRIPTION",VctAllColumns)]
+  #  the case exclusion table is separate as it will be used to substract/filter the CASE table 
+  lst.dfs$Exclude_from_cases <- lookup.codes(df=df,lookupcolumn = "Exclude_from_cases")
   #  the study population table and control exclusion tables for filtering CASE & CONTROL
-  lst.def$Study_population <- lookup.codes(df=lst.def$Include_in_cases,lookupcolumn = "Study_population")
-  lst.def$Exclude_from_controls <- lookup.codes(df=lst.def$Include_in_cases,lookupcolumn = "Exclude_from_controls")
+  lst.dfs$Study_population <- lookup.codes(df=df,lookupcolumn = "Study_population")
+  lst.dfs$Exclude_from_controls <- lookup.codes(df=df,lookupcolumn = "Exclude_from_controls")
+  #lst.def$Include_definitions <- lst.dfs$Include_definitions[,c("TRAIT","DESCRIPTION",VctAllColumns)]
+  lst.dfs<-lapply(lst.dfs,function(x)ConvertFactorsToStringReplaceNAInDf(x))
   
-
-  lst.def<-lapply(lst.def,function(x)ConvertFactorsToStringReplaceNAInDf(x))
-  
-  return(lst.def)
-
-  #write.table(df,paste(dfDefinitions_file,".processed.tsv",sep=""),quote = FALSE,row.names = FALSE,sep="\t")
+  #lst.lst <- convert_dataframelist_to_lst(lst.dfs)
+  return(lst.definitions=lst.dfs)
 }
 
 
-lookup.codes <- function(df=lst.def$Include_in_cases,lookupcolumn="Exclude_from_cases"){
+lookup.codes <- function(df=lst.dfs$Include_definitions,lookupcolumn="Exclude_from_cases"){
   
   dfInEx<-df[!(df[[lookupcolumn]] == "" |is.na(df[[lookupcolumn]])),]
   print(paste(nrow(dfInEx),"traits with dependent trait in",lookupcolumn,sep=" "))
@@ -272,13 +242,31 @@ lookup.codes <- function(df=lst.def$Include_in_cases,lookupcolumn="Exclude_from_
   for(i in 1:nrow(dfInEx)) {
     def=unlist(strsplit(dfInEx[i,lookupcolumn],","))
     for(col in VctAllColumns){
-      Vctcol <- df.lookup[df.lookup$TRAIT %in% def,col]
+      Vctcol <- df[df$TRAIT %in% def,col]
       dfInEx[i,col] <- pasteRemoveNA(Vctcol ,collapse=",",na.rm=T)
     }
   }
   dfInEx <- dfInEx[,c("TRAIT","DESCRIPTION",VctAllColumns)]
   return(dfInEx)
 }
+
+
+convert_dataframelist_to_lst <- function(lst.dfs){
+  defs <- list()
+  for (t in lst.dfs$Definitions$TRAIT){
+    def <- list()
+    def$TRAIT <- lst.dfs$Definitions[lst.dfs$Definitions$TRAIT %in% t,'TRAIT']
+    def$DESCRIPTION <- lst.dfs$Definitions[lst.dfs$Definitions$TRAIT %in% t,'DESCRIPTION']
+    def$Definitions <- c(lst.dfs$Definitions[lst.dfs$Definitions$TRAIT %in% t,VctAllColumns])
+    def$Exclude_from_cases <- c(lst.dfs$Exclude_from_cases[lst.dfs$Exclude_from_cases$TRAIT %in% t,VctAllColumns])
+    def$Study_population <- c(lst.dfs$Study_population[lst.dfs$Study_population$TRAIT %in% t,VctAllColumns])
+    def$Exclude_from_controls <- c(lst.dfs$Exclude_from_controls[lst.dfs$Exclude_from_controls$TRAIT %in% t,VctAllColumns])
+    defs[t] <- list(def)
+  }
+  #defs$lst.dfs<- lst.dfs
+  return(defs)
+}
+
 
 parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE,VctAllColumns){ 
   # result dataframe with non-empty rows in the corresponding inclusion/exclusion criteria
@@ -327,7 +315,7 @@ parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE,VctAllColumns)
                 }
             }
             # remove InExCol that was just filled in:
-            #df[i,"InExCol"]<-gsub(paste(StrInclude_in_case,sep=""),"",df[i,"Include_in_cases"],fixed=TRUE,ignore.case=FALSE)
+            #df[i,"InExCol"]<-gsub(paste(StrInclude_in_case,sep=""),"",df[i,"Include_definitions"],fixed=TRUE,ignore.case=FALSE)
             # remove InExCol trait that was just filled in 
             LstTmpDependencies<- unlist(strsplit(VctInEx,","))
             
