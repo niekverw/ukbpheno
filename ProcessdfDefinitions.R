@@ -219,18 +219,25 @@ ProcessDfDefinitions<-function(df,
   # the while loop rewritten to a function to be run 4 times
   # the CASE table will be concat to the main table because one will be counted if they have any of the codes ?
   df<-parseIncludeExcludeCol(df,"Include_definitions",concat_to_df = TRUE,VctAllColumns=VctAllColumns)
-  lst.dfs<- list()
-  lst.dfs$Definitions <- df[,c("TRAIT","DESCRIPTION",VctAllColumns)]
-  #  the case exclusion table is separate as it will be used to substract/filter the CASE table 
-  lst.dfs$Exclude_from_cases <- lookup.codes(df=df,lookupcolumn = "Exclude_from_cases")
-  #  the study population table and control exclusion tables for filtering CASE & CONTROL
-  lst.dfs$Study_population <- lookup.codes(df=df,lookupcolumn = "Study_population")
-  lst.dfs$Exclude_from_controls <- lookup.codes(df=df,lookupcolumn = "Exclude_from_controls")
-  #lst.def$Include_definitions <- lst.dfs$Include_definitions[,c("TRAIT","DESCRIPTION",VctAllColumns)]
-  lst.dfs<-lapply(lst.dfs,function(x)ConvertFactorsToStringReplaceNAInDf(x))
+  Include_in_cases <- df[,c("TRAIT","DESCRIPTION",VctAllColumns)]
+  Exclude_from_cases <- lookup.codes(df=df,lookupcolumn = "Exclude_from_cases")
+  Study_population <- lookup.codes(df=df,lookupcolumn = "Study_population")
+  Exclude_from_controls <- lookup.codes(df=df,lookupcolumn = "Exclude_from_controls")
+
   
+  dfDefinition <- rbind(Include_in_cases %>% mutate(Definitions="Include_in_cases"),
+        Exclude_from_cases %>% mutate(Definitions="Exclude_from_cases"),
+        Study_population %>% mutate(Definitions="Study_population"),
+        Exclude_from_controls %>% mutate(Definitions="Exclude_from_controls")
+        )
+  
+  dfDefinition <- ConvertFactorsToStringReplaceNAInDf(dfDefinition)
+  
+  ## other ways of storing: , I don't know what's best.   
+  #lst.dfs <- list(Include_in_cases=Include_in_cases,Exclude_from_cases=Exclude_from_cases,Study_population=Study_population,Exclude_from_controls=Exclude_from_controls) 
+  #lst.dfs <- lapply(lst.dfs,function(x) ConvertFactorsToStringReplaceNAInDf(x))
   #lst.lst <- convert_dataframelist_to_lst(lst.dfs)
-  return(lst.definitions=lst.dfs)
+  return(dfDefinition)
 }
 
 
@@ -253,11 +260,11 @@ lookup.codes <- function(df=lst.dfs$Include_definitions,lookupcolumn="Exclude_fr
 
 convert_dataframelist_to_lst <- function(lst.dfs){
   defs <- list()
-  for (t in lst.dfs$Definitions$TRAIT){
+  for (t in lst.dfs$Include_in_cases$TRAIT){
     def <- list()
-    def$TRAIT <- lst.dfs$Definitions[lst.dfs$Definitions$TRAIT %in% t,'TRAIT']
-    def$DESCRIPTION <- lst.dfs$Definitions[lst.dfs$Definitions$TRAIT %in% t,'DESCRIPTION']
-    def$Definitions <- c(lst.dfs$Definitions[lst.dfs$Definitions$TRAIT %in% t,VctAllColumns])
+    def$TRAIT <- lst.dfs$Include_in_cases[lst.dfs$Include_in_cases$TRAIT %in% t,'TRAIT']
+    def$DESCRIPTION <- lst.dfs$Include_in_cases[lst.dfs$Include_in_cases$TRAIT %in% t,'DESCRIPTION']
+    def$Include_in_cases <- c(lst.dfs$Include_in_cases[lst.dfs$Include_in_cases$TRAIT %in% t,VctAllColumns])
     def$Exclude_from_cases <- c(lst.dfs$Exclude_from_cases[lst.dfs$Exclude_from_cases$TRAIT %in% t,VctAllColumns])
     def$Study_population <- c(lst.dfs$Study_population[lst.dfs$Study_population$TRAIT %in% t,VctAllColumns])
     def$Exclude_from_controls <- c(lst.dfs$Exclude_from_controls[lst.dfs$Exclude_from_controls$TRAIT %in% t,VctAllColumns])

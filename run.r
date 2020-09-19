@@ -57,13 +57,13 @@ tic("converting data")
 # ukb's .tab meta data
 dfhtml <- read_ukb_metadata(fhtml) # 9 columns in dfhtml: "field.number","field.count","field.showcase","field.html","field.tab","field.description","col.type","col.name","fread_column_type"
 # ukb's .tab file; extract only relevant fields 
-dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions_processed$Definitions) ## regarding downstream functions, what happens if å field is not present, will we get an error? 
+dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions_processed) ## regarding downstream functions, what happens if å field is not present, will we get an error? 
 dfukb <- read_ukb_tabdata(fukbtab,dfhtml,fields_to_keep = dfDefinitions_ukb_fields$all_ukb_fields) # 439.52 sec
 print(format(object.size(dfukb), units = "Gb"))
 # converting data
 lst.data <- list()
 # touscreen, which uses information from the dfDefinitions_processed (event==2: only the first occurence is an event)
-lst.data$ts <- convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions_processed$Definitions$TS)
+lst.data$ts <- convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions_processed$TS)
 # self reported data  (event==2: only the first occurence is an event)
 lst.data$tte.sr.20001 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20001",field_sr_date = "20006",qc_treshold_year = 10) # cancer
 lst.data$tte.sr.20002 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20002",field_sr_date = "20008",qc_treshold_year = 10) # non cancer
