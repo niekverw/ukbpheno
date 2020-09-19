@@ -250,11 +250,12 @@ ProcessDfDefinitions<-function(df,
   # the CASE table will be concat to the main table because one will be counted if they have any of the codes ?
   lst.def$Include_in_cases<-parseIncludeExcludeCol(df,"Include_in_cases",concat_to_df = TRUE,VctAllColumns=VctAllColumns)
   #  the case exclusion table is separate as it will be used to substract/filter the CASE table ?
-  lst.def$Exclude_from_cases<-parseIncludeExcludeCol(lst.def$Include_in_cases,"Exclude_from_cases",concat_to_df = FALSE,VctAllColumns=VctAllColumns)
+  lst.def$Exclude_from_cases <- lookup.codes(df=lst.def$Include_in_cases,lookupcolumn = "Exclude_from_cases")
   #  the study population table and control exclusion tables for filtering CASE & CONTROL
-  lst.def$Study_population<-parseIncludeExcludeCol(df,"Study_population",concat_to_df = FALSE,VctAllColumns=VctAllColumns)
-  lst.def$Exclude_from_controls<-parseIncludeExcludeCol(df=lst.def$Include_in_cases,InExCol = "Exclude_from_controls",concat_to_df = FALSE,VctAllColumns=VctAllColumns)
- 
+  lst.def$Study_population <- lookup.codes(df=lst.def$Include_in_cases,lookupcolumn = "Study_population")
+  lst.def$Exclude_from_controls <- lookup.codes(df=lst.def$Include_in_cases,lookupcolumn = "Exclude_from_controls")
+  
+
   lst.def<-lapply(lst.def,function(x)ConvertFactorsToStringReplaceNAInDf(x))
   
   return(lst.def)
@@ -263,13 +264,27 @@ ProcessDfDefinitions<-function(df,
 }
 
 
+lookup.codes <- function(df=lst.def$Include_in_cases,lookupcolumn="Exclude_from_cases"){
+  
+  dfInEx<-df[!(df[[lookupcolumn]] == "" |is.na(df[[lookupcolumn]])),]
+  print(paste(nrow(dfInEx),"traits with dependent trait in",lookupcolumn,sep=" "))
+  dfInEx[,VctAllColumns]<-NA
+  for(i in 1:nrow(dfInEx)) {
+    def=unlist(strsplit(dfInEx[i,lookupcolumn],","))
+    for(col in VctAllColumns){
+      Vctcol <- df.lookup[df.lookup$TRAIT %in% def,col]
+      dfInEx[i,col] <- pasteRemoveNA(Vctcol ,collapse=",",na.rm=T)
+    }
+  }
+  dfInEx <- dfInEx[,c("TRAIT","DESCRIPTION",VctAllColumns)]
+  return(dfInEx)
+}
 
 parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE,VctAllColumns){ 
-  col_to_update=VctAllColumns # keep columns up to description, change if definition table changes
   # result dataframe with non-empty rows in the corresponding inclusion/exclusion criteria
   dfInEx<-df[!(df[[InExCol]] == "" |is.na(df[[InExCol]])),]
   print(paste(nrow(dfInEx),"traits with dependent trait in",InExCol,sep=" "))
-  dfInEx[,col_to_update]<-NA
+  dfInEx[,VctAllColumns]<-NA
   # each composite trait with dependencies is a tree as chain of dependency is possible
   # recursively add all codes of nodes on the tree to its parent until root is reached 
   repeat {
