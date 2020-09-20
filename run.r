@@ -1,4 +1,4 @@
-
+# TODO: Add output for death (primary and primary+secondary) in get_incidence_prevalence() )
 #library(ukbtools)  # chmod -R u+w /usr/local/Cellar/r
 library(matrixStats)
 library(fasttime)
@@ -83,6 +83,9 @@ rm(lst.data_dth)
 lst.data <- append(lst.data,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.primary + tte.hes.secondary
 # primary care, gp  (event==1)
 lst.data <- append(lst.data,read_gp_clinical_data(fgp=fgp_clinical )) # 462.085 
+
+#attr(lst.data,all_identifiers <- as.character(dfukb$f.eid))
+
 # setkey on code. 
 toc() #  1111.306 sec elapsed, 18min. 
 
@@ -113,12 +116,14 @@ lst.data.settings <- data.frame(fread("
 
 # generate meta data dynamically,  returns a list with the number of rows per code based on lst.data.settings
 lst.counts <- get_lst_counts(lst.data,lst.data.settings = lst.data.settings)
+
+lst.identifiers <- as.character(dfukb$f.eid)
 # save 
 save(dfhtml,dfukb,lst.data,lst.data.settings,lst.counts,file=fukbphenodata)
 # load(fukbphenodata)
 
 ##########################################
-## analyse 1 definition
+## analyse 1 single definition
 ##########################################
 # expand the definitions based on the data that is loaded
 dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,lst.data.settings=lst.data.settings,lst.counts = lst.counts)
@@ -127,7 +132,6 @@ all_event_dt <- get_all_events(dfDefinitions_processed_expanded[14,],lst.data,ls
 # all_event_dt <- get_all_events(dfDefinitions_processed_expanded[8,],lst.data)  #DmT2
 # all_event_dt <- get_all_events(dfDefinitions_processed_expanded[17,],lst.data)  #Ht #all collapsed to 1 datatable
 # all_event_dt <- get_all_events(dfDefinitions_processed_expanded[9,],lst.data)  #DmT2
-
 all_event_dt.stats <- get_stats_for_events(all_event_dt) #should generate several plots
 all_event_dt.stats$stats.codes.summary.p
 all_event_dt.stats$stats.class.cooccur.p
@@ -142,9 +146,25 @@ View(all_event_dt.summary %>% filter(is.na(Hx) & is.na(Fu)))
 all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,lst.data.settings,reference_date = NULL,window_fu_days_mask = 15)
 hist(all_event_dt.summary %>% pull(Fu_days) %>% as.numeric,breaks=100)
 hist(all_event_dt.summary %>% filter(Fu_days<100) %>% pull(Fu_days) %>% as.numeric,breaks=100)
-hist(all_event_dt.summary$reference_date,breaks=200)
+hist(all_event_dt.summary$reference_date,breaks=200) ## <-  actual first date of diagnosis
 print(format(object.size(lst.data), units = "Mb")) #"2014.1 Mb"
 
-all_event_dt.summary
+##########################################
+############# DEFINE CASE & CONTROLS for 1 definition, Tryout; please check on consistency, features it should have and if everything behaves ok... it can get quite confusing with the reference date, 
+##########################################
+### get only get cases (with exclusions)
+TEST <- get_cases(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Cad"), lst.data,lst.data.settings, reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
+
+### get everything; population, cases (with exclusions), and controls (with exclusions)
+TEST <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,lst.data.settings, lst.identifiers, reference_date=NULL)
+TEST <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="HfInCad"), lst.data,lst.data.settings, lst.identifiers, reference_date=NULL)
+TEST <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="HfInCad"), lst.data,lst.data.settings, lst.identifiers, reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
+TEST <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Cad"), lst.data,lst.data.settings, lst.identifiers, reference_date=NULL)
+TEST <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Cad"), lst.data,lst.data.settings, lst.identifiers, reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
+TEST <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Cad"), lst.data,lst.data.settings, lst.identifiers, reference_date=setNames(as.Date(as.character(dfukb$f.53.1.0),format="%Y-%m-%d"),dfukb$f.eid))
+## ~50% has family history of heart disease, that is a alot !?
+TEST <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="HxHrt"), lst.data,lst.data.settings, lst.identifiers, reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
+
+
 
 gc()

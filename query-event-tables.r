@@ -9,10 +9,15 @@ to_datatype <- function(vct=c(),datatype){
 get_all_events <- function (definition,lst.data=lst.data,lst.data.settings){
   # definitions=dfDefinitions_processed_expanded[9,]
   # look up for all dataframes in list
+  if(is.null(definition) | nrow(definition)==0 ){
+    #message("no input given")
+    return(NULL)
+  }
   if(nrow(definition)>1){
     message("ERROR: Provide one definition")
     return(NULL)
   }
+  
   message(paste("querying the following classifications: " ,paste(names(definition)[names(definition) %in% lst.data.settings$classification],collapse=", ")))
   
   all_event_lst<-lapply(names(lst.data), function(x) {
