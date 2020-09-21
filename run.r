@@ -75,8 +75,8 @@ lst.data$tte.death.icd10.primary <- convert_nurseinterview_to_episodedata(dfukb,
 lst.data$tte.death.icd10.secondary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
 # death registry from data portal , same data as the main dataset but more up to date, refer document DeathLinkage
 # this is merged with the death from tab file for completeness, but it is the same data now. 
-lst.data_dth<-read_death_data(fdeath_portal,fdeath_cause_portal)
-lst.data$tte.death.icd10.primary <-union(lst.data_dth$primary,lst.data$tte.death.icd10.primary)
+lst.data_dth <- read_death_data(fdeath_portal,fdeath_cause_portal)
+lst.data$tte.death.icd10.primary <- union(lst.data_dth$primary,lst.data$tte.death.icd10.primary)
 lst.data$tte.death.icd10.secondary <-union(lst.data_dth$secondary,lst.data$tte.death.icd10.secondary)
 rm(lst.data_dth)
 # hesin  (event==1)
