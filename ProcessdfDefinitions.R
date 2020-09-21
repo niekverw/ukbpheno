@@ -242,7 +242,12 @@ ProcessDfDefinitions<-function(df,
 
 
 lookup.codes <- function(df=lst.dfs$Include_definitions,lookupcolumn="Exclude_from_cases"){
-  
+  VctAllColumns=c("TS",
+                  "ICD10", "ICD9", "OPCS4","OPCS3",
+                  "READ", "CTV3",
+                  "BNF","DMD",
+                  "f.20001",    "f.20002", "f.20003", "f.20004"
+  )
   dfInEx<-df[!(df[[lookupcolumn]] == "" |is.na(df[[lookupcolumn]])),]
   print(paste(nrow(dfInEx),"traits with dependent trait in",lookupcolumn,sep=" "))
   dfInEx[,VctAllColumns]<-NA

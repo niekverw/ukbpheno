@@ -71,13 +71,26 @@ lst.data$tte.sr.20004 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_di
 # medication (event==0, since no age of diagnosis)
 lst.data$sr.20003 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20003",field_sr_date = "",qc_treshold_year = 10) 
 # death registry from tab file (event==1: every occurence is a real event)
-lst.data$tte.death.icd10.primary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40001",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
-lst.data$tte.death.icd10.secondary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
+# lst.data$tte.death.icd10.primary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40001",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
+# lst.data$tte.death.icd10.secondary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
 # death registry from data portal , same data as the main dataset but more up to date, refer document DeathLinkage
 # this is merged with the death from tab file for completeness, but it is the same data now. 
 lst.data_dth <- read_death_data(fdeath_portal,fdeath_cause_portal)
-lst.data$tte.death.icd10.primary <- union(lst.data_dth$primary,lst.data$tte.death.icd10.primary)
-lst.data$tte.death.icd10.secondary <-union(lst.data_dth$secondary,lst.data$tte.death.icd10.secondary)
+
+# nrow(lst.data$tte.death.icd10.primary) 
+# nrow(lst.data_dth$primary)
+# nrow(intersect(lst.data$tte.death.icd10.primary,lst.data_dth$primary))  
+# nrow(setdiff(lst.data$tte.death.icd10.primary,lst.data_dth$primary)) 
+# nrow(setdiff(lst.data_dth$primary,lst.data$tte.death.icd10.primary)) 
+# nrow(intersect(lst.data$tte.death.icd10.secondary,lst.data_dth$secondary)) 
+# nrow(setdiff(lst.data$tte.death.icd10.secondary,lst.data_dth$secondary)) 
+# nrow(setdiff(lst.data_dth$secondary,lst.data$tte.death.icd10.secondary)) 
+# lst.data$tte.death.icd10.primary <- union(lst.data_dth$primary,lst.data$tte.death.icd10.primary)
+# lst.data$tte.death.icd10.secondary <-union(lst.data_dth$secondary,lst.data$tte.death.icd10.secondary)
+
+# take only the death record from portal for now
+lst.data$tte.death.icd10.primary <-lst.data_dth$primary
+lst.data$tte.death.icd10.secondary<-lst.data_dth$secondary
 rm(lst.data_dth)
 # hesin  (event==1)
 lst.data <- append(lst.data,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.primary + tte.hes.secondary
@@ -132,6 +145,7 @@ all_event_dt <- get_all_events(dfDefinitions_processed_expanded[14,],lst.data,ls
 # all_event_dt <- get_all_events(dfDefinitions_processed_expanded[8,],lst.data)  #DmT2
 # all_event_dt <- get_all_events(dfDefinitions_processed_expanded[17,],lst.data)  #Ht #all collapsed to 1 datatable
 # all_event_dt <- get_all_events(dfDefinitions_processed_expanded[9,],lst.data)  #DmT2
+
 all_event_dt.stats <- get_stats_for_events(all_event_dt) #should generate several plots
 all_event_dt.stats$stats.codes.summary.p
 all_event_dt.stats$stats.class.cooccur.p
@@ -153,7 +167,25 @@ print(format(object.size(lst.data), units = "Mb")) #"2014.1 Mb"
 ############# DEFINE CASE & CONTROLS for 1 definition, Tryout; please check on consistency, features it should have and if everything behaves ok... it can get quite confusing with the reference date, 
 ##########################################
 ### get only get cases (with exclusions)
-TEST <- get_cases(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Cad"), lst.data,lst.data.settings, reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
+TEST <- get_cases(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,lst.data.settings, reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
+
+# 
+# View(TEST$all_event_dt.Include_in_cases)
+# TEST.Nicm.IDCD10<-TEST$all_event_dt.Include_in_cases[TEST$all_event_dt.Include_in_cases$classification=="ICD10",]
+# length(unique(TEST$all_event_dt.Include_in_cases$f.eid))
+# head(TEST$all_event_dt.Include_in_cases.summary)
+# 
+# all_event_dt_nicmCaseEx <- get_all_events(dfDefinitions_processed_expanded[49,],lst.data,lst.data.settings)  
+# head(all_event_dt_nicmCaseEx)
+# 
+# #Nicm exclude from case
+# nicmCaseEx_icd10<-all_event_dt_nicmCaseEx[all_event_dt_nicmCaseEx$classification=="ICD10",]
+# rm(temp)
+# all_event_dt_nicmCaseIn<-get_all_events(dfDefinitions_processed_expanded[2,],lst.data,lst.data.settings) 
+# nicmCaseIn_icd10<-all_event_dt_nicmCaseIn[all_event_dt_nicmCaseIn$classification=="ICD10",]
+# nrow(unique(nicmCaseExInTEST<-TEST.Nicm.IDCD10[TEST.Nicm.IDCD10$f.eid %in% nicmCaseEx_icd10$f.eid,"f.eid"]))
+# 
+# View(nicmCaseExInTEST)
 
 ### get everything; population, cases (with exclusions), and controls (with exclusions)
 TEST <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,lst.data.settings, reference_date=NULL)
