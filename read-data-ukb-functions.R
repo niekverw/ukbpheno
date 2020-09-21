@@ -426,7 +426,7 @@ read_death_data <- function(fdeath_portal, fdeath_cause_portal){
   lst_death <- list("primary" = dfdeath.primary, "secondary" = dfdeath.secondary)
   message("setkey(code)")
   lst_death <- lapply(lst_death,function(x) {setkey(x,code) })
-  lst_death <- lapply(lst,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
+  lst_death <- lapply(lst_death,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
   return(lst_death)
   
 }
