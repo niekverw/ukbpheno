@@ -237,7 +237,8 @@ get_cases <- function(definitions,
 get_cases_controls <- function (definitions,
                                  lst.data,
                                  lst.data.settings,
-                                 reference_date=NULL
+                                 reference_date=NULL,
+                                 lst.identifiers=lst.identifiers # Used to define controls if reference_date is not given (NULL)
 ) {
   
   #reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid)
@@ -247,6 +248,10 @@ get_cases_controls <- function (definitions,
   reference_date <- reference_date[!is.na(names(reference_date))]
   if(is.null(reference_date)){
     message("reference_date=NULL, taking first occurence of case and all available identifiers (lst.data$all_identifiers)")
+    if(length(lst.identifiers)<=1){
+      message("ERROR: lst.identifiers is empty, please provide either reference_date or a list of lst.identifiers that should be used as population.")
+      return(0)
+    }
   }
   # define population
   all_event_dt.population <- get_all_events(definitions %>% filter(Definitions =="Study_population"),lst.data,lst.data.settings)   #MI
@@ -266,6 +271,9 @@ get_cases_controls <- function (definitions,
   all_event_dt.Exclude_from_controls <- get_all_events(definitions %>% filter(Definitions =="Exclude_from_controls"),lst.data,lst.data.settings)   #MI
   
   ### define case & control
+  if(is.null(reference_date)){
+    reference_date = setNames(as.Date(rep(NA,length(lst.identifiers))),lst.identifiers)
+  }
   df.casecontrol <- data.frame(reference_date=reference_date) %>% tibble::rownames_to_column('f.eid') %>% as.data.table()
   df.casecontrol <- df.casecontrol[!df.casecontrol$f.eid %in% all_event_dt.Include_in_cases.summary$f.eid,]
   df.casecontrol$reference_date <- as.Date(as.character(df.casecontrol$reference_date),format="%Y-%m-%d")
@@ -276,8 +284,8 @@ get_cases_controls <- function (definitions,
     message(glue::glue("excluding {sum(exclude)} controls"))
     set_to_na <- names(df.casecontrol)[!names(df.casecontrol) %in% c("f.eid","reference_date")]
     df.casecontrol[exclude,(set_to_na):=-1]
-    
-  }
+  } 
+  
   
   df.casecontrol[is.na(df.casecontrol$Any),]$Any <- 1
   df.casecontrol[is.na(df.casecontrol$count),]$count <- 1
