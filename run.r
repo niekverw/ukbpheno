@@ -71,8 +71,8 @@ lst.data$tte.sr.20004 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_di
 # medication (event==0, since no age of diagnosis)
 lst.data$sr.20003 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20003",field_sr_date = "",qc_treshold_year = 10) 
 # death registry from tab file (event==1: every occurence is a real event)
-lst.data$tte.death.icd10.primary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40001",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10) # death
-lst.data$tte.death.icd10.secondary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10) # death
+lst.data$tte.death.icd10.primary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40001",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
+lst.data$tte.death.icd10.secondary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
 # death registry from data portal , same data as the main dataset but more up to date, refer document DeathLinkage
 # this is merged with the death from tab file for completeness, but it is the same data now. 
 lst.data_dth<-read_death_data(fdeath_portal,fdeath_cause_portal)

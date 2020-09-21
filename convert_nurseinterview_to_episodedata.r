@@ -25,7 +25,7 @@ convert_col_to_integer <- function(col){
   }
 }
 
-convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002",field_sr_date = "20008",field_sr_date_type="interpolated_year",qc_treshold_year=10){
+convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002",field_sr_date = "20008",field_sr_date_type="interpolated_year",qc_treshold_year=10,event_code=2){
   # TODO: IF NA, then list first visit answered yes. 
   # 
   # df = lst$df_sr # data.table
@@ -140,9 +140,10 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
     } else if (field_sr_date_type=="date"){
       df_out = df_out[, eventdate:=as.Date(eventdate)]
     }
-    # remove rounding error from interpolation
-    df_out[df_out$eventdate > df_out$visitdate,'eventdate'] <- df_out[df_out$eventdate > df_out$visitdate,]$visitdate
-    
+    # remove rounding error from interpolation if self reported (can't self report after baseline.)
+    if(event_code==2){
+      df_out[df_out$eventdate > df_out$visitdate,'eventdate'] <- df_out[df_out$eventdate > df_out$visitdate,]$visitdate
+    }
     # deduplicate, min/max/mean/sd <- not very efficient?!! 
     message("deduplicate")
     # for each code in the same participant, compute min(oldest record)/max(newest record)/mean date
@@ -166,7 +167,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   }
 
   # record which can be set as an event or not (when no event_date is reported, only visit)
-  df_out$event <- 2
+  df_out$event <- event_code
   df_out <- df_out[, event:=as.integer(event)]
   # mark record without valid event date with 0
   df_out[is.na(df_out$eventdate)]$event <- 0
