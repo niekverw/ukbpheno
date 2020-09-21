@@ -238,7 +238,7 @@ get_cases_controls <- function (definitions,
                                  lst.data,
                                  lst.data.settings,
                                  reference_date=NULL,
-                                 lst.identifiers # Used to define controls if reference_date is not given (NULL)
+                                 lst.identifiers=NULL # Used to define controls if reference_date is not given (NULL)
 ) {
   
   #reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid)
