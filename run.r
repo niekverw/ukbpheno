@@ -171,28 +171,36 @@ print(format(object.size(lst.data), units = "Mb")) #"2014.1 Mb"
 ### get only get cases (with exclusions)
 TEST <- get_cases(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,lst.data.settings, reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
 
-# 
+
 # View(TEST$all_event_dt.Include_in_cases)
 # TEST.Nicm.IDCD10<-TEST$all_event_dt.Include_in_cases[TEST$all_event_dt.Include_in_cases$classification=="ICD10",]
 # length(unique(TEST$all_event_dt.Include_in_cases$f.eid))
 # head(TEST$all_event_dt.Include_in_cases.summary)
 # 
-# all_event_dt_nicmCaseEx <- get_all_events(dfDefinitions_processed_expanded[49,],lst.data,lst.data.settings)  
+# all_event_dt_nicmCaseEx <- get_all_events(dfDefinitions_processed_expanded[49,],lst.data,lst.data.settings)
 # head(all_event_dt_nicmCaseEx)
 # 
 # #Nicm exclude from case
 # nicmCaseEx_icd10<-all_event_dt_nicmCaseEx[all_event_dt_nicmCaseEx$classification=="ICD10",]
 # rm(temp)
-# all_event_dt_nicmCaseIn<-get_all_events(dfDefinitions_processed_expanded[2,],lst.data,lst.data.settings) 
+# all_event_dt_nicmCaseIn<-get_all_events(dfDefinitions_processed_expanded[2,],lst.data,lst.data.settings)
 # nicmCaseIn_icd10<-all_event_dt_nicmCaseIn[all_event_dt_nicmCaseIn$classification=="ICD10",]
-# nrow(unique(nicmCaseExInTEST<-TEST.Nicm.IDCD10[TEST.Nicm.IDCD10$f.eid %in% nicmCaseEx_icd10$f.eid,"f.eid"]))
-# 
+# nicmCaseExInTEST<-TEST.Nicm.IDCD10[TEST.Nicm.IDCD10$f.eid %in% nicmCaseEx_icd10$f.eid,"f.eid"]
+# all_event_dt_nicmControlEx <- get_all_events(dfDefinitions_processed_expanded[51,],lst.data,lst.data.settings)
+# nrow(all_event_dt_nicmControlEx)
 # View(nicmCaseExInTEST)
 
 ### get everything; population, cases (with exclusions), and controls (with exclusions)
 TEST <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,lst.data.settings, reference_date=NULL,lst.identifiers)
 TEST <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,lst.data.settings,  reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
 TEST <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="HfInCad"), lst.data,lst.data.settings, reference_date=NULL,lst.identifiers)
+# population  50596 individuals 
+# [1] "case_excluded control_excluded control case"
+# -2     1     2 
+# 1551 41180  7865 
+
+
+
 TEST <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="HfInCad"), lst.data,lst.data.settings, reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
 TEST <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Cad"), lst.data,lst.data.settings, reference_date=NULL,lst.identifiers)
 TEST <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Cad"), lst.data,lst.data.settings, reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))

@@ -255,8 +255,7 @@ get_cases_controls <- function (definitions,
 ) {
   
   #reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid)
-  
-  
+
   reference_date <- reference_date[!is.na(reference_date)]
   reference_date <- reference_date[!is.na(names(reference_date))]
   if(is.null(reference_date)){
@@ -271,7 +270,7 @@ get_cases_controls <- function (definitions,
   if(!is.null(all_event_dt.population)) {
     all_event_dt.population.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.population,lst.data.settings,reference_date = NULL,window_fu_days_mask = 15)
     reference_date = setNames(as.Date(as.character(all_event_dt.population.summary$reference_date),format="%Y-%m-%d"),all_event_dt.population.summary$f.eid)
-    message(glue::glue("Population: {nrow(all_event_dt.Include_in_cases)} individuals "))
+    message(glue::glue("Population: {length(unique(all_event_dt.population.summary$f.eid))} individuals "))
   } else {
     message(glue::glue("Population: total non-missing reference date = {sum(!is.na(reference_date))}, total missing reference date= {sum(is.na(reference_date))} "))
   }
@@ -282,21 +281,30 @@ get_cases_controls <- function (definitions,
   all_event_dt.Include_in_cases <- cases$all_event_dt.Include_in_cases
   # define exclude controls
   all_event_dt.Exclude_from_controls <- get_all_events(definitions %>% filter(Definitions =="Exclude_from_controls"),lst.data,lst.data.settings)   #MI
-  
+  # print(length(unique(all_event_dt.Exclude_from_controls$f.eid)))
   ### define case & control
   if(is.null(reference_date)){
     reference_date = setNames(as.Date(rep(NA,length(lst.identifiers))),lst.identifiers)
   }
+  
+  # all(is.na(reference_date))
   df.casecontrol <- data.frame(reference_date=reference_date) %>% tibble::rownames_to_column('f.eid') %>% as.data.table()
+
+  # exlude id in case_include & case_exclude from summary => potential control
   df.casecontrol <- df.casecontrol[!df.casecontrol$f.eid %in% all_event_dt.Include_in_cases.summary$f.eid,]
   df.casecontrol$reference_date <- as.Date(as.character(df.casecontrol$reference_date),format="%Y-%m-%d")
-  df.casecontrol <- merge(df.casecontrol,all_event_dt.Include_in_cases.summary,by=c("f.eid","reference_date"),all=T)
   
+  # merge it with the cases
+  df.casecontrol <- merge(df.casecontrol,all_event_dt.Include_in_cases.summary,by=c("f.eid","reference_date"),all=T)
+
   if(!is.null(all_event_dt.Exclude_from_controls)) { 
+    # !is.na(df.casecontrol$Any) for cases i.e. from all_event_dt.Include_in_cases.summary 
+    # here to exclude = 1)not a case  2) in exclude_from_control  
     exclude=(is.na(df.casecontrol$Any) & (df.casecontrol$f.eid %in% all_event_dt.Exclude_from_controls$f.eid))
     message(glue::glue("excluding {sum(exclude)} controls"))
+    # cols to be set to na 
     set_to_na <- names(df.casecontrol)[!names(df.casecontrol) %in% c("f.eid","reference_date")]
-    df.casecontrol[exclude,(set_to_na):=-1]
+    df.casecontrol[exclude,(set_to_na):=-1] #mark the non-control as -1 
   } 
   
   
@@ -305,7 +313,7 @@ get_cases_controls <- function (definitions,
   df.casecontrol[is.na(df.casecontrol$Hx),]$Hx <- 1
   df.casecontrol[is.na(df.casecontrol$Fu),]$Fu <- 1
   df.casecontrol[is.na(df.casecontrol$Ref),]$Ref <- 1
-  
+  print("case_excluded control_excluded control case")
   print(table(df.casecontrol$Any))
   
   return(list(df.casecontrol=df.casecontrol,
