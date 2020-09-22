@@ -236,8 +236,8 @@ get_cases <- function(definitions,
     # the .summary needed to be flagged for the get_case_control() functoin
     all_event_dt.Include_in_cases.summary[exclude,(set_to_na):=-2]
     # remove these in all_event_dt
-    all_event_dt.Include_in_cases<-all_event_dt.Include_in_cases[!all_event_dt.Include_in_cases$f.eid %in% exclude, ]
-                                                                   
+    all_event_dt.Include_in_cases<-all_event_dt.Include_in_cases[! (all_event_dt.Include_in_cases$f.eid %in% unique(all_event_dt.Exclude_from_cases$f.eid)),]
+    message(glue::glue("{nrow(all_event_dt.Include_in_cases)} events from {length(unique(all_event_dt.Include_in_cases$f.eid))} cases."))       
   }
   return(list(all_event_dt.Include_in_cases=all_event_dt.Include_in_cases,
               all_event_dt.Include_in_cases.summary=all_event_dt.Include_in_cases.summary)
