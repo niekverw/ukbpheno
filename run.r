@@ -97,9 +97,11 @@ lst.data <- append(lst.data,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) 
 # primary care, gp  (event==1)
 lst.data <- append(lst.data,read_gp_clinical_data(fgp=fgp_clinical )) # 462.085 
 
-#attr(lst.data,all_identifiers <- as.character(dfukb$f.eid))
+# make sure eeverything is in the right format: 
+lst.data <- lapply(lst.data,function(x) {setkey(x,code) })
+lst.data <- lapply(lst.data,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
+lst.data <- lapply(lst.data,function(x) {x[,'eventdate'] <-  round(x$eventdate);return(x) })
 
-# setkey on code. 
 toc() #  1111.306 sec elapsed, 18min. 
 
 # load lst.data.settings
@@ -198,6 +200,9 @@ TEST <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filt
 ## ~50% has family history of heart disease, that is a alot !?
 TEST <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="HxHrt"), lst.data,lst.data.settings, reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
 
+### get first date of diagnosis by combining reference_date +  first_diagnosis_days (should triple check for some specific participants if dates etc are correct, appropriate NA's etc. . found one error alreday)
+hist(TEST$df.casecontrol %>% filter(Any==2) %>% mutate(date_of_first_diag=reference_date+first_diagnosis_days) %>% pull(date_of_first_diag),breaks=200 )
 
 
-gc()
+
+

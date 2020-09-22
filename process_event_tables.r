@@ -156,11 +156,19 @@ get_incidence_prevalence <- function(all_event_dt,
   #system.time({ df %>% filter(event>0) %>% group_by(f.eid) %>% summarise(first_diagnosis_days=min(days)) }) # <- slow.. 
   #system.time({ df[df$event>0][,.(first_diagnosis_days=min(days,na.rm=T) ), by=f.eid] }) # <- fast..
   #df[df$event>0][df[, .I[which.max(days)], by=f.eid]$V1] # <- aanother way.. 
-  first_diagnosis_days <- suppressWarnings(df[df$event>0][,.(first_diagnosis_days=min(days,na.rm=T) ), by=f.eid] )# 
+  # 
+  # first_diagnosis_days <- df[  ,.(first_diagnosis_days=min(days,na.rm=T)), by=f.eid]
+  # 
+  # 
+  # first_diagnosis_days <- df[  ,.SD[which.min(days)], by=f.eid]
+  # 
+  # df %>% filter(f.eid==1025336 )
+  # first_diagnosis_days %>% filter(f.eid==1025336 )
   
   ### Data if participant had event/med  reference date (visit);+/- x day 
   dfRef <- df[df$eventdate>=(df$reference_date-window_ref_days_include) & df$eventdate<=(df$reference_date+window_ref_days_include),c("f.eid")]
   dfRef[,Ref:=2]
+
   
   ## some other stats, and to include event==0 individuals:
   if(!all(unique(all_event_dt$event==0))){
@@ -169,6 +177,9 @@ get_incidence_prevalence <- function(all_event_dt,
   } else{
     stats <- all_event_dt[, .(count = .N,sum.epidur= NA,median.epidur= NA,max.epidur=NA), by = f.eid]
   }
+  
+  
+  
   # test <- Reduce(function(...) merge(..., all = TRUE,by='f.eid'), list(df,
   #                                                                      Hx_days,
   #                                                                      Fu_days,
@@ -188,10 +199,12 @@ get_incidence_prevalence <- function(all_event_dt,
       Fu_days,
       unique(dfHx[,c("f.eid","Hx")]),
       unique(dfFu[,c("f.eid","Fu")]),
-      unique(dfRef[,c("f.eid","Ref")]),
-      first_diagnosis_days
+      unique(dfRef[,c("f.eid","Ref")])
   ))
-    
+
+  all_event_dt.summary$first_diagnosis_days <- pmin(all_event_dt.summary$Hx_days,all_event_dt.summary$Fu_days,na.rm = T)  
+  all_event_dt.summary[ Hx==2 & is.na(Hx_days),'first_diagnosis_days'] <- NA
+  
   all_event_dt.summary <- merge(all_event_dt.summary,df_referencedate,by="f.eid")
   all_event_dt.summary[,Any:=2]
   all_event_dt.summary <- data.table(all_event_dt.summary)
