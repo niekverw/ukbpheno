@@ -113,18 +113,19 @@ get_incidence_prevalence <- function(all_event_dt,
   #print(glue::glue("window_ref_days_include: {window_ref_days_include}"))
   #print(glue::glue("window_fu_days_mask: {window_fu_days_mask}"))
   
-  reference_date <- reference_date[!is.na(reference_date)]
+  # reference_date <- reference_date[!is.na(reference_date)]
+
+
   if(length(reference_date)==0){reference_date<-NULL}
   if(!is.null(reference_date)){
     df_referencedate <- data.table(reference_date)
     df_referencedate$f.eid <- names(reference_date)
+    
     message(glue::glue("non missing reference_date: {length(reference_date)}"))
   } else{
     message("no reference_date given, taking the first available event as reference")
     df_referencedate <- all_event_dt[,.(reference_date= min(eventdate,na.rm = T)),by=f.eid]
   }
-  
-  
   if(include_secondary_recurrence){
     sources_recurrence_events <- lst.data.settings$datasource
   } else {
@@ -133,7 +134,7 @@ get_incidence_prevalence <- function(all_event_dt,
   
   
   df <- merge(all_event_dt,df_referencedate,by = 'f.eid') %>% arrange(eventdate) %>% as.data.table()
-  df <- df %>% filter(!is.na(reference_date)) # comment out if missing f.eids is fixed. 
+  # df <- df %>% filter(!is.na(reference_date)) # comment out if missing f.eids is fixed. 
 
   df$days <- df$eventdate - df$reference_date
   setkey(df,days) # i don't know why, but setkey was alreaday on f.eid and cannot refresh..
@@ -151,7 +152,6 @@ get_incidence_prevalence <- function(all_event_dt,
                (days>(0+window_fu_days_mask) & event==2  & (!f.eid %in% dfHx$Hx)) ]
   dfFu[,Fu:=2] #unique(dfFu$f.eid)
   Fu_days <- suppressWarnings( dfFu[,.(Fu_days= min(days,na.rm=T) ), keyby=list(f.eid)] )
-  
   ### age of diagnosis
   #system.time({ df %>% filter(event>0) %>% group_by(f.eid) %>% summarise(first_diagnosis_days=min(days)) }) # <- slow.. 
   #system.time({ df[df$event>0][,.(first_diagnosis_days=min(days,na.rm=T) ), by=f.eid] }) # <- fast..
@@ -209,6 +209,8 @@ get_incidence_prevalence <- function(all_event_dt,
   all_event_dt.summary[,Any:=2]
   all_event_dt.summary <- data.table(all_event_dt.summary)
   return(all_event_dt.summary)
+  
+
 }
 
 
@@ -237,7 +239,7 @@ get_cases <- function(definitions,
     all_event_dt.Include_in_cases.summary[exclude,(set_to_na):=-2]
     # remove these in all_event_dt
     all_event_dt.Include_in_cases<-all_event_dt.Include_in_cases[! (all_event_dt.Include_in_cases$f.eid %in% unique(all_event_dt.Exclude_from_cases$f.eid)),]
-    message(glue::glue("{nrow(all_event_dt.Include_in_cases)} events from {length(unique(all_event_dt.Include_in_cases$f.eid))} cases."))       
+    message(glue::glue("{nrow(all_event_dt.Include_in_cases)} events fulfiling criteria in include_in_cases"))       
   }
   return(list(all_event_dt.Include_in_cases=all_event_dt.Include_in_cases,
               all_event_dt.Include_in_cases.summary=all_event_dt.Include_in_cases.summary)
@@ -267,7 +269,11 @@ get_cases_controls <- function (definitions,
   }
   # define population
   all_event_dt.population <- get_all_events(definitions %>% filter(Definitions =="Study_population"),lst.data,lst.data.settings)   #MI
+
+  # only consider event with real event date in study population, set those with visitdate to NA
+  all_event_dt.population[all_event_dt.population$event==0,]$eventdate <-NA
   if(!is.null(all_event_dt.population)) {
+    # get everyone , take the date of relevant events respectively 
     all_event_dt.population.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.population,lst.data.settings,reference_date = NULL,window_fu_days_mask = 15)
     reference_date = setNames(as.Date(as.character(all_event_dt.population.summary$reference_date),format="%Y-%m-%d"),all_event_dt.population.summary$f.eid)
     message(glue::glue("Population: {length(unique(all_event_dt.population.summary$f.eid))} individuals "))
@@ -281,22 +287,22 @@ get_cases_controls <- function (definitions,
   all_event_dt.Include_in_cases <- cases$all_event_dt.Include_in_cases
   # define exclude controls
   all_event_dt.Exclude_from_controls <- get_all_events(definitions %>% filter(Definitions =="Exclude_from_controls"),lst.data,lst.data.settings)   #MI
-  # print(length(unique(all_event_dt.Exclude_from_controls$f.eid)))
   ### define case & control
   if(is.null(reference_date)){
     reference_date = setNames(as.Date(rep(NA,length(lst.identifiers))),lst.identifiers)
   }
   
-  # all(is.na(reference_date))
   df.casecontrol <- data.frame(reference_date=reference_date) %>% tibble::rownames_to_column('f.eid') %>% as.data.table()
 
   # exlude id in case_include & case_exclude from summary => potential control
   df.casecontrol <- df.casecontrol[!df.casecontrol$f.eid %in% all_event_dt.Include_in_cases.summary$f.eid,]
   df.casecontrol$reference_date <- as.Date(as.character(df.casecontrol$reference_date),format="%Y-%m-%d")
-  
+
   # merge it with the cases
   df.casecontrol <- merge(df.casecontrol,all_event_dt.Include_in_cases.summary,by=c("f.eid","reference_date"),all=T)
 
+  
+  
   if(!is.null(all_event_dt.Exclude_from_controls)) { 
     # !is.na(df.casecontrol$Any) for cases i.e. from all_event_dt.Include_in_cases.summary 
     # here to exclude = 1)not a case  2) in exclude_from_control  
@@ -307,13 +313,26 @@ get_cases_controls <- function (definitions,
     df.casecontrol[exclude,(set_to_na):=-1] #mark the non-control as -1 
   } 
   
-  
+  # 2 => case -2 => non-case  -1 => non-control , set control to 1
   df.casecontrol[is.na(df.casecontrol$Any),]$Any <- 1
+  # as control has no event the event count is NA after merge, set it to 1
   df.casecontrol[is.na(df.casecontrol$count),]$count <- 1
-  df.casecontrol[is.na(df.casecontrol$Hx),]$Hx <- 1
-  df.casecontrol[is.na(df.casecontrol$Fu),]$Fu <- 1
-  df.casecontrol[is.na(df.casecontrol$Ref),]$Ref <- 1
-  print("case_excluded control_excluded control case")
+  df.casecontrol[(is.na(df.casecontrol$Hx)&(df.casecontrol$Any == 1)),]$Hx <- 1
+  df.casecontrol[(is.na(df.casecontrol$Fu)&(df.casecontrol$Any == 1)),]$Fu <- 1
+  df.casecontrol[(is.na(df.casecontrol$Ref)&(df.casecontrol$Any == 1)),]$Ref <- 1
+  # At this point NA is only possible in Hx/Fu/Ref for case_included i.e. Any==2
+  # first consider Hx, cases either have event in past ==2 / future ==NA / unknown==NA [no ref date]
+  # case that don't have event in the past but in future  
+  df.casecontrol[(is.na(df.casecontrol$Hx)&(df.casecontrol$Any == 2)&is.na(df.casecontrol$Hx_days)& (!is.na(df.casecontrol$Fu_days))),]$Hx <-  1
+  # similar for Ref , cases either have event within window ==2 / no ==NA / unknown==NA [no ref date]
+  # case that don't have event within window i.e. eventdate is known
+  df.casecontrol[(is.na(df.casecontrol$Ref)&(df.casecontrol$Any == 2)&((!is.na(df.casecontrol$Hx_days)) | (!is.na(df.casecontrol$Fu_days)))),]$Ref <-  1
+  # for Fu , cases either have event in past ==NA / future ==2/ unknown==NA [no ref date]
+  # ******************but this is also affected by the sources_recurrence_events option in get_incidence_rate()?***************
+  df.casecontrol[(is.na(df.casecontrol$Fu)&(df.casecontrol$Any == 2)& (!is.na(df.casecontrol$Hx_days))& (is.na(df.casecontrol$Fu_days))),]$Fu <-  1
+  ############################################################################################################
+  
+ 
   print(table(df.casecontrol$Any))
   
   return(list(df.casecontrol=df.casecontrol,
