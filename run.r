@@ -13,6 +13,7 @@ library(ggrepel)
 library(ggpubr)
 library(pheatmap)
 library(ggdendro)
+library(readxl)
 
 if (Sys.getenv("USER")=="niek"){
   repo_dir="/Users/niek/repos/ukbpheno/"
@@ -50,6 +51,31 @@ fukbphenodata <- paste(pheno_dir,"ukbphenodata.Rdata",sep="") #where to store fi
 # read definitions. 
 dfDefinitions <- fread(fdefinitions, colClasses = 'character', data.table = FALSE)
 dfDefinitions_processed <- ProcessDfDefinitions(dfDefinitions)
+
+####################################################################################################
+code_map_dir<-paste(repo_dir,"data/",sep="")
+#  READ CODEs table is not organized in tree structure
+lst.codemap<-list()
+lst.codemap$ICD9<- fread(paste(code_map_dir,"ICD9.coding87.tsv",sep=""))
+lst.codemap$ICD10<-fread(paste(code_map_dir,"ICD10.coding19.tsv",sep=""))
+lst.codemap$OPCS3<-fread(paste(code_map_dir,"OPCS3.coding259.tsv",sep=""))
+lst.codemap$OPCS4<-fread(paste(code_map_dir,"OPCS4.coding240.tsv",sep=""))
+fcoding.xls<- paste(code_map_dir,"all_lkps_maps.xlsx",sep="")
+lst.codemap$READ2_drugs<- as.data.frame(read_xlsx(fcoding.xls,sheet="read_v2_drugs_lkp"))
+# ctv3 readv2 big list uncomment if decide to expnad ctv3 code
+# lst.codemap$read_ctv3_readv2 <- as.data.frame(read_xlsx(fcoding.xls,sheet="read_ctv3_read_v2"))[,c(1,5)]
+tic()
+test_expandDef<-expand_dfDefinitions_processed2(dfDefinitions_processed,lst.data.settings,lst.codemap) #
+toc() 
+#4.949 sec elapsed with grep read2_drugs
+#1.231 sec elapsed without 
+# orginal codes in definition table : f1,f2,x006f
+length (unlist(strsplit(test_expandDef$READ2_drugs[4], ","))) #267 from 2 codes f1,f2
+# are most of the expanded codes used? 
+
+
+
+
 ########################################## 
 # Prepare UKB data: 
 # read ukb data from ukbconv (.html + .tab) 
@@ -126,7 +152,7 @@ lst.data.settings <- data.frame(fread("
     tte.gpscript.dmd.england  DMD character 0 2 FALSE
     tte.gpscript.bnf.england  BNF character 0 2 FALSE
     tte.gpscript.bnf.scotland BNF character 0 2 FALSE
-    tte.gpscript.read2.wales  READ_drugs  character 1 2 FALSE
+    tte.gpscript.read2.wales  READ2_drugs  character 1 2 FALSE
     ts  TS  character 0 1 TRUE"))
 
 # generate meta data dynamically,  returns a list with the number of rows per code based on lst.data.settings
