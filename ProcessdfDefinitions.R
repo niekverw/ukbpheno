@@ -396,6 +396,9 @@ expand_dfDefinitions_processed <- function(dfDefinitions_processed,lst.data.sett
   for (c in classifications){
     
   for (r in 1:nrow(dfDefinitions_processed)){ # for loops just as fast as apply in this case.. 
+    VctStr=unlist(strsplit(dfDefinitions_processed[1,"ICD10"],",")) 
+    
+    
     VctStr = unlist(strsplit(dfDefinitions_processed[r,c],",")) 
     lookuptable = lst.counts[[c]]
     ignore.case = unique(lst.data.settings[lst.data.settings$classification %in% c,'ignore.case'])[1]
@@ -408,3 +411,89 @@ expand_dfDefinitions_processed <- function(dfDefinitions_processed,lst.data.sett
   }
   return(dfDefinitions_processed)
 }
+
+
+
+#########################################################################################################################################################################################################
+code_map_dir<-paste(repo_dir,"data/",sep="")
+# dfCodesheetREAD_SR.Coding<- fread(paste(code_map_dir,"20003_coding4.tsv",sep=""))
+# dfCodesheetIcd9<- fread(paste(code_map_dir,"ICD9.coding87.tsv",sep=""))
+# dfCodesheetIcd10<- fread(paste(code_map_dir,"ICD10.coding19.tsv",sep=""))
+# dfCodesheetOPCS3<- fread(paste(code_map_dir,"OPCS3.coding259.tsv",sep=""))
+# dfCodesheetOPCS4<- fread(paste(code_map_dir,"OPCS4.coding240.tsv",sep=""))
+
+#  READ CODEs table is not organized in tree structure
+dfCodesheetREAD2Drug<- fread(paste(code_map_dir,"read_v2_drugs_lkp.tsv",sep=""))
+
+lst.codemap<-list()
+# classifications "ICD10"       "OPCS3"       "OPCS4"       "ICD9"  
+lst.codemap$ICD9<- fread(paste(code_map_dir,"ICD9.coding87.tsv",sep=""))
+lst.codemap$ICD10<-fread(paste(code_map_dir,"ICD10.coding19.tsv",sep=""))
+lst.codemap$OPCS3<-fread(paste(code_map_dir,"OPCS3.coding259.tsv",sep=""))
+lst.codemap$OPCS4<-fread(paste(code_map_dir,"OPCS4.coding240.tsv",sep=""))
+
+add_child_nodes <-function(dfcode,codeVct){
+    resultCodeVct<- vector() 
+    currVct<-codeVct
+    while (length(currVct)!=0){
+      if (length(currVct)>0){
+        resultCodeVct<-unique(c(resultCodeVct,currVct))}
+      # get node ID of the ICD codes
+      parentNodeId<-unlist(lapply(currVct,function(x) dfcode[dfcode$coding==x,]$node_id ))
+     # find nodes belonging to these nodes
+      childrenNodes<-unique(unlist(lapply(parentNodeId,function(x) dfcode[dfcode$parent_id==x,]$coding)))
+      currVct<-childrenNodes
+    }
+    # remove codes not selectable
+    keep<-unlist(lapply(resultCodeVct, function(x) dfcode[dfcode$coding==x,]$selectable=="Y"))
+    resultCodeVct<-resultCodeVct[keep]
+    return(resultCodeVct)    
+}
+
+# paste(add_child_nodes(dfCodesheetIcd10,VctStr),collapse=",")
+
+###########################check the READ code expansion seems wrong?###############################
+expand_dfDefinitions_processed2<-function(dfDefinitions_processed,lst.data.settings){
+  icd9 <- fread(fdefinitions, colClasses = 'character', data.table = FALSE)
+  classifications <- lst.data.settings %>% filter(expand_codes==1) %>% pull (classification) %>% unique()
+  for (c in classifications){
+    
+    for (r in 1:nrow(dfDefinitions_processed)){ # for loops just as fast as apply in this case.. 
+
+      VctStr = unlist(strsplit(dfDefinitions_processed[r,c],",")) 
+      lookuptable = lst.counts[[c]]
+      ignore.case = unique(lst.data.settings[lst.data.settings$classification %in% c,'ignore.case'])[1]
+      ##################TODO need a different function for READ codes
+      Str_expanded <-paste(add_child_nodes(lst.codemap[[c]],VctStr),collapse=",")
+
+      dfDefinitions_processed[r,c]<- Str_expanded
+    }
+  }
+  return(dfDefinitions_processed)
+  }
+# lst.data.settings <- data.frame(fread("
+#     datasource classification  datatype  expand_codes  diagnosis ignore.case
+#     tte.sr.20002  f.20002 numeric 0 1 FALSE
+#     tte.sr.20001  f.20001 numeric 0 1 FALSE
+#     tte.sr.20004  f.20004 numeric 0 1 FALSE
+#     sr.20003  f.20003 numeric 0 1 FALSE
+#     tte.death.icd10.primary ICD10 character 1 1 TRUE
+#     tte.death.icd10.secondary ICD10 character 1 2 TRUE
+#     tte.hesin.oper3.primary OPCS3 character 1 1 TRUE
+#     tte.hesin.oper3.secondary OPCS3 character 1 2 TRUE
+#     tte.hesin.oper4.primary OPCS4 character 1 1 TRUE
+#     tte.hesin.oper4.secondary OPCS4 character 1 2 TRUE
+#     tte.hesin.icd10.primary ICD10 character 1 1 TRUE
+#     tte.hesin.icd10.secondary ICD10 character 1 2 TRUE
+#     tte.hesin.icd9.primary  ICD9  character 1 1 TRUE
+#     tte.hesin.icd9.secondary  ICD9  character 1 2 TRUE
+#     tte.gpclincal.read2 READ2  character 0 2 FALSE
+#     tte.gpclincal.read3 CTV3  character 0 2 FALSE
+#     tte.gpscript.dmd.england  DMD character 0 2 FALSE
+#     tte.gpscript.bnf.england  BNF character 0 2 FALSE
+#     tte.gpscript.bnf.scotland BNF character 0 2 FALSE
+#     tte.gpscript.read2.wales  READ2_drugs  character 1 2 FALSE
+#     ts  TS  character 0 1 TRUE"))
+# 
+# View(lst.data$tte.gpclincal.read2)
+# head(lst.data$tte.gpclincal.read2)
