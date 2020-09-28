@@ -137,7 +137,6 @@ lst.data.settings <- data.frame(fread("
 
 # generate meta data dynamically,  returns a list with the number of rows per code based on lst.data.settings
 lst.counts <- get_lst_counts(lst.data,lst.data.settings = lst.data.settings)
-
 lst.identifiers <- as.character(dfukb$f.eid)
 # save 
 save(dfhtml,dfukb,lst.data,lst.data.settings,lst.counts,file=fukbphenodata)
@@ -164,9 +163,6 @@ toc()
 length (unlist(strsplit(test_expandDef$READ2_drugs[4], ","))) #267 from 2 codes f1,f2
 # are most of the expanded codes used? 
 
-#########################################################################################
-
-
 
 
 ##########################################
@@ -174,11 +170,23 @@ length (unlist(strsplit(test_expandDef$READ2_drugs[4], ","))) #267 from 2 codes 
 ##########################################
 # expand the definitions based on the data that is loaded
 dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,lst.data.settings=lst.data.settings,lst.counts = lst.counts)
+dfDefinitions_processed_expanded <-expand_dfDefinitions_processed2(dfDefinitions_processed,lst.data.settings,lst.codemap)
 #all collapsed to 1 datatable
 all_event_dt <- get_all_events(dfDefinitions_processed_expanded[14,],lst.data,lst.data.settings)   #MI
 # all_event_dt <- get_all_events(dfDefinitions_processed_expanded[8,],lst.data)  #DmT2
 # all_event_dt <- get_all_events(dfDefinitions_processed_expanded[17,],lst.data)  #Ht #all collapsed to 1 datatable
 # all_event_dt <- get_all_events(dfDefinitions_processed_expanded[9,],lst.data)  #DmT2
+
+
+
+#########################################################################################
+# TODO: Add output for death (primary and primary+secondary) in get_incidence_prevalence() )
+
+death_event_dt.summary<- get_survival_data(dfDefinitions_processed_expanded[14,],lst.data,lst.data.settings) #1559
+death_event_dt.summary<- get_survival_data(dfDefinitions_processed_expanded[14,],lst.data,lst.data.settings,window_days_mask = 5)
+
+#########################################################################################
+
 
 all_event_dt.stats <- get_stats_for_events(all_event_dt) #should generate several plots
 all_event_dt.stats$stats.codes.summary.p
@@ -189,6 +197,8 @@ all_event_dt.stats$stats.codes.cooccur.filtered.p.heat
 # get incidence/prevalence from baseline
 all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,lst.data.settings, reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
 View(all_event_dt.summary %>% filter(is.na(Hx) & is.na(Fu)))
+
+
 
 # get occcurence  from first event and recurrence of primary events: 
 all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,lst.data.settings,reference_date = NULL,window_fu_days_mask = 15)

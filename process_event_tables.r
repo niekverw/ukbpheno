@@ -171,7 +171,8 @@ get_incidence_prevalence <- function(all_event_dt,
 
   
   ## some other stats, and to include event==0 individuals:
-  if(!all(unique(all_event_dt$event==0))){
+  # allow abesence of HES data , sr/death does not have epidur
+  if(!all(unique(all_event_dt$event==0)) & !all(is.na(all_event_dt$epidur))){
     stats <- suppressWarnings( all_event_dt[, .(count = .N,sum.epidur= sum(epidur,na.rm = T),median.epidur= median(epidur,na.rm = T),max.epidur= max(epidur,na.rm=T)), by = f.eid] )
     stats[is.infinite(stats$max.epidur),]$max.epidur <-NA
   } else{
@@ -339,4 +340,48 @@ get_cases_controls <- function (definitions,
               all_event_dt.Include_in_cases=all_event_dt.Include_in_cases,
               all_event_dt.Include_in_cases.summary=all_event_dt.Include_in_cases.summary)
   )
+}
+
+
+get_survival_data<-function(def,lst.data,
+                             lst.data.settings,
+                             include_secondary_recurrence=FALSE,
+                             window_days_mask=0){
+  # subset lst.data to get only death records
+  lst.data.death<-lst.data[grep("death", names(lst.data))]  
+
+  death_event_dt<-get_all_events(def,lst.data.death,lst.data.settings) 
+
+  # check consistency in the records w.r.t date
+  discrepant_deaths<-death_event_dt%>%  group_by(f.eid) %>% summarize(max_date = max(eventdate, na.rm = TRUE),min_date = min(eventdate),same_date=(max_date==min_date))%>% filter(!same_date)
+  
+  if (nrow(discrepant_deaths)>0){
+    message(glue::glue("Number of individuals have inconsistent death dates: {nrow(discrepant_deaths))}"))
+    print(discrepant_deaths)
+    
+    # drop these individuals?
+    lst.data.death$tte.death.icd10.primary<-lst.data.death$tte.death.icd10.primary[! lst.data.death$tte.death.icd10.primary$f.eid %in% discrepant_deaths$f.eid,]
+    lst.data.death$tte.death.icd10.secondary<-lst.data.death$tte.death.icd10.secondary[! lst.data.death$tte.death.icd10.secondary$f.eid %in% discrepant_deaths$f.eid,]
+  }
+  
+  # reference date is the first event date excluding the death records  
+  # SHOULD one take everything instead because that does reflect a survival event t=0 day....?
+  # lst.data_nondeath<-lst.data[grep("death", names(lst.data),invert=TRUE)]  
+  # all_evt_dt <- get_all_events(def,lst.data_nondeath,lst.data.settings) 
+  # 
+  all_evt_dt <- get_all_events(def,lst.data,lst.data.settings)
+  
+  df_referencedate <- all_evt_dt[,.(reference_date= min(eventdate,na.rm = T)),by=f.eid]
+
+  death_event_dt.summary<-get_incidence_prevalence(death_event_dt,lst.data.settings,reference_date=setNames(df_referencedate$reference_date,df_referencedate$f.eid), include_secondary_recurrence,0, window_days_mask)
+  # fu_days_mask masks FU event but not day==0 which is considered as Hx so apply the mask on the df 
+
+  # make the table cleaner  
+  death_event_dt.summary<-death_event_dt.summary %>% select(f.eid,first_diagnosis_days,reference_date,Any )
+  names(death_event_dt.summary) <-  c("f.eid",	"days_after_diagnosis",	"reference_date",	"Any")
+  
+  death_event_dt.summary[death_event_dt.summary$days_after_diagnosis<window_days_mask ,"days_after_diagnosis"] <- NA
+  
+  return(death_event_dt.summary)
+  
 }
