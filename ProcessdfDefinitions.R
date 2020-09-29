@@ -455,8 +455,8 @@ expand_dfDefinitions_processed2 <-
           ignore.case = unique(lst.data.settings[lst.data.settings$classification %in% cls, 'ignore.case'])[1]
           Str_expanded <- paste(unique(unlist(
             lapply(VctStr,  function(x)
-              lst.codemap$READ2_drugs$read_code [grep(paste("^", x, sep = ""),
-                                                      lst.codemap$READ2_drugs$read_code  ,
+              lst.codemap$READ2_drugs$read_2 [grep(paste("^", x, sep = ""),
+                                                      lst.codemap$READ2_drugs$read_2  ,
                                                       ignore.case = ignore.case)])
           )), collapse = ",")
           dfDefinitions_processed[r, cls] <- Str_expanded

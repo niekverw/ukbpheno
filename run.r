@@ -151,19 +151,26 @@ lst.codemap$ICD9<- fread(paste(code_map_dir,"ICD9.coding87.tsv",sep=""))
 lst.codemap$ICD10<-fread(paste(code_map_dir,"ICD10.coding19.tsv",sep=""))
 lst.codemap$OPCS3<-fread(paste(code_map_dir,"OPCS3.coding259.tsv",sep=""))
 lst.codemap$OPCS4<-fread(paste(code_map_dir,"OPCS4.coding240.tsv",sep=""))
-fcoding.xls<- paste(code_map_dir,"all_lkps_maps.xlsx",sep="")
-lst.codemap$READ2_drugs<- as.data.frame(read_xlsx(fcoding.xls,sheet="read_v2_drugs_lkp"))
+# fcoding.xls<- paste(code_map_dir,"all_lkps_maps.xlsx",sep="")
+# lst.codemap$READ2_drugs<- as.data.frame(read_xlsx(fcoding.xls,sheet="read_v2_drugs_lkp"))
 # ctv3 readv2 big list uncomment if decide to expnad ctv3 code
 # lst.codemap$read_ctv3_readv2 <- as.data.frame(read_xlsx(fcoding.xls,sheet="read_ctv3_read_v2"))[,c(1,5)]
-tic()
-test_expandDef<-expand_dfDefinitions_processed2(dfDefinitions_processed,lst.data.settings,lst.codemap) #
-toc() 
-#4.949 sec elapsed with grep read2_drugs
-#1.231 sec elapsed without 
-# orginal codes in definition table : f1,f2,x006f
-length (unlist(strsplit(test_expandDef$READ2_drugs[4], ","))) #267 from 2 codes f1,f2
-# are most of the expanded codes used? 
 
+# ############ to read from the codes present in all records instead ################
+## it is 20-40% of the whole set
+lst.codemap$READ2_drugs<-fread(paste(code_map_dir, "gpscript.read2.code",sep=""))
+View(lst.codemap$READ2_drugs)
+# lst.codemap$READ2<-fread(paste(code_map_dir, "gpclinical.read2.code",sep=""))
+# lst.codemap$CTV3<-fread(paste(code_map_dir, "gpclinical.read3.code",sep=""))
+# lst.codemap$DMD<-fread(paste(code_map_dir, "gpscript.dmd.code",sep=""))
+# lst.codemap$BNF<-fread(paste(code_map_dir, "gpscript.bnf.code",sep=""))
+tic()
+test_expandDef<-expand_dfDefinitions_processed2(dfDefinitions_processed,lst.data.settings,lst.codemap) 
+toc() 
+#4.949 sec elapsed with grep read2_drugs     # 2.699  taking only codes that exists in data
+#1.231 sec elapsed without 
+# orginal codes in definition table : f1,f2,x006f  (insulin)
+length (unlist(strsplit(test_expandDef$READ2_drugs[4], ","))) #267 from 2 codes f1,f2 # 190taking only codes that exists in data
 
 
 ##########################################
