@@ -135,14 +135,19 @@ get_incidence_prevalence <- function(all_event_dt,
   
   df <- merge(all_event_dt,df_referencedate,by = 'f.eid') %>% arrange(eventdate) %>% as.data.table()
   # df <- df %>% filter(!is.na(reference_date)) # comment out if missing f.eids is fixed. 
-
   df$days <- df$eventdate - df$reference_date
   setkey(df,days) # i don't know why, but setkey was alreaday on f.eid and cannot refresh..
   setkey(df,f.eid)
+  
+  ### flag primary death records
+  df$death.primary<-ifelse((df$.id %in% lst.data.settings[lst.data.settings$death,]$datasource)&(lst.data.settings[match(df$.id ,lst.data.settings$datasource),]$diagnosis==1),1,0)
+  ### flag secondary death records
+  df$death.secondary<-ifelse((df$.id %in% lst.data.settings[lst.data.settings$death,]$datasource)&(lst.data.settings[match(df$.id ,lst.data.settings$datasource),]$diagnosis==2),1,0)
 
   ### History
   dfHx <- df[days<=0]
-  Hx_days <- suppressWarnings( dfHx[event>0][, .(Hx_days=min(days,na.rm=T) ), keyby=list(f.eid)] )
+  # if death record is the only record , they will appear here Hx=0
+  Hx_days <- suppressWarnings(unique(dfHx[event>0][, .(Hx_days=min(days,na.rm=T) ,death.primary,death.secondary), keyby=list(f.eid)] ))
   dfHx[,Hx:=2]
   
   ### Future
@@ -151,7 +156,8 @@ get_incidence_prevalence <- function(all_event_dt,
                (days>(0+window_fu_days_mask) & event==1 & (f.eid %in% dfHx$Hx) & .id %in% sources_recurrence_events ) |
                (days>(0+window_fu_days_mask) & event==2  & (!f.eid %in% dfHx$Hx)) ]
   dfFu[,Fu:=2] #unique(dfFu$f.eid)
-  Fu_days <- suppressWarnings( dfFu[,.(Fu_days= min(days,na.rm=T) ), keyby=list(f.eid)] )
+  # records if death succeed an diagnosis 
+  Fu_days <- suppressWarnings( unique(dfFu[,.(Fu_days= min(days,na.rm=T),death.primary,death.secondary ), keyby=list(f.eid)] ))
   ### age of diagnosis
   #system.time({ df %>% filter(event>0) %>% group_by(f.eid) %>% summarise(first_diagnosis_days=min(days)) }) # <- slow.. 
   #system.time({ df[df$event>0][,.(first_diagnosis_days=min(days,na.rm=T) ), by=f.eid] }) # <- fast..
@@ -192,8 +198,6 @@ get_incidence_prevalence <- function(all_event_dt,
   #                                                                      stats)
   # )
   # View(test)
-  
-  
   all_event_dt.summary <- Reduce(function(...) merge(..., all = TRUE,by='f.eid'), list( 
       stats,
       Hx_days,
@@ -202,6 +206,15 @@ get_incidence_prevalence <- function(all_event_dt,
       unique(dfFu[,c("f.eid","Fu")]),
       unique(dfRef[,c("f.eid","Ref")])
   ))
+  
+  # combine the values from 2 columns and keep 1
+  all_event_dt.summary$death.primary.x<-fcoalesce(all_event_dt.summary$death.primary.x,all_event_dt.summary$death.primary.y)
+  all_event_dt.summary$death.secondary.x<-fcoalesce(all_event_dt.summary$death.secondary.x,all_event_dt.summary$death.secondary.y)
+  all_event_dt.summary<-all_event_dt.summary %>% select(f.eid, count ,sum.epidur, median.epidur, max.epidur,Hx_days,Fu_days, death.primary.x, death.secondary.x,Hx, Fu, Ref) 
+  names(all_event_dt.summary)<- c("f.eid", "count" ,"sum.epidur", "median.epidur", "max.epidur","Hx_days","Fu_days", "death.primary", "death.secondary","Hx", "Fu", "Ref")
+  # NA are not true event (=1) records , which are not death records
+  set(all_event_dt.summary,which(is.na(all_event_dt.summary$death.primary)),"death.primary",0)
+  set(all_event_dt.summary,which(is.na(all_event_dt.summary$death.secondary)),"death.secondary",0)
 
   all_event_dt.summary$first_diagnosis_days <- pmin(all_event_dt.summary$Hx_days,all_event_dt.summary$Fu_days,na.rm = T)  
   all_event_dt.summary[ Hx==2 & is.na(Hx_days),'first_diagnosis_days'] <- NA
@@ -348,8 +361,8 @@ get_survival_data<-function(def,lst.data,
                              include_secondary_recurrence=FALSE,
                              window_days_mask=0){
   # subset lst.data to get only death records
-  lst.data.death<-lst.data[grep("death", names(lst.data))]  
-
+  # lst.data.death<-lst.data[grep("death", names(lst.data))]  
+  lst.data.death<-lst.data[lst.data.settings[match(names(lst.data),lst.data.settings$datasource),]$death]
   death_event_dt<-get_all_events(def,lst.data.death,lst.data.settings) 
 
   # check consistency in the records w.r.t date
@@ -366,7 +379,7 @@ get_survival_data<-function(def,lst.data,
   
   # reference date is the first event date excluding the death records  
   # SHOULD one take everything instead because that does reflect a survival event t=0 day....?
-  # lst.data_nondeath<-lst.data[grep("death", names(lst.data),invert=TRUE)]  
+  # lst.data_nondeath<-lst.data[!lst.data.settings[match(names(lst.data),lst.data.settings$datasource),]$death] 
   # all_evt_dt <- get_all_events(def,lst.data_nondeath,lst.data.settings) 
   # 
   all_evt_dt <- get_all_events(def,lst.data,lst.data.settings)

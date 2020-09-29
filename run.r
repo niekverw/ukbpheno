@@ -112,28 +112,29 @@ toc() #  1111.306 sec elapsed, 18min.
 
 # load lst.data.settings
 lst.data.settings <- data.frame(fread("
-    datasource classification  datatype  expand_codes  diagnosis ignore.case
-    tte.sr.20002  f.20002 numeric 0 1 FALSE
-    tte.sr.20001  f.20001 numeric 0 1 FALSE
-    tte.sr.20004  f.20004 numeric 0 1 FALSE
-    sr.20003  f.20003 numeric 0 1 FALSE
-    tte.death.icd10.primary ICD10 character 1 1 TRUE
-    tte.death.icd10.secondary ICD10 character 1 2 TRUE
-    tte.hesin.oper3.primary OPCS3 character 1 1 TRUE
-    tte.hesin.oper3.secondary OPCS3 character 1 2 TRUE
-    tte.hesin.oper4.primary OPCS4 character 1 1 TRUE
-    tte.hesin.oper4.secondary OPCS4 character 1 2 TRUE
-    tte.hesin.icd10.primary ICD10 character 1 1 TRUE
-    tte.hesin.icd10.secondary ICD10 character 1 2 TRUE
-    tte.hesin.icd9.primary  ICD9  character 1 1 TRUE
-    tte.hesin.icd9.secondary  ICD9  character 1 2 TRUE
-    tte.gpclincal.read2 READ2  character 0 2 FALSE
-    tte.gpclincal.read3 CTV3  character 0 2 FALSE
-    tte.gpscript.dmd.england  DMD character 0 2 FALSE
-    tte.gpscript.bnf.england  BNF character 0 2 FALSE
-    tte.gpscript.bnf.scotland BNF character 0 2 FALSE
-    tte.gpscript.read2.wales  READ2_drugs  character 1 2 FALSE
-    ts  TS  character 0 1 TRUE"))
+datasource	classification	datatype	expand_codes	diagnosis	ignore.case	death
+tte.sr.20002	f.20002	numeric	0	1	FALSE	FALSE
+tte.sr.20001	f.20001	numeric	0	1	FALSE	FALSE
+tte.sr.20004	f.20004	numeric	0	1	FALSE	FALSE
+sr.20003	f.20003	numeric	0	1	FALSE	FALSE
+tte.death.icd10.primary	ICD10	character	1	1	TRUE	TRUE
+tte.death.icd10.secondary	ICD10	character	1	2	TRUE	TRUE
+tte.hesin.oper3.primary	OPCS3	character	1	1	TRUE	FALSE
+tte.hesin.oper3.secondary	OPCS3	character	1	2	TRUE	FALSE
+tte.hesin.oper4.primary	OPCS4	character	1	1	TRUE	FALSE
+tte.hesin.oper4.secondary	OPCS4	character	1	2	TRUE	FALSE
+tte.hesin.icd10.primary	ICD10	character	1	1	TRUE	FALSE
+tte.hesin.icd10.secondary	ICD10	character	1	2	TRUE	FALSE
+tte.hesin.icd9.primary	ICD9	character	1	1	TRUE	FALSE
+tte.hesin.icd9.secondary	ICD9	character	1	2	TRUE	FALSE
+tte.gpclincal.read2	READ2	character	0	2	FALSE	FALSE
+tte.gpclincal.read3	CTV3	character	0	2	FALSE	FALSE
+tte.gpscript.dmd.england	DMD	character	0	2	FALSE	FALSE
+tte.gpscript.bnf.england	BNF	character	0	2	FALSE	FALSE
+tte.gpscript.bnf.scotland	BNF	character	0	2	FALSE	FALSE
+tte.gpscript.read2.wales	READ2_drugs	character	1	2	FALSE	FALSE
+ts	TS	character	0	1	TRUE	FALSE
+"))
 
 # generate meta data dynamically,  returns a list with the number of rows per code based on lst.data.settings
 lst.counts <- get_lst_counts(lst.data,lst.data.settings = lst.data.settings)
@@ -176,16 +177,9 @@ all_event_dt <- get_all_events(dfDefinitions_processed_expanded[14,],lst.data,ls
 # all_event_dt <- get_all_events(dfDefinitions_processed_expanded[8,],lst.data)  #DmT2
 # all_event_dt <- get_all_events(dfDefinitions_processed_expanded[17,],lst.data)  #Ht #all collapsed to 1 datatable
 # all_event_dt <- get_all_events(dfDefinitions_processed_expanded[9,],lst.data)  #DmT2
+# all_event_dt <- get_all_events(dfDefinitions_processed_expanded[21,],lst.data,lst.data.settings)   #Pad
+# all_event_dt <- get_all_events(dfDefinitions_processed_expanded[22,],lst.data,lst.data.settings)  #NCad
 
-
-
-#########################################################################################
-# TODO: Add output for death (primary and primary+secondary) in get_incidence_prevalence() )
-
-death_event_dt.summary<- get_survival_data(dfDefinitions_processed_expanded[14,],lst.data,lst.data.settings) #1559
-death_event_dt.summary<- get_survival_data(dfDefinitions_processed_expanded[14,],lst.data,lst.data.settings,window_days_mask = 5)
-
-#########################################################################################
 
 
 all_event_dt.stats <- get_stats_for_events(all_event_dt) #should generate several plots
@@ -198,7 +192,14 @@ all_event_dt.stats$stats.codes.cooccur.filtered.p.heat
 all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,lst.data.settings, reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
 View(all_event_dt.summary %>% filter(is.na(Hx) & is.na(Fu)))
 
+#########################################################################################
+# TODO: Add output for death (primary and primary+secondary) in get_incidence_prevalence() )
+all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,lst.data.settings, reference_date = NULL)
+head(all_event_dt.summary)
+# death_event_dt.summary<- get_survival_data(dfDefinitions_processed_expanded[14,],lst.data,lst.data.settings) #1559
+# death_event_dt.summary<- get_survival_data(dfDefinitions_processed_expanded[14,],lst.data,lst.data.settings,window_days_mask = 5)
 
+#########################################################################################
 
 # get occcurence  from first event and recurrence of primary events: 
 all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,lst.data.settings,reference_date = NULL,window_fu_days_mask = 15)
