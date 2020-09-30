@@ -435,28 +435,38 @@ add_child_nodes <-function(dfcode,codeVct){
 
 expand_dfDefinitions_processed2 <-
   function(dfDefinitions_processed,
-           lst.data.settings,lst.codemap) {
-    icd9 <-
-      fread(fdefinitions, colClasses = 'character', data.table = FALSE)
+           lst.data.settings) {
+    message("Expand the codes in definition tables")
+    
     classifications <-
       lst.data.settings %>% filter(expand_codes == 1) %>% pull (classification) %>% unique()
+    
+    lst.codemap<-list()
+    
     for (cls in classifications) {
+      
+      fmap=paste(unique(code_map_dir,lst.data.settings[lst.data.settings$classification==cls,]$code_map),sep="")
+      message(glue::glue("Read from codings for {cls} from {fmap}"))
+      
+      lst.codemap[[cls]]<-fread(fmap)
+      
       for (r in 1:nrow(dfDefinitions_processed)) {
         # for loops just as fast as apply in this case..
         VctStr = unlist(strsplit(dfDefinitions_processed[r, cls], ","))
-        
-        if (cls != "READ2_drugs") {
+
+        #if code map is hierarchical, traverse the tree to get child codes
+        if ( unique(lst.data.settings[lst.data.settings$classification==cls,]$hierarchical_map)) {
           # get all nodes down from codemap
           Str_expanded <-
             paste(add_child_nodes(lst.codemap[[cls]], VctStr), collapse = ",")
           dfDefinitions_processed[r, cls] <- Str_expanded
         } else{
-          #grep READ2_drugs table
+          # otherwise grep patterns (codes) that starts with the input code
           ignore.case = unique(lst.data.settings[lst.data.settings$classification %in% cls, 'ignore.case'])[1]
           Str_expanded <- paste(unique(unlist(
             lapply(VctStr,  function(x)
-              lst.codemap$READ2_drugs$read_2 [grep(paste("^", x, sep = ""),
-                                                      lst.codemap$READ2_drugs$read_2  ,
+              lst.codemap[[cls]]$code [grep(paste("^", x, sep = ""),
+                                                      lst.codemap[[cls]]$code  ,
                                                       ignore.case = ignore.case)])
           )), collapse = ",")
           dfDefinitions_processed[r, cls] <- Str_expanded

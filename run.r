@@ -41,12 +41,13 @@ fhesin_diag=paste(pheno_dir,"hesin_diag.txt",sep="")
 fhesin_oper=paste(pheno_dir,"hesin_oper.txt",sep="")
 fgp_clinical =paste(pheno_dir,"gp_clinical.txt",sep="")
 # fgp_scripts =paste(pheno_dir,"gp_scripts.txt",sep="")  
-fdefinitions = paste(repo_dir,"definitions.tsv",sep="")
 fdeath_portal=paste(pheno_dir,"death.txt",sep="")
 fdeath_cause_portal=paste(pheno_dir,"death_cause.txt",sep="")
 # output file:
 fukbphenodata <- paste(pheno_dir,"ukbphenodata.Rdata",sep="") #where to store final object
-
+fdefinitions = paste(repo_dir,"definitions.tsv",sep="")
+fdata_setting = paste(repo_dir,"data.settings.tsv",sep="")
+code_map_dir<-paste(repo_dir,"data/",sep="")
 ##########################################
 # read definitions. 
 dfDefinitions <- fread(fdefinitions, colClasses = 'character', data.table = FALSE)
@@ -111,30 +112,31 @@ lst.data <- lapply(lst.data,function(x) {x[,'eventdate'] <-  round(x$eventdate);
 toc() #  1111.306 sec elapsed, 18min. 
 
 # load lst.data.settings
-lst.data.settings <- data.frame(fread("
-datasource	classification	datatype	expand_codes	diagnosis	ignore.case	death
-tte.sr.20002	f.20002	numeric	0	1	FALSE	FALSE
-tte.sr.20001	f.20001	numeric	0	1	FALSE	FALSE
-tte.sr.20004	f.20004	numeric	0	1	FALSE	FALSE
-sr.20003	f.20003	numeric	0	1	FALSE	FALSE
-tte.death.icd10.primary	ICD10	character	1	1	TRUE	TRUE
-tte.death.icd10.secondary	ICD10	character	1	2	TRUE	TRUE
-tte.hesin.oper3.primary	OPCS3	character	1	1	TRUE	FALSE
-tte.hesin.oper3.secondary	OPCS3	character	1	2	TRUE	FALSE
-tte.hesin.oper4.primary	OPCS4	character	1	1	TRUE	FALSE
-tte.hesin.oper4.secondary	OPCS4	character	1	2	TRUE	FALSE
-tte.hesin.icd10.primary	ICD10	character	1	1	TRUE	FALSE
-tte.hesin.icd10.secondary	ICD10	character	1	2	TRUE	FALSE
-tte.hesin.icd9.primary	ICD9	character	1	1	TRUE	FALSE
-tte.hesin.icd9.secondary	ICD9	character	1	2	TRUE	FALSE
-tte.gpclincal.read2	READ2	character	0	2	FALSE	FALSE
-tte.gpclincal.read3	CTV3	character	0	2	FALSE	FALSE
-tte.gpscript.dmd.england	DMD	character	0	2	FALSE	FALSE
-tte.gpscript.bnf.england	BNF	character	0	2	FALSE	FALSE
-tte.gpscript.bnf.scotland	BNF	character	0	2	FALSE	FALSE
-tte.gpscript.read2.wales	READ2_drugs	character	1	2	FALSE	FALSE
-ts	TS	character	0	1	TRUE	FALSE
-"))
+# lst.data.settings <- data.frame(fread("
+# datasource	classification	datatype	expand_codes	diagnosis	ignore.case	death  code_map  hierarchical_map
+# tte.sr.20002	f.20002	numeric	0	1	FALSE	FALSE  20002.coding6.tsv  TRUE
+# tte.sr.20001	f.20001	numeric	0	1	FALSE	FALSE  20001.coding3.tsv  TRUE
+# tte.sr.20004	f.20004	numeric	0	1	FALSE	FALSE  20004.coding5.tsv  TRUE
+# sr.20003	f.20003	numeric	0	1	FALSE	FALSE  20003.coding4.tsv  FALSE
+# tte.death.icd10.primary	ICD10	character	1	1	TRUE	TRUE  ICD10.coding19.tsv  TRUE
+# tte.death.icd10.secondary	ICD10	character	1	2	TRUE	TRUE  ICD10.coding19.tsv  TRUE
+# tte.hesin.oper3.primary	OPCS3	character	1	1	TRUE	FALSE  OPCS3.coding259.tsv  TRUE
+# tte.hesin.oper3.secondary	OPCS3	character	1	2	TRUE	FALSE  OPCS3.coding259.tsv  TRUE
+# tte.hesin.oper4.primary	OPCS4	character	1	1	TRUE	FALSE  OPCS4.coding240  TRUE
+# tte.hesin.oper4.secondary	OPCS4	character	1	2	TRUE	FALSE  OPCS4.coding240  TRUE
+# tte.hesin.icd10.primary	ICD10	character	1	1	TRUE	FALSE  ICD10.coding19.tsv  TRUE
+# tte.hesin.icd10.secondary	ICD10	character	1	2	TRUE	FALSE  ICD10.coding19.tsv  TRUE
+# tte.hesin.icd9.primary	ICD9	character	1	1	TRUE	FALSE  ICD9.coding87.tsv  TRUE
+# tte.hesin.icd9.secondary	ICD9	character	1	2	TRUE	FALSE  ICD9.coding87.tsv  TRUE
+# tte.gpclincal.read2	READ2	character	0	2	FALSE	FALSE  gpclinical.read2.code  FALSE
+# tte.gpclincal.read3	CTV3	character	0	2	FALSE	FALSE  gpclinical.read3.code  FALSE
+# tte.gpscript.dmd.england	DMD	character	0	2	FALSE	FALSE  gpscript.dmd.code  FALSE
+# tte.gpscript.bnf.england	BNF	character	0	2	FALSE	FALSE  gpscript.bnf.code  FALSE
+# tte.gpscript.bnf.scotland	BNF	character	0	2	FALSE	FALSE  gpscript.bnf.code  FALSE
+# tte.gpscript.read2.wales	READ2_drugs	character	1	2	FALSE	FALSE  gpscript.read2.code  FALSE
+# ts	TS	character	0	1	TRUE	FALSE  NA  NA
+# "))
+lst.data.settings <-fread(fdata_setting)
 
 # generate meta data dynamically,  returns a list with the number of rows per code based on lst.data.settings
 lst.counts <- get_lst_counts(lst.data,lst.data.settings = lst.data.settings)
@@ -143,29 +145,9 @@ lst.identifiers <- as.character(dfukb$f.eid)
 save(dfhtml,dfukb,lst.data,lst.data.settings,lst.counts,file=fukbphenodata)
 # load(fukbphenodata)
 
-####################################################################################################
-code_map_dir<-paste(repo_dir,"data/",sep="")
-#  READ CODEs table is not organized in tree structure
-lst.codemap<-list()
-lst.codemap$ICD9<- fread(paste(code_map_dir,"ICD9.coding87.tsv",sep=""))
-lst.codemap$ICD10<-fread(paste(code_map_dir,"ICD10.coding19.tsv",sep=""))
-lst.codemap$OPCS3<-fread(paste(code_map_dir,"OPCS3.coding259.tsv",sep=""))
-lst.codemap$OPCS4<-fread(paste(code_map_dir,"OPCS4.coding240.tsv",sep=""))
-# fcoding.xls<- paste(code_map_dir,"all_lkps_maps.xlsx",sep="")
-# lst.codemap$READ2_drugs<- as.data.frame(read_xlsx(fcoding.xls,sheet="read_v2_drugs_lkp"))
-# ctv3 readv2 big list uncomment if decide to expnad ctv3 code
-# lst.codemap$read_ctv3_readv2 <- as.data.frame(read_xlsx(fcoding.xls,sheet="read_ctv3_read_v2"))[,c(1,5)]
 
-# ############ to read from the codes present in all records instead ################
-## it is 20-40% of the whole set
-lst.codemap$READ2_drugs<-fread(paste(code_map_dir, "gpscript.read2.code",sep=""))
-View(lst.codemap$READ2_drugs)
-# lst.codemap$READ2<-fread(paste(code_map_dir, "gpclinical.read2.code",sep=""))
-# lst.codemap$CTV3<-fread(paste(code_map_dir, "gpclinical.read3.code",sep=""))
-# lst.codemap$DMD<-fread(paste(code_map_dir, "gpscript.dmd.code",sep=""))
-# lst.codemap$BNF<-fread(paste(code_map_dir, "gpscript.bnf.code",sep=""))
 tic()
-test_expandDef<-expand_dfDefinitions_processed2(dfDefinitions_processed,lst.data.settings,lst.codemap) 
+test_expandDef<-expand_dfDefinitions_processed2(dfDefinitions_processed,lst.data.settings) 
 toc() 
 #4.949 sec elapsed with grep read2_drugs     # 2.699  taking only codes that exists in data
 #1.231 sec elapsed without 
