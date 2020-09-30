@@ -436,7 +436,7 @@ add_child_nodes <-function(dfcode,codeVct){
 expand_dfDefinitions_processed2 <-
   function(dfDefinitions_processed,
            lst.data.settings) {
-    message("Expand the codes in definition tables")
+    message("Expand the codes in the definition table")
     
     classifications <-
       lst.data.settings %>% filter(expand_codes == 1) %>% pull (classification) %>% unique()
@@ -445,7 +445,7 @@ expand_dfDefinitions_processed2 <-
     
     for (cls in classifications) {
       
-      fmap=paste(unique(code_map_dir,lst.data.settings[lst.data.settings$classification==cls,]$code_map),sep="")
+      fmap=paste(code_map_dir,unique(lst.data.settings[lst.data.settings$classification==cls,]$code_map),sep="")
       message(glue::glue("Read from codings for {cls} from {fmap}"))
       
       lst.codemap[[cls]]<-fread(fmap)
