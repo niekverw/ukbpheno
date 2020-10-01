@@ -1,10 +1,25 @@
+
+#' Change factors to strings in a dataframe and assign NA to empty cells
+#'
+#' This function takes data fields containing illness codes/time of diagnosis distributed in multiple with each row representing one individual. It processed the data and return in episodes of event for all individuals
+#' @param df dataframe containing the fields
+#' @return  a data.table object with all episodes
+#' @keywords auxiliary
 #' @export
+#' @examples
+#' ConvertFactorsToStringReplaceNAInDf(data.frame("a" = c(1,2,3),"p" = c("t","b",""),"y" = c(NA,"w","r")))
 ConvertFactorsToStringReplaceNAInDf<-function (df) {
   df <- data.frame(lapply(df, as.character), stringsAsFactors=FALSE) ## CHANGE Factors to strings; everything is now a string.
   df[df==""]  <- NA ### REPLACE EMPTY WITH NA.
   return(df)
 }
 
+
+#' Custom paste function with formatting step to remove redundant spaces
+#'
+#' This function is used for formatting the character vectors
+#' @return  formatted object
+#' @keywords auxiliary
 #' @export
 pasteRemoveNA <- function(..., sep = " ", collapse = NULL, na.rm = F) {
   if (na.rm == F)
@@ -28,14 +43,27 @@ pasteRemoveNA <- function(..., sep = " ", collapse = NULL, na.rm = F) {
     }
 }
 
+#' Check if there is duplicates entries of phenotypes/traits in definition tables
+#'
+#' This function verify traits are uniquely defined and stop execution otherwise.
+#' @keywords auxiliary
 #' @export
 CheckDuplicateTRAITS<-function(df){
   if(length(unique(duplicated(df["TRAIT"])))>1){stop("TRAIT column contains duplicate ID's")}
 }
 
 
-
+#' Preprocess the definition table
+#'
+#' This function preprocess definition table - formatting and remove extra characters as well as additional description following column names (in brackets)
+#' @param df definitiion table as dataframe
+#' @param VctAllColumns character vector containing all column names of interest (as shown in table) where preprocessing is performed
+#' @param VctColstoupper character vector containing all column names without brackets for which the characters in columns will be converted to uppercase.
+#' @return  df
+#' @keywords definition
 #' @export
+#' @examples
+#' PreProcessDfDefinitions(df,c("TS(Touchscreen)","ICD10", "ICD9", "OPCS4","OPCS3","READ2","READ2_drugs", "CTV3","BNF","DMD","f.20001(sr_cancer)", "f.20002(sr_noncancer)", "f.20003(sr_med)", "f.20004(sr_oper)"),c("ICD10","ICD9","OPCS4","OPCS3"))
 PreProcessDfDefinitions<-function(df,VctAllColumns,VctColstoupper=NULL ){ # c("ICD10","ICD9","OPCS4","OPCS3")
 ## df<-dfDefinitions
   # check if nrows==1
@@ -46,7 +74,7 @@ PreProcessDfDefinitions<-function(df,VctAllColumns,VctColstoupper=NULL ){ # c("I
 
   ## for the names: remove everything between dots (R converts symbols to dots "(,.-)/" etc ) <- this is due to data.frame(check.names= TRUE) in ProcessDfDefinitions, set to FALSE
   # names(df) <- gsub( " *\\..*?\\. *", "", names(df) )
-  
+
   ## add missing columns
   df[, VctAllColumns[!VctAllColumns %in% colnames(df)]] <- NA
   ## remove everything between brackets
@@ -74,7 +102,7 @@ PreProcessDfDefinitions<-function(df,VctAllColumns,VctColstoupper=NULL ){ # c("I
     df[,VctColstoupper] <- apply(df[,VctColstoupper],2,toupper)
   }
 
-  
+
   df<-ConvertFactorsToStringReplaceNAInDf(df) #### CONVERT FACTOR TO STRING
 
   if(checkr==1){df<-df[1,]}
@@ -82,6 +110,7 @@ PreProcessDfDefinitions<-function(df,VctAllColumns,VctColstoupper=NULL ){ # c("I
 
   return(df)
 }
+
 
 #' @export
 FillInSRdefinitions<-function(df,Var="SR",cols=c("f.20001","f.20002","f.20004") ) {
@@ -130,7 +159,7 @@ CovertMednamesToUkbcoding<- function(StrRx){
   print("The following codes not found in UKB coding:")
   print(StrRxCodes_notInCode)
   StrRxCodes<-paste(StrRxCodes_inCode,collapse = ",")
-  
+
   # inCodeBool<-unlist(lapply(unlist(strsplit(StrRxCodes,",")),function(x) x %in% dfCodesheetREAD_SR.Coding$UKB.Coding)))
   return(StrRxCodes)
 }
@@ -155,35 +184,19 @@ ReduceRedundancyDf<- function(df){ ### NOT really nessesary
 
 
 
-# DfDefinitions<-read.table("/Users/niekverw/Downloads/ex",sep="\t",header=T)
-#columns<-c("ICD10","ICD9","OPCS4","OPCS3","TOUCHSCREEN","TS_AGE_DIAG_COLNAME","SELFREPORTED","MEDICATION","LAB")
-# print(dfDefinitions)
-#dfDefinitionstmp2<-ProcessDfDefinitions(dfDefinitions,columns)
-
 #' ProcessDfDefinitions
 #'
-#' Process definitions, for input
-#'
-#' @param dfDefinitions df
-#' @param VctAllColumns Vct
-#' @keywords ExtractVarsFromMasterSet CreateUKBiobankPhentoypes ProcessDfDefinitions
-#' @return None
-#'
-#' @examples
-#' #
-#' #This function processes an excel file with definitions and is automtically performed in CreateUKBiobankPhentoypes().
-#' #It can be usefull to run this function as a check prior to running CreateUKBiobankPhentoypes.
-#' #
-#' #VctAllColumns contains all column names of interest, so that it can ignore everything else.
-#' #20001, 20002 and 20004 go into SR
-#' #READ and 20003 is parsed into RX
-#' #
-#' #
-#' #
-#' VctAllColumns<-  c("TS", "SR", "TS_RX", "SR_RX", "LAB", "ICD10", "ICD9", "OPCS4","OPCS3", "TS_AGE_DIAG_COLNAME", "READ","CTV3","BNF","DMD", "n_20001",    "n_20002", "n_20003", "n_20004", "Include_definitions")
-#' ProcessDfDefinitions(dfDefinitions,VctAllColumns)
-#'
+#' This function processes a tsv file with definitions and is automtically performed in CreateUKBiobankPhentoypes().
+#' #It can be usefull to run this function as a check prior to running CreateUKBiobankPhentoypes
+#' @param df definition table as dataframe
+#' @param VctAllColumns character vector containing all column names of interest (as shown in table) where preprocessing is performed
+#' @param VctColstoupper character vector containing all column names without brackets for which the characters in columns will be converted to uppercase.
+#' @param fill_dependencies For composite traits whether to further process dependencies in Include_definitions/Exclude_from_cases/Study_population/Exclude_from_controls columns, default: TRUE
+#' @return  processed definitiion table as dataframe
+#' @keywords definition
 #' @export
+#' @examples
+#' dfDefinitions_processed <- ProcessDfDefinitions(fread("definitions.tsv", colClasses = 'character', data.table = FALSE))
 ProcessDfDefinitions<-function(df,
                                VctAllColumns=c("TS(Touchscreen)",
                                                "ICD10", "ICD9", "OPCS4","OPCS3",
@@ -193,19 +206,19 @@ ProcessDfDefinitions<-function(df,
                                                ),
                                VctColstoupper=c("ICD10","ICD9","OPCS4","OPCS3"),
                                fill_dependencies=T){
-  
+
   # df<- dfDefinitions  #  df<- dfDefinitions2
   df <- data.frame(df,check.names = FALSE)
   names(df) <- sub(pattern = "CODES",replacement = "",names(df) )
   names(df) <- sub(pattern = "_$",replacement = "",names(df) ) # "n_20002_" --> "n_20002"
-  # replace bracket with dot 
+  # replace bracket with dot
   # names(df) <- gsub( "([^.*])\\((.*)\\)", "\\1.\\2", names(df))
   # VctAllColumns <-   gsub( "([^.*])\\((.*)\\)", "\\1.\\2", VctAllColumns)
   # remove bracket and everything in it
   names(df) <- gsub( "\\(.*\\)", "", names(df))
   VctAllColumns <-   gsub( "\\(.*\\)", "", VctAllColumns)
   df <- PreProcessDfDefinitions(df,VctAllColumns,VctColstoupper=VctColstoupper)
-  
+
   if(any(!VctAllColumns %in% names(df))) print(paste("WARNING missing columns:", paste(VctAllColumns[!VctAllColumns %in% names(df)],collapse=", ")))
 
   #################################
@@ -224,33 +237,38 @@ ProcessDfDefinitions<-function(df,
   Study_population <- lookup.codes(df=df,lookupcolumn = "Study_population")
   Exclude_from_controls <- lookup.codes(df=df,lookupcolumn = "Exclude_from_controls")
 
-  
+
   dfDefinition <- rbind(Include_in_cases %>% mutate(Definitions="Include_in_cases"),
         Exclude_from_cases %>% mutate(Definitions="Exclude_from_cases"),
         Study_population %>% mutate(Definitions="Study_population"),
         Exclude_from_controls %>% mutate(Definitions="Exclude_from_controls")
         )
-  
+
   dfDefinition <- ConvertFactorsToStringReplaceNAInDf(dfDefinition)
-  
-  ## other ways of storing: , I don't know what's best.   
-  #lst.dfs <- list(Include_in_cases=Include_in_cases,Exclude_from_cases=Exclude_from_cases,Study_population=Study_population,Exclude_from_controls=Exclude_from_controls) 
+
+  ## other ways of storing: , I don't know what's best.
+  #lst.dfs <- list(Include_in_cases=Include_in_cases,Exclude_from_cases=Exclude_from_cases,Study_population=Study_population,Exclude_from_controls=Exclude_from_controls)
   #lst.dfs <- lapply(lst.dfs,function(x) ConvertFactorsToStringReplaceNAInDf(x))
   #lst.lst <- convert_dataframelist_to_lst(lst.dfs)
   return(dfDefinition)
 }
 
-
-lookup.codes <- function(df=lst.dfs$Include_definitions,lookupcolumn="Exclude_from_cases"){
-  VctAllColumns=c("TS",
-                  "ICD10", "ICD9", "OPCS4","OPCS3",
-                  "READ2", "READ2_drugs","CTV3",
-                  "BNF","DMD",
-                  "f.20001",    "f.20002", "f.20003", "f.20004"
-  )
+#' Helper function to look up the dependencies
+#'
+#' This function is used for trait dependency lookup
+#' @param df definition table as dataframe
+#' @param VctAllColumns names of columns in which codes should be updated, default:c("TS","READ2", "READ2_drugs","CTV3","BNF","DMD","f.20001", "f.20002", "f.20003", "f.20004")
+#' @param lookupcolumn name of dependency column that needs lookup
+#' @return  a new dataframe containing definitions as the result of the lookup
+#' @keywords auxiliary
+#' @export
+lookup.codes <- function(df,VctAllColumns=c("TS","READ2", "READ2_drugs","CTV3","BNF","DMD","f.20001", "f.20002", "f.20003", "f.20004"),lookupcolumn="Exclude_from_cases"){
+  # copy the rows that needs to be looked up
   dfInEx<-df[!(df[[lookupcolumn]] == "" |is.na(df[[lookupcolumn]])),]
   print(paste(nrow(dfInEx),"traits with dependent trait in",lookupcolumn,sep=" "))
+  # update these columns
   dfInEx[,VctAllColumns]<-NA
+  # for each row , extract the codes from the definition table
   for(i in 1:nrow(dfInEx)) {
     def=unlist(strsplit(dfInEx[i,lookupcolumn],","))
     for(col in VctAllColumns){
@@ -262,7 +280,13 @@ lookup.codes <- function(df=lst.dfs$Include_definitions,lookupcolumn="Exclude_fr
   return(dfInEx)
 }
 
-
+#' Helper function to structure the processed definition
+#'
+#' This function is alternative way to store and output the definition table
+#' @param lst.dfs  a list of definition tables (in dataframes)
+#' @return  restructured list of definition tables organized by dependency status
+#' @keywords auxiliary
+#' @export
 convert_dataframelist_to_lst <- function(lst.dfs){
   defs <- list()
   for (t in lst.dfs$Include_in_cases$TRAIT){
@@ -279,20 +303,28 @@ convert_dataframelist_to_lst <- function(lst.dfs){
   return(defs)
 }
 
-
-parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE,VctAllColumns){ 
+#' Helper function to parse the trait dependencies
+#'
+#' Each composite trait with dependencies considered a tree as chain of dependency is possible. To parse and retrieve all codes needed, this function first searches for a leaf nodes and then add all codes of nodes along the way until root is reached; this operation is done recursively until all dependent codes are filled into the df
+#' @param df definition table as dataframe
+#' @param InExCol name of dependency column that needs lookup
+#' @param concat_to_df option to update the input df otherwise store the codes in a new df,default: TRUE
+#' @param VctAllColumns names of columns in which codes should be updated, default:c("TS","READ2", "READ2_drugs","CTV3","BNF","DMD","f.20001", "f.20002", "f.20003", "f.20004")
+#' @return  the original dataframe or a new dataframe with codes
+#' @keywords definition
+#' @export
+parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE,VctAllColumns=c("TS","READ2", "READ2_drugs","CTV3","BNF","DMD","f.20001", "f.20002", "f.20003", "f.20004")){
   # result dataframe with non-empty rows in the corresponding inclusion/exclusion criteria
   dfInEx<-df[!(df[[InExCol]] == "" |is.na(df[[InExCol]])),]
   print(paste(nrow(dfInEx),"traits with dependent trait in",InExCol,sep=" "))
   dfInEx[,VctAllColumns]<-NA
-  # each composite trait with dependencies is a tree as chain of dependency is possible
-  # recursively add all codes of nodes on the tree to its parent until root is reached 
+
   repeat {
     for(i in 1:nrow(df)) {
       row <- df[i,]
       # maybe this not needed but somehow stuck once in a loop where !is.na(row[[InExCol]] ==TRUE && if( is.na(targetrow[InExCol])) ==FALSE (so the set to NA was never reached) ?????????
       if(df[i,InExCol]==""| is.na(df[i,InExCol])) {df[i,InExCol]<-NA}
-      
+
       # row
       if(!is.na(row[[InExCol]])){
         # parse the dependent traits
@@ -301,7 +333,7 @@ parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE,VctAllColumns)
         VctInEx<-  gsub(" ", "", VctInEx)
         # remove brackets if applicable
         VctInEx<- gsub( " *\\(.*?\\) *", "", VctInEx)
-        
+
         # for each trait in dependent traits
         for (StrInEx in VctInEx) {
           # break self-referencing loop
@@ -313,26 +345,26 @@ parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE,VctAllColumns)
           # print("is.na(targetrow[InExCol])")
           # print(is.na(targetrow[InExCol]))
           # if this target trait is a leaf in the tree  i.e itself contains no dependency, start attaching its code to its parent
-          
+
           if( is.na(targetrow[InExCol])){
-            # for each classification/data source, add the corresponding codes in the 
+            # for each classification/data source, add the corresponding codes in the
             for(col in VctAllColumns){
               Vctcol<-unique( unlist(strsplit( c(df[i,col],df[df$TRAIT==StrInEx,col]) ,",")) )
               if (concat_to_df==TRUE){
                   # if to concat codes to the input df
                   df[i,col]<-pasteRemoveNA(Vctcol ,collapse=",",na.rm=T)
                 } else{
-                  # else put in dfInEx 
+                  # else put in dfInEx
                   dfInEx[i,col]<-pasteRemoveNA(Vctcol ,collapse=",",na.rm=T)
                 }
             }
             # remove InExCol that was just filled in:
             #df[i,"InExCol"]<-gsub(paste(StrInclude_in_case,sep=""),"",df[i,"Include_definitions"],fixed=TRUE,ignore.case=FALSE)
-            # remove InExCol trait that was just filled in 
+            # remove InExCol trait that was just filled in
             LstTmpDependencies<- unlist(strsplit(VctInEx,","))
-            
+
             df[i,InExCol]<-paste( LstTmpDependencies [! LstTmpDependencies  %in%  StrInEx] ,sep="",collapse = ",")
-            
+
             df[i,InExCol]<-gsub("^,*|(?<=,),|,*$", "", df[i,InExCol], perl=T)
             if(df[i,InExCol]==""){df[i,InExCol]<-NA} ## if empty replace with NA
           }
@@ -346,8 +378,22 @@ parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE,VctAllColumns)
   }else{return (dfInEx)
     }
 }
+default_ukb_fields <- function(){
 
+  SRfieldnames<-c("20001","20002","20004","20003")
+  SRdatefieldnames <- c("20006","20008","20010")
+  Deathfieldnames <- c("40000","40001","40002")
+  Visitfieldnames <- c("53")
+  Birthfieldnames <- c("34","52")
+  c(SRfieldnames,SRdatefieldnames,Deathfieldnames,Visitfieldnames,Birthfieldnames)
 
+}
+#' Retrieve the required data fields in the ukb dataset *ukbxxxxx.tab* as stated in the definition table
+#'
+#' Survey the main dataset and collect all field names that will be used as specified in definition table. These include basic data fields specified in `default_ukb_fields()`, which can be updated accordingly, and the fields in touchscreen columns. **SHOULD throw error if certain required field is not present in master dataset?**
+#' @param dfDefinitions_processed definition table as dataframe
+#' @return  a list of character vectors named all_ukb_fields,nondefault_ukb_fields and default_ukb_fields
+#' @keywords definition
 #' @export
 get_allvarnames <- function(dfDefinitions_processed){
   #  dfDefinitions_processed
@@ -363,9 +409,9 @@ get_allvarnames <- function(dfDefinitions_processed){
 
   all_ukb_fields <- unique(c(defcols,default_ukb_fields()))
   all_ukb_fields<-gsub("[a-zA-Z]*?_","",all_ukb_fields)
-  nondefault_ukb_fields <- all_ukb_fields[!all_ukb_fields %in% default_ukb_fields() ] 
-  
-  
+  nondefault_ukb_fields <- all_ukb_fields[!all_ukb_fields %in% default_ukb_fields() ]
+
+
   return(
     list(all_ukb_fields=all_ukb_fields,
          nondefault_ukb_fields=nondefault_ukb_fields,
@@ -394,13 +440,13 @@ convert_readv2_to_ukbmedication<-function(Vctn_20003,Vctreadcodes){
 expand_dfDefinitions_processed <- function(dfDefinitions_processed,lst.data.settings,lst.counts){
   classifications <- lst.data.settings %>% filter(expand_codes==1) %>% pull (classification) %>% unique()
   for (c in classifications){
-    
-  for (r in 1:nrow(dfDefinitions_processed)){ # for loops just as fast as apply in this case.. 
 
-    VctStr = unlist(strsplit(dfDefinitions_processed[r,c],",")) 
+  for (r in 1:nrow(dfDefinitions_processed)){ # for loops just as fast as apply in this case..
+
+    VctStr = unlist(strsplit(dfDefinitions_processed[r,c],","))
     lookuptable = lst.counts[[c]]
     ignore.case = unique(lst.data.settings[lst.data.settings$classification %in% c,'ignore.case'])[1]
-    
+
     Str_expanded <- paste(unique(unlist(
       lapply(VctStr,  function(x)  lookuptable$code [ grep(paste("^", x,sep=""),lookuptable$code ,ignore.case=ignore.case )])
       )),collapse=",")
@@ -414,7 +460,7 @@ expand_dfDefinitions_processed <- function(dfDefinitions_processed,lst.data.sett
 
 #####################################################################################################
 add_child_nodes <-function(dfcode,codeVct){
-    resultCodeVct<- vector() 
+    resultCodeVct<- vector()
     currVct<-codeVct
     while (length(currVct)!=0){
       if (length(currVct)>0){
@@ -428,7 +474,7 @@ add_child_nodes <-function(dfcode,codeVct){
     # remove codes not selectable
     keep<-unlist(lapply(resultCodeVct, function(x) dfcode[dfcode$coding==x,]$selectable=="Y"))
     resultCodeVct<-resultCodeVct[keep]
-    return(resultCodeVct)    
+    return(resultCodeVct)
 }
 
 # paste(add_child_nodes(dfCodesheetIcd10,VctStr),collapse=",")
@@ -437,19 +483,19 @@ expand_dfDefinitions_processed2 <-
   function(dfDefinitions_processed,
            lst.data.settings) {
     message("Expand the codes in the definition table")
-    
+
     classifications <-
       lst.data.settings %>% filter(expand_codes == 1) %>% pull (classification) %>% unique()
-    
+
     lst.codemap<-list()
-    
+
     for (cls in classifications) {
-      
+
       fmap=paste(code_map_dir,unique(lst.data.settings[lst.data.settings$classification==cls,]$code_map),sep="")
       message(glue::glue("Read from codings for {cls} from {fmap}"))
-      
+
       lst.codemap[[cls]]<-fread(fmap)
-      
+
       for (r in 1:nrow(dfDefinitions_processed)) {
         # for loops just as fast as apply in this case..
         VctStr = unlist(strsplit(dfDefinitions_processed[r, cls], ","))
@@ -472,7 +518,7 @@ expand_dfDefinitions_processed2 <-
           dfDefinitions_processed[r, cls] <- Str_expanded
           # next
         }
-        
+
       }
     }
     return(dfDefinitions_processed)
