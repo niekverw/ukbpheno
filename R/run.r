@@ -62,9 +62,7 @@ tic("converting data")
 # ukb's .tab meta data
 dfhtml <- read_ukb_metadata(fhtml) # 9 columns in dfhtml: "field.number","field.count","field.showcase","field.html","field.tab","field.description","col.type","col.name","fread_column_type"
 # ukb's .tab file; extract only relevant fields
-dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions_processed) ## regarding downstream functions, what happens if å field is not present, will we get an error?
-# TODO maybe better to know before reading a large file - perform a checking in get_allvarnames()
-# dfDefinitions_ukb_fields$all_ukb_fields %in% dfhtml$field.tab
+dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions_processed,dfhtml) ## regarding downstream functions, what happens if å field is not present, will we get an error? YES a check now is performed in get_allvarnames()
 
 
 dfukb <- read_ukb_tabdata(fukbtab,dfhtml,fields_to_keep = dfDefinitions_ukb_fields$all_ukb_fields) # 439.52 sec

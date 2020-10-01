@@ -233,10 +233,9 @@ ProcessDfDefinitions<-function(df,
   # the CASE table will be concat to the main table because one will be counted if they have any of the codes ?
   df<-parseIncludeExcludeCol(df,"Include_definitions",concat_to_df = TRUE,VctAllColumns=VctAllColumns)
   Include_in_cases <- df[,c("TRAIT","DESCRIPTION",VctAllColumns)]
-  Exclude_from_cases <- lookup.codes(df=df,lookupcolumn = "Exclude_from_cases")
-  Study_population <- lookup.codes(df=df,lookupcolumn = "Study_population")
-  Exclude_from_controls <- lookup.codes(df=df,lookupcolumn = "Exclude_from_controls")
-
+  Exclude_from_cases <- lookup.codes(df=df,lookupcolumn = "Exclude_from_cases",VctAllColumns)
+  Study_population <- lookup.codes(df=df,lookupcolumn = "Study_population",VctAllColumns)
+  Exclude_from_controls <- lookup.codes(df=df,lookupcolumn = "Exclude_from_controls",VctAllColumns)
 
   dfDefinition <- rbind(Include_in_cases %>% mutate(Definitions="Include_in_cases"),
         Exclude_from_cases %>% mutate(Definitions="Exclude_from_cases"),
@@ -257,12 +256,12 @@ ProcessDfDefinitions<-function(df,
 #'
 #' This function is used for trait dependency lookup
 #' @param df definition table as dataframe
-#' @param VctAllColumns names of columns in which codes should be updated, default:c("TS","READ2", "READ2_drugs","CTV3","BNF","DMD","f.20001", "f.20002", "f.20003", "f.20004")
+#' @param VctAllColumns names of columns in which codes should be updated
 #' @param lookupcolumn name of dependency column that needs lookup
 #' @return  a new dataframe containing definitions as the result of the lookup
 #' @keywords auxiliary
 #' @export
-lookup.codes <- function(df,VctAllColumns=c("TS","READ2", "READ2_drugs","CTV3","BNF","DMD","f.20001", "f.20002", "f.20003", "f.20004"),lookupcolumn="Exclude_from_cases"){
+lookup.codes <- function(df,lookupcolumn="Exclude_from_cases",VctAllColumns){
   # copy the rows that needs to be looked up
   dfInEx<-df[!(df[[lookupcolumn]] == "" |is.na(df[[lookupcolumn]])),]
   print(paste(nrow(dfInEx),"traits with dependent trait in",lookupcolumn,sep=" "))
@@ -309,11 +308,11 @@ convert_dataframelist_to_lst <- function(lst.dfs){
 #' @param df definition table as dataframe
 #' @param InExCol name of dependency column that needs lookup
 #' @param concat_to_df option to update the input df otherwise store the codes in a new df,default: TRUE
-#' @param VctAllColumns names of columns in which codes should be updated, default:c("TS","READ2", "READ2_drugs","CTV3","BNF","DMD","f.20001", "f.20002", "f.20003", "f.20004")
+#' @param VctAllColumns names of columns in which codes should be updated
 #' @return  the original dataframe or a new dataframe with codes
 #' @keywords definition
 #' @export
-parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE,VctAllColumns=c("TS","READ2", "READ2_drugs","CTV3","BNF","DMD","f.20001", "f.20002", "f.20003", "f.20004")){
+parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE,VctAllColumns){
   # result dataframe with non-empty rows in the corresponding inclusion/exclusion criteria
   dfInEx<-df[!(df[[InExCol]] == "" |is.na(df[[InExCol]])),]
   print(paste(nrow(dfInEx),"traits with dependent trait in",InExCol,sep=" "))
@@ -378,26 +377,18 @@ parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE,VctAllColumns=
   }else{return (dfInEx)
     }
 }
-default_ukb_fields <- function(){
 
-  SRfieldnames<-c("20001","20002","20004","20003")
-  SRdatefieldnames <- c("20006","20008","20010")
-  Deathfieldnames <- c("40000","40001","40002")
-  Visitfieldnames <- c("53")
-  Birthfieldnames <- c("34","52")
-  c(SRfieldnames,SRdatefieldnames,Deathfieldnames,Visitfieldnames,Birthfieldnames)
-
-}
 #' Retrieve the required data fields in the ukb dataset *ukbxxxxx.tab* as stated in the definition table
 #'
-#' Survey the main dataset and collect all field names that will be used as specified in definition table. These include basic data fields specified in `default_ukb_fields()`, which can be updated accordingly, and the fields in touchscreen columns. **SHOULD throw error if certain required field is not present in master dataset?**
+#' Survey the main dataset and collect all field names that will be used as specified in definition table. These include basic data fields specified in `default_ukb_fields()`, which can be updated accordingly, and the fields in touchscreen columns. If metadata is supplied , it will check if these fields are present in the maindataset.
 #' @param dfDefinitions_processed definition table as dataframe
+#' @param dfhtml the metadata file for main dataset
 #' @return  a list of character vectors named all_ukb_fields,nondefault_ukb_fields and default_ukb_fields
 #' @keywords definition
 #' @export
-get_allvarnames <- function(dfDefinitions_processed){
+get_allvarnames <- function(dfDefinitions_processed,dfhtml=NULL){
   #  dfDefinitions_processed
-  VctAllUKBVDefinitionColumns=c("TS") #set this variable to a selection of columns (dfDefinition columns) to be outputted by the _UKBV variable, default is 'VctAllUKBVDefinitionColumns=c("TS","SR","TS_RX","SR_RX","LAB")'
+  # VctAllUKBVDefinitionColumns=c("TS") #set this variable to a selection of columns (dfDefinition columns) to be outputted by the _UKBV variable, default is 'VctAllUKBVDefinitionColumns=c("TS","SR","TS_RX","SR_RX","LAB")'
   # TS(Touchscreen) in definition
   TScolumns = "TS"
   defcols <- unlist(strsplit(na.omit(unname(unlist(dfDefinitions_processed[,c(TScolumns)]))),split=","))
@@ -411,6 +402,17 @@ get_allvarnames <- function(dfDefinitions_processed){
   all_ukb_fields<-gsub("[a-zA-Z]*?_","",all_ukb_fields)
   nondefault_ukb_fields <- all_ukb_fields[!all_ukb_fields %in% default_ukb_fields() ]
 
+  if (!is.null(dfhtml)){
+
+  if (all(all_ukb_fields %in%dfhtml$field.showcase)){
+    message("All fields required are present in the main dataset.")
+
+  }else{
+    fields_missed<- all_ukb_fields[!all_ukb_fields %in%dfhtml$field.showcase]
+    message(glue::glue("WARNING: {length(fields_missed)} fields not found in the main dataset: {glue::glue_collapse(fields_missed, sep = ',')}"))
+  }
+
+  }
 
   return(
     list(all_ukb_fields=all_ukb_fields,
