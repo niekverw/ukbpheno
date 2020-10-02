@@ -519,7 +519,6 @@ expand_dfDefinitions_processed2 <-
     lst.codemap<-list()
 
     for (cls in classifications) {
-      unique(lst.data.settings[lst.data.settings$classification==cls,]$code_map
       fmap=paste(code_map_dir,unique(lst.data.settings[lst.data.settings$classification==cls,]$code_map),sep="")
 
       message(glue::glue("Read from codings for {cls} from {fmap}"))
