@@ -29,6 +29,7 @@ source(paste(repo_dir,"read-data-ukb-functions.R",sep=""))
 source(paste(repo_dir,"query-event-tables.r",sep=""))
 source(paste(repo_dir,"process_event_tables.r",sep=""))
 source(paste(repo_dir,"convert_touchscreen_to_episodedata.r",sep=""))
+source(paste(repo_dir,"plot_timeline.R",sep=""))
 
 
 ### set paths.
@@ -47,7 +48,7 @@ fdeath_cause_portal=paste(pheno_dir,"death_cause.txt",sep="")
 fukbphenodata <- paste(pheno_dir,"ukbphenodata.Rdata",sep="") #where to store final object
 fdefinitions = paste(repo_dir,"definitions.tsv",sep="")
 fdata_setting = paste(repo_dir,"data.settings.tsv",sep="")
-code_map_dir<-paste(repo_dir,"data/",sep="")
+# code_map_dir<-paste(repo_dir,"data/",sep="")
 ##########################################
 # read definitions.
 dfDefinitions <- fread(fdefinitions, colClasses = 'character', data.table = FALSE)
@@ -161,18 +162,14 @@ length (unlist(strsplit(test_expandDef$READ2_drugs[4], ","))) #267 from 2 codes 
 ##########################################
 # expand the definitions based on the data that is loaded
 dfDefinitions_processed_expanded <- expand_dfDefinitions_processed(dfDefinitions_processed,lst.data.settings=lst.data.settings,lst.counts = lst.counts)
-dfDefinitions_processed_expanded <-expand_dfDefinitions_processed2(dfDefinitions_processed,lst.data.settings,lst.codemap)
+dfDefinitions_processed_expanded <-expand_dfDefinitions_processed2(dfDefinitions_processed,lst.data.settings)
 #all collapsed to 1 datatable
 all_event_dt <- get_all_events(dfDefinitions_processed_expanded[14,],lst.data,lst.data.settings)   #MI
-# all_event_dt <- get_all_events(dfDefinitions_processed_expanded[8,],lst.data)  #DmT2
-# all_event_dt <- get_all_events(dfDefinitions_processed_expanded[17,],lst.data)  #Ht #all collapsed to 1 datatable
-# all_event_dt <- get_all_events(dfDefinitions_processed_expanded[9,],lst.data)  #DmT2
-# all_event_dt <- get_all_events(dfDefinitions_processed_expanded[21,],lst.data,lst.data.settings)   #Pad
-# all_event_dt <- get_all_events(dfDefinitions_processed_expanded[22,],lst.data,lst.data.settings)  #NCad
 
 
-
+# TODO refine get_stats_for_events
 all_event_dt.stats <- get_stats_for_events(all_event_dt) #should generate several plots
+View(all_event_dt.stats$stats.codes.summary.table)
 all_event_dt.stats$stats.codes.summary.p
 all_event_dt.stats$stats.class.cooccur.p
 all_event_dt.stats$stats.codes.cooccur.filtered.p.dendro
@@ -226,4 +223,10 @@ hist(TEST$df.casecontrol %>% filter(Any==2) %>% mutate(date_of_first_diag=refere
 
 
 
+
+###########individual timeline########################
+lst.data.f.eid<-lapply(lst.data,function(x) {x[, ('f.eid') := lapply(.SD, as.numeric), .SDcols = 'f.eid'] }) # set eid to numeric
+lst.data.f.eid<-lapply(lst.data,function(x) {setkey(x,f.eid) }) # double check that everything has the same setkey.
+
+plot_individual_timeline(lst.data.settings,NULL,lst.data.f.eid,identifier="1234567")
 

@@ -1,4 +1,10 @@
-
+#' Default_ukb_fields
+#'
+#' Output the default data fields in a character vector. These data fields are used in converting data to episode data functions and include visit dates,birth ,self reported illness, death.
+#' @return  character vector of data fields
+#' @export
+#' @examples
+#'default_ukb_fields()
 default_ukb_fields <- function(){
 
   SRfieldnames<-c("20001","20002","20004","20003")
@@ -30,6 +36,13 @@ description_to_name <-  function(Vct) {
   return(name)
 }
 
+
+#' Replace NA With Nearest Non-NA On The Left
+#'
+#' Used in parsing meta data file ukbxxxxx.html.
+#' @param Vct
+#' @return  imputed character vector
+
 ReplaceNAWithNearestNonNAOnTheLeft <- function(Vct) {
   N <- length(Vct)
   na.pos <- which(is.na(Vct))
@@ -57,10 +70,18 @@ parse_html_tables <- function(x){
   return(df)
 }
 
-read_ukb_metadata <- function(fhtml="/Volumes/data/ukb/ukb38326.html") {
+
+#' Read the data dictionary for main dataset
+#'
+#' The metadata file *ukbxxxxx.html* can be generated using ukb utility. This function reads the html formatted file and return metadata in a dataframe.
+#' @param fhtml Path to file
+#' @return   metadata for main dataset as dataframe
+#' @export
+#' @examples
+#' read_ukb_metadata ("ukb12345.html")
+read_ukb_metadata <- function(fhtml) {
   tic(paste("read ukb html",fhtml))
 
-  # fileset="ukb38326"
   # Column types as described by UKB
   # http://biobank.ctsu.ox.ac.uk/crystal/help.cgi?cd=value_type
   col_type <- c(
@@ -127,7 +148,18 @@ read_ukb_metadata <- function(fhtml="/Volumes/data/ukb/ukb38326.html") {
 
 
 
-
+#' Read the main dataset
+#'
+#' This function reads the dataset *ukbxxxxx.tab* generated using ukb utility and keep only data fields specified. Depending on the size of the dataset the process may take some time.
+#' @param fukb Path to the main dataset (.tab) file
+#' @param dfhtml dataframe containing the metadata, can be obtained by `read_ukb_metadata()`.
+#' @param fields_to_keep the datafields to keep as a character vector, default: default_ukb_fields()
+#' @return   main dataset as dataframe with only selected data fields
+#' @export
+#' @examples
+#' fukbtab <- paste(pheno_dir,"ukb12345.tab",sep="")
+#' dfhtml<- read_ukb_metadata ("ukb12345.html")
+#' dfukb <- read_ukb_tabdata(fukbtab,dfhtml,fields_to_keep = default_ukb_fields())
 read_ukb_tabdata <- function(fukb,
                           dfhtml,
                           fields_to_keep = default_ukb_fields()) {
@@ -174,9 +206,19 @@ read_ukb_tabdata <- function(fukb,
 #col.classes[col.classes %in% "integer64"] <- "character" #integer64 not supported, unsupported in disk.frame? but not in data.table
 
 
-#  refer HES Data Dictionary Document ID:141140
-read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
 
+#' Read Hospital Inpatient Data
+#'
+#' This function reads the record-level HospitalEpisodeStatistics (HES) data organized in several data tables
+#' @param fhesin Path to HESIN (master file)
+#' @param fhesin_diag Path to HESIN_DIAG file containing diagnosis codes
+#' @param fhesin_oper Path to HESIN_OPER file containing Operations and procedural codes
+#' @return   a data.table object with all episodes
+#' @export
+#' @examples
+#' read_hesin_data("hesin.txt" ,"hesin_diag.txt" ,"hesin_oper.txt" )
+read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
+  #  refer HES Data Dictionary Document ID:141140
   ## TODO; use library(fasttime); fastPOSIXct(DT$start_date)
   # read hesin, extract event date
   message(paste0("read hesin: "),fhesin)
@@ -254,9 +296,14 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
 
 }
 
-# fgp=fgp_clinical
-
-# refer to doc primary_care_data
+#' Read Primary Care clinical event records
+#'
+#' This function reads the record-level clinical events from General Practitioner (GP) data. Refer to official UKB documetation for more information regarding this data.
+#' @param fgp Path to GP clinical event records
+#' @return   a data.table object with all episodes
+#' @export
+#' @examples
+#' read_gp_clinical_data("gpclinical.txt" )
 read_gp_clinical_data <- function(fgp){
   tic(paste("read gp data",fgp))
   message(paste("read gp data",fgp))
@@ -300,8 +347,14 @@ read_gp_clinical_data <- function(fgp){
 
 
 
-
-
+#' Read Primary Care prescription records
+#'
+#' This function reads the prescription records from General Practitioner (GP) data. Refer to official UKB documetation for more information regarding this data.
+#' @param fgp Path to GP prescription records
+#' @return   a data.table object with all episodes
+#' @export
+#' @examples
+#' read_gp_clinical_data("gpscripts.txt" )
 read_gp_script_data <- function(fgp){
 
   tic("read gp prescription data")
@@ -373,6 +426,20 @@ sumcounts <- function(dfs){
 
 
 
+#' Get summary counts on a list of data tables
+#'
+#' This function reads list of episode data in data tables and return summary counts by classification systems according to lst.data.settings.
+#' @param lst.data list of data tables
+#' @param lst.data.settings data.setting as dataframe
+#' @return   a list of data tables of summary counts organized in classifications
+#' @export
+#' @examples
+#' lst.data.settings <-fread(data.settings.tsv)
+#' lst.data <- list()
+#' lst.data$ts <- convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions_processed$TS)
+#' lst.data$tte.sr.20002 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20002",field_sr_date = "20008",qc_treshold_year = 10)
+#' lst.data <- append(lst.data,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper ))
+#' get_lst_counts(lst.data,lst.data.settings)
 get_lst_counts <- function(lst.data,lst.data.settings=lst.data.settings ) {
   print("counting")
   lst.counts <- lapply(lst.data, function(x) x[, .N, by=.(code)] )
@@ -395,7 +462,15 @@ get_lst_counts <- function(lst.data,lst.data.settings=lst.data.settings ) {
 }
 
 
-
+#' Read Mortality data
+#'
+#' This function reads death data on the Data Portal.
+#' @param fdeath_portal Path to file with DEATH table
+#' @param fdeath_cause_portal Path to file with DEATH_CAUSE table
+#' @return   a data.table object with all episodes
+#' @export
+#' @examples
+#' read_death_data("death.txt","death_cause.txt" )
 read_death_data <- function(fdeath_portal, fdeath_cause_portal){
   tic(paste("read death data",fdeath_portal,"&",fdeath_cause_portal))
   mindate = as.Date("1930-01-01")

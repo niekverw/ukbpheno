@@ -252,6 +252,8 @@ ProcessDfDefinitions<-function(df,
   return(dfDefinition)
 }
 
+
+
 #' Helper function to look up the dependencies
 #'
 #' This function is used for trait dependency lookup
@@ -386,6 +388,10 @@ parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE,VctAllColumns)
 #' @return  a list of character vectors named all_ukb_fields,nondefault_ukb_fields and default_ukb_fields
 #' @keywords definition
 #' @export
+#' @examples
+#' dfDefinitions_processed <- ProcessDfDefinitions(fread("definitions.tsv", colClasses = 'character', data.table = FALSE))
+#' dfhtml <- read_ukb_metadata(fhtml)
+#' dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions_processed,dfhtml)
 get_allvarnames <- function(dfDefinitions_processed,dfhtml=NULL){
   #  dfDefinitions_processed
   # VctAllUKBVDefinitionColumns=c("TS") #set this variable to a selection of columns (dfDefinition columns) to be outputted by the _UKBV variable, default is 'VctAllUKBVDefinitionColumns=c("TS","SR","TS_RX","SR_RX","LAB")'
@@ -435,10 +441,15 @@ convert_readv2_to_ukbmedication<-function(Vctn_20003,Vctreadcodes){
   return(Vctn_20003)
 }
 
-
+#' Expand the illness/medication codes in definition table to include codes that belong to this code
+#'
+#' Explicitly fill in codes covered by the parent codes that are available in the raw data (using lst.counts)stated in the definition table
+#' @param dfDefinitions_processed definition table as dataframe
+#' @param lst.data.settings data.setting as dataframe, it includes settings that should be used, e.g. if ICD10 should be looked up case sensitive or not (incase of READ cases are important, dotts should also NOT be interpreted)
+#' @param lst.counts a summary of the raw data produced by `get_lst_counts()`
+#' @return  definition table as dataframe
+#' @keywords definition
 #' @export
-## expand definition codes based on the ccodes that are available in the raw data (using lst.counts).
-## lst.data.settings includes settings that should be used, e.g. if ICD10 should be looked up case sensitive or not (incase of READ cases are important, dotts should also NOT be interpreted)
 expand_dfDefinitions_processed <- function(dfDefinitions_processed,lst.data.settings,lst.counts){
   classifications <- lst.data.settings %>% filter(expand_codes==1) %>% pull (classification) %>% unique()
   for (c in classifications){
@@ -460,7 +471,14 @@ expand_dfDefinitions_processed <- function(dfDefinitions_processed,lst.data.sett
 
 
 
-#####################################################################################################
+#' Traverse hierarchical code dictionary
+#'
+#' Given a hierchical dictionary, identify all children codes under the input parent code.
+#' @param dfcode hierarchical tree-structured code dictionary with at least columns "coding","selectable","node" and "parent".
+#' @param codeVct Input code as character vector
+#' @return  All selectable codes (input code inclusive) as character vector
+#' @keywords auxiliary
+#' @export
 add_child_nodes <-function(dfcode,codeVct){
     resultCodeVct<- vector()
     currVct<-codeVct
@@ -479,11 +497,20 @@ add_child_nodes <-function(dfcode,codeVct){
     return(resultCodeVct)
 }
 
-# paste(add_child_nodes(dfCodesheetIcd10,VctStr),collapse=",")
+#' Expand the illness/medication codes in definition table to include codes that belong to this code
+#'
+#' Explicitly fill in codes covered by the parent codes stated in the definition table. This differs from `expand_dfDefinitions_processed()` in the dictionaries taken - it reads the code dictionaries stated in lst.data.setting and expand to available codes accordingly.
+#' @param dfDefinitions_processed definition table as dataframe
+#' @param lst.data.settings data.setting as dataframe, it includes settings that should be used, e.g. if ICD10 should be looked up case sensitive or not (incase of READ cases are important, dotts should also NOT be interpreted)
+#' @return  definition table as dataframe
+#' @keywords definition
+#' @export
+#' @example
+#' expand_dfDefinitions_processed2(dfDefinitions_processed,lst.data.settings,"code_map_dir/")
 
 expand_dfDefinitions_processed2 <-
   function(dfDefinitions_processed,
-           lst.data.settings) {
+           lst.data.settings,code_map_dir="data/") {
     message("Expand the codes in the definition table")
 
     classifications <-
@@ -492,8 +519,9 @@ expand_dfDefinitions_processed2 <-
     lst.codemap<-list()
 
     for (cls in classifications) {
-
+      unique(lst.data.settings[lst.data.settings$classification==cls,]$code_map
       fmap=paste(code_map_dir,unique(lst.data.settings[lst.data.settings$classification==cls,]$code_map),sep="")
+
       message(glue::glue("Read from codings for {cls} from {fmap}"))
 
       lst.codemap[[cls]]<-fread(fmap)

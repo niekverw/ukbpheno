@@ -3,93 +3,116 @@
 library(scales)
 library(lubridate)
 
-plot_individual_timeline <- function(all_event_dt=NULL,lst.data=NULL,identifier=1234567) {
+
+
+#' Get all episodes for a phenotype
+#'
+#' Given a phenotype and a list of episode data , extract events for this phenotype from all data sources
+#'
+#' @param lst.data.settings data frame containing data settings
+#' @param ind_all_event_dt a data table containing all events for the target individual
+#' @param lst.data.eid list of data table with all episode data collapsed to 1 datatable, with key set to the identifier.
+#' @param identifier identifier of the target individual for the timeline to be visualized
+#' @return  a data table with all events
+#' @keywords time-to-event
+#' @export
+#' @examples
+#' lst.data.f.eid<-lapply(lst.data,function(x) {x[, ("f.eid") := lapply(.SD, as.numeric), .SDcols = "f.eid"] })  set eid to numeric
+#' lst.data.f.eid<-lapply(lst.data,function(x) {setkey(x,f.eid) }) # double check that everything has the same setkey.
+#' plot_individual_timeline(lst.data.settings,NULL,lst.data.f.eid,identifier="1234567")
+plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst.data.eid=NULL,identifier=1234567) {
   # credit:  https://benalexkeen.com/creating-a-timeline-graphic-using-r-and-ggplot2/
-  # input: a collapsed datatable with all_event_dt for one participant, e.g. for disease codes. 
-  # alternative input: lst.data and identifier, so that it generates the all_event_dt based on all available data. 
-  # lst.data, can be keyed on f.eid which is MUCH faster, we can create a functiion that checks the key and returns a new keyed object as global var if it iis not right.  lst.data.f.eid<-lapply(lst.data,function(x) {setkey(x,f.eid) }) # double check that everything has the same setkey. 
-  # lst.data, TODO: make f.eid integers (fastest type): lst.data.f.eid<-lapply(lst.data,function(x) {x[, ('f.eid') := lapply(.SD, as.numeric), .SDcols = 'f.eid'] }) # double check that everything has the same setkey. 
-  identifier <- as.character(identifier)
-  if(is.null(all_event_dt) & is.null(lst.data)){
-    message("all_event_dt and lst.data are null, please provide one")
+  # input: a collapsed datatable with ind_all_event_dt for one participant, e.g. for disease codes.
+  # alternative input: lst.data.eid and identifier, so that it generates the ind_all_event_dt based on all available data.
+  # lst.data.eid, can be keyed on f.eid which is MUCH faster, we can create a functiion that checks the key and returns a new keyed object as global var if it iis not right.  lst.data.eid.f.eid<-lapply(lst.data.eid,function(x) {setkey(x,f.eid) }) # double check that everything has the same setkey.
+  # lst.data.eid, TODO: make f.eid integers (fastest type): lst.data.eid.f.eid<-lapply(lst.data.eid,function(x) {x[, ('f.eid') := lapply(.SD, as.numeric), .SDcols = 'f.eid'] }) # double check that everything has the same setkey.
+
+  # ###############################################################################
+  # Why to character? it throws an error when fetching the events for the individual
+  # Error in bmerge .....Incompatible join types: x.f.eid (double) and i.V1 (character)
+  # identifier <- as.character(identifier)
+  identifier<-as.numeric(identifier)
+  # ###################################################################################33
+  if(is.null(ind_all_event_dt) & is.null(lst.data.eid)){
+    message("ind_all_event_dt and lst.data.eid are null, please provide one")
     return(NULL)
   }
-  
-  if(is.null(all_event_dt)){
-    all_event_lst <- lapply(names(lst.data), function(x) {
-      if(key(lst.data[[x]]) =="f.eid"){
-        lst.data[[x]] [ .(identifier),nomatch=NULL] # nomatch is important
+
+  if(is.null(ind_all_event_dt)){
+    all_event_lst <- lapply(names(lst.data.eid), function(x) {
+      if(key(lst.data.eid[[x]]) =="f.eid"){
+        lst.data.eid[[x]] [ .(identifier),nomatch=NULL] # nomatch is important
       } else{
-        lst.data[[x]] [ lst.data[[x]]$f.eid %in% identifier]
+        lst.data.eid[[x]] [ lst.data.eid[[x]]$f.eid %in% identifier]
       }
     } )
-    names(all_event_lst)<-names(lst.data)
-    # remove empty dfs frame list 
+    names(all_event_lst)<-names(lst.data.eid)
+    # remove empty dfs frame list
     all_event_lst <- all_event_lst[lapply(all_event_lst,nrow)>0]
     # set key to be eid
-    all_event_dt <- plyr::ldply(all_event_lst, data.frame) %>% as.data.table()
-    all_event_dt$classification <- lst.data.settings[match(all_event_dt$.id ,lst.data.settings$datasource),]$classification
-    setkey(all_event_dt,f.eid)   
+    ind_all_event_dt <- plyr::ldply(all_event_lst, data.frame) %>% as.data.table()
+    ind_all_event_dt$classification <- lst.data.settings[match(ind_all_event_dt$.id ,lst.data.settings$datasource),]$classification
+    setkey(ind_all_event_dt,f.eid)
     ######
   }
-  if (any(!all_event_dt$f.eid %in% identifier)){
+  if (any(!ind_all_event_dt$f.eid %in% identifier)){
     message(glue::glue("no data on {identifier}"))
     return(0)
   }
-  ### get iit ini the right formatt. 
-  df <- all_event_dt %>% filter(f.eid %in% identifier) %>% as.data.frame()
+  ### get iit ini the right formatt.
+  df <- ind_all_event_dt %>% filter(f.eid %in% identifier) %>% as.data.frame()
   df <- data.frame(month=month(df$eventdate),
             year=year(df$eventdate),
             code= df$code,
             event=df$event,
             classification=df$classification )
-  
+
   df <- rbind(df %>% filter (event==1) %>% group_by(month,year,code,classification) %>% mutate(dup=length(code)),
              df %>%  filter (event==0 | event ==2)%>% arrange(-event) %>% distinct(code,classification, .keep_all = TRUE) %>% group_by(month,year,code,classification) %>% mutate(dup=length(code))
              )
   # change from factor to character
   df$code<- as.character(df$code)
-  
+
   df[df$dup>1,]$code = paste0(df[df$dup>1,]$code,"(x",df[df$dup>1,]$dup,")")
 
   df <- unique(df)
-  
+
   #############
   df$date <- with(df, ymd(sprintf('%04d%02d%02d', year, month, 1)))
   df <- df[with(df, order(date)), ]
   head(df)
-  
+
   classification_levels <- unique(df$classification)
   # blue green yellow red   max allow 14 classification
   classification_colors <- c("#0070C0", "#00B050", "#FFC000", "#C00000","grey","purple","pink","black","peru","darkblue","cyan4","seagreen","slateblue1","orangered1")
   df$classification <- factor(df$classification, levels=classification_levels, ordered=TRUE)
-  
+
   positions <- c(0.5, -0.5, 1.0, -1.0, 1.5, -1.5)
   directions <- c(1, -1)
-  
+
   line_pos <- data.frame(
     "date"=unique(df$date),
     "position"=rep(positions, length.out=length(unique(df$date))),
     "direction"=rep(directions, length.out=length(unique(df$date)))
   )
-  
+
   df <- merge(x=df, y=line_pos, by="date", all = TRUE)
   df <- df[with(df, order(date, classification)), ]
-  
+
   head(df)
-  
+
   text_offset <- 0.05
-  
+
   df$month_count <- ave(df$date==df$date, df$date, FUN=cumsum)
   df$text_position <- (df$month_count * text_offset * df$direction) + df$position
   head(df)
-  
+
   month_buffer <- 2
-  
+
   month_date_range <- seq(min(df$date) - months(month_buffer), max(df$date) + months(month_buffer), by='month')
   month_format <- format(month_date_range, '%b')
   month_df <- data.frame(month_date_range, month_format)
-  
+
   year_date_range <- seq(min(df$date) - months(month_buffer), max(df$date) + months(month_buffer), by='year')
   year_date_range <- as.Date(
     intersect(
@@ -99,24 +122,24 @@ plot_individual_timeline <- function(all_event_dt=NULL,lst.data=NULL,identifier=
   )
   year_format <- format(year_date_range, '%Y')
   year_df <- data.frame(year_date_range, year_format)
-  
+
   #### PLOT ####
-  
+
   timeline_plot<-ggplot(df,aes(x=date,y=0, col=classification, label=code))
   timeline_plot<-timeline_plot+labs(col="Classifications")
   timeline_plot<-timeline_plot+scale_color_manual(values=classification_colors[1:length(classification_levels)], labels=classification_levels, drop = FALSE)
   timeline_plot<-timeline_plot+theme_classic()
-  
+
   # Plot horizontal black line for timeline
-  timeline_plot<-timeline_plot+geom_hline(yintercept=0, 
+  timeline_plot<-timeline_plot+geom_hline(yintercept=0,
                                           color = "black", size=0.3)
-  
+
   # Plot vertical segment lines for codes
   timeline_plot<-timeline_plot+geom_segment(data=df[df$month_count == 1,], aes(y=position,yend=0,xend=date), color='black', size=0.2)
-  
+
   # Plot scatter points at zero and date
   timeline_plot<-timeline_plot+geom_point(aes(y=0), size=3)
-  
+
   # Don't show axes, appropriately position legend
   timeline_plot<-timeline_plot+theme(axis.line.y=element_blank(),
                                      axis.text.y=element_blank(),
@@ -128,7 +151,7 @@ plot_individual_timeline <- function(all_event_dt=NULL,lst.data=NULL,identifier=
                                      axis.line.x =element_blank(),
                                      legend.position = "bottom"
   )
-  
+
   # Show text for each month
   #timeline_plot<-timeline_plot+geom_text(data=month_df, aes(x=month_date_range,y=-0.1,label=month_format),size=2.5,vjust=0.5, color='black', angle=90)
   # Show year text
@@ -139,22 +162,3 @@ plot_individual_timeline <- function(all_event_dt=NULL,lst.data=NULL,identifier=
   return(timeline_plot)
 }
 
-
-
-
-lst.data.f.eid<-lapply(lst.data,function(x) {x[, ('f.eid') := lapply(.SD, as.numeric), .SDcols = 'f.eid'] }) # set eid to numeric
-lst.data.f.eid<-lapply(lst.data,function(x) {setkey(x,f.eid) }) # double check that everything has the same setkey. 
-
-plot_individual_timeline(all_event_dt,lst.data.f.eid,identifier="6026143")
-
-plot_individual_timeline(all_event_dt=NULL,lst.data.f.eid,identifier="1234567")
-
-plot_individual_timeline(all_event_dt=NULL,lst.data.f.eid,identifier="6026179")
-plot_individual_timeline(all_event_dt=NULL,lst.data.f.eid,identifier="6025646")
-plot_individual_timeline(all_event_dt=NULL,lst.data.f.eid,identifier="6025150")
-plot_individual_timeline(all_event_dt=NULL,lst.data.f.eid,identifier="1001031")#Insufficient values in manual scale. 9 needed but only 8 provided.
-
-plot_individual_timeline(all_event_dt=NULL,lst.data.f.eid,identifier="1001187") 
-plot_individual_timeline(all_event_dt=NULL,lst.data.f.eid,identifier="1000393")
-
-plot_individual_timeline(all_event_dt=NULL,lst.data.f.eid,identifier="1000355")
