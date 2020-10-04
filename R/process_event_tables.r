@@ -201,6 +201,7 @@ get_incidence_prevalence <- function(all_event_dt,
   # first_diagnosis_days %>% filter(f.eid==1025336 )
 
   ### Data if participant had event/med  reference date (visit);+/- x day
+  #TODO I think episodes for visitdate (event=0 rows) is messing up with this flag! i.e. almost all of them have this flag on
   dfRef <- df[df$eventdate>=(df$reference_date-window_ref_days_include) & df$eventdate<=(df$reference_date+window_ref_days_include),c("f.eid")]
   dfRef[,Ref:=2]
 
