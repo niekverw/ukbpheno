@@ -296,6 +296,8 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
 
 }
 
+nrow(lst.data$tte.gpclincal.read2)
+
 #' Read Primary Care clinical event records
 #'
 #' This function reads the record-level clinical events from General Practitioner (GP) data. Refer to official UKB documetation for more information regarding this data.
@@ -304,7 +306,7 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
 #' @export
 #' @examples
 #' read_gp_clinical_data("gpclinical.txt" )
-read_gp_clinical_data <- function(fgp){
+read_gp_clinical_data <- function(fgp,min_instance=3){
   tic(paste("read gp data",fgp))
   message(paste("read gp data",fgp))
   # records potentially erroneous have date changed to 01/01/1901 (occured before birth), 02/02/1902 (occured on DOB), 03/03/1903 (same year as DOB), 07/07/2037 (occured after the time of extraction)
@@ -331,6 +333,7 @@ read_gp_clinical_data <- function(fgp){
 
   dfgp$event <- 1
 
+
   #  parse versions
   tte.gpclincal.read3 <-  dfgp %>% filter(read_3 !="")  %>% select(eid,event_dt,read_3,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_3,event=event)  %>% as.data.table()
   tte.gpclincal.read2 <-  dfgp %>% filter(read_2 !="")  %>% select(eid,event_dt,read_2,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% as.data.table()
@@ -339,12 +342,21 @@ read_gp_clinical_data <- function(fgp){
   lst <- list(tte.gpclincal.read2=tte.gpclincal.read2,tte.gpclincal.read3=tte.gpclincal.read3)
   lst <- lapply(lst,function(x) {setkey(x,code) })
   lst <- lapply(lst,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
-  toc() #423.762 sec elapsed
+
+  ############################################################################################
+  ##instance filter
+  message(glue::glue("Retain only records which occur {min_instance} times."))
+  lst <- lapply(lst,function(x){x[, if(.N>min_instance) .SD, by = c('f.eid','code')]})
+  message(glue::glue("#indvidual remain {length(unique(c(lst$tte.gpclincal.read2$f.eid,lst$tte.gpclincal.read3$f.eid)))}"))
+  #############################################################################################
+
+  #with more thoughts, I am not sure what to do with the window now?
+  # dfout_extrastats <- suppressWarnings(test[, .(eventdate=eventdate,datediff=(eventdate-shift(eventdate,fill=NA,type="lag"))), keyby=list(f.eid,code)])
+
+  toc() #423.762 sec elapsed  #822.694 sec with the instance filter!
   return(lst)
 
 }
-
-
 
 
 #' Read Primary Care prescription records
@@ -355,7 +367,7 @@ read_gp_clinical_data <- function(fgp){
 #' @export
 #' @examples
 #' read_gp_clinical_data("gpscripts.txt" )
-read_gp_script_data <- function(fgp){
+read_gp_script_data <- function(fgp,min_instance=3){
 
   tic("read gp prescription data")
   mindate = as.Date("1930-01-01")
@@ -406,9 +418,18 @@ read_gp_script_data <- function(fgp){
   #dfgp$event_dt <- format(fasttime::fastPOSIXct(dfgp$event_dt),format="%Y-%m-%d") # needs specific input format, making that format takes more time...
 
 
-  lst <- list(tte.gpscript.bnf.england=tte.gpscript.bnf.england,tte.gpscript.bnf.england=tte.gpscript.bnf.england,tte.gpscript.bnf.scotland=tte.gpscript.bnf.scotland,tte.gpscript.read2.wales=tte.gpscript.read2.wales)
+  lst <- list(tte.gpscript.dmd.england=tte.gpscript.dmd.england,tte.gpscript.bnf.england=tte.gpscript.bnf.england,tte.gpscript.bnf.scotland=tte.gpscript.bnf.scotland,tte.gpscript.read2.wales=tte.gpscript.read2.wales)
   lst <- lapply(lst,function(x) {setkey(x,code) })
   lst <- lapply(lst,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
+
+
+  ############################################################################################
+  ##instance filter
+  message(glue::glue("Retain only records which occur {min_instance} times."))
+  lst <- lapply(lst,function(x){x[, if(.N>min_instance) .SD, by = c('f.eid','code')]})
+  message(glue::glue("#indvidual remain {length(unique(c(lst$tte.gpscript.dmd.england$f.eid,lst$tte.gpscript.bnf.england$f.eid,lst$tte.gpscript.bnf.scotland$f.eid,lst$tte.gpscript.read2.wales$f.eid)))}"))
+  #############################################################################################
+
   toc() #423.762 sec elapsed
   return(lst)
 
