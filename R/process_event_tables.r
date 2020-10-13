@@ -16,31 +16,30 @@ get_stats_for_events <- function(all_event_dt){
   stats.codes <- stats.codes %>% dplyr::group_by(classification, code) %>% summarise(count=n() )
   stats.codes <- stats.codes %>% arrange(count)
   stats.codes$rank <- 1:nrow(stats.codes)
-  png("test.png")
-  p1 <- ggplot(stats.codes, aes(rank, count,label=code,color=classification)) + geom_point() + ylim(-((max(stats.codes$count))/3),NA)  + geom_text_repel(size =3,segment.size=0.5)
-  p1
-  dev.off()
-  p2 <- ggplot(stats.codes, aes(rank, count,label=code,color=classification)) + scale_y_continuous(trans='log2') + geom_point()   + geom_text_repel(size =3,segment.size=0.5)
+  p1 <-ggplot2::ggplot(stats.codes, ggplot2::aes(rank, count,label=code,color=classification)) + ggplot2::geom_point() + ggplot2::ylim(-((max(stats.codes$count))/3),NA)  + ggrepel::geom_text_repel(size =3,segment.size=0.5)
+
+  p2 <- ggplot2::ggplot(stats.codes,ggplot2:: aes(rank, count,label=code,color=classification)) + ggplot2::scale_y_continuous(trans='log2') + ggplot2::geom_point()   + ggrepel::geom_text_repel(size =3,segment.size=0.5)
   stats.codes.summary.table <- stats.codes
-  stats.codes.summary.p <- ggarrange(p1,p2,nrow = 1, ncol = 2,common.legend = TRUE)
+  stats.codes.summary.p <- ggpubr::ggarrange(p1,p2,nrow = 1, ncol = 2,common.legend = TRUE)
 
   # show co-occurences of classifications
   stats.coocurrence <- table(all_event_dt[,c("f.eid" ,"classification")])#[1:10,]
   stats.coocurrence[stats.coocurrence>0] <-1
+
   mat <- crossprod(as.matrix(stats.coocurrence))
   mat <- floor(t(mat * 100 / diag(mat)))                 # calculate the percentage
   diag(mat) <- NA
   stats.class.cooccur.table <- mat
 
-  # stats.class.cooccur.p <- pheatmap::pheatmap(mat,display_numbers=mat,cluster_cols = F,cluster_rows = F )
+    # stats.class.cooccur.p <- pheatmap::pheatmap(mat,display_numbers=mat,cluster_cols = F,cluster_rows = F )
   # #########ggplot2 implementation of the heatmap##########################################################################
   longData<- reshape2::melt(mat)
   names(longData)<- c("Code_presence","Code_occur","%")
-  stats.class.cooccur.p <- ggplot(longData, aes(x = Code_occur , y =Code_presence,fill=`%`)) +
-    geom_tile()+
-    scale_fill_distiller(palette = "RdYlBu",na.value = "grey85") +
-    labs(x="Classfication of co-occurence", y="Classification present",title="Co-occurence of diagnosis by sources",caption = "[In the presence of row, column coexists with row by %]") +
-    geom_text(aes(label = `%`))
+  stats.class.cooccur.p <- ggplot2::ggplot(longData, ggplot2::aes(x = Code_occur , y =Code_presence,fill=`%`)) +
+    ggplot2::geom_tile()+
+    ggplot2::scale_fill_distiller(palette = "RdYlBu",na.value = "grey85") +
+    ggplot2::labs(x="Classfication of co-occurence", y="Classification present",title="Co-occurence of diagnosis by sources",caption = "[In the presence of row, column coexists with row by %]") +
+    ggplot2::geom_text(aes(label = `%`))
  # ########################################################################################################################
   # show co-occurences of codes
   stats.coocurrence <- table(all_event_dt[,c("f.eid" ,"code")])
@@ -57,14 +56,17 @@ get_stats_for_events <- function(all_event_dt){
   # stats.codes.cooccur.filtered.p <- pheatmap::pheatmap( stats.codes.cooccur.filtered.table  ,fontsize = 6)
   # ########## ggplot implementation#################################################################################
   # Create ggplot version dendrogram from ggdendro
-  code.dendro <- as.dendrogram(hclust(d = dist(x = stats.codes.cooccur.filtered.table)))
-  ddata_x <- dendro_data(code.dendro)
+
+   code.dendro <- as.dendrogram(hclust(d = dist(x = stats.codes.cooccur.filtered.table)))
+  ddata_x <-  ggdendro::dendro_data(code.dendro)
   # to colour leaves by classifications
-  lab_gp <- label(ddata_x)
+
+  lab_gp <- ggdendro::label(ddata_x)
   lab_gp$group <- stats.codes[match(lab_gp$label,stats.codes$code),]$classification
-  stats.codes.cooccur.filtered.p.dendro <- ggplot(segment(ddata_x)) +
-    geom_segment(aes(x=x, y=y+10, xend=xend, yend=yend+10)) +  geom_text(data=label(ddata_x),
-                 aes(label=label, x=x, y=-5, colour=lab_gp$group),size =3,angle=45)   +theme(axis.line=element_blank(),
+
+  stats.codes.cooccur.filtered.p.dendro <- ggplot2::ggplot(ggdendro::segment(ddata_x)) +
+    ggplot2::geom_segment(aes(x=x, y=y+10, xend=xend, yend=yend+10)) +  ggplot2::geom_text(data=label(ddata_x),
+    ggplot2::aes(label=label, x=x, y=-5, colour=lab_gp$group),size =3,angle=45) +ggplot2::theme(axis.line=element_blank(),
          axis.text.x=element_blank(),
          axis.text.y=element_blank(),
          axis.ticks=element_blank(),
@@ -79,12 +81,13 @@ get_stats_for_events <- function(all_event_dt){
   # ggplot version heatmap
   # code.order <- order.dendrogram(code.dendro)
   # TODO maker heatmap ordered like dendrogram?
+
   longData<- reshape2::melt(stats.codes.cooccur.filtered.table)
   names(longData)<- c("Code_presence","Code_occur","%")
-  stats.codes.cooccur.filtered.p.heat <- ggplot(longData, aes(x = Code_occur , y =Code_presence,fill=`%`)) +
-    geom_tile()+
-    scale_fill_distiller(palette = "RdYlBu",na.value = "grey85") +
-    labs(x="Code of co-occurence", y="Code present",title="Co-occurence of diagnosis code",caption = "[In the presence of row, column coexists with row by %]") + theme(axis.text.x = element_text(angle = 45))
+  stats.codes.cooccur.filtered.p.heat <- ggplot2::ggplot(longData, ggplot2::aes(x = Code_occur , y =Code_presence,fill=`%`)) +
+    ggplot2::geom_tile()+
+    ggplot2::scale_fill_distiller(palette = "RdYlBu",na.value = "grey85") +
+    ggplot2::labs(x="Code of co-occurence", y="Code present",title="Co-occurence of diagnosis code",caption = "[In the presence of row, column coexists with row by %]") + ggplot2::theme(axis.text.x = element_text(angle = 45))
 ###############################################################################################################
 
 
@@ -98,7 +101,6 @@ get_stats_for_events <- function(all_event_dt){
          stats.codes.cooccur.filtered.p.dendro = stats.codes.cooccur.filtered.p.dendro,
          stats.codes.cooccur.filtered.p.heat = stats.codes.cooccur.filtered.p.heat))
 }
-
 
 
 #' Get data for phenotype incidence and prevalence
@@ -147,7 +149,7 @@ get_incidence_prevalence <- function(all_event_dt,
 
   if(length(reference_date)==0){reference_date<-NULL}
   if(!is.null(reference_date)){
-    df_referencedate <- data.table(reference_date)
+    df_referencedate <-data.table::data.table(reference_date)
     df_referencedate$f.eid <- names(reference_date)
 
     message(glue::glue("non missing reference_date: {length(reference_date)}"))
@@ -158,15 +160,17 @@ get_incidence_prevalence <- function(all_event_dt,
   if(include_secondary_recurrence){
     sources_recurrence_events <- lst.data.settings$datasource
   } else {
-    sources_recurrence_events <- lst.data.settings %>% filter(diagnosis==1) %>% pull(datasource)
+    sources_recurrence_events <- lst.data.settings %>%  dplyr::filter(diagnosis==1) %>% dplyr::pull(datasource)
   }
 
 
-  df <- merge(all_event_dt,df_referencedate,by = 'f.eid') %>% arrange(eventdate) %>% as.data.table()
+
+  df <- merge(all_event_dt,df_referencedate,by = 'f.eid') %>% dplyr::arrange(eventdate) %>% data.table::as.data.table()
   # df <- df %>% filter(!is.na(reference_date)) # comment out if missing f.eids is fixed.
   df$days <- df$eventdate - df$reference_date
-  setkey(df,days) # i don't know why, but setkey was alreaday on f.eid and cannot refresh..
-  setkey(df,f.eid)
+
+  data.table::setkey(df,days) # i don't know why, but setkey was alreaday on f.eid and cannot refresh..
+  data.table::setkey(df,f.eid)
 
   ### flag primary death records
   df$death.primary<-ifelse((df$.id %in% lst.data.settings[lst.data.settings$death,]$datasource)&(lst.data.settings[match(df$.id ,lst.data.settings$datasource),]$diagnosis==1),1,0)
@@ -228,6 +232,7 @@ get_incidence_prevalence <- function(all_event_dt,
   #                                                                      stats)
   # )
   # View(test)
+
   all_event_dt.summary <- Reduce(function(...) merge(..., all = TRUE,by='f.eid'), list(
       stats,
       Hx_days,
@@ -238,9 +243,10 @@ get_incidence_prevalence <- function(all_event_dt,
   ))
 
   # combine the values from 2 columns and keep 1
-  all_event_dt.summary$death.primary.x<-fcoalesce(all_event_dt.summary$death.primary.x,all_event_dt.summary$death.primary.y)
-  all_event_dt.summary$death.secondary.x<-fcoalesce(all_event_dt.summary$death.secondary.x,all_event_dt.summary$death.secondary.y)
-  all_event_dt.summary<-all_event_dt.summary %>% select(f.eid, count ,sum.epidur, median.epidur, max.epidur,Hx_days,Fu_days, death.primary.x, death.secondary.x,Hx, Fu, Ref)
+
+  all_event_dt.summary$death.primary.x<-data.table::fcoalesce(all_event_dt.summary$death.primary.x,all_event_dt.summary$death.primary.y)
+  all_event_dt.summary$death.secondary.x<-data.table::fcoalesce(all_event_dt.summary$death.secondary.x,all_event_dt.summary$death.secondary.y)
+  all_event_dt.summary<-all_event_dt.summary %>% dplyr::select(f.eid, count ,sum.epidur, median.epidur, max.epidur,Hx_days,Fu_days, death.primary.x, death.secondary.x,Hx, Fu, Ref)
   names(all_event_dt.summary)<- c("f.eid", "count" ,"sum.epidur", "median.epidur", "max.epidur","Hx_days","Fu_days", "death.primary", "death.secondary","Hx", "Fu", "Ref")
   # NA are not true event (=1) records , which are not death records
   set(all_event_dt.summary,which(is.na(all_event_dt.summary$death.primary)),"death.primary",0)
@@ -251,7 +257,7 @@ get_incidence_prevalence <- function(all_event_dt,
 
   all_event_dt.summary <- merge(all_event_dt.summary,df_referencedate,by="f.eid")
   all_event_dt.summary[,Any:=2]
-  all_event_dt.summary <- data.table(all_event_dt.summary)
+  all_event_dt.summary <- data.table::data.table(all_event_dt.summary)
   return(all_event_dt.summary)
 
 
@@ -280,13 +286,14 @@ get_cases <- function(definitions,
   if(length(unique(definitions$TRAIT))>1){
     message("more than 1 TRAIT in definitions")
   }
-  all_event_dt.Include_in_cases <- get_all_events(definitions %>% filter(Definitions =="Include_in_cases"),lst.data,lst.data.settings)   #MI
+
+  all_event_dt.Include_in_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,lst.data.settings)   #MI
   all_event_dt.Include_in_cases.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.Include_in_cases,lst.data.settings,
                                                                     reference_date = reference_date)
                                                                     #...)
 
   message(glue::glue("including {nrow(all_event_dt.Include_in_cases.summary)} cases"))
-  all_event_dt.Exclude_from_cases <- get_all_events(definitions %>% filter(Definitions =="Exclude_from_cases"),lst.data,lst.data.settings)   #MI
+  all_event_dt.Exclude_from_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Exclude_from_cases"),lst.data,lst.data.settings)   #MI
   if(!is.null(all_event_dt.Exclude_from_cases)){
     exclude=all_event_dt.Include_in_cases.summary$f.eid %in% unique(all_event_dt.Exclude_from_cases$f.eid)
     message(glue::glue("excluding {sum(exclude)} cases"))
@@ -356,13 +363,13 @@ get_cases_controls <- function (definitions,
   all_event_dt.Include_in_cases.summary <- cases$all_event_dt.Include_in_cases.summary
   all_event_dt.Include_in_cases <- cases$all_event_dt.Include_in_cases
   # define exclude controls
-  all_event_dt.Exclude_from_controls <- get_all_events(definitions %>% filter(Definitions =="Exclude_from_controls"),lst.data,lst.data.settings)   #MI
+  all_event_dt.Exclude_from_controls <- get_all_events(definitions %>% dplyr::filter(Definitions =="Exclude_from_controls"),lst.data,lst.data.settings)   #MI
   ### define case & control
   if(is.null(reference_date)){
     reference_date = setNames(as.Date(rep(NA,length(lst.identifiers))),lst.identifiers)
   }
 
-  df.casecontrol <- data.frame(reference_date=reference_date) %>% tibble::rownames_to_column('f.eid') %>% as.data.table()
+  df.casecontrol <- data.frame(reference_date=reference_date) %>% tibble::rownames_to_column('f.eid') %>% data.table::as.data.table()
 
   # exlude id in case_include & case_exclude from summary => potential control
   df.casecontrol <- df.casecontrol[!df.casecontrol$f.eid %in% all_event_dt.Include_in_cases.summary$f.eid,]
@@ -434,7 +441,7 @@ get_survival_data<-function(def,lst.data,
   death_event_dt<-get_all_events(def,lst.data.death,lst.data.settings)
 
   # check consistency in the records w.r.t date
-  discrepant_deaths<-death_event_dt%>%  group_by(f.eid) %>% summarize(max_date = max(eventdate, na.rm = TRUE),min_date = min(eventdate),same_date=(max_date==min_date))%>% filter(!same_date)
+  discrepant_deaths<-death_event_dt%>%  dplyr::group_by(f.eid) %>% dplyr::summarize(max_date = max(eventdate, na.rm = TRUE),min_date = min(eventdate),same_date=(max_date==min_date))%>% dplyr::filter(!same_date)
 
   if (nrow(discrepant_deaths)>0){
     message(glue::glue("Number of individuals have inconsistent death dates: {nrow(discrepant_deaths))}"))
@@ -458,7 +465,7 @@ get_survival_data<-function(def,lst.data,
   # fu_days_mask masks FU event but not day==0 which is considered as Hx so apply the mask on the df
 
   # make the table cleaner
-  death_event_dt.summary<-death_event_dt.summary %>% select(f.eid,first_diagnosis_days,reference_date,Any )
+  death_event_dt.summary<-death_event_dt.summary %>% dplyr::select(f.eid,first_diagnosis_days,reference_date,Any )
   names(death_event_dt.summary) <-  c("f.eid",	"days_after_diagnosis",	"reference_date",	"Any")
 
   death_event_dt.summary[death_event_dt.summary$days_after_diagnosis<window_days_mask ,"days_after_diagnosis"] <- NA

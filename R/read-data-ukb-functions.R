@@ -71,6 +71,7 @@ parse_html_tables <- function(x){
 }
 
 
+
 #' Read the data dictionary for main dataset
 #'
 #' The metadata file *ukbxxxxx.html* can be generated using ukb utility. This function reads the html formatted file and return metadata in a dataframe.
@@ -80,7 +81,7 @@ parse_html_tables <- function(x){
 #' @examples
 #' read_ukb_metadata ("ukb12345.html")
 read_ukb_metadata <- function(fhtml) {
-  tic(paste("read ukb html",fhtml))
+  tictoc::tic(paste("read ukb html",fhtml))
 
   # Column types as described by UKB
   # http://biobank.ctsu.ox.ac.uk/crystal/help.cgi?cd=value_type
@@ -142,7 +143,8 @@ read_ukb_metadata <- function(fhtml) {
     fread_column_type = col_type[as.character(df_meta$Type)]
 
   )
-  toc()
+
+  tictoc::toc()
   return(df_meta)
 }
 
@@ -163,7 +165,7 @@ read_ukb_metadata <- function(fhtml) {
 read_ukb_tabdata <- function(fukb,
                           dfhtml,
                           fields_to_keep = default_ukb_fields()) {
-  tic(paste("read ukb data",fukb))
+  tictoc::tic(paste("read ukb data",fukb))
   if (!exists("n_threads")){n_threads=1}
 
   if(!any(fields_to_keep %in% "eid" )){
@@ -186,13 +188,13 @@ read_ukb_tabdata <- function(fukb,
   # ####
   freadcolclasses[which(dfhtml$field.tab %in% fields_to_keep.tab)] <- dfhtml[which(dfhtml$field.tab %in% fields_to_keep.tab),]$fread_column_type
 
-  tic("fread data")
-  df <- fread( paste0(fukb), header=T,
+  tictoc::tic("fread data")
+  df <- data.table::fread( paste0(fukb), header=T,
                colClasses = freadcolclasses,
                sep = "\t",
                showProgress = TRUE)
   print(format(object.size(df), units = "Gb"))
-  toc()
+  tictoc::toc()
 
   # library(vroom)
   # which(freadcolclasses !="NULL")
@@ -222,7 +224,7 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   ## TODO; use library(fasttime); fastPOSIXct(DT$start_date)
   # read hesin, extract event date
   message(paste0("read hesin: "),fhesin)
-  dfhesin <- (fread(fhesin,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
+  dfhesin <- (data.table::fread(fhesin,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
   message("converting dates")
   dfhesin$epistart <- as.Date(as.character(dfhesin$epistart),format="%d/%m/%Y") #"%Y%m%d")
   dfhesin$admidate <- as.Date(as.character(dfhesin$admidate),format="%d/%m/%Y")
@@ -235,15 +237,15 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   dfhesin$epidur <- as.numeric(dfhesin$epiend - dfhesin$epistart )
   # sanity check
   dfhesin[dfhesin$epidur <0,]$epidur <- NA
-  colnames(dfhesin)
+  # colnames(dfhesin)
   #keep only cols that maybe of use
-  dfhesin <- dfhesin %>% select(eid,ins_index,source,epistart,admidate,epiend,disdate,epidur)
+  dfhesin <- dfhesin %>% dplyr::select(eid,ins_index,source,epistart,admidate,epiend,disdate,epidur)
 
 
 
   # read diag
   message(paste0("read diag: ",fhesin_diag))
-  dfdiag <- (fread(fhesin_diag,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
+  dfdiag <- (data.table::fread(fhesin_diag,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
   message("merging hesin + diagnosis")
   dfhesin_diag <- merge(dfhesin,dfdiag,by = c("eid","ins_index"),all=T)
   dfhesin_diag$eventdate <- dfhesin_diag$epistart
@@ -254,7 +256,7 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
 
   # read oper
   message(paste0("read oper: ",fhesin_oper))
-  dfoper <- (fread(fhesin_oper,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
+  dfoper <- (data.table::fread(fhesin_oper,header=T,sep="\t", stringsAsFactors=FALSE, na.strings=""))
   # note date format differ from main hesin table
   dfoper$opdate <- as.Date(as.character(dfoper$opdate),format="%d/%m/%Y")
   message("merging hesin + operation") # for duration, take episode duration.
@@ -269,15 +271,15 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   dfhesin_oper <- dfhesin_oper[, event:=as.integer(event)]
 
   # filter + rename
-  tte.hesin.oper3.primary <- dfhesin_oper %>% filter(level==1 & !is.na(oper3))  %>% select(eid,eventdate,epidur,oper3,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% as.data.table()
-  tte.hesin.oper4.primary <- dfhesin_oper %>% filter(level==1 & !is.na(oper4))  %>% select(eid,eventdate,epidur,oper4,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% as.data.table()
-  tte.hesin.icd10.primary <- dfhesin_diag %>% filter( level==1 & !is.na(diag_icd10))  %>% select(eid,eventdate,epidur,diag_icd10,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% as.data.table()
-  tte.hesin.icd9.primary <- dfhesin_diag %>% filter( level==1 & !is.na(diag_icd9))  %>% select(eid,eventdate,epidur,diag_icd9,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% as.data.table()
+  tte.hesin.oper3.primary <- dfhesin_oper %>% dplyr::filter(level==1 & !is.na(oper3))  %>% dplyr::select(eid,eventdate,epidur,oper3,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% data.table::as.data.table()
+  tte.hesin.oper4.primary <- dfhesin_oper %>% dplyr::filter(level==1 & !is.na(oper4))  %>% dplyr::select(eid,eventdate,epidur,oper4,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% data.table::as.data.table()
+  tte.hesin.icd10.primary <- dfhesin_diag %>% dplyr::filter( level==1 & !is.na(diag_icd10))  %>% dplyr::select(eid,eventdate,epidur,diag_icd10,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% data.table::as.data.table()
+  tte.hesin.icd9.primary <- dfhesin_diag %>% dplyr::filter( level==1 & !is.na(diag_icd9))  %>% dplyr::select(eid,eventdate,epidur,diag_icd9,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% data.table::as.data.table()
 
-  tte.hesin.oper3.secondary <- dfhesin_oper %>% filter(level==2 & !is.na(oper3))  %>% select(eid,eventdate,epidur,oper3,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% as.data.table()
-  tte.hesin.oper4.secondary <- dfhesin_oper %>% filter(level==2 & !is.na(oper4))  %>% select(eid,eventdate,epidur,oper4,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% as.data.table()
-  tte.hesin.icd10.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd10))  %>% select(eid,eventdate,epidur,diag_icd10,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% as.data.table()
-  tte.hesin.icd9.secondary <- dfhesin_diag %>% filter( level==2 & !is.na(diag_icd9))  %>% select(eid,eventdate,epidur,diag_icd9,event)  %>% rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% as.data.table()
+  tte.hesin.oper3.secondary <- dfhesin_oper %>% dplyr::filter(level==2 & !is.na(oper3))  %>% dplyr::select(eid,eventdate,epidur,oper3,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% data.table::as.data.table()
+  tte.hesin.oper4.secondary <- dfhesin_oper %>% dplyr::filter(level==2 & !is.na(oper4))  %>% dplyr::select(eid,eventdate,epidur,oper4,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% data.table::as.data.table()
+  tte.hesin.icd10.secondary <- dfhesin_diag %>% dplyr::filter( level==2 & !is.na(diag_icd10))  %>% dplyr::select(eid,eventdate,epidur,diag_icd10,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% data.table::as.data.table()
+  tte.hesin.icd9.secondary <- dfhesin_diag %>% dplyr::filter( level==2 & !is.na(diag_icd9))  %>% dplyr::select(eid,eventdate,epidur,diag_icd9,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% data.table::as.data.table()
 
 
   lst <- list(tte.hesin.oper3.primary = tte.hesin.oper3.primary,
@@ -296,7 +298,6 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
 
 }
 
-nrow(lst.data$tte.gpclincal.read2)
 
 #' Read Primary Care clinical event records
 #'
@@ -307,7 +308,7 @@ nrow(lst.data$tte.gpclincal.read2)
 #' @examples
 #' read_gp_clinical_data("gpclinical.txt" )
 read_gp_clinical_data <- function(fgp,min_instance=3){
-  tic(paste("read gp data",fgp))
+  tictoc::tic(paste("read gp data",fgp))
   message(paste("read gp data",fgp))
   # records potentially erroneous have date changed to 01/01/1901 (occured before birth), 02/02/1902 (occured on DOB), 03/03/1903 (same year as DOB), 07/07/2037 (occured after the time of extraction)
   mindate = as.Date("1930-01-01")
@@ -315,7 +316,7 @@ read_gp_clinical_data <- function(fgp,min_instance=3){
   # in current structure of gp_clinical.txt
   # $1 eid $3 event_dt $4 read_2 $5 read3
   # $2 data_provider  $6 - $8 are free-text fields "value" entries differ depending on the data source
-  dfgp <- fread(cmd = paste("awk -F'\t'  '$6==\"\" && $7==\"\" && $8==\"\" {print $1,$3,$4,$5}' OFS='\t'",fgp) ,sep = "\t",
+  dfgp <- data.table::fread(cmd = paste("awk -F'\t'  '$6==\"\" && $7==\"\" && $8==\"\" {print $1,$3,$4,$5}' OFS='\t'",fgp) ,sep = "\t",
                 colClasses = c("integer","character","character","character")) #,select=cols_tokeep)
   #names(dfgp) <-  c("eid",	"data_provider",	"event_dt",	"read_2",	"read_3",	"value1","value2","value3")
 
@@ -335,25 +336,24 @@ read_gp_clinical_data <- function(fgp,min_instance=3){
 
 
   #  parse versions
-  tte.gpclincal.read3 <-  dfgp %>% filter(read_3 !="")  %>% select(eid,event_dt,read_3,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_3,event=event)  %>% as.data.table()
-  tte.gpclincal.read2 <-  dfgp %>% filter(read_2 !="")  %>% select(eid,event_dt,read_2,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% as.data.table()
+  tte.gpclincal.read3 <-  dfgp %>% dplyr::filter(read_3 !="")  %>% dplyr::select(eid,event_dt,read_3,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = read_3,event=event)  %>% data.table::as.data.table()
+  tte.gpclincal.read2 <-  dfgp %>% dplyr::filter(read_2 !="")  %>% dplyr::select(eid,event_dt,read_2,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% data.table::as.data.table()
 
 
   lst <- list(tte.gpclincal.read2=tte.gpclincal.read2,tte.gpclincal.read3=tte.gpclincal.read3)
-  lst <- lapply(lst,function(x) {setkey(x,code) })
+  lst <- lapply(lst,function(x) {data.table::setkey(x,code) })
   lst <- lapply(lst,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
 
-  ############################################################################################
-  ##instance filter
-  message(glue::glue("Retain only records which occur {min_instance} times."))
-  lst <- lapply(lst,function(x){x[, if(.N>min_instance) .SD, by = c('f.eid','code')]})
-  message(glue::glue("#indvidual remain {length(unique(c(lst$tte.gpclincal.read2$f.eid,lst$tte.gpclincal.read3$f.eid)))}"))
-  #############################################################################################
-
-  #with more thoughts, I am not sure what to do with the window now?
+  # ############################################################################################
+  # ##instance filter
+  # message(glue::glue("Retain only records which occur {min_instance} times."))
+  # lst <- lapply(lst,function(x){x[, if(.N>min_instance) .SD, by = c('f.eid','code')]})
+  # message(glue::glue("#indvidual remain {length(unique(c(lst$tte.gpclincal.read2$f.eid,lst$tte.gpclincal.read3$f.eid)))}"))
+  # #############################################################################################
+  #
+  # #with more thoughts, I am not sure what to do with the window now?
   # dfout_extrastats <- suppressWarnings(test[, .(eventdate=eventdate,datediff=(eventdate-shift(eventdate,fill=NA,type="lag"))), keyby=list(f.eid,code)])
-
-  toc() #423.762 sec elapsed  #822.694 sec with the instance filter!
+  tictoc::toc() #423.762 sec elapsed  #822.694 sec with the instance filter!
   return(lst)
 
 }
@@ -369,14 +369,14 @@ read_gp_clinical_data <- function(fgp,min_instance=3){
 #' read_gp_clinical_data("gpscripts.txt" )
 read_gp_script_data <- function(fgp,min_instance=3){
 
-  tic("read gp prescription data")
+  tictoc::tic("read gp prescription data")
   mindate = as.Date("1930-01-01")
   maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?.
 
   # TODO: some way to preprocess such huge file ?
 
   # 1.eid	data_provider	issue_date	read_2	bnf_code	dmd_code	drug_name	8.quantity
-  dfgp <- fread(fgp ,sep = "\t",colClasses = c("integer","integer","string","string","string","string","string","string")) #,select=cols_tokeep) ," | head -10000 "
+  dfgp <- data.table::fread(fgp ,sep = "\t",colClasses = c("integer","integer","string","string","string","string","string","string")) #,select=cols_tokeep) ," | head -10000 "
 
   names(dfgp) <-  c("eid","data_provider","event_dt",	"read_2",	"bnf_code",	"dmd_code",	"drug_name",	"quantity")
   dfgp$event_dt <- as.Date(as.character(dfgp$event_dt),format="%d/%m/%Y")
@@ -398,13 +398,13 @@ read_gp_script_data <- function(fgp,min_instance=3){
   # DMD used in England Vision, note one prescription may be described differently and coded differently
   # TODO standardize med codes:  varies in length (how to deal with this?), some with "." in between (strip all dots?)
   # England Vision
-  tte.gpscript.dmd.england <-  dfgp %>% filter(dmd_code !="")  %>% select(eid,event_dt,dmd_code,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = dmd_code,event=event)  %>% as.data.table()
+  tte.gpscript.dmd.england <-  dfgp %>% dplyr::filter(dmd_code !="")  %>% dplyr::select(eid,event_dt,dmd_code,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = dmd_code,event=event)  %>% data.table::as.data.table()
   # data_provider 1= England(Vision), 2= Scotland, 3 = England (TPP), 4 = Wales
-  tte.gpscript.bnf.england <-  dfgp %>% filter(bnf_code !="" && data_provider == 3 )  %>% select(eid,event_dt,bnf_code,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% as.data.table()
+  tte.gpscript.bnf.england <-  dfgp %>% dplyr::filter(bnf_code !="" && data_provider == 3 )  %>% dplyr::select(eid,event_dt,bnf_code,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% data.table::as.data.table()
 
-  tte.gpscript.bnf.scotland <-  dfgp %>% filter(bnf_code !="" && data_provider == 2 )  %>% select(eid,event_dt,bnf_code,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% as.data.table()
+  tte.gpscript.bnf.scotland <-  dfgp %>% dplyr::filter(bnf_code !="" && data_provider == 2 )  %>% dplyr::select(eid,event_dt,bnf_code,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% data.table::as.data.table()
   # Wales : read_2
-  tte.gpscript.read2.wales <-  dfgp %>% filter(read_2 !="")  %>% select(eid,event_dt,read_2,event)  %>% rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% as.data.table()
+  tte.gpscript.read2.wales <-  dfgp %>% dplyr::filter(read_2 !="")  %>% dplyr::select(eid,event_dt,read_2,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% data.table::as.data.table()
 
 
   # TODO count by tables
@@ -419,18 +419,18 @@ read_gp_script_data <- function(fgp,min_instance=3){
 
 
   lst <- list(tte.gpscript.dmd.england=tte.gpscript.dmd.england,tte.gpscript.bnf.england=tte.gpscript.bnf.england,tte.gpscript.bnf.scotland=tte.gpscript.bnf.scotland,tte.gpscript.read2.wales=tte.gpscript.read2.wales)
-  lst <- lapply(lst,function(x) {setkey(x,code) })
+  lst <- lapply(lst,function(x) {data.table::setkey(x,code) })
   lst <- lapply(lst,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
 
 
-  ############################################################################################
-  ##instance filter
-  message(glue::glue("Retain only records which occur {min_instance} times."))
-  lst <- lapply(lst,function(x){x[, if(.N>min_instance) .SD, by = c('f.eid','code')]})
-  message(glue::glue("#indvidual remain {length(unique(c(lst$tte.gpscript.dmd.england$f.eid,lst$tte.gpscript.bnf.england$f.eid,lst$tte.gpscript.bnf.scotland$f.eid,lst$tte.gpscript.read2.wales$f.eid)))}"))
-  #############################################################################################
+  # ############################################################################################
+  # ##instance filter
+  # message(glue::glue("Retain only records which occur {min_instance} times."))
+  # lst <- lapply(lst,function(x){x[, if(.N>min_instance) .SD, by = c('f.eid','code')]})
+  # message(glue::glue("#indvidual remain {length(unique(c(lst$tte.gpscript.dmd.england$f.eid,lst$tte.gpscript.bnf.england$f.eid,lst$tte.gpscript.bnf.scotland$f.eid,lst$tte.gpscript.read2.wales$f.eid)))}"))
+  # #############################################################################################
 
-  toc() #423.762 sec elapsed
+  tictoc::toc() #423.762 sec elapsed
   return(lst)
 
 }
@@ -440,7 +440,7 @@ read_gp_script_data <- function(fgp,min_instance=3){
 sumcounts <- function(dfs){
   df <- suppressWarnings(Reduce(function(...) merge(..., all = TRUE, by = "code"), dfs))
   names(df)<-c("code",names(dfs))
-  df <- as.data.table(cbind(df,N=df[ ,rowSums(.SD,na.rm = T), .SDcols =names(df)[!names(df) %in% "code"] ]))
+  df <- data.table::as.data.table(cbind(df,N=df[ ,rowSums(.SD,na.rm = T), .SDcols =names(df)[!names(df) %in% "code"] ]))
   return(df)
 }
 
@@ -493,7 +493,7 @@ get_lst_counts <- function(lst.data,lst.data.settings=lst.data.settings ) {
 #' @examples
 #' read_death_data("death.txt","death_cause.txt" )
 read_death_data <- function(fdeath_portal, fdeath_cause_portal){
-  tic(paste("read death data",fdeath_portal,"&",fdeath_cause_portal))
+  tictoc::tic(paste("read death data",fdeath_portal,"&",fdeath_cause_portal))
   mindate = as.Date("1930-01-01")
   maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?.
 
@@ -501,9 +501,10 @@ read_death_data <- function(fdeath_portal, fdeath_cause_portal){
   death.portal=fread(fdeath_portal)
   death.cause.portal=fread(fdeath_cause_portal)
   #  each record uniquely identified by the eid (encoded identifier) of the participant and the instance index (ins_index) of the record
+
   dfdeath<-merge(death.portal,death.cause.portal,by=c("eid","ins_index"))
   # level indicate primary or secondary cause
-  dfdeath<-select(dfdeath,eid , cause_icd10, date_of_death,level)
+  dfdeath<-dplyr::select(dfdeath,eid , cause_icd10, date_of_death,level)
   names(dfdeath) <- c("f.eid","code","eventdate","level")
   # class change for consistency
   dfdeath <- dfdeath[, f.eid:=as.character(f.eid)]
@@ -512,17 +513,17 @@ read_death_data <- function(fdeath_portal, fdeath_cause_portal){
   dfdeath <- subset(dfdeath, eventdate < maxdate ) # remove deaths that occurs after today
 
   # parse primary and secondary cause; add event flag with all considered valid; drop col level
-  dfdeath.primary<-dfdeath %>% filter(level ==1 ) %>% mutate (event=1) %>% select(f.eid , code, eventdate,event)
+  dfdeath.primary<-dfdeath %>% dplyr::filter(level ==1 ) %>% dplyr::mutate(event=1) %>% dplyr::select(f.eid , code, eventdate,event)
   dfdeath.primary <- dfdeath.primary[, event:=as.integer(event)]
 
-  dfdeath.secondary<-dfdeath %>% filter(level ==2 ) %>% mutate (event=1) %>% select(f.eid , code, eventdate,event)
+  dfdeath.secondary<-dfdeath %>% dplyr::filter(level ==2 ) %>% dplyr::mutate(event=1) %>% dplyr::select(f.eid , code, eventdate,event)
   dfdeath.secondary <- dfdeath.secondary[, event:=as.integer(event)]
 
-  toc()
+  tictoc::toc()
 
   lst_death <- list("primary" = dfdeath.primary, "secondary" = dfdeath.secondary)
   message("setkey(code)")
-  lst_death <- lapply(lst_death,function(x) {setkey(x,code) })
+  lst_death <- lapply(lst_death,function(x) {data.table::setkey(x,code) })
   lst_death <- lapply(lst_death,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
   return(lst_death)
 

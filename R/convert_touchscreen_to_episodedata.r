@@ -51,7 +51,7 @@
 #' convert_touchscreen_to_episodedata(dfukb,ts_conditions = "6150[3894]")
 #' convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions_processed$TS)
 convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_processed$TS,qc_treshold_year=10,event_code=2){
-  tic()
+  tictoc::tic()
   ts_conditions <- unique(c(na.omit(unlist(strsplit(ts_conditions,",")))))
   print(paste("Input fields:",ts_conditions,sep=" ") )
 
@@ -75,7 +75,7 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
   # for each field listed in ts
   for (col in ts_conditions) {
     # col<-"3581≥0[3581]"
-    print(paste("process touchscreen data for",col,sep=" "))
+    message(glue::glue("process touchscreen data for {col}"))
     # parse the field and condition
     cdn<-str_extract(col,"[=|<|>|≥|≤|!][=]*\\d+")
     field_ts_diagnosis<-str_extract(col,"\\d+")
@@ -136,7 +136,7 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
       # find rows that fulfil the condition
       cdn_exp <-paste(diagfield,cdn,sep="") #"f.xxxxx.v.i ==1"
 
-      df_sub<- df_sub %>% filter(eval((parse(text=cdn_exp))))
+      df_sub<- df_sub %>% dplyr::filter(eval((parse(text=cdn_exp))))
       # if no rows fulfil the condition
       if (nrow(df_sub)==0){next}
       # replace the diagfield content with the condition
@@ -153,7 +153,7 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
   # after loop through all fields listed in ts
   message("convert to dataframe")
   # df_out contains all visits , each row in df_out is a event
-  df_out <- data.table(df_out,stringsAsFactors=F)
+  df_out <- data.table::data.table(df_out,stringsAsFactors=F)
   df_out <- df_out[, visitdate:=as.Date(visitdate)]
   df_out <- df_out[, birthyearmonth:=as.Date(birthyearmonth)]
 
@@ -170,8 +170,8 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
   df_out[df_out$eventdate > df_out$visitdate,'eventdate'] <- df_out[df_out$eventdate > df_out$visitdate,]$visitdate
 
   # deduplicate
-  message("deduplicate")
-  setkey(df_out,f.eid,code)
+  message("Deduplicate")
+  data.table::setkey(df_out,f.eid,code)
   dfout_extrastats <- suppressWarnings(df_out[, .(mindt= min(eventdate,na.rm = T),maxdt= max(eventdate,na.rm = T),meandt= mean(eventdate,na.rm=T) ), keyby=list(f.eid,code)])
   dfout_extrastats <- merge(df_out[,c('f.eid','code','eventdate')] ,dfout_extrastats,by=c('f.eid','code'))
 
@@ -207,7 +207,7 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
   gc()
   print(format(object.size(df_out), units = "Mb"))
 
-  toc()
+  tictoc::toc()
   return(df_out)
 
 

@@ -1,7 +1,7 @@
 
 
-library(scales)
-library(lubridate)
+# library(scales)
+# library(lubridate)
 
 
 
@@ -40,7 +40,7 @@ plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst
 
   if(is.null(ind_all_event_dt)){
     all_event_lst <- lapply(names(lst.data.eid), function(x) {
-      if(key(lst.data.eid[[x]]) =="f.eid"){
+      if(data.table::key(lst.data.eid[[x]]) =="f.eid"){
         lst.data.eid[[x]] [ .(identifier),nomatch=NULL] # nomatch is important
       } else{
         lst.data.eid[[x]] [ lst.data.eid[[x]]$f.eid %in% identifier]
@@ -52,7 +52,7 @@ plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst
     # set key to be eid
     ind_all_event_dt <- plyr::ldply(all_event_lst, data.frame) %>% as.data.table()
     ind_all_event_dt$classification <- lst.data.settings[match(ind_all_event_dt$.id ,lst.data.settings$datasource),]$classification
-    setkey(ind_all_event_dt,f.eid)
+    data.table::setkey(ind_all_event_dt,f.eid)
     ######
   }
   if (any(!ind_all_event_dt$f.eid %in% identifier)){
@@ -60,15 +60,15 @@ plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst
     return(0)
   }
   ### get iit ini the right formatt.
-  df <- ind_all_event_dt %>% filter(f.eid %in% identifier) %>% as.data.frame()
+  df <- ind_all_event_dt %>% dplyr::filter(f.eid %in% identifier) %>% as.data.frame()
   df <- data.frame(month=month(df$eventdate),
             year=year(df$eventdate),
             code= df$code,
             event=df$event,
             classification=df$classification )
 
-  df <- rbind(df %>% filter (event==1) %>% group_by(month,year,code,classification) %>% mutate(dup=length(code)),
-             df %>%  filter (event==0 | event ==2)%>% arrange(-event) %>% distinct(code,classification, .keep_all = TRUE) %>% group_by(month,year,code,classification) %>% mutate(dup=length(code))
+  df <- rbind(df %>% dplyr::filter (event==1) %>% dplyr::group_by(month,year,code,classification) %>% dplyr::mutate(dup=length(code)),
+             df %>%  dplyr::filter (event==0 | event ==2)%>% dplyr::arrange(-event) %>% dplyr::distinct(code,classification, .keep_all = TRUE) %>% dplyr::group_by(month,year,code,classification) %>% dplyr::mutate(dup=length(code))
              )
   # change from factor to character
   df$code<- as.character(df$code)
@@ -80,7 +80,7 @@ plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst
   #############
   df$date <- with(df, ymd(sprintf('%04d%02d%02d', year, month, 1)))
   df <- df[with(df, order(date)), ]
-  head(df)
+  # head(df)
 
   classification_levels <- unique(df$classification)
   # blue green yellow red   max allow 14 classification
@@ -99,7 +99,7 @@ plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst
   df <- merge(x=df, y=line_pos, by="date", all = TRUE)
   df <- df[with(df, order(date, classification)), ]
 
-  head(df)
+  # head(df)
 
   text_offset <- 0.05
 
@@ -116,8 +116,8 @@ plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst
   year_date_range <- seq(min(df$date) - months(month_buffer), max(df$date) + months(month_buffer), by='year')
   year_date_range <- as.Date(
     intersect(
-      ceiling_date(year_date_range, unit="year"),
-      floor_date(year_date_range, unit="year")
+      lubridate::ceiling_date(year_date_range, unit="year"),
+      lubridate::floor_date(year_date_range, unit="year")
     ),  origin = "1970-01-01"
   )
   year_format <- format(year_date_range, '%Y')
@@ -125,23 +125,24 @@ plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst
 
   #### PLOT ####
 
-  timeline_plot<-ggplot(df,aes(x=date,y=0, col=classification, label=code))
-  timeline_plot<-timeline_plot+labs(col="Classifications")
-  timeline_plot<-timeline_plot+scale_color_manual(values=classification_colors[1:length(classification_levels)], labels=classification_levels, drop = FALSE)
-  timeline_plot<-timeline_plot+theme_classic()
+  timeline_plot<-ggplot2::ggplot(df,ggplot2::aes(x=date,y=0, col=classification, label=code))
+  timeline_plot<-timeline_plot+ggplot2::labs(col="Classifications")
 
-  # Plot horizontal black line for timeline
-  timeline_plot<-timeline_plot+geom_hline(yintercept=0,
+  timeline_plot<-timeline_plot+ggplot2::scale_color_manual(values=classification_colors[1:length(classification_levels)], labels=classification_levels, drop = FALSE)
+  timeline_plot<-timeline_plot+ggplot2::theme_classic()
+
+    # Plot horizontal black line for timeline
+  timeline_plot<-timeline_plot+ggplot2::geom_hline(yintercept=0,
                                           color = "black", size=0.3)
 
   # Plot vertical segment lines for codes
-  timeline_plot<-timeline_plot+geom_segment(data=df[df$month_count == 1,], aes(y=position,yend=0,xend=date), color='black', size=0.2)
+  timeline_plot<-timeline_plot+ggplot2::geom_segment(data=df[df$month_count == 1,], ggplot2::aes(y=position,yend=0,xend=date), color='black', size=0.2)
 
   # Plot scatter points at zero and date
-  timeline_plot<-timeline_plot+geom_point(aes(y=0), size=3)
+  timeline_plot<-timeline_plot+ggplot2::geom_point(aes(y=0), size=3)
 
   # Don't show axes, appropriately position legend
-  timeline_plot<-timeline_plot+theme(axis.line.y=element_blank(),
+  timeline_plot<-timeline_plot+ggplot2::theme(axis.line.y=element_blank(),
                                      axis.text.y=element_blank(),
                                      axis.title.x=element_blank(),
                                      axis.title.y=element_blank(),
@@ -155,9 +156,9 @@ plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst
   # Show text for each month
   #timeline_plot<-timeline_plot+geom_text(data=month_df, aes(x=month_date_range,y=-0.1,label=month_format),size=2.5,vjust=0.5, color='black', angle=90)
   # Show year text
-  timeline_plot<-timeline_plot+geom_text(data=year_df, aes(x=year_date_range,y=-0.2,label=year_format, fontface="bold"),size=2.5, color='black',angle=90)
+  timeline_plot<-timeline_plot+ggplot2::geom_text(data=year_df, ggplot2::aes(x=year_date_range,y=-0.2,label=year_format, fontface="bold"),size=2.5, color='black',angle=90)
   # Show text for each code
-  timeline_plot<-timeline_plot+geom_text(aes(y=text_position,label=code),size=2.5)
+  timeline_plot<-timeline_plot+ggplot2::geom_text(ggplot2::aes(y=text_position,label=code),size=2.5)
   print(timeline_plot)
   return(timeline_plot)
 }

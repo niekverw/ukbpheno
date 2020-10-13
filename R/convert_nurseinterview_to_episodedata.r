@@ -73,7 +73,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   # qc_threshold_year=10
 
   # df=dfukb
-  tic(paste("convert_nurseinterview_to_episodedata: ",field_sr_diagnosis))
+  tictoc::tic(paste("convert_nurseinterview_to_episodedata: ",field_sr_diagnosis))
 
   if(!is.null(field_sr_date)) { if(field_sr_date==""){field_sr_date=NULL}}
   if(is.null(field_sr_date))  { print("field_sr_date == NULL; qc_threshold_year and field_sr_date_type will not be used.") }
@@ -145,10 +145,9 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
     }
 
   }
-
   message("convert to dataframe")
   # df_out contains all visits , each row in df_out is a event
-  df_out <- data.table(df_out,stringsAsFactors=F)
+  df_out <- data.table::data.table(df_out,stringsAsFactors=F)
   df_out <- df_out[, visitdate:=as.Date(visitdate)]
   #df_out <- df_out[, code:=as.character(code)] #convert_col_to_integer(df_out$code) # df_out[, code:=as.integer(code)]
   # remove leading and trailing whitespace in column code
@@ -185,7 +184,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
     message("deduplicate")
     # for each code in the same participant, compute min(oldest record)/max(newest record)/mean date
     #### slow: # dfout_extrastats <- df_out %>% group_by(f.eid,code) %>% mutate(mindt = min(eventdate, na.rm = TRUE),maxdt = max(eventdate, na.rm = TRUE),meandt = mean(eventdate, na.rm = TRUE))
-    setkey(df_out,f.eid,code)
+    data.table::setkey(df_out,f.eid,code)
     dfout_extrastats <- suppressWarnings(df_out[, .(mindt= min(eventdate,na.rm = T),maxdt= max(eventdate,na.rm = T),meandt= mean(eventdate,na.rm=T) ), keyby=list(f.eid,code)])
     dfout_extrastats <- merge(df_out[,c('f.eid','code','eventdate')] ,dfout_extrastats,by=c('f.eid','code'))
 
@@ -220,13 +219,12 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   }
   df_out <- df_out[,c("f.eid","code","eventdate","event"),with=FALSE]
 
-  setkey(df_out,code)
+  data.table::setkey(df_out,code)
   df_out[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid']
 
   gc()
   print(format(object.size(df_out), units = "Mb"))
-
-  toc()
+  tictoc::toc()
   return(df_out)
 }
 
