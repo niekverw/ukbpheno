@@ -52,6 +52,10 @@
 #' convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions_processed$TS)
 convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_processed$TS,qc_treshold_year=10,event_code=2){
   tictoc::tic()
+  #########################pipe####################################
+  `%>%` <- magrittr::`%>%`  #is this a proper way ?
+  #################################################################
+
   ts_conditions <- unique(c(na.omit(unlist(strsplit(ts_conditions,",")))))
   print(paste("Input fields:",ts_conditions,sep=" ") )
 
@@ -136,7 +140,7 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
       # find rows that fulfil the condition
       cdn_exp <-paste(diagfield,cdn,sep="") #"f.xxxxx.v.i ==1"
 
-      df_sub<- df_sub dplyr::`%>%` dplyr::filter(eval((parse(text=cdn_exp))))
+      df_sub<- df_sub %>% dplyr::filter(eval((parse(text=cdn_exp))))
       # if no rows fulfil the condition
       if (nrow(df_sub)==0){next}
       # replace the diagfield content with the condition

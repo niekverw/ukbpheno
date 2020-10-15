@@ -18,6 +18,9 @@ to_datatype <- function(vct=c(),datatype){
 #' get_all_events(dfDefinitions_processed_expanded[14,],lst.data,lst.data.settings)
 get_all_events <- function (definition,lst.data=lst.data,lst.data.settings){
   # definitions=dfDefinitions_processed_expanded[9,]
+  #########################pipe####################################
+  `%>%` <- magrittr::`%>%`
+  #################################################################
   # look up for all dataframes in list
   if(is.null(definition) | nrow(definition)==0 ){
     #message("no input given")
@@ -31,8 +34,8 @@ get_all_events <- function (definition,lst.data=lst.data,lst.data.settings){
   message(paste("querying the following classifications: " ,paste(names(definition)[names(definition) %in% lst.data.settings$classification],collapse=", ")))
 
   all_event_lst<-lapply(names(lst.data), function(x) {
-    classification=lst.data.settings dplyr::`%>%` dplyr::filter(datasource == x) dplyr::`%>%` dplyr::pull(classification)
-    datatype=lst.data.settings dplyr::`%>%` dplyr::filter(datasource == x) dplyr::`%>%` dplyr::pull(datatype)
+    classification=lst.data.settings %>% dplyr::filter(datasource == x) %>% dplyr::pull(classification)
+    datatype=lst.data.settings %>% dplyr::filter(datasource == x) %>% dplyr::pull(datatype)
     codes <- to_datatype(strsplit(definition[,classification],split = ",")[[1]],datatype)
     lst.data[[x]][.(codes),nomatch=NULL] # nomatch is important, otherwise it will return row with NA if it didnt find the code (but which on the other hand may also maybe good to keep track?? )
 
@@ -43,7 +46,7 @@ get_all_events <- function (definition,lst.data=lst.data,lst.data.settings){
   all_event_lst <- all_event_lst[lapply(all_event_lst,nrow)>0]
 
   # set key to be eid
-  all_event_dt <- plyr::ldply(all_event_lst, data.frame) dplyr::`%>%` data.table::as.data.table()
+  all_event_dt <- plyr::ldply(all_event_lst, data.frame) %>% data.table::as.data.table()
   all_event_dt$classification <- lst.data.settings[match(all_event_dt$.id ,lst.data.settings$datasource),]$classification
   data.table::setkey(all_event_dt,f.eid)
   return (all_event_dt)

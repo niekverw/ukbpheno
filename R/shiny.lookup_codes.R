@@ -11,6 +11,9 @@ library(stringr)
 # fcoding.xls="data/all_lkps_maps.xlsx"
 
 load_data <- function(){
+  #########################pipe####################################
+  `%>%` <- magrittr::`%>%`
+  #################################################################
   #### READ V2
   dfCodesheet.read_v2_read_ctv3 <- as.data.frame(read_xlsx(fcoding.xls,sheet="read_v2_read_ctv3"))[,c(2,7)]
   colnames(dfCodesheet.read_v2_read_ctv3)<-c("read_code","CTV3")
@@ -20,13 +23,13 @@ load_data <- function(){
   dfCodesheet.read_v2_opcs4 <- as.data.frame(read_xlsx(fcoding.xls,sheet="read_v2_opcs4"))[,c(1,2)]
 
   dfCodesheet.read_v2_lkp <- as.data.frame(read_xlsx(fcoding.xls,sheet="read_v2_lkp"))
-  dfCodesheet.read_v2_lkp <- as.data.frame(dfCodesheet.read_v2_lkp dplyr::`%>%` arrange(read_code,term_code))
+  dfCodesheet.read_v2_lkp <- as.data.frame(dfCodesheet.read_v2_lkp %>% arrange(read_code,term_code))
   #dfCodesheet.read_v2_lkp <- dfCodesheet.read_v2_lkp[dfCodesheet.read_v2_lkp$term_code==0,]
   dfCodesheet.read_v2_drugs_lkp<- as.data.frame(read_xlsx(fcoding.xls,sheet="read_v2_drugs_lkp"))
   dfCodesheet.read_v2_lkp <- rbind(dfCodesheet.read_v2_lkp[,c(1,3)],dfCodesheet.read_v2_drugs_lkp[,1:2])
-  dfCodesheet.read_v2_lkp <- as.data.frame(dfCodesheet.read_v2_lkp dplyr::`%>%` group_by(read_code) dplyr::`%>%`  summarize(text = str_c(term_description, collapse = "/")))
+  dfCodesheet.read_v2_lkp <- as.data.frame(dfCodesheet.read_v2_lkp %>% group_by(read_code) %>%  summarize(text = str_c(term_description, collapse = "/")))
   #dfCodesheet.read_v2_lkp$read_code <- gsub("\\.","", dfCodesheet.read_v2_lkp$read_code)
-  dfCodesheet.read_v2_lkp <- dfCodesheet.read_v2_lkp dplyr::`%>%` unique()  dplyr::`%>%` arrange(read_code)
+  dfCodesheet.read_v2_lkp <- dfCodesheet.read_v2_lkp %>% unique()  %>% arrange(read_code)
   dfCodesheet.read_v2_lkp$text <- str_replace_all(dfCodesheet.read_v2_lkp$text,"[^/[:^punct:]]", "")
 
   # meds; read to ukb code
@@ -57,7 +60,7 @@ load_data <- function(){
   dfCodesheet.read_ctv3_icd10 <- as.data.frame(read_xlsx(fcoding.xls,sheet="read_ctv3_icd10"))[,c(1,2)]
   dfCodesheet.read_ctv3_opcs4 <- as.data.frame(read_xlsx(fcoding.xls,sheet="read_ctv3_opcs4"))[,c(1,2)]
   dfCodesheet.read_ctv3_lkp <- as.data.frame(read_xlsx(fcoding.xls,sheet="read_ctv3_lkp"))[,c(1,2)]
-  dfCodesheet.read_ctv3_lkp <- as.data.frame(dfCodesheet.read_ctv3_lkp dplyr::`%>%` group_by(read_code) dplyr::`%>%`  summarize(text = str_c(term_description, collapse = "/")))
+  dfCodesheet.read_ctv3_lkp <- as.data.frame(dfCodesheet.read_ctv3_lkp %>% group_by(read_code) %>%  summarize(text = str_c(term_description, collapse = "/")))
 
   dfCodesheet.CTV3 <- merge(dfCodesheet.read_ctv3_readv2,dfCodesheet.read_ctv3_icd10,by="read_code",all=T)
   dfCodesheet.CTV3 <- merge(dfCodesheet.CTV3,dfCodesheet.read_ctv3_icd9,by="read_code",all=T)
@@ -206,11 +209,14 @@ add.description.to.codes <- function(Str,code.id="UKB.Coding",description.id="Me
 
 add.description.to.vectorofcodes <- function(vctcodes=c("G551.","G55.."),code.id="CTV3",description.id="text",description.lookuptable=LstdfCodesheets$CTV3,ignore.case=FALSE,firstcodeonly=TRUE) {
   #c <- unlist(sapply(vctcodes,na.omit,USE.NAMES = F))
+  #########################pipe####################################
+  `%>%` <- magrittr::`%>%`
+  #################################################################
   if(length(vctcodes)==0){return(c())}
 
   c<-as.character(vctcodes)
   df_c <- description.lookuptable[.(c)] #[[code.id]]
-  df_c <- df_c dplyr::`%>%` select(c=eval(code.id),text) dplyr::`%>%` unique dplyr::`%>%` filter(!is.na(c)) dplyr::`%>%` dplyr::group_by(c) dplyr::`%>%` mutate(text = paste0(text, collapse = "/")) dplyr::`%>%` unique dplyr::`%>%` mutate(c_text=paste0(c," (",text,")"))
+  df_c <- df_c %>% select(c=eval(code.id),text) %>% unique %>% filter(!is.na(c)) %>% dplyr::group_by(c) %>% mutate(text = paste0(text, collapse = "/")) %>% unique %>% mutate(c_text=paste0(c," (",text,")"))
   df_c<- data.frame(df_c)
   #c <- paste(unique(unname(c)),collapse=",")
   return(df_c)
@@ -247,16 +253,19 @@ expand_clean_codes <- function(col=df$ICD10,
 }
 
 lookup_list_in_df <- function(lst,df.lookup){
+  #########################pipe####################################
+  `%>%` <- magrittr::`%>%`
+  #################################################################
   # lookup list in df, as long as names are corresponding to df headers..
   df.all<-data.frame()
   for (i in 1:length(lst)){
     lookup=na.omit(lst[i][[1]])
-    d <- df.lookup[ df.lookup[,get(names(lst[i]) )] %in% lookup ,] dplyr::`%>%` unique()
+    d <- df.lookup[ df.lookup[,get(names(lst[i]) )] %in% lookup ,] %>% unique()
     #if(nrow(d)>1) d$source = names(lst[i])
     df.all<-rbind(df.all,d)
 
   }
-  df.all <- df.all dplyr::`%>%` unique()
+  df.all <- df.all %>% unique()
   return(df.all)
 }
 

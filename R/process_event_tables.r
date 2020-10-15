@@ -11,10 +11,13 @@
 #' all_event_dt <- get_all_events(dfDefinitions_processed_expanded[1,],lst.data,lst.data.settings)
 #' get_stats_for_events(all_event_dt)
 get_stats_for_events <- function(all_event_dt){
+  #########################pipe####################################
+  `%>%` <- magrittr::`%>%`
+  #################################################################
   # show stats on codes
   stats.codes <- all_event_dt[, .(count=.N,sum.event = sum(event,na.rm = T),sum.epidur= sum(epidur,na.rm = T),median.epidur= median(epidur,na.rm = T),max.epidur= max(epidur,na.rm=T) ), keyby=list(f.eid,classification, code)]
-  stats.codes <- stats.codes dplyr::`%>%` dplyr::group_by(classification, code) dplyr::`%>%` summarise(count=n() )
-  stats.codes <- stats.codes dplyr::`%>%` arrange(count)
+  stats.codes <- stats.codes %>% dplyr::group_by(classification, code) %>% summarise(count=n() )
+  stats.codes <- stats.codes %>% arrange(count)
   stats.codes$rank <- 1:nrow(stats.codes)
   p1 <-ggplot2::ggplot(stats.codes, ggplot2::aes(rank, count,label=code,color=classification)) + ggplot2::geom_point() + ggplot2::ylim(-((max(stats.codes$count))/3),NA)  + ggrepel::geom_text_repel(size =3,segment.size=0.5)
 
@@ -146,7 +149,9 @@ get_incidence_prevalence <- function(all_event_dt,
 
   # reference_date <- reference_date[!is.na(reference_date)]
 
-
+  #########################pipe####################################
+  `%>%` <- magrittr::`%>%`
+  #################################################################
   if(length(reference_date)==0){reference_date<-NULL}
   if(!is.null(reference_date)){
     df_referencedate <-data.table::data.table(reference_date)
@@ -160,13 +165,13 @@ get_incidence_prevalence <- function(all_event_dt,
   if(include_secondary_recurrence){
     sources_recurrence_events <- lst.data.settings$datasource
   } else {
-    sources_recurrence_events <- lst.data.settings dplyr::`%>%`  dplyr::filter(diagnosis==1) dplyr::`%>%` dplyr::pull(datasource)
+    sources_recurrence_events <- lst.data.settings %>%  dplyr::filter(diagnosis==1) %>% dplyr::pull(datasource)
   }
 
 
 
-  df <- merge(all_event_dt,df_referencedate,by = 'f.eid') dplyr::`%>%` dplyr::arrange(eventdate) dplyr::`%>%` data.table::as.data.table()
-  # df <- df dplyr::`%>%` filter(!is.na(reference_date)) # comment out if missing f.eids is fixed.
+  df <- merge(all_event_dt,df_referencedate,by = 'f.eid') %>% dplyr::arrange(eventdate) %>% data.table::as.data.table()
+  # df <- df %>% filter(!is.na(reference_date)) # comment out if missing f.eids is fixed.
   df$days <- df$eventdate - df$reference_date
 
   data.table::setkey(df,days) # i don't know why, but setkey was alreaday on f.eid and cannot refresh..
@@ -192,7 +197,7 @@ get_incidence_prevalence <- function(all_event_dt,
   # records if death succeed an diagnosis
   Fu_days <- suppressWarnings( unique(dfFu[,.(Fu_days= min(days,na.rm=T),death.primary,death.secondary ), keyby=list(f.eid)] ))
   ### age of diagnosis
-  #system.time({ df dplyr::`%>%` filter(event>0) dplyr::`%>%` group_by(f.eid) dplyr::`%>%` summarise(first_diagnosis_days=min(days)) }) # <- slow..
+  #system.time({ df %>% filter(event>0) %>% group_by(f.eid) %>% summarise(first_diagnosis_days=min(days)) }) # <- slow..
   #system.time({ df[df$event>0][,.(first_diagnosis_days=min(days,na.rm=T) ), by=f.eid] }) # <- fast..
   #df[df$event>0][df[, .I[which.max(days)], by=f.eid]$V1] # <- aanother way..
   #
@@ -201,8 +206,8 @@ get_incidence_prevalence <- function(all_event_dt,
   #
   # first_diagnosis_days <- df[  ,.SD[which.min(days)], by=f.eid]
   #
-  # df dplyr::`%>%` filter(f.eid==1025336 )
-  # first_diagnosis_days dplyr::`%>%` filter(f.eid==1025336 )
+  # df %>% filter(f.eid==1025336 )
+  # first_diagnosis_days %>% filter(f.eid==1025336 )
 
   ### Data if participant had event/med  reference date (visit);+/- x day
   #TODO I think episodes for visitdate (event=0 rows) is messing up with this flag! i.e. almost all of them have this flag on
@@ -246,7 +251,7 @@ get_incidence_prevalence <- function(all_event_dt,
 
   all_event_dt.summary$death.primary.x<-data.table::fcoalesce(all_event_dt.summary$death.primary.x,all_event_dt.summary$death.primary.y)
   all_event_dt.summary$death.secondary.x<-data.table::fcoalesce(all_event_dt.summary$death.secondary.x,all_event_dt.summary$death.secondary.y)
-  all_event_dt.summary<-all_event_dt.summary dplyr::`%>%` dplyr::select(f.eid, count ,sum.epidur, median.epidur, max.epidur,Hx_days,Fu_days, death.primary.x, death.secondary.x,Hx, Fu, Ref)
+  all_event_dt.summary<-all_event_dt.summary %>% dplyr::select(f.eid, count ,sum.epidur, median.epidur, max.epidur,Hx_days,Fu_days, death.primary.x, death.secondary.x,Hx, Fu, Ref)
   names(all_event_dt.summary)<- c("f.eid", "count" ,"sum.epidur", "median.epidur", "max.epidur","Hx_days","Fu_days", "death.primary", "death.secondary","Hx", "Fu", "Ref")
   # NA are not true event (=1) records , which are not death records
   set(all_event_dt.summary,which(is.na(all_event_dt.summary$death.primary)),"death.primary",0)
@@ -275,25 +280,29 @@ get_incidence_prevalence <- function(all_event_dt,
 #' @keywords time-to-event
 #' @export
 #' @examples
-#' get_cases(definitions=dfDefinitions_processed_expanded dplyr::`%>%` filter(TRAIT=="Nicm"), lst.data,lst.data.settings, reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
+#' get_cases(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,lst.data.settings, reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
 get_cases <- function(definitions,
                        lst.data,
                        lst.data.settings,
                        reference_date=NULL,
                        ...
                          ) {
+
+  #########################pipe####################################
+  `%>%` <- magrittr::`%>%`
+  #################################################################
   # define cases
   if(length(unique(definitions$TRAIT))>1){
     message("more than 1 TRAIT in definitions")
   }
 
-  all_event_dt.Include_in_cases <- get_all_events(definitions dplyr::`%>%` dplyr::filter(Definitions =="Include_in_cases"),lst.data,lst.data.settings)   #MI
+  all_event_dt.Include_in_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,lst.data.settings)   #MI
   all_event_dt.Include_in_cases.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.Include_in_cases,lst.data.settings,
                                                                     reference_date = reference_date)
                                                                     #...)
 
   message(glue::glue("including {nrow(all_event_dt.Include_in_cases.summary)} cases"))
-  all_event_dt.Exclude_from_cases <- get_all_events(definitions dplyr::`%>%` dplyr::filter(Definitions =="Exclude_from_cases"),lst.data,lst.data.settings)   #MI
+  all_event_dt.Exclude_from_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Exclude_from_cases"),lst.data,lst.data.settings)   #MI
   if(!is.null(all_event_dt.Exclude_from_cases)){
     exclude=all_event_dt.Include_in_cases.summary$f.eid %in% unique(all_event_dt.Exclude_from_cases$f.eid)
     message(glue::glue("excluding {sum(exclude)} cases"))
@@ -325,7 +334,7 @@ get_cases <- function(definitions,
 #' @keywords time-to-event
 #' @export
 #' @examples
-#' get_cases_controls(definitions=dfDefinitions_processed_expanded dplyr::`%>%` filter(TRAIT=="Nicm"), lst.data,lst.data.settings,  reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
+#' get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,lst.data.settings,  reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
 get_cases_controls <- function (definitions,
                                  lst.data,
                                  lst.data.settings,
@@ -334,7 +343,9 @@ get_cases_controls <- function (definitions,
 ) {
 
   #reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid)
-
+  #########################pipe####################################
+  `%>%` <- magrittr::`%>%`
+  #################################################################
   reference_date <- reference_date[!is.na(reference_date)]
   reference_date <- reference_date[!is.na(names(reference_date))]
   if(is.null(reference_date)){
@@ -345,7 +356,7 @@ get_cases_controls <- function (definitions,
     }
   }
   # define population
-  all_event_dt.population <- get_all_events(definitions dplyr::`%>%` filter(Definitions =="Study_population"),lst.data,lst.data.settings)   #MI
+  all_event_dt.population <- get_all_events(definitions %>% filter(Definitions =="Study_population"),lst.data,lst.data.settings)   #MI
 
   if(!is.null(all_event_dt.population)) {
     # only consider event with real event date in study population, set those with visitdate to NA
@@ -363,13 +374,13 @@ get_cases_controls <- function (definitions,
   all_event_dt.Include_in_cases.summary <- cases$all_event_dt.Include_in_cases.summary
   all_event_dt.Include_in_cases <- cases$all_event_dt.Include_in_cases
   # define exclude controls
-  all_event_dt.Exclude_from_controls <- get_all_events(definitions dplyr::`%>%` dplyr::filter(Definitions =="Exclude_from_controls"),lst.data,lst.data.settings)   #MI
+  all_event_dt.Exclude_from_controls <- get_all_events(definitions %>% dplyr::filter(Definitions =="Exclude_from_controls"),lst.data,lst.data.settings)   #MI
   ### define case & control
   if(is.null(reference_date)){
     reference_date = setNames(as.Date(rep(NA,length(lst.identifiers))),lst.identifiers)
   }
 
-  df.casecontrol <- data.frame(reference_date=reference_date) dplyr::`%>%` tibble::rownames_to_column('f.eid') dplyr::`%>%` data.table::as.data.table()
+  df.casecontrol <- data.frame(reference_date=reference_date) %>% tibble::rownames_to_column('f.eid') %>% data.table::as.data.table()
 
   # exlude id in case_include & case_exclude from summary => potential control
   df.casecontrol <- df.casecontrol[!df.casecontrol$f.eid %in% all_event_dt.Include_in_cases.summary$f.eid,]
@@ -437,11 +448,14 @@ get_survival_data<-function(def,lst.data,
                              window_days_mask=0){
   # subset lst.data to get only death records
   # lst.data.death<-lst.data[grep("death", names(lst.data))]
+  #########################pipe####################################
+  `%>%` <- magrittr::`%>%`
+  #################################################################
   lst.data.death<-lst.data[lst.data.settings[match(names(lst.data),lst.data.settings$datasource),]$death]
   death_event_dt<-get_all_events(def,lst.data.death,lst.data.settings)
 
   # check consistency in the records w.r.t date
-  discrepant_deaths<-death_event_dtdplyr::`%>%`  dplyr::group_by(f.eid) dplyr::`%>%` dplyr::summarize(max_date = max(eventdate, na.rm = TRUE),min_date = min(eventdate),same_date=(max_date==min_date))dplyr::`%>%` dplyr::filter(!same_date)
+  discrepant_deaths<-death_event_dt%>%  dplyr::group_by(f.eid) %>% dplyr::summarize(max_date = max(eventdate, na.rm = TRUE),min_date = min(eventdate),same_date=(max_date==min_date))%>% dplyr::filter(!same_date)
 
   if (nrow(discrepant_deaths)>0){
     message(glue::glue("Number of individuals have inconsistent death dates: {nrow(discrepant_deaths))}"))
@@ -465,7 +479,7 @@ get_survival_data<-function(def,lst.data,
   # fu_days_mask masks FU event but not day==0 which is considered as Hx so apply the mask on the df
 
   # make the table cleaner
-  death_event_dt.summary<-death_event_dt.summary dplyr::`%>%` dplyr::select(f.eid,first_diagnosis_days,reference_date,Any )
+  death_event_dt.summary<-death_event_dt.summary %>% dplyr::select(f.eid,first_diagnosis_days,reference_date,Any )
   names(death_event_dt.summary) <-  c("f.eid",	"days_after_diagnosis",	"reference_date",	"Any")
 
   death_event_dt.summary[death_event_dt.summary$days_after_diagnosis<window_days_mask ,"days_after_diagnosis"] <- NA
