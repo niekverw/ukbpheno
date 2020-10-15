@@ -52,10 +52,6 @@
 #' convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions_processed$TS)
 convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_processed$TS,qc_treshold_year=10,event_code=2){
   tictoc::tic()
-  #########################pipe####################################
-  `%>%` <- magrittr::`%>%`  #is this a proper way ?
-  #################################################################
-
   ts_conditions <- unique(c(na.omit(unlist(strsplit(ts_conditions,",")))))
   print(paste("Input fields:",ts_conditions,sep=" ") )
 

@@ -26,9 +26,7 @@ plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst
   # alternative input: lst.data.eid and identifier, so that it generates the ind_all_event_dt based on all available data.
   # lst.data.eid, can be keyed on f.eid which is MUCH faster, we can create a functiion that checks the key and returns a new keyed object as global var if it iis not right.  lst.data.eid.f.eid<-lapply(lst.data.eid,function(x) {setkey(x,f.eid) }) # double check that everything has the same setkey.
   # lst.data.eid, TODO: make f.eid integers (fastest type): lst.data.eid.f.eid<-lapply(lst.data.eid,function(x) {x[, ('f.eid') := lapply(.SD, as.numeric), .SDcols = 'f.eid'] }) # double check that everything has the same setkey.
-  #########################pipe####################################
-  `%>%` <- magrittr::`%>%`
-  #################################################################
+
   # ###############################################################################
   # Why to character? it throws an error when fetching the events for the individual
   # Error in bmerge .....Incompatible join types: x.f.eid (double) and i.V1 (character)

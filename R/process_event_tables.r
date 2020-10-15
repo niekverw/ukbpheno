@@ -11,9 +11,7 @@
 #' all_event_dt <- get_all_events(dfDefinitions_processed_expanded[1,],lst.data,lst.data.settings)
 #' get_stats_for_events(all_event_dt)
 get_stats_for_events <- function(all_event_dt){
-  #########################pipe####################################
-  `%>%` <- magrittr::`%>%`
-  #################################################################
+
   # show stats on codes
   stats.codes <- all_event_dt[, .(count=.N,sum.event = sum(event,na.rm = T),sum.epidur= sum(epidur,na.rm = T),median.epidur= median(epidur,na.rm = T),max.epidur= max(epidur,na.rm=T) ), keyby=list(f.eid,classification, code)]
   stats.codes <- stats.codes %>% dplyr::group_by(classification, code) %>% summarise(count=n() )
@@ -149,9 +147,7 @@ get_incidence_prevalence <- function(all_event_dt,
 
   # reference_date <- reference_date[!is.na(reference_date)]
 
-  #########################pipe####################################
-  `%>%` <- magrittr::`%>%`
-  #################################################################
+
   if(length(reference_date)==0){reference_date<-NULL}
   if(!is.null(reference_date)){
     df_referencedate <-data.table::data.table(reference_date)
@@ -288,9 +284,6 @@ get_cases <- function(definitions,
                        ...
                          ) {
 
-  #########################pipe####################################
-  `%>%` <- magrittr::`%>%`
-  #################################################################
   # define cases
   if(length(unique(definitions$TRAIT))>1){
     message("more than 1 TRAIT in definitions")
@@ -343,9 +336,7 @@ get_cases_controls <- function (definitions,
 ) {
 
   #reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid)
-  #########################pipe####################################
-  `%>%` <- magrittr::`%>%`
-  #################################################################
+
   reference_date <- reference_date[!is.na(reference_date)]
   reference_date <- reference_date[!is.na(names(reference_date))]
   if(is.null(reference_date)){
@@ -448,9 +439,7 @@ get_survival_data<-function(def,lst.data,
                              window_days_mask=0){
   # subset lst.data to get only death records
   # lst.data.death<-lst.data[grep("death", names(lst.data))]
-  #########################pipe####################################
-  `%>%` <- magrittr::`%>%`
-  #################################################################
+
   lst.data.death<-lst.data[lst.data.settings[match(names(lst.data),lst.data.settings$datasource),]$death]
   death_event_dt<-get_all_events(def,lst.data.death,lst.data.settings)
 

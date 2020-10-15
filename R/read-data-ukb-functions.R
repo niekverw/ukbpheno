@@ -21,9 +21,7 @@ default_ukb_fields <- function(){
 # @param data Field-to-description table from html file
 #
 description_to_name <-  function(Vct) {
-  #########################pipe####################################
-  `%>%` <- magrittr::`%>%`
-  #################################################################
+
   #https://github.com/kenhanscombe/ukbtools/blob/master/R/dataset.R
   name <- tolower(Vct) %>%
     gsub(" - ", "_", x = .) %>%
@@ -223,9 +221,7 @@ read_ukb_tabdata <- function(fukb,
 #' @examples
 #' read_hesin_data("hesin.txt" ,"hesin_diag.txt" ,"hesin_oper.txt" )
 read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
-  #########################pipe####################################
-  `%>%` <- magrittr::`%>%`
-  #################################################################
+
   #  refer HES Data Dictionary Document ID:141140
   ## TODO; use library(fasttime); fastPOSIXct(DT$start_date)
   # read hesin, extract event date
@@ -313,10 +309,8 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
 #' @export
 #' @examples
 #' read_gp_clinical_data("gpclinical.txt" )
-read_gp_clinical_data <- function(fgp,min_instance=3){
-  #########################pipe####################################
-  `%>%` <- magrittr::`%>%`
-  #################################################################
+read_gp_clinical_data <- function(fgp){
+
   tictoc::tic(paste("read gp data",fgp))
   message(paste("read gp data",fgp))
   # records potentially erroneous have date changed to 01/01/1901 (occured before birth), 02/02/1902 (occured on DOB), 03/03/1903 (same year as DOB), 07/07/2037 (occured after the time of extraction)
@@ -376,10 +370,8 @@ read_gp_clinical_data <- function(fgp,min_instance=3){
 #' @export
 #' @examples
 #' read_gp_clinical_data("gpscripts.txt" )
-read_gp_script_data <- function(fgp,min_instance=3){
-  #########################pipe####################################
-  `%>%` <- magrittr::`%>%`
-  #################################################################
+read_gp_script_data <- function(fgp){
+
   tictoc::tic("read gp prescription data")
   mindate = as.Date("1930-01-01")
   maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?.
@@ -494,7 +486,6 @@ get_lst_counts <- function(lst.data,lst.data.settings=lst.data.settings ) {
   return(lst.counts.aggregate)
 }
 
-
 #' Read Mortality data
 #'
 #' This function reads death data on the Data Portal.
@@ -505,10 +496,6 @@ get_lst_counts <- function(lst.data,lst.data.settings=lst.data.settings ) {
 #' @examples
 #' read_death_data("death.txt","death_cause.txt" )
 read_death_data <- function(fdeath_portal, fdeath_cause_portal){
-  #########################pipe####################################
-  `%>%` <- magrittr::`%>%`
-  #################################################################
-
   tictoc::tic(paste("read death data",fdeath_portal,"&",fdeath_cause_portal))
   mindate = as.Date("1930-01-01")
   maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?.

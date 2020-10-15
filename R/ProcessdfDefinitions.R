@@ -212,9 +212,7 @@ ProcessDfDefinitions<-function(df,
                                fill_dependencies=T){
 
   # df<- dfDefinitions  #  df<- dfDefinitions2
-  #########################pipe####################################
-  `%>%` <- magrittr::`%>%`
-  #################################################################
+
   df <- data.frame(df,check.names = FALSE)
   names(df) <- sub(pattern = "CODES",replacement = "",names(df) )
   names(df) <- sub(pattern = "_$",replacement = "",names(df) ) # "n_20002_" --> "n_20002"

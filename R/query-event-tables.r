@@ -18,9 +18,7 @@ to_datatype <- function(vct=c(),datatype){
 #' get_all_events(dfDefinitions_processed_expanded[14,],lst.data,lst.data.settings)
 get_all_events <- function (definition,lst.data=lst.data,lst.data.settings){
   # definitions=dfDefinitions_processed_expanded[9,]
-  #########################pipe####################################
-  `%>%` <- magrittr::`%>%`
-  #################################################################
+
   # look up for all dataframes in list
   if(is.null(definition) | nrow(definition)==0 ){
     #message("no input given")

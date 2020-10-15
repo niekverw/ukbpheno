@@ -11,9 +11,7 @@ library(stringr)
 # fcoding.xls="data/all_lkps_maps.xlsx"
 
 load_data <- function(){
-  #########################pipe####################################
-  `%>%` <- magrittr::`%>%`
-  #################################################################
+
   #### READ V2
   dfCodesheet.read_v2_read_ctv3 <- as.data.frame(read_xlsx(fcoding.xls,sheet="read_v2_read_ctv3"))[,c(2,7)]
   colnames(dfCodesheet.read_v2_read_ctv3)<-c("read_code","CTV3")
@@ -209,9 +207,7 @@ add.description.to.codes <- function(Str,code.id="UKB.Coding",description.id="Me
 
 add.description.to.vectorofcodes <- function(vctcodes=c("G551.","G55.."),code.id="CTV3",description.id="text",description.lookuptable=LstdfCodesheets$CTV3,ignore.case=FALSE,firstcodeonly=TRUE) {
   #c <- unlist(sapply(vctcodes,na.omit,USE.NAMES = F))
-  #########################pipe####################################
-  `%>%` <- magrittr::`%>%`
-  #################################################################
+
   if(length(vctcodes)==0){return(c())}
 
   c<-as.character(vctcodes)
@@ -253,9 +249,7 @@ expand_clean_codes <- function(col=df$ICD10,
 }
 
 lookup_list_in_df <- function(lst,df.lookup){
-  #########################pipe####################################
-  `%>%` <- magrittr::`%>%`
-  #################################################################
+
   # lookup list in df, as long as names are corresponding to df headers..
   df.all<-data.frame()
   for (i in 1:length(lst)){
