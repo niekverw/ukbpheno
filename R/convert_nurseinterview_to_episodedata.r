@@ -183,7 +183,7 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
     # deduplicate, min/max/mean/sd <- not very efficient?!!
     message("deduplicate")
     # for each code in the same participant, compute min(oldest record)/max(newest record)/mean date
-    #### slow: # dfout_extrastats <- df_out %>% group_by(f.eid,code) %>% mutate(mindt = min(eventdate, na.rm = TRUE),maxdt = max(eventdate, na.rm = TRUE),meandt = mean(eventdate, na.rm = TRUE))
+    #### slow: # dfout_extrastats <- df_out dplyr::`%>%` group_by(f.eid,code) dplyr::`%>%` mutate(mindt = min(eventdate, na.rm = TRUE),maxdt = max(eventdate, na.rm = TRUE),meandt = mean(eventdate, na.rm = TRUE))
     data.table::setkey(df_out,f.eid,code)
     dfout_extrastats <- suppressWarnings(df_out[, .(mindt= min(eventdate,na.rm = T),maxdt= max(eventdate,na.rm = T),meandt= mean(eventdate,na.rm=T) ), keyby=list(f.eid,code)])
     dfout_extrastats <- merge(df_out[,c('f.eid','code','eventdate')] ,dfout_extrastats,by=c('f.eid','code'))

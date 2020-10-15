@@ -237,10 +237,10 @@ ProcessDfDefinitions<-function(df,
   Study_population <- lookup.codes(df=df,lookupcolumn = "Study_population",VctAllColumns)
   Exclude_from_controls <- lookup.codes(df=df,lookupcolumn = "Exclude_from_controls",VctAllColumns)
 
-  dfDefinition <- rbind(Include_in_cases %>% dplyr::mutate(Definitions="Include_in_cases"),
-        Exclude_from_cases %>% dplyr::mutate(Definitions="Exclude_from_cases"),
-        Study_population %>% dplyr::mutate(Definitions="Study_population"),
-        Exclude_from_controls %>% dplyr::mutate(Definitions="Exclude_from_controls")
+  dfDefinition <- rbind(Include_in_cases dplyr::`%>%` dplyr::mutate(Definitions="Include_in_cases"),
+        Exclude_from_cases dplyr::`%>%` dplyr::mutate(Definitions="Exclude_from_cases"),
+        Study_population dplyr::`%>%` dplyr::mutate(Definitions="Study_population"),
+        Exclude_from_controls dplyr::`%>%` dplyr::mutate(Definitions="Exclude_from_controls")
         )
 
   dfDefinition <- ConvertFactorsToStringReplaceNAInDf(dfDefinition)
@@ -451,7 +451,7 @@ convert_readv2_to_ukbmedication<-function(Vctn_20003,Vctreadcodes){
 #' @keywords definition
 #' @export
 expand_dfDefinitions_processed <- function(dfDefinitions_processed,lst.data.settings,lst.counts){
-  classifications <- lst.data.settings %>% dplyr::filter(expand_codes==1) %>% dplyr::pull (classification) %>% unique()
+  classifications <- lst.data.settings dplyr::`%>%` dplyr::filter(expand_codes==1) dplyr::`%>%` dplyr::pull (classification) dplyr::`%>%` unique()
   for (c in classifications){
 
   for (r in 1:nrow(dfDefinitions_processed)){ # for loops just as fast as apply in this case..
@@ -514,7 +514,7 @@ expand_dfDefinitions_processed2 <-
     message("Expand the codes in the definition table")
 
     classifications <-
-      lst.data.settings %>% dplyr::filter(expand_codes == 1) %>% dplyr::pull (classification) %>% unique()
+      lst.data.settings dplyr::`%>%` dplyr::filter(expand_codes == 1) dplyr::`%>%` dplyr::pull (classification) dplyr::`%>%` unique()
 
     lst.codemap<-list()
 

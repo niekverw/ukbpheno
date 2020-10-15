@@ -22,15 +22,15 @@ default_ukb_fields <- function(){
 #
 description_to_name <-  function(Vct) {
   #https://github.com/kenhanscombe/ukbtools/blob/master/R/dataset.R
-  name <- tolower(Vct) %>%
-    gsub(" - ", "_", x = .) %>%
-    gsub(" ", "_", x = .) %>%
+  name <- tolower(Vct) dplyr::`%>%`
+    gsub(" - ", "_", x = .) dplyr::`%>%`
+    gsub(" ", "_", x = .) dplyr::`%>%`
     # remove the sentences describing data-coding
-    gsub("uses.*data.*coding.*simple_list.$", "", x = .) %>%
-    gsub("uses.*data.*coding.*hierarchical_tree.", "", x = .) %>%
-    gsub("uses.*data.*coding_[0-9]*", "", x = .) %>%
+    gsub("uses.*data.*coding.*simple_list.$", "", x = .) dplyr::`%>%`
+    gsub("uses.*data.*coding.*hierarchical_tree.", "", x = .) dplyr::`%>%`
+    gsub("uses.*data.*coding_[0-9]*", "", x = .) dplyr::`%>%`
     # remove leading weird character?
-    gsub("[^[:alnum:][:space:]_]", "", x = .) %>%
+    gsub("[^[:alnum:][:space:]_]", "", x = .) dplyr::`%>%`
     gsub("__*", "_", x = .)
 
   return(name)
@@ -239,7 +239,7 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   dfhesin[dfhesin$epidur <0,]$epidur <- NA
   # colnames(dfhesin)
   #keep only cols that maybe of use
-  dfhesin <- dfhesin %>% dplyr::select(eid,ins_index,source,epistart,admidate,epiend,disdate,epidur)
+  dfhesin <- dfhesin dplyr::`%>%` dplyr::select(eid,ins_index,source,epistart,admidate,epiend,disdate,epidur)
 
 
 
@@ -271,15 +271,15 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   dfhesin_oper <- dfhesin_oper[, event:=as.integer(event)]
 
   # filter + rename
-  tte.hesin.oper3.primary <- dfhesin_oper %>% dplyr::filter(level==1 & !is.na(oper3))  %>% dplyr::select(eid,eventdate,epidur,oper3,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% data.table::as.data.table()
-  tte.hesin.oper4.primary <- dfhesin_oper %>% dplyr::filter(level==1 & !is.na(oper4))  %>% dplyr::select(eid,eventdate,epidur,oper4,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% data.table::as.data.table()
-  tte.hesin.icd10.primary <- dfhesin_diag %>% dplyr::filter( level==1 & !is.na(diag_icd10))  %>% dplyr::select(eid,eventdate,epidur,diag_icd10,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% data.table::as.data.table()
-  tte.hesin.icd9.primary <- dfhesin_diag %>% dplyr::filter( level==1 & !is.na(diag_icd9))  %>% dplyr::select(eid,eventdate,epidur,diag_icd9,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% data.table::as.data.table()
+  tte.hesin.oper3.primary <- dfhesin_oper dplyr::`%>%` dplyr::filter(level==1 & !is.na(oper3))  dplyr::`%>%` dplyr::select(eid,eventdate,epidur,oper3,event)  dplyr::`%>%` dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  dplyr::`%>%` data.table::as.data.table()
+  tte.hesin.oper4.primary <- dfhesin_oper dplyr::`%>%` dplyr::filter(level==1 & !is.na(oper4))  dplyr::`%>%` dplyr::select(eid,eventdate,epidur,oper4,event)  dplyr::`%>%` dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  dplyr::`%>%` data.table::as.data.table()
+  tte.hesin.icd10.primary <- dfhesin_diag dplyr::`%>%` dplyr::filter( level==1 & !is.na(diag_icd10))  dplyr::`%>%` dplyr::select(eid,eventdate,epidur,diag_icd10,event)  dplyr::`%>%` dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  dplyr::`%>%` data.table::as.data.table()
+  tte.hesin.icd9.primary <- dfhesin_diag dplyr::`%>%` dplyr::filter( level==1 & !is.na(diag_icd9))  dplyr::`%>%` dplyr::select(eid,eventdate,epidur,diag_icd9,event)  dplyr::`%>%` dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  dplyr::`%>%` data.table::as.data.table()
 
-  tte.hesin.oper3.secondary <- dfhesin_oper %>% dplyr::filter(level==2 & !is.na(oper3))  %>% dplyr::select(eid,eventdate,epidur,oper3,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% data.table::as.data.table()
-  tte.hesin.oper4.secondary <- dfhesin_oper %>% dplyr::filter(level==2 & !is.na(oper4))  %>% dplyr::select(eid,eventdate,epidur,oper4,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% data.table::as.data.table()
-  tte.hesin.icd10.secondary <- dfhesin_diag %>% dplyr::filter( level==2 & !is.na(diag_icd10))  %>% dplyr::select(eid,eventdate,epidur,diag_icd10,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% data.table::as.data.table()
-  tte.hesin.icd9.secondary <- dfhesin_diag %>% dplyr::filter( level==2 & !is.na(diag_icd9))  %>% dplyr::select(eid,eventdate,epidur,diag_icd9,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% data.table::as.data.table()
+  tte.hesin.oper3.secondary <- dfhesin_oper dplyr::`%>%` dplyr::filter(level==2 & !is.na(oper3))  dplyr::`%>%` dplyr::select(eid,eventdate,epidur,oper3,event)  dplyr::`%>%` dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  dplyr::`%>%` data.table::as.data.table()
+  tte.hesin.oper4.secondary <- dfhesin_oper dplyr::`%>%` dplyr::filter(level==2 & !is.na(oper4))  dplyr::`%>%` dplyr::select(eid,eventdate,epidur,oper4,event)  dplyr::`%>%` dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  dplyr::`%>%` data.table::as.data.table()
+  tte.hesin.icd10.secondary <- dfhesin_diag dplyr::`%>%` dplyr::filter( level==2 & !is.na(diag_icd10))  dplyr::`%>%` dplyr::select(eid,eventdate,epidur,diag_icd10,event)  dplyr::`%>%` dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  dplyr::`%>%` data.table::as.data.table()
+  tte.hesin.icd9.secondary <- dfhesin_diag dplyr::`%>%` dplyr::filter( level==2 & !is.na(diag_icd9))  dplyr::`%>%` dplyr::select(eid,eventdate,epidur,diag_icd9,event)  dplyr::`%>%` dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  dplyr::`%>%` data.table::as.data.table()
 
 
   lst <- list(tte.hesin.oper3.primary = tte.hesin.oper3.primary,
@@ -336,8 +336,8 @@ read_gp_clinical_data <- function(fgp,min_instance=3){
 
 
   #  parse versions
-  tte.gpclincal.read3 <-  dfgp %>% dplyr::filter(read_3 !="")  %>% dplyr::select(eid,event_dt,read_3,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = read_3,event=event)  %>% data.table::as.data.table()
-  tte.gpclincal.read2 <-  dfgp %>% dplyr::filter(read_2 !="")  %>% dplyr::select(eid,event_dt,read_2,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% data.table::as.data.table()
+  tte.gpclincal.read3 <-  dfgp dplyr::`%>%` dplyr::filter(read_3 !="")  dplyr::`%>%` dplyr::select(eid,event_dt,read_3,event)  dplyr::`%>%` dplyr::rename(f.eid=eid,eventdate = event_dt,code = read_3,event=event)  dplyr::`%>%` data.table::as.data.table()
+  tte.gpclincal.read2 <-  dfgp dplyr::`%>%` dplyr::filter(read_2 !="")  dplyr::`%>%` dplyr::select(eid,event_dt,read_2,event)  dplyr::`%>%` dplyr::rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  dplyr::`%>%` data.table::as.data.table()
 
 
   lst <- list(tte.gpclincal.read2=tte.gpclincal.read2,tte.gpclincal.read3=tte.gpclincal.read3)
@@ -398,13 +398,13 @@ read_gp_script_data <- function(fgp,min_instance=3){
   # DMD used in England Vision, note one prescription may be described differently and coded differently
   # TODO standardize med codes:  varies in length (how to deal with this?), some with "." in between (strip all dots?)
   # England Vision
-  tte.gpscript.dmd.england <-  dfgp %>% dplyr::filter(dmd_code !="")  %>% dplyr::select(eid,event_dt,dmd_code,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = dmd_code,event=event)  %>% data.table::as.data.table()
+  tte.gpscript.dmd.england <-  dfgp dplyr::`%>%` dplyr::filter(dmd_code !="")  dplyr::`%>%` dplyr::select(eid,event_dt,dmd_code,event)  dplyr::`%>%` dplyr::rename(f.eid=eid,eventdate = event_dt,code = dmd_code,event=event)  dplyr::`%>%` data.table::as.data.table()
   # data_provider 1= England(Vision), 2= Scotland, 3 = England (TPP), 4 = Wales
-  tte.gpscript.bnf.england <-  dfgp %>% dplyr::filter(bnf_code !="" && data_provider == 3 )  %>% dplyr::select(eid,event_dt,bnf_code,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% data.table::as.data.table()
+  tte.gpscript.bnf.england <-  dfgp dplyr::`%>%` dplyr::filter(bnf_code !="" && data_provider == 3 )  dplyr::`%>%` dplyr::select(eid,event_dt,bnf_code,event)  dplyr::`%>%` dplyr::rename(f.eid=eid,eventdate = event_dt,code = bnf_code,event=event)  dplyr::`%>%` data.table::as.data.table()
 
-  tte.gpscript.bnf.scotland <-  dfgp %>% dplyr::filter(bnf_code !="" && data_provider == 2 )  %>% dplyr::select(eid,event_dt,bnf_code,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% data.table::as.data.table()
+  tte.gpscript.bnf.scotland <-  dfgp dplyr::`%>%` dplyr::filter(bnf_code !="" && data_provider == 2 )  dplyr::`%>%` dplyr::select(eid,event_dt,bnf_code,event)  dplyr::`%>%` dplyr::rename(f.eid=eid,eventdate = event_dt,code = bnf_code,event=event)  dplyr::`%>%` data.table::as.data.table()
   # Wales : read_2
-  tte.gpscript.read2.wales <-  dfgp %>% dplyr::filter(read_2 !="")  %>% dplyr::select(eid,event_dt,read_2,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% data.table::as.data.table()
+  tte.gpscript.read2.wales <-  dfgp dplyr::`%>%` dplyr::filter(read_2 !="")  dplyr::`%>%` dplyr::select(eid,event_dt,read_2,event)  dplyr::`%>%` dplyr::rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  dplyr::`%>%` data.table::as.data.table()
 
 
   # TODO count by tables
@@ -513,10 +513,10 @@ read_death_data <- function(fdeath_portal, fdeath_cause_portal){
   dfdeath <- subset(dfdeath, eventdate < maxdate ) # remove deaths that occurs after today
 
   # parse primary and secondary cause; add event flag with all considered valid; drop col level
-  dfdeath.primary<-dfdeath %>% dplyr::filter(level ==1 ) %>% dplyr::mutate(event=1) %>% dplyr::select(f.eid , code, eventdate,event)
+  dfdeath.primary<-dfdeath dplyr::`%>%` dplyr::filter(level ==1 ) dplyr::`%>%` dplyr::mutate(event=1) dplyr::`%>%` dplyr::select(f.eid , code, eventdate,event)
   dfdeath.primary <- dfdeath.primary[, event:=as.integer(event)]
 
-  dfdeath.secondary<-dfdeath %>% dplyr::filter(level ==2 ) %>% dplyr::mutate(event=1) %>% dplyr::select(f.eid , code, eventdate,event)
+  dfdeath.secondary<-dfdeath dplyr::`%>%` dplyr::filter(level ==2 ) dplyr::`%>%` dplyr::mutate(event=1) dplyr::`%>%` dplyr::select(f.eid , code, eventdate,event)
   dfdeath.secondary <- dfdeath.secondary[, event:=as.integer(event)]
 
   tictoc::toc()

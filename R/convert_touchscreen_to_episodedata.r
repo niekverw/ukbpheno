@@ -136,7 +136,7 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
       # find rows that fulfil the condition
       cdn_exp <-paste(diagfield,cdn,sep="") #"f.xxxxx.v.i ==1"
 
-      df_sub<- df_sub %>% dplyr::filter(eval((parse(text=cdn_exp))))
+      df_sub<- df_sub dplyr::`%>%` dplyr::filter(eval((parse(text=cdn_exp))))
       # if no rows fulfil the condition
       if (nrow(df_sub)==0){next}
       # replace the diagfield content with the condition

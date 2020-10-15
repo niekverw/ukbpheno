@@ -50,7 +50,7 @@ plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst
     # remove empty dfs frame list
     all_event_lst <- all_event_lst[lapply(all_event_lst,nrow)>0]
     # set key to be eid
-    ind_all_event_dt <- plyr::ldply(all_event_lst, data.frame) %>% as.data.table()
+    ind_all_event_dt <- plyr::ldply(all_event_lst, data.frame) dplyr::`%>%` as.data.table()
     ind_all_event_dt$classification <- lst.data.settings[match(ind_all_event_dt$.id ,lst.data.settings$datasource),]$classification
     data.table::setkey(ind_all_event_dt,f.eid)
     ######
@@ -60,15 +60,15 @@ plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst
     return(0)
   }
   ### get iit ini the right formatt.
-  df <- ind_all_event_dt %>% dplyr::filter(f.eid %in% identifier) %>% as.data.frame()
+  df <- ind_all_event_dt dplyr::`%>%` dplyr::filter(f.eid %in% identifier) dplyr::`%>%` as.data.frame()
   df <- data.frame(month=month(df$eventdate),
             year=year(df$eventdate),
             code= df$code,
             event=df$event,
             classification=df$classification )
 
-  df <- rbind(df %>% dplyr::filter (event==1) %>% dplyr::group_by(month,year,code,classification) %>% dplyr::mutate(dup=length(code)),
-             df %>%  dplyr::filter (event==0 | event ==2)%>% dplyr::arrange(-event) %>% dplyr::distinct(code,classification, .keep_all = TRUE) %>% dplyr::group_by(month,year,code,classification) %>% dplyr::mutate(dup=length(code))
+  df <- rbind(df dplyr::`%>%` dplyr::filter (event==1) dplyr::`%>%` dplyr::group_by(month,year,code,classification) dplyr::`%>%` dplyr::mutate(dup=length(code)),
+             df dplyr::`%>%`  dplyr::filter (event==0 | event ==2)dplyr::`%>%` dplyr::arrange(-event) dplyr::`%>%` dplyr::distinct(code,classification, .keep_all = TRUE) dplyr::`%>%` dplyr::group_by(month,year,code,classification) dplyr::`%>%` dplyr::mutate(dup=length(code))
              )
   # change from factor to character
   df$code<- as.character(df$code)
