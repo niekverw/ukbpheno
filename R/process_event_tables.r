@@ -164,6 +164,11 @@ get_incidence_prevalence <- function(all_event_dt,
     sources_recurrence_events <- lst.data.settings %>%  dplyr::filter(diagnosis==1) %>% dplyr::pull(datasource)
   }
 
+  # stop if there is no event
+  if (nrow(all_event_dt)==0){
+    message("No event found. Stop")
+    return(NULL)
+  }
 
 
   df <- merge(all_event_dt,df_referencedate,by = 'f.eid') %>% dplyr::arrange(eventdate) %>% data.table::as.data.table()

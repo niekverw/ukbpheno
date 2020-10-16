@@ -77,8 +77,8 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
     # col<-"3581≥0[3581]"
     message(glue::glue("process touchscreen data for {col}"))
     # parse the field and condition
-    cdn<-str_extract(col,"[=|<|>|≥|≤|!][=]*\\d+")
-    field_ts_diagnosis<-str_extract(col,"\\d+")
+    cdn<-stringr::str_extract(col,"[=|<|>|≥|≤|!][=]*\\d+")
+    field_ts_diagnosis<-stringr::str_extract(col,"\\d+")
     tsdiagnosisfields = names(df)[grepl( paste0("[^0-9]",field_ts_diagnosis,"[^0-9]"), names(df))]
 
 
