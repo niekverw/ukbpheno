@@ -136,7 +136,16 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
       # find rows that fulfil the condition
       cdn_exp <-paste(diagfield,cdn,sep="") #"f.xxxxx.v.i ==1"
 
-      df_sub<- df_sub %>% dplyr::filter(eval((parse(text=cdn_exp))))
+      ########################################################################
+      #  if no expression is given , get all non-NA rows
+      # this allows handling of field like 5441, but is it a good idea to allow this? e.g. minus values in certain fields => missing
+      if (is.na(cdn)){
+
+        df_sub<- df_sub %>% dplyr::filter(!is.na(diagfield))
+      }else{
+        df_sub<- df_sub %>% dplyr::filter(eval((parse(text=cdn_exp))))
+      }
+      ########################################################################
       # if no rows fulfil the condition
       if (nrow(df_sub)==0){next}
       # replace the diagfield content with the condition
