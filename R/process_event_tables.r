@@ -172,21 +172,50 @@ get_incidence_prevalence <- function(all_event_dt,
 
 
   df <- merge(all_event_dt,df_referencedate,by = 'f.eid') %>% dplyr::arrange(eventdate) %>% data.table::as.data.table()
+
   # df <- df %>% filter(!is.na(reference_date)) # comment out if missing f.eids is fixed.
   df$days <- df$eventdate - df$reference_date
 
   data.table::setkey(df,days) # i don't know why, but setkey was alreaday on f.eid and cannot refresh..
   data.table::setkey(df,f.eid)
 
-  ### flag primary death records
-  df$death.primary<-ifelse((df$.id %in% lst.data.settings[lst.data.settings$death,]$datasource)&(lst.data.settings[match(df$.id ,lst.data.settings$datasource),]$diagnosis==1),1,0)
-  ### flag secondary death records
-  df$death.secondary<-ifelse((df$.id %in% lst.data.settings[lst.data.settings$death,]$datasource)&(lst.data.settings[match(df$.id ,lst.data.settings$datasource),]$diagnosis==2),1,0)
+
+  #############################################333
+  # death
+  dfDth<-df[df$.id %in% lst.data.settings[lst.data.settings$death,]$datasource,]
+  # get death records
+  # dfDth<-df[(df$.id %in% lst.data.settings[lst.data.settings$death,]$datasource),]
+  # ### flag primary death records
+  # dfDth$death.primary<-ifelse((lst.data.settings[match(dfDth$.id ,lst.data.settings$datasource),]$diagnosis==1),2,NA)
+  # ### flag secondary death records
+  # dfDth$death.secondary<-ifelse((lst.data.settings[match(dfDth$.id ,lst.data.settings$datasource),]$diagnosis==2),2,NA)
+  ### this seems faster
+  dfDth$death.primary <- NA
+  dfDth$death.primary[lst.data.settings[match(dfDth$.id ,lst.data.settings$datasource),]$diagnosis==1] <- 2
+
+  dfDth$death.secondary<- NA
+  dfDth$death.secondary[lst.data.settings[match(dfDth$.id ,lst.data.settings$datasource),]$diagnosis==2] <- 2
+  # dfDth
+  dfDth<-dfDth[,c("f.eid","days","death.primary","death.secondary")]
+  colnames(dfDth)<-c("f.eid","survival_days","death.primary","death.secondary")
+
+  # in the case of duplicate death records,one per primary /secondary
+  dfDth_extrastats <- suppressWarnings(dfDth[, .(mindy= min(survival_days,na.rm = T),maxdy= max(survival_days,na.rm = T),meandy= mean(survival_days,na.rm=T) ), keyby=list(f.eid)])
+  id.diff.deathdt<-unique(dfDth_extrastats[dfDth_extrastats$mindy!=dfDth_extrastats$meandy|dfDth_extrastats$maxdy!=dfDth_extrastats$meandy,]$f.eid)
+
+  if (length(id.diff.deathdt)>0){
+  message(glue::glue("Inconsistent death records for these individuals: {glue::glue_collapse(id.diff.deathdt,sep = ',')}"))
+  message("Mean survival day will be taken.")
+  }
+  # in case of multiple death records with different death dates , take mean
+  dfDth<-stats::aggregate(x=dfDth[,!(names(dfDth) %in% c("f.eid")),with=FALSE], by=list(f.eid=dfDth$f.eid), mean, na.rm = TRUE)
+  # Nan to NA
+    dfDth[is.na(dfDth)]<-NA
+  ###############################################################################################################################
 
   ### History
   dfHx <- df[days<=0]
-  # if death record is the only record , they will appear here Hx=0
-  Hx_days <- suppressWarnings(unique(dfHx[event>0][, .(Hx_days=min(days,na.rm=T) ,death.primary,death.secondary), keyby=list(f.eid)] ))
+  Hx_days <- suppressWarnings(unique(dfHx[event>0][, .(Hx_days=min(days,na.rm=T)), keyby=list(f.eid)] ))
   dfHx[,Hx:=2]
 
   ### Future
@@ -195,8 +224,7 @@ get_incidence_prevalence <- function(all_event_dt,
                (days>(0+window_fu_days_mask) & event==1 & (f.eid %in% dfHx$Hx) & .id %in% sources_recurrence_events ) |
                (days>(0+window_fu_days_mask) & event==2  & (!f.eid %in% dfHx$Hx)) ]
   dfFu[,Fu:=2] #unique(dfFu$f.eid)
-  # records if death succeed an diagnosis
-  Fu_days <- suppressWarnings( unique(dfFu[,.(Fu_days= min(days,na.rm=T),death.primary,death.secondary ), keyby=list(f.eid)] ))
+  Fu_days <- suppressWarnings( unique(dfFu[,.(Fu_days= min(days,na.rm=T)), keyby=list(f.eid)] ))
   ### age of diagnosis
   #system.time({ df %>% filter(event>0) %>% group_by(f.eid) %>% summarise(first_diagnosis_days=min(days)) }) # <- slow..
   #system.time({ df[df$event>0][,.(first_diagnosis_days=min(days,na.rm=T) ), by=f.eid] }) # <- fast..
@@ -239,8 +267,17 @@ get_incidence_prevalence <- function(all_event_dt,
   # )
   # View(test)
 
+  # stats
+  # Hx_days
+  # Fu_days
+  # dfDth
+  # dfHx[,c("f.eid","Hx")]
+  # dfHx
+  # dfRef[,c("f.eid","Ref")]
+
   all_event_dt.summary <- Reduce(function(...) merge(..., all = TRUE,by='f.eid'), list(
       stats,
+      dfDth,
       Hx_days,
       Fu_days,
       unique(dfHx[,c("f.eid","Hx")]),
@@ -248,15 +285,6 @@ get_incidence_prevalence <- function(all_event_dt,
       unique(dfRef[,c("f.eid","Ref")])
   ))
 
-  # combine the values from 2 columns and keep 1
-
-  all_event_dt.summary$death.primary.x<-data.table::fcoalesce(all_event_dt.summary$death.primary.x,all_event_dt.summary$death.primary.y)
-  all_event_dt.summary$death.secondary.x<-data.table::fcoalesce(all_event_dt.summary$death.secondary.x,all_event_dt.summary$death.secondary.y)
-  all_event_dt.summary<-all_event_dt.summary %>% dplyr::select(f.eid, count ,sum.epidur, median.epidur, max.epidur,Hx_days,Fu_days, death.primary.x, death.secondary.x,Hx, Fu, Ref)
-  names(all_event_dt.summary)<- c("f.eid", "count" ,"sum.epidur", "median.epidur", "max.epidur","Hx_days","Fu_days", "death.primary", "death.secondary","Hx", "Fu", "Ref")
-  # NA are not true event (=1) records , which are not death records
-  set(all_event_dt.summary,which(is.na(all_event_dt.summary$death.primary)),"death.primary",0)
-  set(all_event_dt.summary,which(is.na(all_event_dt.summary$death.secondary)),"death.secondary",0)
 
   all_event_dt.summary$first_diagnosis_days <- pmin(all_event_dt.summary$Hx_days,all_event_dt.summary$Fu_days,na.rm = T)
   all_event_dt.summary[ Hx==2 & is.na(Hx_days),'first_diagnosis_days'] <- NA
@@ -268,6 +296,9 @@ get_incidence_prevalence <- function(all_event_dt,
 
 
 }
+
+
+
 
 #' Get case for a phenotype
 #'
@@ -376,8 +407,8 @@ get_cases_controls <- function (definitions,
     reference_date = setNames(as.Date(rep(NA,length(lst.identifiers))),lst.identifiers)
   }
 
+  # NOTE that if the rownames are not unique it will be discarded at data.frame() i.e. f.eid replaced by the running row number
   df.casecontrol <- data.frame(reference_date=reference_date) %>% tibble::rownames_to_column('f.eid') %>% data.table::as.data.table()
-
   # exlude id in case_include & case_exclude from summary => potential control
   df.casecontrol <- df.casecontrol[!df.casecontrol$f.eid %in% all_event_dt.Include_in_cases.summary$f.eid,]
   df.casecontrol$reference_date <- as.Date(as.character(df.casecontrol$reference_date),format="%Y-%m-%d")
