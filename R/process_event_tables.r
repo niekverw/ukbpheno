@@ -164,10 +164,21 @@ get_incidence_prevalence <- function(all_event_dt,
     sources_recurrence_events <- lst.data.settings %>%  dplyr::filter(diagnosis==1) %>% dplyr::pull(datasource)
   }
 
-  # stop if there is no event
+  ###########################################################
+  # in case of empty rows , the entire column will be cast to default of class NA i.e. logical
+  # this could create error for downstream functions "Error in bmerge....Incompatible join types"
+  col_num<-c("count","sum.epidur","median.epidur","max.epidur", "survival_days", "death.primary","death.secondary" , "Hx_days", "Fu_days" ,"Hx" , "Fu","Ref" , "first_diagnosis_days","Any")
+  col_chr<-"f.eid"
+  col_date<-"reference_date"
+  # catch if there is no event, return an empty table which can be merged
   if (nrow(all_event_dt)==0){
-    message("No event found. Stop")
-    return(NULL)
+    message("No event found.")
+    results_cols<-c("f.eid","count","sum.epidur","median.epidur","max.epidur", "survival_days", "death.primary","death.secondary" , "Hx_days", "Fu_days" ,"Hx" , "Fu","Ref" , "first_diagnosis_days", "reference_date","Any")
+    all_event_dt.summary <- setNames(data.table(matrix(nrow = 0, ncol = 16)),results_cols )
+    all_event_dt.summary[, (col_num) := lapply(.SD, as.numeric), .SDcols = col_num]
+    all_event_dt.summary[, (col_chr) := lapply(.SD, as.character), .SDcols = col_chr]
+    all_event_dt.summary[, (col_date) := lapply(.SD, as.Date), .SDcols = col_date]
+    return(all_event_dt.summary)
   }
 
 
@@ -180,7 +191,7 @@ get_incidence_prevalence <- function(all_event_dt,
   data.table::setkey(df,f.eid)
 
 
-  #############################################
+  #################################################################################
   # death
   dfDth<-df[df$.id %in% lst.data.settings[lst.data.settings$death,]$datasource,]
 
@@ -217,9 +228,7 @@ get_incidence_prevalence <- function(all_event_dt,
   }else{
     # no records, take f.eid for the merge later
     dfDth<-unique(df[,"f.eid"])
-    dfDth$survival_days<-as.numeric(NA)
-    dfDth$death.primary<-as.numeric(NA)
-    dfDth$death.secondary<-as.numeric(NA)
+    dfDth[,c("survival_days","death.primary","death.secondary")]<-as.numeric(NA)
   }
   ###############################################################################################################################
 
@@ -302,6 +311,12 @@ get_incidence_prevalence <- function(all_event_dt,
   all_event_dt.summary <- merge(all_event_dt.summary,df_referencedate,by="f.eid")
   all_event_dt.summary[,Any:=2]
   all_event_dt.summary <- data.table::data.table(all_event_dt.summary)
+
+  ####################################type check######################################################
+  all_event_dt.summary[, (col_num) := lapply(.SD, as.numeric), .SDcols = col_num]
+  all_event_dt.summary[, (col_chr) := lapply(.SD, as.character), .SDcols = col_chr]
+  all_event_dt.summary[, (col_date) := lapply(.SD, as.Date), .SDcols = col_date]
+  #####################################################################################################
   return(all_event_dt.summary)
 
 
@@ -411,7 +426,7 @@ get_cases_controls <- function (definitions,
   all_event_dt.Include_in_cases.summary <- cases$all_event_dt.Include_in_cases.summary
   all_event_dt.Include_in_cases <- cases$all_event_dt.Include_in_cases
   # define exclude controls
-  all_event_dt.Exclude_from_controls <- get_all_events(definitions %>% dplyr::filter(Definitions =="Exclude_from_controls"),lst.data,lst.data.settings)   #MI
+  all_event_dt.Exclude_from_controls <- get_all_events(definitions %>% dplyr::filter(Definitions =="Exclude_from_controls"),lst.data,lst.data.settings)
   ### define case & control
   if(is.null(reference_date)){
     reference_date = setNames(as.Date(rep(NA,length(lst.identifiers))),lst.identifiers)
@@ -425,7 +440,6 @@ get_cases_controls <- function (definitions,
 
   # merge it with the cases
   df.casecontrol <- merge(df.casecontrol,all_event_dt.Include_in_cases.summary,by=c("f.eid","reference_date"),all=T)
-
 
 
   if(!is.null(all_event_dt.Exclude_from_controls)) {
