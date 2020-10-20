@@ -147,6 +147,7 @@ get_incidence_prevalence <- function(all_event_dt,
 
   # reference_date <- reference_date[!is.na(reference_date)]
 
+
   if(length(reference_date)==0){reference_date<-NULL}
   if(!is.null(reference_date)){
     df_referencedate <-data.table::data.table(reference_date)
@@ -179,7 +180,7 @@ get_incidence_prevalence <- function(all_event_dt,
   data.table::setkey(df,f.eid)
 
 
-  #############################################333
+  #############################################
   # death
   dfDth<-df[df$.id %in% lst.data.settings[lst.data.settings$death,]$datasource,]
 
@@ -215,7 +216,7 @@ get_incidence_prevalence <- function(all_event_dt,
 
   }else{
     # no records, take f.eid for the merge later
-    dfDth<-df[,"f.eid"]
+    dfDth<-unique(df[,"f.eid"])
     dfDth$survival_days<-as.numeric(NA)
     dfDth$death.primary<-as.numeric(NA)
     dfDth$death.secondary<-as.numeric(NA)
@@ -286,7 +287,7 @@ get_incidence_prevalence <- function(all_event_dt,
 
   all_event_dt.summary <- Reduce(function(...) merge(..., all = TRUE,by='f.eid'), list(
       stats,
-      dfDth[ , c("f.eid","survival_days","death.primary","death.secondary")],
+      unique(dfDth[ , c("f.eid","survival_days","death.primary","death.secondary")]),
       Hx_days,
       Fu_days,
       unique(dfHx[,c("f.eid","Hx")]),
