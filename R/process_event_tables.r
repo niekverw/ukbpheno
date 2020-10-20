@@ -183,6 +183,8 @@ get_incidence_prevalence <- function(all_event_dt,
   #############################################333
   # death
   dfDth<-df[df$.id %in% lst.data.settings[lst.data.settings$death,]$datasource,]
+
+  if (nrow(dfDth) >0){
   # get death records
   # dfDth<-df[(df$.id %in% lst.data.settings[lst.data.settings$death,]$datasource),]
   # ### flag primary death records
@@ -210,7 +212,13 @@ get_incidence_prevalence <- function(all_event_dt,
   # in case of multiple death records with different death dates , take mean
   dfDth<-stats::aggregate(x=dfDth[,!(names(dfDth) %in% c("f.eid")),with=FALSE], by=list(f.eid=dfDth$f.eid), mean, na.rm = TRUE)
   # Nan to NA
-    dfDth[is.na(dfDth)]<-NA
+  dfDth[is.na(dfDth)]<-NA
+
+  }else{
+    # no records, take f.eid for the merge later
+    dfDth$f.eid<-df[,"f.eid"]
+    dfDth[ , c("survival_days","death.primary","death.secondary") := NA, by = "f.eid"]
+  }
   ###############################################################################################################################
 
   ### History
