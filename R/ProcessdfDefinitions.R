@@ -505,15 +505,15 @@ add_child_nodes <-function(dfcode,codeVct){
 
 #' Expand the illness/medication codes in definition table to include codes that belong to this code
 #'
-#' Explicitly fill in codes covered by the parent codes stated in the definition table. This differs from `expand_dfDefinitions_processed()` in the dictionaries taken - it reads the code dictionaries stated in lst.data.setting and expand to available codes accordingly.
+#' Explicitly fill in codes covered by the parent codes stated in the definition table. This differs from `expand_dfDefinitions_processed()` in the dictionaries taken - it reads the code dictionaries stated in lst.data.setting and expand to available codes accordingly. Codes not present **will be removed**.
 #' @param dfDefinitions_processed definition table as dataframe
 #' @param lst.data.settings data.setting as dataframe, it includes settings that should be used, e.g. if ICD10 should be looked up case sensitive or not (incase of READ cases are important, dotts should also NOT be interpreted)
+#' @param code_map_dir the directory storing the coding files
 #' @return  definition table as dataframe
 #' @keywords definition
 #' @export
 #' @example
 #' expand_dfDefinitions_processed2(dfDefinitions_processed,lst.data.settings,"code_map_dir/")
-
 expand_dfDefinitions_processed2 <-
   function(dfDefinitions_processed,
            lst.data.settings,code_map_dir="data/") {
@@ -530,7 +530,8 @@ expand_dfDefinitions_processed2 <-
       message(glue::glue("Read from codings for {cls} from {fmap}"))
 
       lst.codemap[[cls]]<-fread(fmap)
-
+      # rename the column
+      names(lst.codemap[[cls]])[grep("^cod", names(lst.codemap[[cls]]))] <- "coding"
       for (r in 1:nrow(dfDefinitions_processed)) {
         # for loops just as fast as apply in this case..
         VctStr = unlist(strsplit(dfDefinitions_processed[r, cls], ","))
@@ -546,8 +547,8 @@ expand_dfDefinitions_processed2 <-
           ignore.case = unique(lst.data.settings[lst.data.settings$classification %in% cls, 'ignore.case'])[1]
           Str_expanded <- paste(unique(unlist(
             lapply(VctStr,  function(x)
-              lst.codemap[[cls]]$code [grep(paste("^", x, sep = ""),
-                                                      lst.codemap[[cls]]$code  ,
+              lst.codemap[[cls]]$coding [grep(paste("^", x, sep = ""),
+                                                      lst.codemap[[cls]]$coding  ,
                                                       ignore.case = ignore.case)])
           )), collapse = ",")
           dfDefinitions_processed[r, cls] <- Str_expanded
@@ -558,6 +559,60 @@ expand_dfDefinitions_processed2 <-
     }
     return(dfDefinitions_processed)
   }
+
+
+
+
+#' Check if the illness/medication codes in definition table are found the coding files
+#'
+#' Given a definition table and the directory with codings, check if codes in definition table are present in the coding files.
+#' @param dfDefinitions_processed definition table as dataframe
+#' @param lst.data.settings data.setting as dataframe, it includes settings that should be used, e.g. if ICD10 should be looked up case sensitive or not (incase of READ cases are important, dotts should also NOT be interpreted)
+#' @param code_map_dir the directory storing the coding files
+#' @param check_expandable_codes_only boolean flag to indicate whether or not to check the only codes to be expanded
+#' @return  character vector that are missing
+#' @keywords definition
+#' @export
+#' @example
+#' check_dfDefinitions_codes(dfDefinitions_processed,lst.data.settings,code_map_dir ="code_map_dir/")
+check_dfDefinitions_codes <-function(dfDefinitions_processed,
+                                     lst.data.settings,code_map_dir="data/",check_expandable_codes_only=T){
+   all_missing_codes<-character()
+   #  get all codings needed in data.settings
+   if (!check_expandable_codes_only){
+     classifications <-
+       lst.data.settings %>%  dplyr::pull (classification) %>% unique()
+   }else{
+     classifications <-
+       lst.data.settings %>% dplyr::filter(expand_codes == 1) %>% dplyr::pull (classification) %>% unique()
+   }
+
+
+   lst.codemap<-list()
+   for (cls in classifications) {
+     if (is.na(unique(lst.data.settings[lst.data.settings$classification==cls,]$code_map))) next
+    fmap=paste(code_map_dir,unique(lst.data.settings[lst.data.settings$classification==cls,]$code_map),sep="")
+
+    message(glue::glue("Read from codings for {cls} from {fmap}"))
+    # read maps from files
+
+    lst.codemap[[cls]]<-fread(fmap)
+    # rename the column
+    names(lst.codemap[[cls]])[grep("^cod", names(lst.codemap[[cls]]))] <- "coding"
+    # get the column from definition table
+    # print(na.omit(unlist(strsplit(dfDefinitions_processed[[cls]],","))))
+
+    missing_codes<-dplyr::setdiff(na.omit(unlist(strsplit(dfDefinitions_processed[[cls]],","))),lst.codemap[[cls]]$coding)
+    missing_codes<-na.omit(missing_codes)
+
+    message(glue::glue("Missing in {cls}: \n{glue::glue_collapse(missing_codes,sep=',')} \n******************************"))
+    all_missing_codes<-c(all_missing_codes,missing_codes)
+   }
+
+
+   return(all_missing_codes)
+}
+
 
 # View(lst.data$tte.gpclincal.read2)
 # head(lst.data$tte.gpclincal.read2)
