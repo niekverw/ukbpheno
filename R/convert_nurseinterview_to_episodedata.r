@@ -62,7 +62,7 @@ convert_col_to_integer <- function(col){
 #' @examples
 #' convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20001",field_sr_date = "20006",qc_treshold_year = 10)
 #' convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20002",field_sr_date = "20008",qc_treshold_year = 10)
-convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002",field_sr_date = "20008",field_sr_date_type="interpolated_year",qc_threshold_year=10,event_code=2){
+convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002",field_sr_date = "20008",field_sr_date_type="interpolated_year",qc_threshold_year=10,event_code=2,codetype="numeric"){
   # TODO: IF NA, then list first visit answered yes.
   #
   # df = lst$df_sr # data.table
@@ -154,8 +154,13 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   df_out[, code:=lapply(.SD, trimws), .SDcols = "code"]
   # 99999 unclassifiable for ukb codings
   df_out <- df_out[!code %in% "99999"]
-  #  char -> integer
-  df_out$code <- convert_col_to_integer(df_out$code)
+
+  # code type either numeric or character
+  if (codetype == "numeric"){
+    #  char -> integer
+    df_out$code <- convert_col_to_integer(df_out$code)
+  }
+
 
 
   # field_sr_date <-> field_sr_date_type, default :20008 <->	Interpolated Year
@@ -171,8 +176,8 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
       df_out <- df_out[, eventdate:=as.numeric(eventdate)] ## as number. interpolated age.
       df_out[eventdate <0,'eventdate']<-NA
       # interpolate the event date as birth + age of diagnosis
+      df_out[, birthyearmonth := as.Date(birthyearmonth)]
       df_out$eventdate = df_out[,"birthyearmonth"] + (df_out[,"eventdate"]*daysinyear)
-
     } else if (field_sr_date_type=="date"){
       df_out = df_out[, eventdate:=as.Date(eventdate)]
     }
