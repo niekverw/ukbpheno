@@ -3594,7 +3594,7 @@ coding	meaning	node_id	parent_id	selectable
 4954	4954 Maltworkers' lung	3781	3776	Y
 4955	4955 Mushroom-workers' lung	3782	3776	Y
 4956	4956 Maple-bark-strippers' lung	3783	3776	Y
-4957	4957 "ventilation" pneumonitis	3784	3776	Y
+4957	"4957 ""ventilation"" pneumonitis"	3784	3776	Y
 4958	4958 Other allergic pneumonitis	3785	3776	Y
 4959	4959 Unspecified allergic alveolitis	3786	3776	Y
 496	496 Chronic airways obstruction, not elsewhere classified	3787	79	N
@@ -7095,17 +7095,17 @@ coding	meaning	node_id	parent_id	selectable
 76389	76389 Fetus or newborn affected by other complications of labour and delivery	7282	7277	Y
 7639	7639 Fetus or newborn affected by unspec. comp. of labour and delivery	7283	7254	Y
 764	764 Slow fetal growth and fetal malnutrition	7284	119	N
-7640	7640 "light-for-dates" without mention of fetal malnutrition	7285	7284	Y
-7641	7641 "light-for-dates" with signs of fetal malnutrition	7286	7284	Y
-7642	7642 Fetal malnutrition without mention of "light-for-dates"	7287	7284	Y
+7640	"7640 ""light-for-dates"" without mention of fetal malnutrition"	7285	7284	Y
+7641	"7641 ""light-for-dates"" with signs of fetal malnutrition"	7286	7284	Y
+7642	"7642 Fetal malnutrition without mention of ""light-for-dates"""	7287	7284	Y
 7649	7649 Fetal growth retardation, unspecified	7288	7284	Y
 765	765 Disorders relating to short gestation and unspecified low birth-weight	7289	119	N
 7650	7650 Extreme immaturity	7290	7289	Y
 7651	7651 Other preterm infants	7291	7289	Y
 766	766 Disorders relating to long gestation and high birthweight	7292	119	N
 7660	7660 Exceptionally large baby	7293	7292	Y
-7661	7661 Other "heavy-for-dates" infants	7294	7292	Y
-7662	7662 Post-term infant, not "heavy-for-dates"	7295	7292	Y
+7661	"7661 Other ""heavy-for-dates"" infants"	7294	7292	Y
+7662	"7662 Post-term infant, not ""heavy-for-dates"""	7295	7292	Y
 767	767 Birth trauma	7296	119	N
 7670	7670 Birth trauma: subdural and cerebral haemorrhage	7297	7296	N
 76700	76700 Birth trauma: subdural haemorrhage (trauma or intrapartum anoxia/hypoxia)	7298	7297	Y
@@ -7312,7 +7312,7 @@ coding	meaning	node_id	parent_id	selectable
 7746	7746 Unspecified fetal and neonatal jaundice	7499	7476	Y
 7747	7747 Kernicterus not due to isoimmunization	7500	7476	Y
 775	775 Endocrine and metabolic disturbances specific to the fetus and newborn	7501	119	N
-7750	7750 Syndrome of "infant of a diabetic mother"	7502	7501	Y
+7750	"7750 Syndrome of ""infant of a diabetic mother"""	7502	7501	Y
 7751	7751 Neonatal diabetes mellitus	7503	7501	Y
 7752	7752 Neonatal myasthenia gravis	7504	7501	Y
 7753	7753 Neonatal thyrotoxicosis	7505	7501	Y
@@ -8887,194 +8887,194 @@ coding	meaning	node_id	parent_id	selectable
 9997	9997 Rh incompatibility reaction	9074	9066	Y
 9998	9998 Other transfusion reaction	9075	9066	Y
 9999	9999 Other and unspecified complications of medical care n.e.c.	9076	9066	Y
-Block 001-009	001-009 Intestinal infectious diseases	20	1	N
-Block 010-018	010-018 Tuberculosis	21	1	N
-Block 020-027	020-027 Zoonotic bacterial diseases	22	1	N
-Block 030-041	030-041 Other bacterial diseases	23	1	N
-Block 042-044	042-044 Human immunodeficiency virus (HIV) infection	24	1	Y
-Block 045-049	045-049 Poliomyelitis and other non-arthropod-borne viral diseases of central nervous system	25	1	N
-Block 050-059	050-059 Viral diseases accompanied by exanthem	26	1	N
-Block 060-066	060-066 Arthropod-borne viral diseases	27	1	N
-Block 070-079	070-079 Other diseases due to viruses and chlamydiae	28	1	N
-Block 080-088	080-088 Rickettsioses and other arthropod-borne diseases	29	1	N
-Block 090-099	090-099 Syphilis and other venereal diseases	30	1	N
-Block 100-104	100-104 Other spirochetal diseases	31	1	N
-Block 110-118	110-118 Mycoses	32	1	N
-Block 120-129	120-129 Helminthiases	33	1	N
-Block 130-136	130-136 Other infectious and parasitic diseases	34	1	N
-Block 137-139	137-139 Late effects of infectious and parasitic diseases	35	1	N
-Block 140-149	140-149 Malignant neoplasm of lip, oral cavity, and pharynx	36	2	N
-Block 150-159	150-159 Malignant neoplasm of digestive organs and peritoneum	37	2	N
-Block 160-165	160-165 Malignant neoplasm of respiratory and intrathoracic organs	38	2	N
-Block 170-175	170-175 Malignant neoplasm of bone, connective tissue, skin, and breast	39	2	N
-Block 176-176	176-176 Kaposi's sarcoma	40	2	Y
-Block 179-189	179-189 Malignant neoplasm of genitourinary organs	41	2	N
-Block 190-199	190-199 Malignant neoplasm of other and unspecified sites	42	2	N
-Block 200-208	200-208 Malignant neoplasm of lymphatic and hematopoietic tissue	43	2	N
-Block 209-209	209-209 Neuroendocrine tumors	44	2	Y
-Block 210-229	210-229 Benign neoplasms	45	2	N
-Block 230-234	230-234 Carcinoma in situ	46	2	N
-Block 235-238	235-238 Neoplasms of uncertain behavior	47	2	N
-Block 239-239	239-239 Neoplasms of unspecified nature	48	2	N
-Block 240-246	240-246 Disorders of thyroid gland	49	3	N
-Block 249-259	249-259 Diseases of other endocrine glands	50	3	N
-Block 260-269	260-269 Nutritional deficiencies	51	3	N
-Block 270-279	270-279 Other metabolic and immunity disorders	52	3	N
-Block 280-285	280-285 Anemia	53	4	N
-Block 286-287	286-287 Coagulation/hemorrhagic	54	4	N
-Block 288-289	288-289 Other	55	4	N
-Block 290-299	290-299 Psychosis	56	5	N
-Block 300-316	300-316 Neurotic disorders, personality disorders, and other nonpsychotic mental disorders	57	5	N
-Block 317-319	317-319 Mental retardation	58	5	N
-Block 320-327	320-327 Inflammatory diseases of the central nervous system	59	6	N
-Block 330-337	330-337 Hereditary and degenerative diseases of the central nervous system	60	6	N
-Block 338-338	338-338 Pain	61	6	Y
-Block 339-339	339-339 Other headache syndromes	62	6	Y
-Block 340-349	340-349 Other disorders of the central nervous system	63	6	N
-Block 350-359	350-359 Disorders of the peripheral nervous system	64	6	N
-Block 360-379	360-379 Disorders of the eye and adnexa	65	6	N
-Block 380-389	380-389 Diseases of the ear and mastoid process	66	6	N
-Block 390-392	390-392 Acute Rheumatic Fever	67	7	N
-Block 393-398	393-398 Chronic rheumatic heart disease	68	7	N
-Block 401-405	401-405 Hypertensive disease	69	7	N
-Block 410-414	410-414 Ischemic heart disease	70	7	N
-Block 415-417	415-417 Diseases of pulmonary circulation	71	7	N
-Block 420-429	420-429 Other forms of heart disease	72	7	N
-Block 430-438	430-438 Cerebrovascular disease	73	7	N
-Block 440-448	440-448 Diseases of arteries, arterioles, and capillaries	74	7	N
-Block 451-459	451-459 Diseases of veins and lymphatics, and other diseases of circulatory system	75	7	N
-Block 460-466	460-466 Acute respiratory infections	76	8	N
-Block 470-478	470-478 Other diseases of the upper respiratory tract	77	8	N
-Block 480-488	480-488 Pneumonia and influenza	78	8	N
-Block 490-496	490-496 Chronic obstructive pulmonary disease and allied conditions	79	8	N
-Block 500-508	500-508 Pneumoconioses and other lung diseases due to external agents	80	8	N
-Block 510-519	510-519 Other diseases of respiratory system	81	8	N
-Block 520-529	520-529 Diseases of oral cavity, salivary glands, and jaws	82	9	N
-Block 530-537	530-537 Diseases of esophagus, stomach, and duodenum	83	9	N
-Block 540-543	540-543 Appendicitis	84	9	N
-Block 550-553	550-553 Hernia of abdominal cavity	85	9	N
-Block 555-558	555-558 Noninfectious enteritis and colitis	86	9	N
-Block 560-569	560-569 Other diseases of intestines and peritoneum	87	9	N
-Block 570-579	570-579 Other diseases of digestive system	88	9	N
-Block 580-589	580-589 Nephritis, nephrotic syndrome, and nephrosis	89	10	N
-Block 590-599	590-599 Other diseases of urinary system	90	10	N
-Block 600-608	600-608 Diseases of male genital organs	91	10	N
-Block 617-629	617-629 Other disorders of female genital tract	92	10	N
-Block 630-633	630-633 Ectopic and molar pregnancy	93	11	N
-Block 634-639	634-639 Other pregnancy with abortive outcome	94	11	N
-Block 640-649	640-649 Complications mainly related to pregnancy	95	11	N
-Block 650-659	650-659 Normal delivery, and other indications for care in pregnancy, labor, and delivery	96	11	N
-Block 660-669	660-669 Complications occurring mainly in the course of labor and delivery	97	11	N
-Block 670-676	670-676 Complications of the puerperium	98	11	N
-Block 678-679	678-679 Other maternal and fetal complications	99	11	Y
-Block 680-686	680-686 Infections of skin and subcutaneous tissue	100	12	N
-Block 690-698	690-698 Other inflammatory conditions of skin and subcutaneous tissue	101	12	N
-Block 700-709	700-709 Other diseases of skin and subcutaneous tissue	102	12	N
-Block 710-719	710-719 Arthropathies and related disorders	103	13	N
-Block 720-724	720-724 Dorsopathies	104	13	N
-Block 725-729	725-729 Rheumatism, excluding the back	105	13	N
-Block 730-739	730-739 Osteopathies, chondropathies, and acquired musculoskeletal deformities	106	13	N
-Block 740-742	740-742 Nervous system	107	14	N
-Block 743-744	743-744 Eye, ear, face and neck	108	14	N
-Block 745-747	745-747 Circulatory system	109	14	N
-Block 748-748	748-748 Respiratory system	110	14	N
-Block 749-751	749-751 Digestive system	111	14	N
-Block 752-752	752-752 Genital organs	112	14	N
-Block 753-753	753-753 Urinary system	113	14	N
-Block 754-756	754-756 Musculoskeletal system	114	14	N
-Block 757-757	757-757 Integument	115	14	N
-Block 758-758	758-758 Chromosomal anomalies	116	14	N
-Block 759-759	759-759 Other	117	14	N
-Block 760-763	760-763 Maternal causes of perinatal morbidity and mortality	118	15	N
-Block 764-779	764-779 Other conditions originating in the perinatal period	119	15	N
-Block 780-789	780-789 Symptoms	120	16	N
-Block 790-796	790-796 Nonspecific abnormal findings	121	16	N
-Block 797-799	797-799 Ill-defined and unknown causes of morbidity and mortality	122	16	N
-Block 800-804	800-804 Fracture of skull	123	17	N
-Block 805-809	805-809 Fracture of neck and trunk	124	17	N
-Block 810-819	810-819 Fracture of upper limb	125	17	N
-Block 820-829	820-829 Fracture of lower limb	126	17	N
-Block 830-839	830-839 Dislocation	127	17	N
-Block 840-848	840-848 Sprains and strains of joints and adjacent muscles	128	17	N
-Block 850-854	850-854 Intracranial injury, excluding those with skull fracture	129	17	N
-Block 860-869	860-869 Internal injury of thorax, abdomen, and pelvis	130	17	N
-Block 870-879	870-879 Open wound of head, neck, and trunk	131	17	N
-Block 880-887	880-887 Open wound of upper limb	132	17	N
-Block 890-897	890-897 Open wound of lower limb	133	17	N
-Block 900-904	900-904 Injury to blood vessels	134	17	N
-Block 905-909	905-909 Late effects of injuries, poisonings, toxic effects, and other external causes	135	17	N
-Block 910-919	910-919 Superficial injury	136	17	N
-Block 920-924	920-924 Contusion with intact skin surface	137	17	N
-Block 925-929	925-929 Crushing injury	138	17	N
-Block 930-939	930-939 Effects of foreign body entering through Body orifice	139	17	N
-Block 940-949	940-949 Burns	140	17	N
-Block 950-957	950-957 Injury to nerves and spinal cord	141	17	N
-Block 958-959	958-959 Certain traumatic complications and unspecified injuries	142	17	N
-Block 960-979	960-979 Poisoning by drugs, medicinal and biological substances	143	17	N
-Block 980-989	980-989 Toxic effects of substances chiefly nonmedicinal as to source	144	17	N
-Block 990-995	990-995 Other and unspecified effects of external causes	145	17	N
-Block 996-999	996-999 Complications of surgical and medical care, not elsewhere classified	146	17	N
-Block E800-E807	E800-E807 Railway accidents	147	18	N
-Block E810-E819	E810-E819 Motor vehicle traffic accidents	148	18	N
-Block E820-E825	E820-E825 Motor vehicle non-traffic accidents	149	18	N
-Block E826-E829	E826-E829 Other road vehicle accidents	150	18	N
-Block E830-E831	E830-E831 Water transport accidents	151	18	N
-Block E840-E845	E840-E845 Air and space transport accidents	152	18	N
-Block E846-E848	E846-E848 Vehicle accidents not elsewhere classifiable	153	18	N
-Block E849-E849	E849-E849 Place of Occurrence	154	18	Y
-Block E850-E858	E850-E858 Accidental poisoning by drugs, medicinal substances, and biologicals	155	18	N
-Block E860-E869	E860-E869 Accidental poisoning by other solid and liquid substances, gases, and vapors	156	18	N
-Block E870-E876	E870-E876 Misadventures to patients during surgical and medical care	157	18	N
-Block E878-E879	E878-E879 Surgical and medical procedures as the cause of abnormal reaction of patient or later complication, without mention of misadventure at the time of procedure	158	18	N
-Block E880-E888	E880-E888 Accidental falls	159	18	N
-Block E890-E899	E890-E899 Accidents caused by fire and flames	160	18	N
-Block E900-E909	E900-E909 Accidents due to natural and environmental factors	161	18	N
-Block E910-E915	E910-E915 Accidents caused by submersion, suffocation, and foreign bodies	162	18	N
-Block E916-E928	E916-E928 Other accidents	163	18	N
-Block E929-E929	E929-E929 Late effects of accidental injury	164	18	N
-Block E930-E949	E930-E949 Drugs, medicinal and biological substances causing adverse effects in therapeutic use	165	18	N
-Block E950-E959	E950-E959 Suicide and self-inflicted injury	166	18	N
-Block E960-E969	E960-E969 Homicide and injury purposely inflicted by other persons	167	18	N
-Block E970-E978	E970-E978 Legal intervention	168	18	N
-Block E979-E979	E979-E979 Terrorism	169	18	Y
-Block E980-E989	E980-E989 Injury undetermined whether accidentally or purposely inflicted	170	18	N
-Block E990-E999	E990-E999 Injury resulting from operations of war	171	18	N
-Block V01-V06	V01-V06 Persons with potential health hazards related to communicable diseases	172	19	N
-Block V07-V09	V07-V09 Persons with need for isolation, Other potential health hazards and Prophylactic measures	173	19	N
-Block V10-V19	V10-V19 Persons with potential health hazards related to personal and family history	174	19	N
-Block V20-V29	V20-V29 Persons encountering health services in Circumstances related to Reproduction and development	175	19	N
-Block V30-V39	V30-V39 Live-born infants according to type of birth	176	19	N
-Block V40-V49	V40-V49 Persons with a condition influencing their health status	177	19	N
-Block V50-V59	V50-V59 Persons encountering health services for specific procedures and aftercare	178	19	N
-Block V60-V69	V60-V69 Persons encountering health services in other circumstances	179	19	N
-Block V70-V82	V70-V82 Persons without reported diagnosis encountered during examination and investigation of individuals and populations	180	19	N
-Block V83-V84	V83-V84 Genetics	181	19	Y
-Block V85-V85	V85-V85 Body mass index	182	19	Y
-Block V86-V86	V86-V86 Estrogen receptor Status	183	19	Y
-Block V87-V87	V87-V87 Other Specified Personal Exposures And History Presenting Hazards To Health	184	19	Y
-Block V88-V88	V88-V88 Acquired Absence Of Other Organs And Tissue	185	19	Y
-Block V89-V89	V89-V89 Other Suspected Conditions Not Found	186	19	Y
-Block V90-V90	V90-V90 Retained Foreign Body	187	19	Y
-Block V91-V91	V91-V91 Multiple Gestation Placenta Status	188	19	Y
-Chapter E	Chapter E - External causes of injury	18	0	N
-Chapter I	Chapter I Infectious and parasitic diseases (001-139)	1	0	N
-Chapter II	Chapter II Neoplasms (140-239)	2	0	N
-Chapter III	Chapter III Endocrine, nutritional and metabolic diseases, and immunity disorders (240-279)	3	0	N
-Chapter IV	Chapter IV Diseases of the blood and blood-forming organs (280-289)	4	0	N
-Chapter IX	Chapter IX Diseases of the digestive system (520-579)	9	0	N
-Chapter V	Chapter V Mental disorders (230-319)	5	0	N
-Chapter V	Chapter V - Supplementary classification of factors influencing health status and contact with health services	19	0	N
-Chapter VI	Chapter VI Diseases of the nervous system and the sense organs (320-389)	6	0	N
-Chapter VII	Chapter VII Diseases of the circulatory system (390-459)	7	0	N
-Chapter VIII	Chapter VIII Diseases of the respiratory system (460-519)	8	0	N
-Chapter X	Chapter X Diseases of the genitourinary system (580-629)	10	0	N
-Chapter XI	Chapter XI Complications of pregnancy, childbirth, and the puerperium (630-679)	11	0	N
-Chapter XII	Chapter XII Diseases of the skin and subcutaneous tissue (680-709)	12	0	N
-Chapter XIII	Chapter XIII Diseases of the musculoskeletal system and connective tissue (710-739)	13	0	N
-Chapter XIV	Chapter XIV Congenital anomalies (740-759)	14	0	N
-Chapter XV	Chapter XV Certain conditions originating in the perinatal period (760-779)	15	0	N
-Chapter XVI	Chapter XVI Symptoms, signs, and ill-defined conditions (780-799)	16	0	N
-Chapter XVII	Chapter XVII Injury and poisoning (800-999)	17	0	N
+Block_001-009	001-009 Intestinal infectious diseases	20	1	N
+Block_010-018	010-018 Tuberculosis	21	1	N
+Block_020-027	020-027 Zoonotic bacterial diseases	22	1	N
+Block_030-041	030-041 Other bacterial diseases	23	1	N
+Block_042-044	042-044 Human immunodeficiency virus (HIV) infection	24	1	Y
+Block_045-049	045-049 Poliomyelitis and other non-arthropod-borne viral diseases of central nervous system	25	1	N
+Block_050-059	050-059 Viral diseases accompanied by exanthem	26	1	N
+Block_060-066	060-066 Arthropod-borne viral diseases	27	1	N
+Block_070-079	070-079 Other diseases due to viruses and chlamydiae	28	1	N
+Block_080-088	080-088 Rickettsioses and other arthropod-borne diseases	29	1	N
+Block_090-099	090-099 Syphilis and other venereal diseases	30	1	N
+Block_100-104	100-104 Other spirochetal diseases	31	1	N
+Block_110-118	110-118 Mycoses	32	1	N
+Block_120-129	120-129 Helminthiases	33	1	N
+Block_130-136	130-136 Other infectious and parasitic diseases	34	1	N
+Block_137-139	137-139 Late effects of infectious and parasitic diseases	35	1	N
+Block_140-149	140-149 Malignant neoplasm of lip, oral cavity, and pharynx	36	2	N
+Block_150-159	150-159 Malignant neoplasm of digestive organs and peritoneum	37	2	N
+Block_160-165	160-165 Malignant neoplasm of respiratory and intrathoracic organs	38	2	N
+Block_170-175	170-175 Malignant neoplasm of bone, connective tissue, skin, and breast	39	2	N
+Block_176-176	176-176 Kaposi's sarcoma	40	2	Y
+Block_179-189	179-189 Malignant neoplasm of genitourinary organs	41	2	N
+Block_190-199	190-199 Malignant neoplasm of other and unspecified sites	42	2	N
+Block_200-208	200-208 Malignant neoplasm of lymphatic and hematopoietic tissue	43	2	N
+Block_209-209	209-209 Neuroendocrine tumors	44	2	Y
+Block_210-229	210-229 Benign neoplasms	45	2	N
+Block_230-234	230-234 Carcinoma in situ	46	2	N
+Block_235-238	235-238 Neoplasms of uncertain behavior	47	2	N
+Block_239-239	239-239 Neoplasms of unspecified nature	48	2	N
+Block_240-246	240-246 Disorders of thyroid gland	49	3	N
+Block_249-259	249-259 Diseases of other endocrine glands	50	3	N
+Block_260-269	260-269 Nutritional deficiencies	51	3	N
+Block_270-279	270-279 Other metabolic and immunity disorders	52	3	N
+Block_280-285	280-285 Anemia	53	4	N
+Block_286-287	286-287 Coagulation/hemorrhagic	54	4	N
+Block_288-289	288-289 Other	55	4	N
+Block_290-299	290-299 Psychosis	56	5	N
+Block_300-316	300-316 Neurotic disorders, personality disorders, and other nonpsychotic mental disorders	57	5	N
+Block_317-319	317-319 Mental retardation	58	5	N
+Block_320-327	320-327 Inflammatory diseases of the central nervous system	59	6	N
+Block_330-337	330-337 Hereditary and degenerative diseases of the central nervous system	60	6	N
+Block_338-338	338-338 Pain	61	6	Y
+Block_339-339	339-339 Other headache syndromes	62	6	Y
+Block_340-349	340-349 Other disorders of the central nervous system	63	6	N
+Block_350-359	350-359 Disorders of the peripheral nervous system	64	6	N
+Block_360-379	360-379 Disorders of the eye and adnexa	65	6	N
+Block_380-389	380-389 Diseases of the ear and mastoid process	66	6	N
+Block_390-392	390-392 Acute Rheumatic Fever	67	7	N
+Block_393-398	393-398 Chronic rheumatic heart disease	68	7	N
+Block_401-405	401-405 Hypertensive disease	69	7	N
+Block_410-414	410-414 Ischemic heart disease	70	7	N
+Block_415-417	415-417 Diseases of pulmonary circulation	71	7	N
+Block_420-429	420-429 Other forms of heart disease	72	7	N
+Block_430-438	430-438 Cerebrovascular disease	73	7	N
+Block_440-448	440-448 Diseases of arteries, arterioles, and capillaries	74	7	N
+Block_451-459	451-459 Diseases of veins and lymphatics, and other diseases of circulatory system	75	7	N
+Block_460-466	460-466 Acute respiratory infections	76	8	N
+Block_470-478	470-478 Other diseases of the upper respiratory tract	77	8	N
+Block_480-488	480-488 Pneumonia and influenza	78	8	N
+Block_490-496	490-496 Chronic obstructive pulmonary disease and allied conditions	79	8	N
+Block_500-508	500-508 Pneumoconioses and other lung diseases due to external agents	80	8	N
+Block_510-519	510-519 Other diseases of respiratory system	81	8	N
+Block_520-529	520-529 Diseases of oral cavity, salivary glands, and jaws	82	9	N
+Block_530-537	530-537 Diseases of esophagus, stomach, and duodenum	83	9	N
+Block_540-543	540-543 Appendicitis	84	9	N
+Block_550-553	550-553 Hernia of abdominal cavity	85	9	N
+Block_555-558	555-558 Noninfectious enteritis and colitis	86	9	N
+Block_560-569	560-569 Other diseases of intestines and peritoneum	87	9	N
+Block_570-579	570-579 Other diseases of digestive system	88	9	N
+Block_580-589	580-589 Nephritis, nephrotic syndrome, and nephrosis	89	10	N
+Block_590-599	590-599 Other diseases of urinary system	90	10	N
+Block_600-608	600-608 Diseases of male genital organs	91	10	N
+Block_617-629	617-629 Other disorders of female genital tract	92	10	N
+Block_630-633	630-633 Ectopic and molar pregnancy	93	11	N
+Block_634-639	634-639 Other pregnancy with abortive outcome	94	11	N
+Block_640-649	640-649 Complications mainly related to pregnancy	95	11	N
+Block_650-659	650-659 Normal delivery, and other indications for care in pregnancy, labor, and delivery	96	11	N
+Block_660-669	660-669 Complications occurring mainly in the course of labor and delivery	97	11	N
+Block_670-676	670-676 Complications of the puerperium	98	11	N
+Block_678-679	678-679 Other maternal and fetal complications	99	11	Y
+Block_680-686	680-686 Infections of skin and subcutaneous tissue	100	12	N
+Block_690-698	690-698 Other inflammatory conditions of skin and subcutaneous tissue	101	12	N
+Block_700-709	700-709 Other diseases of skin and subcutaneous tissue	102	12	N
+Block_710-719	710-719 Arthropathies and related disorders	103	13	N
+Block_720-724	720-724 Dorsopathies	104	13	N
+Block_725-729	725-729 Rheumatism, excluding the back	105	13	N
+Block_730-739	730-739 Osteopathies, chondropathies, and acquired musculoskeletal deformities	106	13	N
+Block_740-742	740-742 Nervous system	107	14	N
+Block_743-744	743-744 Eye, ear, face and neck	108	14	N
+Block_745-747	745-747 Circulatory system	109	14	N
+Block_748-748	748-748 Respiratory system	110	14	N
+Block_749-751	749-751 Digestive system	111	14	N
+Block_752-752	752-752 Genital organs	112	14	N
+Block_753-753	753-753 Urinary system	113	14	N
+Block_754-756	754-756 Musculoskeletal system	114	14	N
+Block_757-757	757-757 Integument	115	14	N
+Block_758-758	758-758 Chromosomal anomalies	116	14	N
+Block_759-759	759-759 Other	117	14	N
+Block_760-763	760-763 Maternal causes of perinatal morbidity and mortality	118	15	N
+Block_764-779	764-779 Other conditions originating in the perinatal period	119	15	N
+Block_780-789	780-789 Symptoms	120	16	N
+Block_790-796	790-796 Nonspecific abnormal findings	121	16	N
+Block_797-799	797-799 Ill-defined and unknown causes of morbidity and mortality	122	16	N
+Block_800-804	800-804 Fracture of skull	123	17	N
+Block_805-809	805-809 Fracture of neck and trunk	124	17	N
+Block_810-819	810-819 Fracture of upper limb	125	17	N
+Block_820-829	820-829 Fracture of lower limb	126	17	N
+Block_830-839	830-839 Dislocation	127	17	N
+Block_840-848	840-848 Sprains and strains of joints and adjacent muscles	128	17	N
+Block_850-854	850-854 Intracranial injury, excluding those with skull fracture	129	17	N
+Block_860-869	860-869 Internal injury of thorax, abdomen, and pelvis	130	17	N
+Block_870-879	870-879 Open wound of head, neck, and trunk	131	17	N
+Block_880-887	880-887 Open wound of upper limb	132	17	N
+Block_890-897	890-897 Open wound of lower limb	133	17	N
+Block_900-904	900-904 Injury to blood vessels	134	17	N
+Block_905-909	905-909 Late effects of injuries, poisonings, toxic effects, and other external causes	135	17	N
+Block_910-919	910-919 Superficial injury	136	17	N
+Block_920-924	920-924 Contusion with intact skin surface	137	17	N
+Block_925-929	925-929 Crushing injury	138	17	N
+Block_930-939	930-939 Effects of foreign body entering through Body orifice	139	17	N
+Block_940-949	940-949 Burns	140	17	N
+Block_950-957	950-957 Injury to nerves and spinal cord	141	17	N
+Block_958-959	958-959 Certain traumatic complications and unspecified injuries	142	17	N
+Block_960-979	960-979 Poisoning by drugs, medicinal and biological substances	143	17	N
+Block_980-989	980-989 Toxic effects of substances chiefly nonmedicinal as to source	144	17	N
+Block_990-995	990-995 Other and unspecified effects of external causes	145	17	N
+Block_996-999	996-999 Complications of surgical and medical care, not elsewhere classified	146	17	N
+Block_E800-E807	E800-E807 Railway accidents	147	18	N
+Block_E810-E819	E810-E819 Motor vehicle traffic accidents	148	18	N
+Block_E820-E825	E820-E825 Motor vehicle non-traffic accidents	149	18	N
+Block_E826-E829	E826-E829 Other road vehicle accidents	150	18	N
+Block_E830-E831	E830-E831 Water transport accidents	151	18	N
+Block_E840-E845	E840-E845 Air and space transport accidents	152	18	N
+Block_E846-E848	E846-E848 Vehicle accidents not elsewhere classifiable	153	18	N
+Block_E849-E849	E849-E849 Place of Occurrence	154	18	Y
+Block_E850-E858	E850-E858 Accidental poisoning by drugs, medicinal substances, and biologicals	155	18	N
+Block_E860-E869	E860-E869 Accidental poisoning by other solid and liquid substances, gases, and vapors	156	18	N
+Block_E870-E876	E870-E876 Misadventures to patients during surgical and medical care	157	18	N
+Block_E878-E879	E878-E879 Surgical and medical procedures as the cause of abnormal reaction of patient or later complication, without mention of misadventure at the time of procedure	158	18	N
+Block_E880-E888	E880-E888 Accidental falls	159	18	N
+Block_E890-E899	E890-E899 Accidents caused by fire and flames	160	18	N
+Block_E900-E909	E900-E909 Accidents due to natural and environmental factors	161	18	N
+Block_E910-E915	E910-E915 Accidents caused by submersion, suffocation, and foreign bodies	162	18	N
+Block_E916-E928	E916-E928 Other accidents	163	18	N
+Block_E929-E929	E929-E929 Late effects of accidental injury	164	18	N
+Block_E930-E949	E930-E949 Drugs, medicinal and biological substances causing adverse effects in therapeutic use	165	18	N
+Block_E950-E959	E950-E959 Suicide and self-inflicted injury	166	18	N
+Block_E960-E969	E960-E969 Homicide and injury purposely inflicted by other persons	167	18	N
+Block_E970-E978	E970-E978 Legal intervention	168	18	N
+Block_E979-E979	E979-E979 Terrorism	169	18	Y
+Block_E980-E989	E980-E989 Injury undetermined whether accidentally or purposely inflicted	170	18	N
+Block_E990-E999	E990-E999 Injury resulting from operations of war	171	18	N
+Block_V01-V06	V01-V06 Persons with potential health hazards related to communicable diseases	172	19	N
+Block_V07-V09	V07-V09 Persons with need for isolation, Other potential health hazards and Prophylactic measures	173	19	N
+Block_V10-V19	V10-V19 Persons with potential health hazards related to personal and family history	174	19	N
+Block_V20-V29	V20-V29 Persons encountering health services in Circumstances related to Reproduction and development	175	19	N
+Block_V30-V39	V30-V39 Live-born infants according to type of birth	176	19	N
+Block_V40-V49	V40-V49 Persons with a condition influencing their health status	177	19	N
+Block_V50-V59	V50-V59 Persons encountering health services for specific procedures and aftercare	178	19	N
+Block_V60-V69	V60-V69 Persons encountering health services in other circumstances	179	19	N
+Block_V70-V82	V70-V82 Persons without reported diagnosis encountered during examination and investigation of individuals and populations	180	19	N
+Block_V83-V84	V83-V84 Genetics	181	19	Y
+Block_V85-V85	V85-V85 Body mass index	182	19	Y
+Block_V86-V86	V86-V86 Estrogen receptor Status	183	19	Y
+Block_V87-V87	V87-V87 Other Specified Personal Exposures And History Presenting Hazards To Health	184	19	Y
+Block_V88-V88	V88-V88 Acquired Absence Of Other Organs And Tissue	185	19	Y
+Block_V89-V89	V89-V89 Other Suspected Conditions Not Found	186	19	Y
+Block_V90-V90	V90-V90 Retained Foreign Body	187	19	Y
+Block_V91-V91	V91-V91 Multiple Gestation Placenta Status	188	19	Y
+Chapter_E	Chapter E - External causes of injury	18	0	N
+Chapter_I	Chapter I Infectious and parasitic diseases (001-139)	1	0	N
+Chapter_II	Chapter II Neoplasms (140-239)	2	0	N
+Chapter_III	Chapter III Endocrine, nutritional and metabolic diseases, and immunity disorders (240-279)	3	0	N
+Chapter_IV	Chapter IV Diseases of the blood and blood-forming organs (280-289)	4	0	N
+Chapter_IX	Chapter IX Diseases of the digestive system (520-579)	9	0	N
+Chapter_V	Chapter V Mental disorders (230-319)	5	0	N
+Chapter_V	Chapter V - Supplementary classification of factors influencing health status and contact with health services	19	0	N
+Chapter_VI	Chapter VI Diseases of the nervous system and the sense organs (320-389)	6	0	N
+Chapter_VII	Chapter VII Diseases of the circulatory system (390-459)	7	0	N
+Chapter_VIII	Chapter VIII Diseases of the respiratory system (460-519)	8	0	N
+Chapter_X	Chapter X Diseases of the genitourinary system (580-629)	10	0	N
+Chapter_XI	Chapter XI Complications of pregnancy, childbirth, and the puerperium (630-679)	11	0	N
+Chapter_XII	Chapter XII Diseases of the skin and subcutaneous tissue (680-709)	12	0	N
+Chapter_XIII	Chapter XIII Diseases of the musculoskeletal system and connective tissue (710-739)	13	0	N
+Chapter_XIV	Chapter XIV Congenital anomalies (740-759)	14	0	N
+Chapter_XV	Chapter XV Certain conditions originating in the perinatal period (760-779)	15	0	N
+Chapter_XVI	Chapter XVI Symptoms, signs, and ill-defined conditions (780-799)	16	0	N
+Chapter_XVII	Chapter XVII Injury and poisoning (800-999)	17	0	N
 E800	E800 Railway accident involving collision with rolling stock	9077	147	N
 E8000	E8000 Railway acc.-coll. with rolling stock (i/p railway employee)	9078	9077	Y
 E8001	E8001 Railway acc.-coll. with rolling stock (i/p passenger on railway)	9079	9077	Y

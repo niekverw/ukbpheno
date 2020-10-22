@@ -920,269 +920,269 @@ B98	B98 Other specified infectious agents as the cause of diseases classified to
 B980	B98.0 Helicobacter pylori [H.pylori] as the cause of diseases classified to other chapters	1204	1203	Y
 B981	B98.1 Vibrio vulnificus as the cause of diseases classified to other chapters	1205	1203	Y
 B99	B99 Other and unspecified infectious diseases	1206	43	Y
-Block A00-A09	A00-A09 Intestinal infectious diseases	23	1	N
-Block A15-A19	A15-A19 Tuberculosis	24	1	N
-Block A20-A28	A20-A28 Certain zoonotic bacterial diseases	25	1	N
-Block A30-A49	A30-A49 Other bacterial diseases	26	1	N
-Block A50-A64	A50-A64 Infections with a predominantly sexual mode of transmission	27	1	N
-Block A65-A69	A65-A69 Other spirochaetal diseases	28	1	N
-Block A70-A74	A70-A74 Other diseases caused by chlamydiae	29	1	N
-Block A75-A79	A75-A79 Rickettsioses	30	1	N
-Block A80-A89	A80-A89 Viral infections of the central nervous system	31	1	N
-Block A92-A99	A92-A99 Arthropod-borne viral fevers and viral haemorrhagic fevers	32	1	N
-Block B00-B09	B00-B09 Viral infections characterized by skin and mucous membrane lesions	33	1	N
-Block B15-B19	B15-B19 Viral hepatitis	34	1	N
-Block B20-B24	B20-B24 Human immunodeficiency virus [HIV] disease	35	1	N
-Block B25-B34	B25-B34 Other viral diseases	36	1	N
-Block B35-B49	B35-B49 Mycoses	37	1	N
-Block B50-B64	B50-B64 Protozoal diseases	38	1	N
-Block B65-B83	B65-B83 Helminthiases	39	1	N
-Block B85-B89	B85-B89 Pediculosis, acariasis and other infestations	40	1	N
-Block B90-B94	B90-B94 Sequelae of infectious and parasitic diseases	41	1	N
-Block B95-B98	B95-B98 Bacterial, viral and other infectious agents	42	1	N
-Block B99-B99	B99-B99 Other infectious diseases	43	1	N
-Block C00-C14	C00-C14 Malignant neoplasms of lip, oral cavity and pharynx	44	2	N
-Block C15-C26	C15-C26 Malignant neoplasms of digestive organs	45	2	N
-Block C30-C39	C30-C39 Malignant neoplasms of respiratory and intrathoracic organs	46	2	N
-Block C40-C41	C40-C41 Malignant neoplasms of bone and articular cartilage	47	2	N
-Block C43-C44	C43-C44 Melanoma and other malignant neoplasms of skin	48	2	N
-Block C45-C49	C45-C49 Malignant neoplasms of mesothelial and soft tissue	49	2	N
-Block C50-C50	C50-C50 Malignant neoplasm of breast	50	2	N
-Block C51-C58	C51-C58 Malignant neoplasms of female genital organs	51	2	N
-Block C60-C63	C60-C63 Malignant neoplasms of male genital organs	52	2	N
-Block C64-C68	C64-C68 Malignant neoplasms of urinary tract	53	2	N
-Block C69-C72	C69-C72 Malignant neoplasms of eye, brain and other parts of central nervous system	54	2	N
-Block C73-C75	C73-C75 Malignant neoplasms of thyroid and other endocrine glands	55	2	N
-Block C76-C80	C76-C80 Malignant neoplasms of ill-defined, secondary and unspecified sites	56	2	N
-Block C81-C96	C81-C96 Malignant neoplasms, stated or presumed to be primary, of lymphoid, haematopoietic and related tissue	57	2	N
-Block C97-C97	C97-C97 Malignant neoplasms of independent (primary) multiple sites	58	2	N
-Block D00-D09	D00-D09 In situ neoplasms	59	2	N
-Block D10-D36	D10-D36 Benign neoplasms	60	2	N
-Block D37-D48	D37-D48 Neoplasms of uncertain or unknown behaviour	61	2	N
-Block D50-D53	D50-D53 Nutritional anaemias	62	3	N
-Block D55-D59	D55-D59 Haemolytic anaemias	63	3	N
-Block D60-D64	D60-D64 Aplastic and other anaemias	64	3	N
-Block D65-D69	D65-D69 Coagulation defects, purpura and other haemorrhagic conditions	65	3	N
-Block D70-D77	D70-D77 Other diseases of blood and blood-forming organs	66	3	N
-Block D80-D89	D80-D89 Certain disorders involving the immune mechanism	67	3	N
-Block E00-E07	E00-E07 Disorders of thyroid gland	68	4	N
-Block E10-E14	E10-E14 Diabetes mellitus	69	4	N
-Block E15-E16	E15-E16 Other disorders of glucose regulation and pancreatic internal secretion	70	4	N
-Block E20-E35	E20-E35 Disorders of other endocrine glands	71	4	N
-Block E40-E46	E40-E46 Malnutrition	72	4	N
-Block E50-E64	E50-E64 Other nutritional deficiencies	73	4	N
-Block E65-E68	E65-E68 Obesity and other hyperalimentation	74	4	N
-Block E70-E90	E70-E90 Metabolic disorders	75	4	N
-Block F00-F09	F00-F09 Organic, including symptomatic, mental disorders	76	5	N
-Block F10-F19	F10-F19 Mental and behavioural disorders due to psychoactive substance use	77	5	N
-Block F20-F29	F20-F29 Schizophrenia, schizotypal and delusional disorders	78	5	N
-Block F30-F39	F30-F39 Mood [affective] disorders	79	5	N
-Block F40-F48	F40-F48 Neurotic, stress-related and somatoform disorders	80	5	N
-Block F50-F59	F50-F59 Behavioural syndromes associated with physiological disturbances and physical factors	81	5	N
-Block F60-F69	F60-F69 Disorders of adult personality and behaviour	82	5	N
-Block F70-F79	F70-F79 Mental retardation	83	5	N
-Block F80-F89	F80-F89 Disorders of psychological development	84	5	N
-Block F90-F98	F90-F98 Behavioural and emotional disorders with onset usually occurring in childhood and adolescence	85	5	N
-Block F99-F99	F99-F99 Unspecified mental disorder	86	5	N
-Block G00-G09	G00-G09 Inflammatory diseases of the central nervous system	87	6	N
-Block G10-G14	G10-G14 Systemic atrophies primarily affecting the central nervous system	88	6	N
-Block G20-G26	G20-G26 Extrapyramidal and movement disorders	89	6	N
-Block G30-G32	G30-G32 Other degenerative diseases of the nervous system	90	6	N
-Block G35-G37	G35-G37 Demyelinating diseases of the central nervous system	91	6	N
-Block G40-G47	G40-G47 Episodic and paroxysmal disorders	92	6	N
-Block G50-G59	G50-G59 Nerve, nerve root and plexus disorders	93	6	N
-Block G60-G64	G60-G64 Polyneuropathies and other disorders of the peripheral nervous system	94	6	N
-Block G70-G73	G70-G73 Diseases of myoneural junction and muscle	95	6	N
-Block G80-G83	G80-G83 Cerebral palsy and other paralytic syndromes	96	6	N
-Block G90-G99	G90-G99 Other disorders of the nervous system	97	6	N
-Block H00-H06	H00-H06 Disorders of eyelid, lacrimal system and orbit	98	7	N
-Block H10-H13	H10-H13 Disorders of conjunctiva	99	7	N
-Block H15-H22	H15-H22 Disorders of sclera, cornea, iris and ciliary body	100	7	N
-Block H25-H28	H25-H28 Disorders of lens	101	7	N
-Block H30-H36	H30-H36 Disorders of choroid and retina	102	7	N
-Block H40-H42	H40-H42 Glaucoma	103	7	N
-Block H43-H45	H43-H45 Disorders of vitreous body and globe	104	7	N
-Block H46-H48	H46-H48 Disorders of optic nerve and visual pathways	105	7	N
-Block H49-H52	H49-H52 Disorders of ocular muscles, binocular movement, accommodation and refraction	106	7	N
-Block H53-H54	H53-H54 Visual disturbances and blindness	107	7	N
-Block H55-H59	H55-H59 Other disorders of eye and adnexa	108	7	N
-Block H60-H62	H60-H62 Diseases of external ear	109	8	N
-Block H65-H75	H65-H75 Diseases of middle ear and mastoid	110	8	N
-Block H80-H83	H80-H83 Diseases of inner ear	111	8	N
-Block H90-H95	H90-H95 Other disorders of ear	112	8	N
-Block I00-I02	I00-I02 Acute rheumatic fever	113	9	N
-Block I05-I09	I05-I09 Chronic rheumatic heart diseases	114	9	N
-Block I10-I15	I10-I15 Hypertensive diseases	115	9	N
-Block I20-I25	I20-I25 Ischaemic heart diseases	116	9	N
-Block I26-I28	I26-I28 Pulmonary heart disease and diseases of pulmonary circulation	117	9	N
-Block I30-I52	I30-I52 Other forms of heart disease	118	9	N
-Block I60-I69	I60-I69 Cerebrovascular diseases	119	9	N
-Block I70-I79	I70-I79 Diseases of arteries, arterioles and capillaries	120	9	N
-Block I80-I89	I80-I89 Diseases of veins, lymphatic vessels and lymph nodes, not elsewhere classified	121	9	N
-Block I95-I99	I95-I99 Other and unspecified disorders of the circulatory system	122	9	N
-Block J00-J06	J00-J06 Acute upper respiratory infections	123	10	N
-Block J09-J18	J09-J18 Influenza and pneumonia	124	10	N
-Block J20-J22	J20-J22 Other acute lower respiratory infections	125	10	N
-Block J30-J39	J30-J39 Other diseases of upper respiratory tract	126	10	N
-Block J40-J47	J40-J47 Chronic lower respiratory diseases	127	10	N
-Block J60-J70	J60-J70 Lung diseases due to external agents	128	10	N
-Block J80-J84	J80-J84 Other respiratory diseases principally affecting the interstitium	129	10	N
-Block J85-J86	J85-J86 Suppurative and necrotic conditions of lower respiratory tract	130	10	N
-Block J90-J94	J90-J94 Other diseases of pleura	131	10	N
-Block J95-J99	J95-J99 Other diseases of the respiratory system	132	10	N
-Block K00-K14	K00-K14 Diseases of oral cavity, salivary glands and jaws	133	11	N
-Block K20-K31	K20-K31 Diseases of oesophagus, stomach and duodenum	134	11	N
-Block K35-K38	K35-K38 Diseases of appendix	135	11	N
-Block K40-K46	K40-K46 Hernia	136	11	N
-Block K50-K52	K50-K52 Noninfective enteritis and colitis	137	11	N
-Block K55-K64	K55-K64 Other diseases of intestines	138	11	N
-Block K65-K67	K65-K67 Diseases of peritoneum	139	11	N
-Block K70-K77	K70-K77 Diseases of liver	140	11	N
-Block K80-K87	K80-K87 Disorders of gallbladder, biliary tract and pancreas	141	11	N
-Block K90-K93	K90-K93 Other diseases of the digestive system	142	11	N
-Block L00-L08	L00-L08 Infections of the skin and subcutaneous tissue	143	12	N
-Block L10-L14	L10-L14 Bullous disorders	144	12	N
-Block L20-L30	L20-L30 Dermatitis and eczema	145	12	N
-Block L40-L45	L40-L45 Papulosquamous disorders	146	12	N
-Block L50-L54	L50-L54 Urticaria and erythema	147	12	N
-Block L55-L59	L55-L59 Radiation-related disorders of the skin and subcutaneous tissue	148	12	N
-Block L60-L75	L60-L75 Disorders of skin appendages	149	12	N
-Block L80-L99	L80-L99 Other disorders of the skin and subcutaneous tissue	150	12	N
-Block M00-M03	M00-M03 Infectious arthropathies	151	13	N
-Block M05-M14	M05-M14 Inflammatory polyarthropathies	152	13	N
-Block M15-M19	M15-M19 Arthrosis	153	13	N
-Block M20-M25	M20-M25 Other joint disorders	154	13	N
-Block M40-M43	M40-M43 Deforming dorsopathies	155	13	N
-Block M45-M49	M45-M49 Spondylopathies	156	13	N
-Block M50-M54	M50-M54 Other dorsopathies	157	13	N
-Block M60-M63	M60-M63 Disorders of muscles	158	13	N
-Block M65-M68	M65-M68 Disorders of synovium and tendon	159	13	N
-Block M70-M79	M70-M79 Other soft tissue disorders	160	13	N
-Block M80-M85	M80-M85 Disorders of bone density and structure	161	13	N
-Block M86-M90	M86-M90 Other osteopathies	162	13	N
-Block M91-M94	M91-M94 Chondropathies	163	13	N
-Block M95-M99	M95-M99 Other disorders of the musculoskeletal system and connective tissue	164	13	N
-Block N00-N08	N00-N08 Glomerular diseases	165	14	N
-Block N10-N16	N10-N16 Renal tubulo-interstitial diseases	166	14	N
-Block N17-N19	N17-N19 Renal failure	167	14	N
-Block N20-N23	N20-N23 Urolithiasis	168	14	N
-Block N25-N29	N25-N29 Other disorders of kidney and ureter	169	14	N
-Block N30-N39	N30-N39 Other diseases of urinary system	170	14	N
-Block N40-N51	N40-N51 Diseases of male genital organs	171	14	N
-Block N60-N64	N60-N64 Disorders of breast	172	14	N
-Block N70-N77	N70-N77 Inflammatory diseases of female pelvic organs	173	14	N
-Block N80-N98	N80-N98 Noninflammatory disorders of female genital tract	174	14	N
-Block N99-N99	N99-N99 Other disorders of the genitourinary system	175	14	N
-Block O00-O08	O00-O08 Pregnancy with abortive outcome	176	15	N
-Block O10-O16	O10-O16 Oedema, proteinuria and hypertensive disorders in pregnancy, childbirth and the puerperium	177	15	N
-Block O20-O29	O20-O29 Other maternal disorders predominantly related to pregnancy	178	15	N
-Block O30-O48	O30-O48 Maternal care related to the fetus and amniotic cavity and possible delivery problems	179	15	N
-Block O60-O75	O60-O75 Complications of labour and delivery	180	15	N
-Block O80-O84	O80-O84 Delivery	181	15	N
-Block O85-O92	O85-O92 Complications predominantly related to the puerperium	182	15	N
-Block O94-O99	O94-O99 Other obstetric conditions, not elsewhere classified	183	15	N
-Block P00-P04	P00-P04 Fetus and newborn affected by maternal factors and by complications of pregnancy, labour and delivery	184	16	N
-Block P05-P08	P05-P08 Disorders related to length of gestation and fetal growth	185	16	N
-Block P10-P15	P10-P15 Birth trauma	186	16	N
-Block P20-P29	P20-P29 Respiratory and cardiovascular disorders specific to the perinatal period	187	16	N
-Block P35-P39	P35-P39 Infections specific to the perinatal period	188	16	N
-Block P50-P61	P50-P61 Haemorrhagic and haematological disorders of fetus and newborn	189	16	N
-Block P70-P74	P70-P74 Transitory endocrine and metabolic disorders specific to fetus and newborn	190	16	N
-Block P75-P78	P75-P78 Digestive system disorders of fetus and newborn	191	16	N
-Block P80-P83	P80-P83 Conditions involving the integument and temperature regulation of fetus and newborn	192	16	N
-Block P90-P96	P90-P96 Other disorders originating in the perinatal period	193	16	N
-Block Q00-Q07	Q00-Q07 Congenital malformations of the nervous system	194	17	N
-Block Q10-Q18	Q10-Q18 Congenital malformations of eye, ear, face and neck	195	17	N
-Block Q20-Q28	Q20-Q28 Congenital malformations of the circulatory system	196	17	N
-Block Q30-Q34	Q30-Q34 Congenital malformations of the respiratory system	197	17	N
-Block Q35-Q37	Q35-Q37 Cleft lip and cleft palate	198	17	N
-Block Q38-Q45	Q38-Q45 Other congenital malformations of the digestive system	199	17	N
-Block Q50-Q56	Q50-Q56 Congenital malformations of genital organs	200	17	N
-Block Q60-Q64	Q60-Q64 Congenital malformations of the urinary system	201	17	N
-Block Q65-Q79	Q65-Q79 Congenital malformations and deformations of the musculoskeletal system	202	17	N
-Block Q80-Q89	Q80-Q89 Other congenital malformations	203	17	N
-Block Q90-Q99	Q90-Q99 Chromosomal abnormalities, not elsewhere classified	204	17	N
-Block R00-R09	R00-R09 Symptoms and signs involving the circulatory and respiratory systems	205	18	N
-Block R10-R19	R10-R19 Symptoms and signs involving the digestive system and abdomen	206	18	N
-Block R20-R23	R20-R23 Symptoms and signs involving the skin and subcutaneous tissue	207	18	N
-Block R25-R29	R25-R29 Symptoms and signs involving the nervous and musculoskeletal systems	208	18	N
-Block R30-R39	R30-R39 Symptoms and signs involving the urinary system	209	18	N
-Block R40-R46	R40-R46 Symptoms and signs involving cognition, perception, emotional state and behaviour	210	18	N
-Block R47-R49	R47-R49 Symptoms and signs involving speech and voice	211	18	N
-Block R50-R69	R50-R69 General symptoms and signs	212	18	N
-Block R70-R79	R70-R79 Abnormal findings on examination of blood, without diagnosis	213	18	N
-Block R80-R82	R80-R82 Abnormal findings on examination of urine, without diagnosis	214	18	N
-Block R83-R89	R83-R89 Abnormal findings on examination of other body fluids, substances and tissues, without diagnosis	215	18	N
-Block R90-R94	R90-R94 Abnormal findings on diagnostic imaging and in function studies, without diagnosis	216	18	N
-Block R95-R99	R95-R99 Ill-defined and unknown causes of mortality	217	18	N
-Block S00-S09	S00-S09 Injuries to the head	218	19	N
-Block S10-S19	S10-S19 Injuries to the neck	219	19	N
-Block S20-S29	S20-S29 Injuries to the thorax	220	19	N
-Block S30-S39	S30-S39 Injuries to the abdomen, lower back, lumbar spine and pelvis	221	19	N
-Block S40-S49	S40-S49 Injuries to the shoulder and upper arm	222	19	N
-Block S50-S59	S50-S59 Injuries to the elbow and forearm	223	19	N
-Block S60-S69	S60-S69 Injuries to the wrist and hand	224	19	N
-Block S70-S79	S70-S79 Injuries to the hip and thigh	225	19	N
-Block S80-S89	S80-S89 Injuries to the knee and lower leg	226	19	N
-Block S90-S99	S90-S99 Injuries to the ankle and foot	227	19	N
-Block T00-T07	T00-T07 Injuries involving multiple body regions	228	19	N
-Block T08-T14	T08-T14 Injuries to unspecified part of trunk, limb or body region	229	19	N
-Block T15-T19	T15-T19 Effects of foreign body entering through natural orifice	230	19	N
-Block T20-T25	T20-T25 Burns and corrosions of external body surface, specified by site	231	19	N
-Block T26-T28	T26-T28 Burns and corrosions confined to eye and internal organs	232	19	N
-Block T29-T32	T29-T32 Burns and corrosions of multiple and unspecified body regions	233	19	N
-Block T33-T35	T33-T35 Frostbite	234	19	N
-Block T36-T50	T36-T50 Poisoning by drugs, medicaments and biological substances	235	19	N
-Block T51-T65	T51-T65 Toxic effects of substances chiefly nonmedicinal as to source	236	19	N
-Block T66-T78	T66-T78 Other and unspecified effects of external causes	237	19	N
-Block T79-T79	T79-T79 Certain early complications of trauma	238	19	N
-Block T80-T88	T80-T88 Complications of surgical and medical care, not elsewhere classified	239	19	N
-Block T90-T98	T90-T98 Sequelae of injuries, of poisoning and of other consequences of external causes	240	19	N
-Block U00-U49	U00-U49 Provisional assignment of new diseases of uncertain etiology or emergency use	284	22	N
-Block U82-U85	U82-U85 Resistance to antimicrobial and antineoplastic drugs	285	22	N
-Block V01-V09	V01-V09 Pedestrian injured in transport accident	241	20	N
-Block V10-V19	V10-V19 Pedal cyclist injured in transport accident	242	20	N
-Block V20-V29	V20-V29 Motorcycle rider injured in transport accident	243	20	N
-Block V30-V39	V30-V39 Occupant of three-wheeled motor vehicle injured in transport accident	244	20	N
-Block V40-V49	V40-V49 Car occupant injured in transport accident	245	20	N
-Block V50-V59	V50-V59 Occupant of pick-up truck or van injured in transport accident	246	20	N
-Block V60-V69	V60-V69 Occupant of heavy transport vehicle injured in transport accident	247	20	N
-Block V70-V79	V70-V79 Bus occupant injured in transport accident	248	20	N
-Block V80-V89	V80-V89 Other land transport accidents	249	20	N
-Block V90-V94	V90-V94 Water transport accidents	250	20	N
-Block V95-V97	V95-V97 Air and space transport accidents	251	20	N
-Block V98-V99	V98-V99 Other and unspecified transport accidents	252	20	N
-Block W00-W19	W00-W19 Falls	253	20	N
-Block W20-W49	W20-W49 Exposure to inanimate mechanical forces	254	20	N
-Block W50-W64	W50-W64 Exposure to animate mechanical forces	255	20	N
-Block W65-W74	W65-W74 Accidental drowning and submersion	256	20	N
-Block W75-W84	W75-W84 Other accidental threats to breathing	257	20	N
-Block W85-W99	W85-W99 Exposure to electric current, radiation and extreme ambient air temperature and pressure	258	20	N
-Block X00-X09	X00-X09 Exposure to smoke, fire and flames	259	20	N
-Block X10-X19	X10-X19 Contact with heat and hot substances	260	20	N
-Block X20-X29	X20-X29 Contact with venomous animals and plants	261	20	N
-Block X30-X39	X30-X39 Exposure to forces of nature	262	20	N
-Block X40-X49	X40-X49 Accidental poisoning by and exposure to noxious substances	263	20	N
-Block X50-X57	X50-X57 Overexertion, travel and privation	264	20	N
-Block X58-X59	X58-X59 Accidental exposure to other and unspecified factors	265	20	N
-Block X60-X84	X60-X84 Intentional self-harm	266	20	N
-Block X85-X99	X85-X99 Assault	267	20	N
-Block Y00-Y09	Y00-Y09 Assault	268	20	N
-Block Y10-Y34	Y10-Y34 Event of undetermined intent	269	20	N
-Block Y35-Y36	Y35-Y36 Legal intervention and operations of war	270	20	N
-Block Y40-Y59	Y40-Y59 Drugs, medicaments and biological substances causing adverse effects in therapeutic use	271	20	N
-Block Y60-Y69	Y60-Y69 Misadventures to patients during surgical and medical care	272	20	N
-Block Y70-Y82	Y70-Y82 Medical devices associated with adverse incidents in diagnostic and therapeutic use	273	20	N
-Block Y83-Y84	Y83-Y84 Surgical and other medical procedures as the cause of abnormal reaction of the patient, or of later complication, without mention of misadventure at the time of the procedure	274	20	N
-Block Y85-Y89	Y85-Y89 Sequelae of external causes of morbidity and mortality	275	20	N
-Block Y90-Y98	Y90-Y98 Supplementary factors related to causes of morbidity and mortality classified elsewhere	276	20	N
-Block Z00-Z13	Z00-Z13 Persons encountering health services for examination and investigation	277	21	N
-Block Z20-Z29	Z20-Z29 Persons with potential health hazards related to communicable diseases	278	21	N
-Block Z30-Z39	Z30-Z39 Persons encountering health services in circumstances related to reproduction	279	21	N
-Block Z40-Z54	Z40-Z54 Persons encountering health services for specific procedures and health care	280	21	N
-Block Z55-Z65	Z55-Z65 Persons with potential health hazards related to socioeconomic and psychosocial circumstances	281	21	N
-Block Z70-Z76	Z70-Z76 Persons encountering health services in other circumstances	282	21	N
-Block Z80-Z99	Z80-Z99 Persons with potential health hazards related to family and personal history and certain conditions influencing health status	283	21	N
+Block_A00-A09	A00-A09 Intestinal infectious diseases	23	1	N
+Block_A15-A19	A15-A19 Tuberculosis	24	1	N
+Block_A20-A28	A20-A28 Certain zoonotic bacterial diseases	25	1	N
+Block_A30-A49	A30-A49 Other bacterial diseases	26	1	N
+Block_A50-A64	A50-A64 Infections with a predominantly sexual mode of transmission	27	1	N
+Block_A65-A69	A65-A69 Other spirochaetal diseases	28	1	N
+Block_A70-A74	A70-A74 Other diseases caused by chlamydiae	29	1	N
+Block_A75-A79	A75-A79 Rickettsioses	30	1	N
+Block_A80-A89	A80-A89 Viral infections of the central nervous system	31	1	N
+Block_A92-A99	A92-A99 Arthropod-borne viral fevers and viral haemorrhagic fevers	32	1	N
+Block_B00-B09	B00-B09 Viral infections characterized by skin and mucous membrane lesions	33	1	N
+Block_B15-B19	B15-B19 Viral hepatitis	34	1	N
+Block_B20-B24	B20-B24 Human immunodeficiency virus [HIV] disease	35	1	N
+Block_B25-B34	B25-B34 Other viral diseases	36	1	N
+Block_B35-B49	B35-B49 Mycoses	37	1	N
+Block_B50-B64	B50-B64 Protozoal diseases	38	1	N
+Block_B65-B83	B65-B83 Helminthiases	39	1	N
+Block_B85-B89	B85-B89 Pediculosis, acariasis and other infestations	40	1	N
+Block_B90-B94	B90-B94 Sequelae of infectious and parasitic diseases	41	1	N
+Block_B95-B98	B95-B98 Bacterial, viral and other infectious agents	42	1	N
+Block_B99-B99	B99-B99 Other infectious diseases	43	1	N
+Block_C00-C14	C00-C14 Malignant neoplasms of lip, oral cavity and pharynx	44	2	N
+Block_C15-C26	C15-C26 Malignant neoplasms of digestive organs	45	2	N
+Block_C30-C39	C30-C39 Malignant neoplasms of respiratory and intrathoracic organs	46	2	N
+Block_C40-C41	C40-C41 Malignant neoplasms of bone and articular cartilage	47	2	N
+Block_C43-C44	C43-C44 Melanoma and other malignant neoplasms of skin	48	2	N
+Block_C45-C49	C45-C49 Malignant neoplasms of mesothelial and soft tissue	49	2	N
+Block_C50-C50	C50-C50 Malignant neoplasm of breast	50	2	N
+Block_C51-C58	C51-C58 Malignant neoplasms of female genital organs	51	2	N
+Block_C60-C63	C60-C63 Malignant neoplasms of male genital organs	52	2	N
+Block_C64-C68	C64-C68 Malignant neoplasms of urinary tract	53	2	N
+Block_C69-C72	C69-C72 Malignant neoplasms of eye, brain and other parts of central nervous system	54	2	N
+Block_C73-C75	C73-C75 Malignant neoplasms of thyroid and other endocrine glands	55	2	N
+Block_C76-C80	C76-C80 Malignant neoplasms of ill-defined, secondary and unspecified sites	56	2	N
+Block_C81-C96	C81-C96 Malignant neoplasms, stated or presumed to be primary, of lymphoid, haematopoietic and related tissue	57	2	N
+Block_C97-C97	C97-C97 Malignant neoplasms of independent (primary) multiple sites	58	2	N
+Block_D00-D09	D00-D09 In situ neoplasms	59	2	N
+Block_D10-D36	D10-D36 Benign neoplasms	60	2	N
+Block_D37-D48	D37-D48 Neoplasms of uncertain or unknown behaviour	61	2	N
+Block_D50-D53	D50-D53 Nutritional anaemias	62	3	N
+Block_D55-D59	D55-D59 Haemolytic anaemias	63	3	N
+Block_D60-D64	D60-D64 Aplastic and other anaemias	64	3	N
+Block_D65-D69	D65-D69 Coagulation defects, purpura and other haemorrhagic conditions	65	3	N
+Block_D70-D77	D70-D77 Other diseases of blood and blood-forming organs	66	3	N
+Block_D80-D89	D80-D89 Certain disorders involving the immune mechanism	67	3	N
+Block_E00-E07	E00-E07 Disorders of thyroid gland	68	4	N
+Block_E10-E14	E10-E14 Diabetes mellitus	69	4	N
+Block_E15-E16	E15-E16 Other disorders of glucose regulation and pancreatic internal secretion	70	4	N
+Block_E20-E35	E20-E35 Disorders of other endocrine glands	71	4	N
+Block_E40-E46	E40-E46 Malnutrition	72	4	N
+Block_E50-E64	E50-E64 Other nutritional deficiencies	73	4	N
+Block_E65-E68	E65-E68 Obesity and other hyperalimentation	74	4	N
+Block_E70-E90	E70-E90 Metabolic disorders	75	4	N
+Block_F00-F09	F00-F09 Organic, including symptomatic, mental disorders	76	5	N
+Block_F10-F19	F10-F19 Mental and behavioural disorders due to psychoactive substance use	77	5	N
+Block_F20-F29	F20-F29 Schizophrenia, schizotypal and delusional disorders	78	5	N
+Block_F30-F39	F30-F39 Mood [affective] disorders	79	5	N
+Block_F40-F48	F40-F48 Neurotic, stress-related and somatoform disorders	80	5	N
+Block_F50-F59	F50-F59 Behavioural syndromes associated with physiological disturbances and physical factors	81	5	N
+Block_F60-F69	F60-F69 Disorders of adult personality and behaviour	82	5	N
+Block_F70-F79	F70-F79 Mental retardation	83	5	N
+Block_F80-F89	F80-F89 Disorders of psychological development	84	5	N
+Block_F90-F98	F90-F98 Behavioural and emotional disorders with onset usually occurring in childhood and adolescence	85	5	N
+Block_F99-F99	F99-F99 Unspecified mental disorder	86	5	N
+Block_G00-G09	G00-G09 Inflammatory diseases of the central nervous system	87	6	N
+Block_G10-G14	G10-G14 Systemic atrophies primarily affecting the central nervous system	88	6	N
+Block_G20-G26	G20-G26 Extrapyramidal and movement disorders	89	6	N
+Block_G30-G32	G30-G32 Other degenerative diseases of the nervous system	90	6	N
+Block_G35-G37	G35-G37 Demyelinating diseases of the central nervous system	91	6	N
+Block_G40-G47	G40-G47 Episodic and paroxysmal disorders	92	6	N
+Block_G50-G59	G50-G59 Nerve, nerve root and plexus disorders	93	6	N
+Block_G60-G64	G60-G64 Polyneuropathies and other disorders of the peripheral nervous system	94	6	N
+Block_G70-G73	G70-G73 Diseases of myoneural junction and muscle	95	6	N
+Block_G80-G83	G80-G83 Cerebral palsy and other paralytic syndromes	96	6	N
+Block_G90-G99	G90-G99 Other disorders of the nervous system	97	6	N
+Block_H00-H06	H00-H06 Disorders of eyelid, lacrimal system and orbit	98	7	N
+Block_H10-H13	H10-H13 Disorders of conjunctiva	99	7	N
+Block_H15-H22	H15-H22 Disorders of sclera, cornea, iris and ciliary body	100	7	N
+Block_H25-H28	H25-H28 Disorders of lens	101	7	N
+Block_H30-H36	H30-H36 Disorders of choroid and retina	102	7	N
+Block_H40-H42	H40-H42 Glaucoma	103	7	N
+Block_H43-H45	H43-H45 Disorders of vitreous body and globe	104	7	N
+Block_H46-H48	H46-H48 Disorders of optic nerve and visual pathways	105	7	N
+Block_H49-H52	H49-H52 Disorders of ocular muscles, binocular movement, accommodation and refraction	106	7	N
+Block_H53-H54	H53-H54 Visual disturbances and blindness	107	7	N
+Block_H55-H59	H55-H59 Other disorders of eye and adnexa	108	7	N
+Block_H60-H62	H60-H62 Diseases of external ear	109	8	N
+Block_H65-H75	H65-H75 Diseases of middle ear and mastoid	110	8	N
+Block_H80-H83	H80-H83 Diseases of inner ear	111	8	N
+Block_H90-H95	H90-H95 Other disorders of ear	112	8	N
+Block_I00-I02	I00-I02 Acute rheumatic fever	113	9	N
+Block_I05-I09	I05-I09 Chronic rheumatic heart diseases	114	9	N
+Block_I10-I15	I10-I15 Hypertensive diseases	115	9	N
+Block_I20-I25	I20-I25 Ischaemic heart diseases	116	9	N
+Block_I26-I28	I26-I28 Pulmonary heart disease and diseases of pulmonary circulation	117	9	N
+Block_I30-I52	I30-I52 Other forms of heart disease	118	9	N
+Block_I60-I69	I60-I69 Cerebrovascular diseases	119	9	N
+Block_I70-I79	I70-I79 Diseases of arteries, arterioles and capillaries	120	9	N
+Block_I80-I89	I80-I89 Diseases of veins, lymphatic vessels and lymph nodes, not elsewhere classified	121	9	N
+Block_I95-I99	I95-I99 Other and unspecified disorders of the circulatory system	122	9	N
+Block_J00-J06	J00-J06 Acute upper respiratory infections	123	10	N
+Block_J09-J18	J09-J18 Influenza and pneumonia	124	10	N
+Block_J20-J22	J20-J22 Other acute lower respiratory infections	125	10	N
+Block_J30-J39	J30-J39 Other diseases of upper respiratory tract	126	10	N
+Block_J40-J47	J40-J47 Chronic lower respiratory diseases	127	10	N
+Block_J60-J70	J60-J70 Lung diseases due to external agents	128	10	N
+Block_J80-J84	J80-J84 Other respiratory diseases principally affecting the interstitium	129	10	N
+Block_J85-J86	J85-J86 Suppurative and necrotic conditions of lower respiratory tract	130	10	N
+Block_J90-J94	J90-J94 Other diseases of pleura	131	10	N
+Block_J95-J99	J95-J99 Other diseases of the respiratory system	132	10	N
+Block_K00-K14	K00-K14 Diseases of oral cavity, salivary glands and jaws	133	11	N
+Block_K20-K31	K20-K31 Diseases of oesophagus, stomach and duodenum	134	11	N
+Block_K35-K38	K35-K38 Diseases of appendix	135	11	N
+Block_K40-K46	K40-K46 Hernia	136	11	N
+Block_K50-K52	K50-K52 Noninfective enteritis and colitis	137	11	N
+Block_K55-K64	K55-K64 Other diseases of intestines	138	11	N
+Block_K65-K67	K65-K67 Diseases of peritoneum	139	11	N
+Block_K70-K77	K70-K77 Diseases of liver	140	11	N
+Block_K80-K87	K80-K87 Disorders of gallbladder, biliary tract and pancreas	141	11	N
+Block_K90-K93	K90-K93 Other diseases of the digestive system	142	11	N
+Block_L00-L08	L00-L08 Infections of the skin and subcutaneous tissue	143	12	N
+Block_L10-L14	L10-L14 Bullous disorders	144	12	N
+Block_L20-L30	L20-L30 Dermatitis and eczema	145	12	N
+Block_L40-L45	L40-L45 Papulosquamous disorders	146	12	N
+Block_L50-L54	L50-L54 Urticaria and erythema	147	12	N
+Block_L55-L59	L55-L59 Radiation-related disorders of the skin and subcutaneous tissue	148	12	N
+Block_L60-L75	L60-L75 Disorders of skin appendages	149	12	N
+Block_L80-L99	L80-L99 Other disorders of the skin and subcutaneous tissue	150	12	N
+Block_M00-M03	M00-M03 Infectious arthropathies	151	13	N
+Block_M05-M14	M05-M14 Inflammatory polyarthropathies	152	13	N
+Block_M15-M19	M15-M19 Arthrosis	153	13	N
+Block_M20-M25	M20-M25 Other joint disorders	154	13	N
+Block_M40-M43	M40-M43 Deforming dorsopathies	155	13	N
+Block_M45-M49	M45-M49 Spondylopathies	156	13	N
+Block_M50-M54	M50-M54 Other dorsopathies	157	13	N
+Block_M60-M63	M60-M63 Disorders of muscles	158	13	N
+Block_M65-M68	M65-M68 Disorders of synovium and tendon	159	13	N
+Block_M70-M79	M70-M79 Other soft tissue disorders	160	13	N
+Block_M80-M85	M80-M85 Disorders of bone density and structure	161	13	N
+Block_M86-M90	M86-M90 Other osteopathies	162	13	N
+Block_M91-M94	M91-M94 Chondropathies	163	13	N
+Block_M95-M99	M95-M99 Other disorders of the musculoskeletal system and connective tissue	164	13	N
+Block_N00-N08	N00-N08 Glomerular diseases	165	14	N
+Block_N10-N16	N10-N16 Renal tubulo-interstitial diseases	166	14	N
+Block_N17-N19	N17-N19 Renal failure	167	14	N
+Block_N20-N23	N20-N23 Urolithiasis	168	14	N
+Block_N25-N29	N25-N29 Other disorders of kidney and ureter	169	14	N
+Block_N30-N39	N30-N39 Other diseases of urinary system	170	14	N
+Block_N40-N51	N40-N51 Diseases of male genital organs	171	14	N
+Block_N60-N64	N60-N64 Disorders of breast	172	14	N
+Block_N70-N77	N70-N77 Inflammatory diseases of female pelvic organs	173	14	N
+Block_N80-N98	N80-N98 Noninflammatory disorders of female genital tract	174	14	N
+Block_N99-N99	N99-N99 Other disorders of the genitourinary system	175	14	N
+Block_O00-O08	O00-O08 Pregnancy with abortive outcome	176	15	N
+Block_O10-O16	O10-O16 Oedema, proteinuria and hypertensive disorders in pregnancy, childbirth and the puerperium	177	15	N
+Block_O20-O29	O20-O29 Other maternal disorders predominantly related to pregnancy	178	15	N
+Block_O30-O48	O30-O48 Maternal care related to the fetus and amniotic cavity and possible delivery problems	179	15	N
+Block_O60-O75	O60-O75 Complications of labour and delivery	180	15	N
+Block_O80-O84	O80-O84 Delivery	181	15	N
+Block_O85-O92	O85-O92 Complications predominantly related to the puerperium	182	15	N
+Block_O94-O99	O94-O99 Other obstetric conditions, not elsewhere classified	183	15	N
+Block_P00-P04	P00-P04 Fetus and newborn affected by maternal factors and by complications of pregnancy, labour and delivery	184	16	N
+Block_P05-P08	P05-P08 Disorders related to length of gestation and fetal growth	185	16	N
+Block_P10-P15	P10-P15 Birth trauma	186	16	N
+Block_P20-P29	P20-P29 Respiratory and cardiovascular disorders specific to the perinatal period	187	16	N
+Block_P35-P39	P35-P39 Infections specific to the perinatal period	188	16	N
+Block_P50-P61	P50-P61 Haemorrhagic and haematological disorders of fetus and newborn	189	16	N
+Block_P70-P74	P70-P74 Transitory endocrine and metabolic disorders specific to fetus and newborn	190	16	N
+Block_P75-P78	P75-P78 Digestive system disorders of fetus and newborn	191	16	N
+Block_P80-P83	P80-P83 Conditions involving the integument and temperature regulation of fetus and newborn	192	16	N
+Block_P90-P96	P90-P96 Other disorders originating in the perinatal period	193	16	N
+Block_Q00-Q07	Q00-Q07 Congenital malformations of the nervous system	194	17	N
+Block_Q10-Q18	Q10-Q18 Congenital malformations of eye, ear, face and neck	195	17	N
+Block_Q20-Q28	Q20-Q28 Congenital malformations of the circulatory system	196	17	N
+Block_Q30-Q34	Q30-Q34 Congenital malformations of the respiratory system	197	17	N
+Block_Q35-Q37	Q35-Q37 Cleft lip and cleft palate	198	17	N
+Block_Q38-Q45	Q38-Q45 Other congenital malformations of the digestive system	199	17	N
+Block_Q50-Q56	Q50-Q56 Congenital malformations of genital organs	200	17	N
+Block_Q60-Q64	Q60-Q64 Congenital malformations of the urinary system	201	17	N
+Block_Q65-Q79	Q65-Q79 Congenital malformations and deformations of the musculoskeletal system	202	17	N
+Block_Q80-Q89	Q80-Q89 Other congenital malformations	203	17	N
+Block_Q90-Q99	Q90-Q99 Chromosomal abnormalities, not elsewhere classified	204	17	N
+Block_R00-R09	R00-R09 Symptoms and signs involving the circulatory and respiratory systems	205	18	N
+Block_R10-R19	R10-R19 Symptoms and signs involving the digestive system and abdomen	206	18	N
+Block_R20-R23	R20-R23 Symptoms and signs involving the skin and subcutaneous tissue	207	18	N
+Block_R25-R29	R25-R29 Symptoms and signs involving the nervous and musculoskeletal systems	208	18	N
+Block_R30-R39	R30-R39 Symptoms and signs involving the urinary system	209	18	N
+Block_R40-R46	R40-R46 Symptoms and signs involving cognition, perception, emotional state and behaviour	210	18	N
+Block_R47-R49	R47-R49 Symptoms and signs involving speech and voice	211	18	N
+Block_R50-R69	R50-R69 General symptoms and signs	212	18	N
+Block_R70-R79	R70-R79 Abnormal findings on examination of blood, without diagnosis	213	18	N
+Block_R80-R82	R80-R82 Abnormal findings on examination of urine, without diagnosis	214	18	N
+Block_R83-R89	R83-R89 Abnormal findings on examination of other body fluids, substances and tissues, without diagnosis	215	18	N
+Block_R90-R94	R90-R94 Abnormal findings on diagnostic imaging and in function studies, without diagnosis	216	18	N
+Block_R95-R99	R95-R99 Ill-defined and unknown causes of mortality	217	18	N
+Block_S00-S09	S00-S09 Injuries to the head	218	19	N
+Block_S10-S19	S10-S19 Injuries to the neck	219	19	N
+Block_S20-S29	S20-S29 Injuries to the thorax	220	19	N
+Block_S30-S39	S30-S39 Injuries to the abdomen, lower back, lumbar spine and pelvis	221	19	N
+Block_S40-S49	S40-S49 Injuries to the shoulder and upper arm	222	19	N
+Block_S50-S59	S50-S59 Injuries to the elbow and forearm	223	19	N
+Block_S60-S69	S60-S69 Injuries to the wrist and hand	224	19	N
+Block_S70-S79	S70-S79 Injuries to the hip and thigh	225	19	N
+Block_S80-S89	S80-S89 Injuries to the knee and lower leg	226	19	N
+Block_S90-S99	S90-S99 Injuries to the ankle and foot	227	19	N
+Block_T00-T07	T00-T07 Injuries involving multiple body regions	228	19	N
+Block_T08-T14	T08-T14 Injuries to unspecified part of trunk, limb or body region	229	19	N
+Block_T15-T19	T15-T19 Effects of foreign body entering through natural orifice	230	19	N
+Block_T20-T25	T20-T25 Burns and corrosions of external body surface, specified by site	231	19	N
+Block_T26-T28	T26-T28 Burns and corrosions confined to eye and internal organs	232	19	N
+Block_T29-T32	T29-T32 Burns and corrosions of multiple and unspecified body regions	233	19	N
+Block_T33-T35	T33-T35 Frostbite	234	19	N
+Block_T36-T50	T36-T50 Poisoning by drugs, medicaments and biological substances	235	19	N
+Block_T51-T65	T51-T65 Toxic effects of substances chiefly nonmedicinal as to source	236	19	N
+Block_T66-T78	T66-T78 Other and unspecified effects of external causes	237	19	N
+Block_T79-T79	T79-T79 Certain early complications of trauma	238	19	N
+Block_T80-T88	T80-T88 Complications of surgical and medical care, not elsewhere classified	239	19	N
+Block_T90-T98	T90-T98 Sequelae of injuries, of poisoning and of other consequences of external causes	240	19	N
+Block_U00-U49	U00-U49 Provisional assignment of new diseases of uncertain etiology or emergency use	284	22	N
+Block_U82-U85	U82-U85 Resistance to antimicrobial and antineoplastic drugs	285	22	N
+Block_V01-V09	V01-V09 Pedestrian injured in transport accident	241	20	N
+Block_V10-V19	V10-V19 Pedal cyclist injured in transport accident	242	20	N
+Block_V20-V29	V20-V29 Motorcycle rider injured in transport accident	243	20	N
+Block_V30-V39	V30-V39 Occupant of three-wheeled motor vehicle injured in transport accident	244	20	N
+Block_V40-V49	V40-V49 Car occupant injured in transport accident	245	20	N
+Block_V50-V59	V50-V59 Occupant of pick-up truck or van injured in transport accident	246	20	N
+Block_V60-V69	V60-V69 Occupant of heavy transport vehicle injured in transport accident	247	20	N
+Block_V70-V79	V70-V79 Bus occupant injured in transport accident	248	20	N
+Block_V80-V89	V80-V89 Other land transport accidents	249	20	N
+Block_V90-V94	V90-V94 Water transport accidents	250	20	N
+Block_V95-V97	V95-V97 Air and space transport accidents	251	20	N
+Block_V98-V99	V98-V99 Other and unspecified transport accidents	252	20	N
+Block_W00-W19	W00-W19 Falls	253	20	N
+Block_W20-W49	W20-W49 Exposure to inanimate mechanical forces	254	20	N
+Block_W50-W64	W50-W64 Exposure to animate mechanical forces	255	20	N
+Block_W65-W74	W65-W74 Accidental drowning and submersion	256	20	N
+Block_W75-W84	W75-W84 Other accidental threats to breathing	257	20	N
+Block_W85-W99	W85-W99 Exposure to electric current, radiation and extreme ambient air temperature and pressure	258	20	N
+Block_X00-X09	X00-X09 Exposure to smoke, fire and flames	259	20	N
+Block_X10-X19	X10-X19 Contact with heat and hot substances	260	20	N
+Block_X20-X29	X20-X29 Contact with venomous animals and plants	261	20	N
+Block_X30-X39	X30-X39 Exposure to forces of nature	262	20	N
+Block_X40-X49	X40-X49 Accidental poisoning by and exposure to noxious substances	263	20	N
+Block_X50-X57	X50-X57 Overexertion, travel and privation	264	20	N
+Block_X58-X59	X58-X59 Accidental exposure to other and unspecified factors	265	20	N
+Block_X60-X84	X60-X84 Intentional self-harm	266	20	N
+Block_X85-X99	X85-X99 Assault	267	20	N
+Block_Y00-Y09	Y00-Y09 Assault	268	20	N
+Block_Y10-Y34	Y10-Y34 Event of undetermined intent	269	20	N
+Block_Y35-Y36	Y35-Y36 Legal intervention and operations of war	270	20	N
+Block_Y40-Y59	Y40-Y59 Drugs, medicaments and biological substances causing adverse effects in therapeutic use	271	20	N
+Block_Y60-Y69	Y60-Y69 Misadventures to patients during surgical and medical care	272	20	N
+Block_Y70-Y82	Y70-Y82 Medical devices associated with adverse incidents in diagnostic and therapeutic use	273	20	N
+Block_Y83-Y84	Y83-Y84 Surgical and other medical procedures as the cause of abnormal reaction of the patient, or of later complication, without mention of misadventure at the time of the procedure	274	20	N
+Block_Y85-Y89	Y85-Y89 Sequelae of external causes of morbidity and mortality	275	20	N
+Block_Y90-Y98	Y90-Y98 Supplementary factors related to causes of morbidity and mortality classified elsewhere	276	20	N
+Block_Z00-Z13	Z00-Z13 Persons encountering health services for examination and investigation	277	21	N
+Block_Z20-Z29	Z20-Z29 Persons with potential health hazards related to communicable diseases	278	21	N
+Block_Z30-Z39	Z30-Z39 Persons encountering health services in circumstances related to reproduction	279	21	N
+Block_Z40-Z54	Z40-Z54 Persons encountering health services for specific procedures and health care	280	21	N
+Block_Z55-Z65	Z55-Z65 Persons with potential health hazards related to socioeconomic and psychosocial circumstances	281	21	N
+Block_Z70-Z76	Z70-Z76 Persons encountering health services in other circumstances	282	21	N
+Block_Z80-Z99	Z80-Z99 Persons with potential health hazards related to family and personal history and certain conditions influencing health status	283	21	N
 C00	C00 Malignant neoplasm of lip	1207	44	N
 C000	C00.0 External upper lip	1208	1207	Y
 C001	C00.1 External lower lip	1209	1207	Y
@@ -1742,28 +1742,28 @@ C967	C96.7 Other specified malignant neoplasms of lymphoid, haematopoietic and r
 C968	C96.8 Histiocytic sarcoma	1763	1754	Y
 C969	C96.9 Malignant neoplasms of lymphoid, haematopoietic and related tissue, unspecified	1764	1754	Y
 C97	C97 Malignant neoplasms of independent (primary) multiple sites	1765	58	Y
-Chapter I	Chapter I Certain infectious and parasitic diseases	1	0	N
-Chapter II	Chapter II Neoplasms	2	0	N
-Chapter III	Chapter III Diseases of the blood and blood-forming organs and certain disorders involving the immune mechanism	3	0	N
-Chapter IV	Chapter IV Endocrine, nutritional and metabolic diseases	4	0	N
-Chapter IX	Chapter IX Diseases of the circulatory system	9	0	N
-Chapter V	Chapter V Mental and behavioural disorders	5	0	N
-Chapter VI	Chapter VI Diseases of the nervous system	6	0	N
-Chapter VII	Chapter VII Diseases of the eye and adnexa	7	0	N
-Chapter VIII	Chapter VIII Diseases of the ear and mastoid process	8	0	N
-Chapter X	Chapter X Diseases of the respiratory system	10	0	N
-Chapter XI	Chapter XI Diseases of the digestive system	11	0	N
-Chapter XII	Chapter XII Diseases of the skin and subcutaneous tissue	12	0	N
-Chapter XIII	Chapter XIII Diseases of the musculoskeletal system and connective tissue	13	0	N
-Chapter XIV	Chapter XIV Diseases of the genitourinary system	14	0	N
-Chapter XIX	Chapter XIX Injury, poisoning and certain other consequences of external causes	19	0	N
-Chapter XV	Chapter XV Pregnancy, childbirth and the puerperium	15	0	N
-Chapter XVI	Chapter XVI Certain conditions originating in the perinatal period	16	0	N
-Chapter XVII	Chapter XVII Congenital malformations, deformations and chromosomal abnormalities	17	0	N
-Chapter XVIII	Chapter XVIII Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified	18	0	N
-Chapter XX	Chapter XX External causes of morbidity and mortality	20	0	N
-Chapter XXI	Chapter XXI Factors influencing health status and contact with health services	21	0	N
-Chapter XXII	Chapter XXII Codes for special purposes	22	0	N
+Chapter_I	Chapter I Certain infectious and parasitic diseases	1	0	N
+Chapter_II	Chapter II Neoplasms	2	0	N
+Chapter_III	Chapter III Diseases of the blood and blood-forming organs and certain disorders involving the immune mechanism	3	0	N
+Chapter_IV	Chapter IV Endocrine, nutritional and metabolic diseases	4	0	N
+Chapter_IX	Chapter IX Diseases of the circulatory system	9	0	N
+Chapter_V	Chapter V Mental and behavioural disorders	5	0	N
+Chapter_VI	Chapter VI Diseases of the nervous system	6	0	N
+Chapter_VII	Chapter VII Diseases of the eye and adnexa	7	0	N
+Chapter_VIII	Chapter VIII Diseases of the ear and mastoid process	8	0	N
+Chapter_X	Chapter X Diseases of the respiratory system	10	0	N
+Chapter_XI	Chapter XI Diseases of the digestive system	11	0	N
+Chapter_XII	Chapter XII Diseases of the skin and subcutaneous tissue	12	0	N
+Chapter_XIII	Chapter XIII Diseases of the musculoskeletal system and connective tissue	13	0	N
+Chapter_XIV	Chapter XIV Diseases of the genitourinary system	14	0	N
+Chapter_XIX	Chapter XIX Injury, poisoning and certain other consequences of external causes	19	0	N
+Chapter_XV	Chapter XV Pregnancy, childbirth and the puerperium	15	0	N
+Chapter_XVI	Chapter XVI Certain conditions originating in the perinatal period	16	0	N
+Chapter_XVII	Chapter XVII Congenital malformations, deformations and chromosomal abnormalities	17	0	N
+Chapter_XVIII	Chapter XVIII Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified	18	0	N
+Chapter_XX	Chapter XX External causes of morbidity and mortality	20	0	N
+Chapter_XXI	Chapter XXI Factors influencing health status and contact with health services	21	0	N
+Chapter_XXII	Chapter XXII Codes for special purposes	22	0	N
 D00	D00 Carcinoma in situ of oral cavity, oesophagus and stomach	1766	59	N
 D000	D00.0 Lip, oral cavity and pharynx	1767	1766	Y
 D001	D00.1 Oesophagus	1768	1766	Y

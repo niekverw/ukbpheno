@@ -323,6 +323,7 @@ A511	A51.1 Extirpation of lesion of meninges of spinal cord	346	345	Y
 A512	A51.2 Freeing of adhesions of meninges of spinal cord	347	345	Y
 A513	A51.3 Biopsy of lesion of meninges of spinal cord	348	345	Y
 A514	A51.4 Endoscopic division of epidural adhesions	349	345	Y
+A515	A51.5 Repair of dura of spinal cord	10929	345	Y
 A518	A51.8 Other specified other operations on meninges of spinal cord	350	345	Y
 A519	A51.9 Unspecified other operations on meninges of spinal cord	351	345	Y
 A52	A52 Therapeutic epidural injection	352	1	N
@@ -500,6 +501,12 @@ A811	A81.1 Stellate ganglion blockade	523	522	Y
 A812	A81.2 Injection of therapeutic substance around sympathetic nerve	524	522	Y
 A818	A81.8 Other specified other operations on sympathetic nerve	525	522	Y
 A819	A81.9 Unspecified other operations on sympathetic nerve	526	522	Y
+A82	A82 Other neurophysiological operations	10930	1	N
+A821	A82.1 Quantitative sensory testing	10931	10930	Y
+A822	A82.2 Electro-oculography	10932	10930	Y
+A823	A82.3 Multifocal electroretinography	10933	10930	Y
+A828	A82.8 Other specified other neurophysiological operations	10934	10930	Y
+A829	A82.9 Unspecified other neurophysiological operations	10935	10930	Y
 A83	A83 Electroconvulsive therapy	527	1	N
 A838	A83.8 Other specified electroconvulsive therapy	528	527	Y
 A839	A83.9 Unspecified electroconvulsive therapy	529	527	Y
@@ -564,6 +571,7 @@ B121	B12.1 Excision of lesion of thyroid gland	587	586	Y
 B122	B12.2 Biopsy of lesion of thyroid gland	588	586	Y
 B123	B12.3 Incision of lesion of thyroid gland	589	586	Y
 B124	B12.4 Exploration of thyroid gland	590	586	Y
+B125	B12.5 Percutaneous drainage of lesion of thyroid gland	10936	586	Y
 B128	B12.8 Other specified other operations on thyroid gland	591	586	Y
 B129	B12.9 Unspecified other operations on thyroid gland	592	586	Y
 B14	B14 Excision of parathyroid gland	593	2	N
@@ -639,6 +647,8 @@ B292	B29.2 Reconstruction of breast using local flap of skin NEC	662	660	Y
 B293	B29.3 Reconstruction of breast using flap of skin of abdomen NEC	663	660	Y
 B294	B29.4 Reconstruction of breast using distant flap of skin NEC	664	660	Y
 B295	B29.5 Revision of reconstruction of breast	665	660	Y
+B296	B29.6 Reconstruction of breast using glandular remodelling	10937	660	Y
+B297	B29.7 Reconstruction of breast using dermoglandular flap	10938	660	Y
 B298	B29.8 Other specified reconstruction of breast	666	660	Y
 B299	B29.9 Unspecified reconstruction of breast	667	660	Y
 B30	B30 Prosthesis for breast	668	2	N
@@ -659,6 +669,7 @@ B32	B32 Biopsy of breast	682	2	N
 B321	B32.1 Percutaneous biopsy of lesion of breast	683	682	Y
 B322	B32.2 Biopsy of lesion of breast NEC	684	682	Y
 B323	B32.3 Wire guided biopsy of lesion of breast	685	682	Y
+B324	B32.4 Vacuum biopsy of lesion of breast	10939	682	Y
 B328	B32.8 Other specified biopsy of breast	686	682	Y
 B329	B32.9 Unspecified biopsy of breast	687	682	Y
 B33	B33 Incision of breast	688	2	N
@@ -697,6 +708,7 @@ B372	B37.2 Injection into breast	720	718	Y
 B373	B37.3 Extraction of milk from breast	721	718	Y
 B374	B37.4 Capsulectomy of breast	722	718	Y
 B375	B37.5 Lipofilling of breast	723	718	Y
+B376	B37.6 Partial capsulectomy of breast	10940	718	Y
 B378	B37.8 Other specified other operations on breast	724	718	Y
 B379	B37.9 Unspecified other operations on breast	725	718	Y
 B38	B38 Reconstruction of breast using flap of skin of buttock	726	2	N
@@ -716,6 +728,11 @@ B40	B40 Destruction of lesion of breast	739	2	N
 B401	B40.1 Interstitial laser destruction of lesion of breast	740	739	Y
 B408	B40.8 Other specified destruction of lesion of breast	741	739	Y
 B409	B40.9 Unspecified destruction of lesion of breast	742	739	Y
+B41	B41 Excision of breast	10941	2	N
+B411	B41.1 Radionuclide guided excision of lesion of breast	10942	10941	Y
+B412	B41.2 Radionuclide guided partial excision of breast	10943	10941	Y
+B418	B41.8 Other specified excision of breast	10944	10941	Y
+B419	B41.9 Unspecified excision of breast	10945	10941	Y
 C01	C01 Excision of eye	743	3	N
 C011	C01.1 Exenteration of orbit	744	743	Y
 C012	C01.2 Enucleation of eye	745	743	Y
@@ -1042,6 +1059,7 @@ C512	C51.2 Chelation of cornea	1065	1063	Y
 C513	C51.3 Exploration of cornea	1066	1063	Y
 C514	C51.4 Tattooing of cornea	1067	1063	Y
 C515	C51.5 Placement of therapeutic contact lens on to cornea	1068	1063	Y
+C516	C51.6 Topography evaluation of cornea	10946	1063	Y
 C518	C51.8 Other specified other operations on cornea	1069	1063	Y
 C519	C51.9 Unspecified other operations on cornea	1070	1063	Y
 C52	C52 Excision of sclera	1071	3	N
@@ -1280,6 +1298,10 @@ C904	C90.4 Peribulbar anaesthetic	1303	1299	Y
 C905	C90.5 Retrobulbar anaesthetic	1304	1299	Y
 C908	C90.8 Other specified local anaesthetics for ophthalmology procedures	1305	1299	Y
 C909	C90.9 Unspecified local anaesthetics for ophthalmology procedures	1306	1299	Y
+C91	C91 Operations on anterior segment of eye	10947	3	N
+C911	C91.1 Optical coherence tomography of anterior segment of eye	10948	10947	Y
+C918	C91.8 Other specified operations on anterior segment of eye	10949	10947	Y
+C919	C91.9 Unspecified operations on anterior segment of eye	10950	10947	Y
 Chapter A	Chapter A - Nervous System	1	0	N
 Chapter B	Chapter B - Endocrine System and Breast	2	0	N
 Chapter C	Chapter C - Eye	3	0	N
@@ -1342,6 +1364,8 @@ D06	D06 Other operations on external ear	1340	4	N
 D061	D06.1 Biopsy of lesion of external ear	1341	1340	Y
 D062	D06.2 Repair of lobe of external ear	1342	1340	Y
 D063	D06.3 Repair of external ear NEC	1343	1340	Y
+D064	D06.4 Graft of skin to external ear	10951	1340	Y
+D065	D06.5 Repair of flap of skin external ear	10952	1340	Y
 D068	D06.8 Other specified other operations on external ear	1344	1340	Y
 D069	D06.9 Unspecified other operations on external ear	1345	1340	Y
 D07	D07 Clearance of external auditory canal	1346	4	N
@@ -1527,6 +1551,7 @@ E093	E09.3 Suture of external nose	1525	1522	Y
 E094	E09.4 Shave of skin of nose	1526	1522	Y
 E095	E09.5 Biopsy of lesion of external nose	1527	1522	Y
 E096	E09.6 Laser destruction of lesion of external nose	1528	1522	Y
+E097	E09.7 Graft of skin to external nose	10953	1522	Y
 E098	E09.8 Other specified operations on external nose	1529	1522	Y
 E099	E09.9 Unspecified operations on external nose	1530	1522	Y
 E10	E10 Other operations on nose	1531	5	N
@@ -1644,6 +1669,7 @@ E293	E29.3 Partial vertical laryngectomy	1642	1639	Y
 E294	E29.4 Partial laryngectomy NEC	1643	1639	Y
 E295	E29.5 Laryngofissure and chordectomy of vocal chord	1644	1639	Y
 E296	E29.6 Laryngectomy NEC	1645	1639	Y
+E297	E29.7 Cordectomy of vocal cord NEC	10954	1639	Y
 E298	E29.8 Other specified excision of larynx	1646	1639	Y
 E299	E29.9 Unspecified excision of larynx	1647	1639	Y
 E30	E30 Open extirpation of lesion of larynx	1648	5	N
@@ -1841,6 +1867,7 @@ E63	E63 Diagnostic endoscopic examination of mediastinum	1839	5	N
 E631	E63.1 Diagnostic endoscopic examination of mediastinum and biopsy of lesion of mediastinum	1840	1839	Y
 E632	E63.2 Endobronchial ultrasound examination of mediastinum	1841	1839	Y
 E633	E63.3 Endo-oesophageal ultrasound examination of mediastinum	1842	1839	Y
+E634	E63.4 Endoscopic ultrasound examination of mediastinum and biopsy of lesion of mediastinum	10955	1839	Y
 E638	E63.8 Other specified diagnostic endoscopic examination of mediastinum	1843	1839	Y
 E639	E63.9 Unspecified diagnostic endoscopic examination of mediastinum	1844	1839	Y
 E64	E64 Therapeutic endoscopic operations on nasal cavity	1845	5	N
@@ -1851,12 +1878,21 @@ E65	E65 Diagnostic endoscopic examination of nasal cavity	1849	5	N
 E651	E65.1 Diagnostic endoscopic examination of nasal cavity and biopsy of lesion of nasal cavity	1850	1849	Y
 E658	E65.8 Other specified	1851	1849	Y
 E659	E65.9 Unspecified	1852	1849	Y
+E66	E66 Other operations on external nose	10956	5	N
+E661	E66.1 Other operations on external nose (flap of skin to external nose)	10957	10956	Y
+E668	E66.8 Other operations on external nose (other specified)	10958	10956	Y
+E669	E66.9 Other operations on external nose (unspecified)	10959	10956	Y
+E67	E67 Other therapeutic fibreoptic endoscopic operations on lower respiratory tract	10960	5	N
+E671	E67.1 Endoscopic thermal bronchoplasty	10961	10960	Y
+E678	E67.8 Other specified other therapeutic fibreoptic endoscopic operations on lower respiratory tract	10962	10960	Y
+E679	E67.9 Unspecified other therapeutic fibreoptic endoscopic operations on lower respiratory tract	10963	10960	Y
 E85	E85 Ventilation support	1853	5	N
 E851	E85.1 Invasive ventilation	1854	1853	Y
 E852	E85.2 Non-invasive ventilation NEC	1855	1853	Y
 E853	E85.3 Improving efficiency of ventilation	1856	1853	Y
 E854	E85.4 Bag valve mask ventilation	1857	1853	Y
 E855	E85.5 Nebuliser ventilation	1858	1853	Y
+E856	E85.6 Continuous positive airway pressure	10964	1853	Y
 E858	E85.8 Other specified ventilation support	1859	1853	Y
 E859	E85.9 Unspecified ventilation support	1860	1853	Y
 E87	E87 Oxygen therapy support	1861	5	N
@@ -1871,6 +1907,7 @@ E891	E89.1 Clearance of secretions of respiratory tract	1869	1868	Y
 E892	E89.2 Expectoration of induced sputum from respiratory tract	1870	1868	Y
 E893	E89.3 Nebuliser therapy	1871	1868	Y
 E894	E89.4 Control of respiration	1872	1868	Y
+E895	E89.5 Mechanical insufflation and exsufflation	10965	1868	Y
 E898	E89.8 Other specified other respiratory support	1873	1868	Y
 E899	E89.9 Unspecified other respiratory support	1874	1868	Y
 E91	E91 Oximetry testing	1875	5	N
@@ -1886,6 +1923,7 @@ E923	E92.3 Measurement of alveolar carbon monoxide	1884	1881	Y
 E924	E92.4 Blood gas analysis	1885	1881	Y
 E925	E92.5 Complex lung function exercise test	1886	1881	Y
 E926	E92.6 Simple lung function exercise test	1887	1881	Y
+E927	E92.7 Measurement of fractional exhaled nitric oxide concentration	10966	1881	Y
 E928	E92.8 Other specified respiratory tests	1888	1881	Y
 E929	E92.9 Unspecified respiratory tests	1889	1881	Y
 E93	E93 Respiratory measurements	1890	5	N
@@ -1972,6 +2010,7 @@ F092	F09.2 Surgical removal of impacted tooth NEC	1970	1968	Y
 F093	F09.3 Surgical removal of wisdom tooth NEC	1971	1968	Y
 F094	F09.4 Surgical removal of tooth NEC	1972	1968	Y
 F095	F09.5 Surgical removal of retained root of tooth	1973	1968	Y
+F096	F09.6 Surgical removal of tooth, Coronectomy NEC	10967	1968	Y
 F098	F09.8 Other specified surgical removal of tooth	1974	1968	Y
 F099	F09.9 Unspecified surgical removal of tooth	1975	1968	Y
 F10	F10 Simple extraction of tooth	1976	6	N
@@ -1979,6 +2018,7 @@ F101	F10.1 Full dental clearance	1977	1976	Y
 F102	F10.2 Upper dental clearance	1978	1976	Y
 F103	F10.3 Lower dental clearance	1979	1976	Y
 F104	F10.4 Extraction of multiple teeth NEC	1980	1976	Y
+F105	F10.5 Extraction of retained root of tooth	10968	1976	Y
 F108	F10.8 Other specified simple extraction of tooth	1981	1976	Y
 F109	F10.9 Unspecified simple extraction of tooth	1982	1976	Y
 F11	F11 Preprosthetic oral surgery	1983	6	N
@@ -2315,6 +2355,10 @@ G113	G11.3 Open revision of tubal prosthesis in oesophagus	2313	2310	Y
 G114	G11.4 Open removal of tubal prosthesis from oesophagus	2314	2310	Y
 G118	G11.8 Other specified open placement of prosthesis in oesophagus	2315	2310	Y
 G119	G11.9 Unspecified open placement of prosthesis in oesophagus	2316	2310	Y
+G12	G12 Other fibreoptic endoscopic extirpation of lesion of oesophagus	10969	7	N
+G121	G12.1 Fibreoptic endoscopic mucosal resection of lesion of oesophagus	10970	10969	Y
+G128	G12.8 Other specified other fibreoptic endoscopic extirpation of lesion of oesophagus	10971	10969	Y
+G129	G12.9 Unspecified other fibreoptic endoscopic extirpation of lesion of oesophagus	10972	10969	Y
 G13	G13 Other open operations on oesophagus	2317	7	N
 G131	G13.1 Open biopsy of lesion of oesophagus	2318	2317	Y
 G132	G13.2 Open removal of foreign body from oesophagus	2319	2317	Y
@@ -2366,6 +2410,10 @@ G191	G19.1 Diagnostic endoscopic examination of oesophagus and biopsy of lesion 
 G192	G19.2 Diagnostic endoscopic insertion of Bravo pH capsule using rigid oesophagoscope	2365	2363	Y
 G198	G19.8 Other specified diagnostic endoscopic examination of oesophagus using rigid oesophagoscope	2366	2363	Y
 G199	G19.9 Unspecified diagnostic endoscopic examination of oesophagus using rigid oesophagoscope	2367	2363	Y
+G20	G20 Therapeutic fibreoptic endoscopic operations on oesophagus	10973	7	N
+G201	G20.1 Fibreoptic endoscopic coagulation of bleeding lesion of oesophagus	10974	10973	Y
+G208	G20.8 Other specified therapeutic fibreoptic endoscopic operations on oesophagus	10975	10973	Y
+G209	G20.9 Unspecified therapeutic fibreoptic endoscopic operations on oesophagus	10976	10973	Y
 G21	G21 Other operations on oesophagus	2368	7	N
 G211	G21.1 Intubation of oesophagus for pH manometry	2369	2368	Y
 G212	G21.2 Intubation of oesophagus for pressure manometry	2370	2368	Y
@@ -2507,6 +2555,7 @@ G419	G41.9 Unspecified other operations on pylorus	2505	2501	Y
 G42	G42 Other fibreoptic endoscopic extirpation of lesion of upper gastrointestinal tract	2506	7	N
 G421	G42.1 Fibreoptic endoscopic submucosal resection of lesion of upper gastrointestinal tract	2507	2506	Y
 G422	G42.2 Fibreoptic endoscopic photodynamic therapy of lesion of upper gastrointestinal tract	2508	2506	Y
+G423	G42.3 Fibreoptic endoscopic mucosal resection of lesion of upper gastrointestinal tract	10977	2506	Y
 G428	G42.8 Other specified other fibreoptic endoscopic extirpation of lesion of upper gastrointestinal tract	2509	2506	Y
 G429	G42.9 Unspecified other fibreoptic endoscopic extirpation of lesion of upper gastrointestinal tract	2510	2506	Y
 G43	G43 Fibreoptic endoscopic extirpation of lesion of upper gastrointestinal tract	2511	7	N
@@ -2538,6 +2587,7 @@ G458	G45.8 Other specified diagnostic fibreoptic endoscopic examination of upper
 G459	G45.9 Unspecified diagnostic fibreoptic endoscopic examination of upper gastrointestinal tract	2537	2531	Y
 G46	G46 Therapeutic fibreoptic endoscopic operations on upper gastrointestinal tract	2538	7	N
 G461	G46.1 Fibreoptic endoscopic endoluminal plication of gastro-oesophageal junction	2539	2538	Y
+G462	G46.2 Fibreoptic endoscopic coagulation of bleeding lesion - upper gastrointestinal tract	10978	2538	Y
 G468	G46.8 Other specified therapeutic fibreoptic endoscopic operations on upper gastrointestinal tract	2540	2538	Y
 G469	G46.9 Unspecified therapeutic fibreoptic endoscopic operations on upper gastrointestinal tract	2541	2538	Y
 G47	G47 Intubation of stomach	2542	7	N
@@ -2545,6 +2595,7 @@ G471	G47.1 Intubation of stomach for pH manometry	2543	2542	Y
 G472	G47.2 Intubation of stomach for pressure manometry	2544	2542	Y
 G473	G47.3 Irrigation of stomach	2545	2542	Y
 G474	G47.4 Intubation of stomach for study of gastric secretion	2546	2542	Y
+G475	G47.5 Insertion of nasogastric tube	10979	2542	Y
 G478	G47.8 Other specified intubation of stomach	2547	2542	Y
 G479	G47.9 Unspecified intubation of stomach	2548	2542	Y
 G48	G48 Other operations on stomach	2549	7	N
@@ -2621,6 +2672,7 @@ G60	G60 Artificial opening into jejunum	2619	7	N
 G601	G60.1 Creation of jejunostomy	2620	2619	Y
 G602	G60.2 Refashioning of jejunostomy	2621	2619	Y
 G603	G60.3 Closure of jejunostomy	2622	2619	Y
+G604	G60.4 Attention to jejunostomy tube	10980	2619	Y
 G608	G60.8 Other specified artificial opening into jejunum	2623	2619	Y
 G609	G60.9 Unspecified artificial opening into jejunum	2624	2619	Y
 G61	G61 Bypass of jejunum	2625	7	N
@@ -2655,6 +2707,7 @@ G671	G67.1 Intubation of jejunum for decompression of intestine	2653	2652	Y
 G672	G67.2 Intubation of jejunum for measurement of intestinal function	2654	2652	Y
 G673	G67.3 Passage of Crosby capsule into jejunum for biopsy of mucosa of jejunum	2655	2652	Y
 G674	G67.4 Intubation of jejunum NEC	2656	2652	Y
+G675	G67.5 Insertion of nasojejunal tube	10981	2652	Y
 G678	G67.8 Other specified other operations on jejunum	2657	2652	Y
 G679	G67.9 Unspecified other operations on jejunum	2658	2652	Y
 G68	G68 Transplantation of ileum	2659	7	N
@@ -2747,6 +2800,7 @@ G821	G82.1 Radiological reduction of intussusception of ileum using barium enema
 G822	G82.2 Intubation of ileum for decompression of intestine	2746	2744	Y
 G823	G82.3 Intubation of ileum for studies on function HFQ	2747	2744	Y
 G824	G82.4 Intubation of ileum NEC	2748	2744	Y
+G825	G82.5 Radiological reduction of intussusception of ileum using air enema	10982	2744	Y
 G828	G82.8 Other specified other operations on ileum	2749	2744	Y
 G829	G82.9 Unspecified other operations on ileum	2750	2744	Y
 H01	H01 Emergency excision of appendix	2751	8	N
@@ -2896,6 +2950,7 @@ H203	H20.3 Fibreoptic endoscopic laser destruction of lesion of colon	2894	2891	
 H204	H20.4 Fibreoptic endoscopic destruction of lesion of colon NEC	2895	2891	Y
 H205	H20.5 Fibreoptic endoscopic submucosal resection of lesion of colon	2896	2891	Y
 H206	H20.6 Fibreoptic endoscopic resection of lesion of colon NEC	2897	2891	Y
+H207	H20.7 Fibreoptic endoscopic mucosal resection of lesion of colon	10983	2891	Y
 H208	H20.8 Other specified endoscopic extirpation of lesion of colon	2898	2891	Y
 H209	H20.9 Unspecified endoscopic extirpation of lesion of colon	2899	2891	Y
 H21	H21 Other therapeutic endoscopic operations on colon	2900	8	N
@@ -2903,6 +2958,7 @@ H211	H21.1 Fibreoptic endoscopic dilation of colon	2901	2900	Y
 H212	H21.2 Fibreoptic endoscopic coagulation of blood vessel of colon	2902	2900	Y
 H213	H21.3 Fibreoptic endoscopic removal of foreign body from colon	2903	2900	Y
 H214	H21.4 Fibreoptic endoscopic insertion of expanding metal stent into colon	2904	2900	Y
+H215	H21.5 Fibreoptic endoscopic decompression of colon	10984	2900	Y
 H218	H21.8 Other specified other therapeutic endoscopic operations on colon	2905	2900	Y
 H219	H21.9 Unspecified other therapeutic endoscopic operations on colon	2906	2900	Y
 H22	H22 Diagnostic endoscopic examination of colon	2907	8	N
@@ -2916,6 +2972,7 @@ H233	H23.3 Endoscopic laser destruction of lesion of lower bowel using fibreopti
 H234	H23.4 Endoscopic destruction of lesion of lower bowel using fibreoptic sigmoidoscope NEC	2915	2911	Y
 H235	H23.5 Endoscopic submucosal resection of lesion of lower bowel using fibreoptic sigmoidoscope	2916	2911	Y
 H236	H23.6 Endoscopic resection of lesion of lower bowel using fibreoptic sigmoidoscope NEC	2917	2911	Y
+H237	H23.7 Endoscopic mucosal resection of lesion of lower bowel using fibreoptic sigmoidoscope	10985	2911	Y
 H238	H23.8 Other specified endoscopic extirpation of lesion of lower bowel using fibreoptic sigmoidoscope	2918	2911	Y
 H239	H23.9 Unspecified endoscopic extirpation of lesion of lower bowel using fibreoptic sigmoidoscope	2919	2911	Y
 H24	H24 Other therapeutic endoscopic operations on lower bowel using fibreoptic sigmoidoscope	2920	8	N
@@ -2923,6 +2980,7 @@ H241	H24.1 Endoscopic dilation of lower bowel using fibreoptic sigmoidoscope	292
 H242	H24.2 Endoscopic coagulation of blood vessel of lower bowel using fibreoptic sigmoidoscope	2922	2920	Y
 H243	H24.3 Endoscopic insertion of tubal prosthesis into lower bowel using fibreoptic sigmoidoscope	2923	2920	Y
 H244	H24.4 Endoscopic insertion of expanding metal stent into lower bowel using fibreoptic sigmoidoscope	2924	2920	Y
+H245	H24.5 Endoscopic decompression of lower bowel using fibreoptic sigmoidoscope	10986	2920	Y
 H248	H24.8 Other specified other therapeutic endoscopic operations on lower bowel using fibreoptic sigmoidoscope	2925	2920	Y
 H249	H24.9 Unspecified other therapeutic endoscopic operations on lower bowel using fibreoptic sigmoidoscope	2926	2920	Y
 H25	H25 Diagnostic endoscopic examination of lower bowel using fibreoptic sigmoidoscope	2927	8	N
@@ -2945,6 +3003,7 @@ H271	H27.1 Endoscopic dilation of sigmoid colon using rigid sigmoidoscope	2943	2
 H272	H27.2 Endoscopic removal of foreign body from sigmoid colon using rigid sigmoidoscope	2944	2942	Y
 H273	H27.3 Endoscopic insertion of tubal prosthesis into sigmoid colon using rigid sigmoidoscope	2945	2942	Y
 H274	H27.4 Endoscopic insertion of expanding metal stent into sigmoid colon using rigid sigmoidoscope	2946	2942	Y
+H275	H27.5 Endoscopic decompression of sigmoid colon using rigid sigmoidoscope	10987	2942	Y
 H278	H27.8 Other specified other therapeutic endoscopic operations on sigmoid colon using rigid sigmoidoscope	2947	2942	Y
 H279	H27.9 Unspecified other therapeutic endoscopic operations on sigmoid colon using rigid sigmoidoscope	2948	2942	Y
 H28	H28 Diagnostic endoscopic examination of sigmoid colon using rigid sigmoidoscope	2949	8	N
@@ -2956,6 +3015,7 @@ H291	H29.1 Subtotal excision of colon and rectum and creation of colonic pouch a
 H292	H29.2 Subtotal excision of colon and rectum and creation of colonic pouch NEC	2955	2953	Y
 H293	H29.3 Subtotal excision of colon and creation of colonic pouch and anastomosis of colon to rectum	2956	2953	Y
 H294	H29.4 Subtotal excision of colon and creation of colonic pouch NEC	2957	2953	Y
+H295	H29.5 Subtotal excision of colon and anastomosis of colon to ileum	10988	2953	Y
 H298	H29.8 Other specified subtotal excision of colon	2958	2953	Y
 H299	H29.9 Unspecified subtotal excision of colon	2959	2953	Y
 H30	H30 Other operations on colon	2960	8	N
@@ -3001,12 +3061,17 @@ H351	H35.1 Anterior fixation of rectum	2999	2998	Y
 H352	H35.2 Posterior fixation of rectum using prosthetic material	3000	2998	Y
 H353	H35.3 Posterior fixation of rectum NEC	3001	2998	Y
 H354	H35.4 Fixation of rectum using fascia lata	3002	2998	Y
+H355	H35.5 Anterior fixation of rectum using prosthetic material	10989	2998	Y
 H358	H35.8 Other specified fixation of rectum for prolapse	3003	2998	Y
 H359	H35.9 Unspecified fixation of rectum for prolapse	3004	2998	Y
 H36	H36 Other abdominal operations for prolapse of rectum	3005	8	N
 H361	H36.1 Abdominal repair of levator ani muscles	3006	3005	Y
 H368	H36.8 Other specified other abdominal operations for prolapse of rectum	3007	3005	Y
 H369	H36.9 Unspecified other abdominal operations for prolapse of rectum	3008	3005	Y
+H37	H37 Other endoscopic extirpation of lesion of sigmoid colon using rigid sigmoidoscope	10990	8	N
+H371	H37.1 Endoscopic mucosal resection of lesion of sigmoid colon using rigid sigmoidoscope	10991	10990	Y
+H378	H37.8 Other specified other endoscopic extirpation of lesion of sigmoid colon using rigid sigmoidoscope	10992	10990	Y
+H379	H37.9 Unspecified other endoscopic extirpation of lesion of sigmoid colon using rigid sigmoidoscope	10993	10990	Y
 H40	H40 Operations on rectum through anal sphincter	3009	8	N
 H401	H40.1 Trans-sphincteric excision of mucosa of rectum	3010	3009	Y
 H402	H40.2 Trans-sphincteric excision of lesion of rectum	3011	3009	Y
@@ -3029,6 +3094,7 @@ H423	H42.3 Insertion of supralevator sling	3027	3024	Y
 H424	H42.4 Removal of encircling suture from around perianal sphincter	3028	3024	Y
 H425	H42.5 Excision of mucosal prolapse of rectum NEC	3029	3024	Y
 H426	H42.6 Perineal repair of prolapse of rectum NEC	3030	3024	Y
+H427	H42.7 Rubber band ligation of prolapsed rectal mucosa	10994	3024	Y
 H428	H42.8 Other specified perineal operations for prolapse of rectum	3031	3024	Y
 H429	H42.9 Unspecified perineal operations for prolapse of rectum	3032	3024	Y
 H44	H44 Manipulation of rectum	3033	8	N
@@ -3146,6 +3212,7 @@ H623	H62.3 Dilation of bowel NEC	3144	3141	Y
 H624	H62.4 Intubation of bowel NEC	3145	3141	Y
 H625	H62.5 Irrigation of bowel NEC	3146	3141	Y
 H626	H62.6 Proctoscopy	3147	3141	Y
+H627	H62.7 Endoanal ultrasound examination of lower bowel	10995	3141	Y
 H628	H62.8 Other specified other operations on bowel	3148	3141	Y
 H629	H62.9 Unspecified other operations on bowel	3149	3141	Y
 H66	H66 Therapeutic operations on ileoanal pouch	3150	8	N
@@ -3174,6 +3241,10 @@ H703	H70.3 Diagnostic endoscopic examination of ileoanal pouch and biopsy of ile
 H704	H70.4 Diagnostic endoscopic examination of ileoanal pouch using rigid sigmoidoscope NEC	3173	3169	Y
 H708	H70.8 Other specified diagnostic endoscopic examination of enteric pouch using rigid sigmoidoscope	3174	3169	Y
 H709	H70.9 Unspecified diagnostic endoscopic examination of enteric pouch using rigid sigmoidoscope	3175	3169	Y
+H71	H71 Therapeutic endoscopic operations on enteric pouch	10996	8	N
+H711	H71.1 Fibreoptic endoscopic balloon dilation of colonic pouch NEC	10997	10996	Y
+H718	H71.8 Other specified therapeutic endoscopic operations on enteric pouch	10998	10996	Y
+H719	H71.9 Unspecified therapeutic endoscopic operations on enteric pouch	10999	10996	Y
 J01	J01 Transplantation of liver	3176	9	N
 J011	J01.1 Orthotopic transplantation of liver NEC	3177	3176	Y
 J012	J01.2 Heterotopic transplantation of liver	3178	3176	Y
@@ -3221,6 +3292,7 @@ J07	J07 Other open operations on liver	3219	9	N
 J071	J07.1 Open devascularisation of liver	3220	3219	Y
 J072	J07.2 Open insertion of cannula for perfusion of liver	3221	3219	Y
 J073	J07.3 Exploration of liver	3222	3219	Y
+J074	J07.4 Transection of liver	11000	3219	Y
 J078	J07.8 Other specified other open operations on liver	3223	3219	Y
 J079	J07.9 Unspecified other open operations on liver	3224	3219	Y
 J08	J08 Therapeutic endoscopic operations on liver using laparoscope	3225	9	N
@@ -3418,6 +3490,9 @@ J388	J38.8 Other specified endoscopic incision of sphincter of Oddi	3416	3413	Y
 J389	J38.9 Unspecified endoscopic incision of sphincter of Oddi	3417	3413	Y
 J39	J39 Other therapeutic endoscopic operations on ampulla of Vater	3418	9	N
 J391	J39.1 Endoscopic sphincterotomy of accessory ampulla of Vater	3419	3418	Y
+J392	J39.2 Endoscopic sphincteroplasty of ampulla of Vater NEC	11001	3418	Y
+J393	J39.3 Endoscopic sphincteroplasty of ampulla of Vater and removal of calculus HFQ	11002	3418	Y
+J394	J39.4 Endoscopic sphincteroplasty of ampulla of Vater and insertion of tubal prosthesis into bile duct	11003	3418	Y
 J398	J39.8 Other specified other therapeutic endoscopic operations on ampulla of Vater	3420	3418	Y
 J399	J39.9 Unspecified other therapeutic endoscopic operations on ampulla of Vater	3421	3418	Y
 J40	J40 Endoscopic retrograde placement of prosthesis in bile duct	3422	9	N
@@ -4075,6 +4150,7 @@ K593	K59.3 Resiting of lead of cardioverter defibrillator	4073	4070	Y
 K594	K59.4 Renewal of cardioverter defibrillator	4074	4070	Y
 K595	K59.5 Removal of cardioverter defibrillator	4075	4070	Y
 K596	K59.6 Implantation of cardioverter defibrillator using three electrode leads	4076	4070	Y
+K597	K59.7 Renewal of cardioverter defibrillator using three electrode leads	11004	4070	Y
 K598	K59.8 Other specified cardioverter defibrillator introduced through the vein	4077	4070	Y
 K599	K59.9 Unspecified cardioverter defibrillator introduced through the vein	4078	4070	Y
 K60	K60 Cardiac pacemaker system introduced through vein	4079	10	N
@@ -4157,6 +4233,18 @@ K723	K72.3 Renewal of subcutaneous cardioverter defibrillator	4155	4152	Y
 K724	K72.4 Removal of subcutaneous cardioverter defibrillator	4156	4152	Y
 K728	K72.8 Other specified	4157	4152	Y
 K729	K72.9 Unspecified	4158	4152	Y
+K73	K73 Other cardiac pacemaker system introduced through vein	11005	10	N
+K731	K73.1 Renewal of intravenous single chamber cardiac pacemaker system	11006	11005	Y
+K732	K73.2 Renewal of intravenous dual chamber cardiac pacemaker system	11007	11005	Y
+K733	K73.3 Renewal of intravenous biventricular cardiac pacemaker	11008	11005	Y
+K738	K73.8 Other specified other cardiac pacemaker system introduced through vein	11009	11005	Y
+K739	K73.9 Unspecified other cardiac pacemaker system introduced through vein	11010	11005	Y
+K74	K74 Cardiac pacemaker system	11011	10	N
+K741	K74.1 Renewal of single chamber cardiac pacemaker system NEC	11012	11011	Y
+K742	K74.2 Renewal of dual chamber cardiac pacemaker system NEC	11013	11011	Y
+K743	K74.3 Renewal of biventricular cardiac pacemaker NEC	11014	11011	Y
+K748	K74.8 Other specified cardiac pacemaker system	11015	11011	Y
+K749	K74.9 Unspecified cardiac pacemaker system	11016	11011	Y
 K75	K75 Percutaneous transluminal balloon angioplasty and insertion of stent into coronary artery	4159	10	N
 K751	K75.1 Percutaneous transluminal balloon angioplasty and insertion of 1-2 drug-eluting stents into coronary artery	4160	4159	Y
 K752	K75.2 Percutaneous transluminal balloon angioplasty and insertion of 3 or more drug-eluting stents into coronary artery	4161	4159	Y
@@ -4401,6 +4489,7 @@ L35	L35 Transluminal operations on cerebral artery	4399	11	N
 L351	L35.1 Percutaneous transluminal embolisation of cerebral artery	4400	4399	Y
 L352	L35.2 Arteriography of cerebral artery	4401	4399	Y
 L353	L35.3 Percutaneous transluminal insertion of stent into cerebral artery	4402	4399	Y
+L354	L35.4 Percutaneous transluminal embolectomy of cerebral artery	11017	4399	Y
 L358	L35.8 Other specified transluminal operations on cerebral artery	4403	4399	Y
 L359	L35.9 Unspecified transluminal operations on cerebral artery	4404	4399	Y
 L37	L37 Reconstruction of subclavian artery	4405	11	N
@@ -4740,6 +4829,7 @@ L859	L85.9 Unspecified ligation of varicose vein of leg	4738	4733	Y
 L86	L86 Injection into varicose vein of leg	4739	11	N
 L861	L86.1 Injection of sclerosing substance into varicose vein of leg NEC	4740	4739	Y
 L862	L86.2 Ultrasound guided foam sclerotherapy for varicose vein of leg	4741	4739	Y
+L863	L86.3 Injection of glue into varicose vein of leg	11018	4739	Y
 L868	L86.8 Other specified injection into varicose vein of leg	4742	4739	Y
 L869	L86.9 Unspecified injection into varicose vein of leg	4743	4739	Y
 L87	L87 Other operations on varicose vein of leg	4744	11	N
@@ -4890,6 +4980,11 @@ M063	M06.3 Closure of nephrostomy	4888	4885	Y
 M064	M06.4 Attention to nephrostomy tube NEC	4889	4885	Y
 M068	M06.8 Other specified incision of kidney	4890	4885	Y
 M069	M06.9 Unspecified incision of kidney	4891	4885	Y
+M07	M07 Therapeutic ureteroscopic operations on kidney	11019	12	N
+M071	M07.1 Ureteroscopic laser fragmentation of calculus of kidney	11020	11019	Y
+M072	M07.2 Ureteroscopic extraction of calculus of kidney NEC	11021	11019	Y
+M078	M07.8 Other specified therapeutic ureteroscopic operations on kidney	11022	11019	Y
+M079	M07.9 Unspecified therapeutic ureteroscopic operations on kidney	11023	11019	Y
 M08	M08 Other open operations on kidney	4892	12	N
 M081	M08.1 Open biopsy of lesion of kidney	4893	4892	Y
 M082	M08.2 Open denervation of kidney	4894	4892	Y
@@ -4969,6 +5064,7 @@ M193	M19.3 Revision of urinary diversion	4967	4964	Y
 M194	M19.4 Cutaneous ureterostomy NEC	4968	4964	Y
 M195	M19.5 Revision of ureterostomy stoma	4969	4964	Y
 M196	M19.6 Percutaneous tunnelled kidney to bladder bypass using prosthesis	4970	4964	Y
+M197	M19.7 Construction of orthotopic bladder substitute using intestine	11024	4964	Y
 M198	M19.8 Other specified urinary diversion	4971	4964	Y
 M199	M19.9 Unspecified urinary diversion	4972	4964	Y
 M20	M20 Replantation of ureter	4973	12	N
@@ -4996,6 +5092,16 @@ M23	M23 Incision of ureter	4994	12	N
 M231	M23.1 Open ureterolithotomy	4995	4994	Y
 M238	M23.8 Other specified incision of ureter	4996	4994	Y
 M239	M23.9 Unspecified incision of ureter	4997	4994	Y
+M24	M24 Other urinary diversion	11025	12	N
+M241	M24.1 Construction of continent catheterisable intestinal pouch NEC	11026	11025	Y
+M242	M24.2 Construction of continent catheterisable intestinal pouch with continent cystostomy NEC	11027	11025	Y
+M243	M24.3 Construction of continent catheterisable intestinal pouch with continent cystostomy using appendix	11028	11025	Y
+M244	M24.4 Construction of continent catheterisable intestinal pouch with continent cystostomy using ileum	11029	11025	Y
+M245	M24.5 Creation of continent cystostomy NEC	11030	11025	Y
+M246	M24.6 Creation of continent cystostomy using appendix	11031	11025	Y
+M247	M24.7 Creation of continent cystostomy using ileum	11032	11025	Y
+M248	M24.8 Other specified other urinary diversion	11033	11025	Y
+M249	M24.9 Unspecified other urinary diversion	11034	11025	Y
 M25	M25 Other open operations on ureter	4998	12	N
 M251	M25.1 Excision of ureterocele	4999	4998	Y
 M252	M25.2 Open excision of lesion of ureter NEC	5000	4998	Y
@@ -5208,6 +5314,13 @@ M562	M56.2 Endoscopic incision of outlet of female bladder	5206	5204	Y
 M563	M56.3 Endoscopic injection of inert substance into outlet of female bladder	5207	5204	Y
 M568	M56.8 Other specified therapeutic endoscopic operations on outlet of female bladder	5208	5204	Y
 M569	M56.9 Unspecified therapeutic endoscopic operations on outlet of female bladder	5209	5204	Y
+M57	M57 Other vaginal operations to support outlet of female bladder	11035	12	N
+M571	M57.1 Introduction of vaginal tape NEC	11036	11035	Y
+M572	M57.2 Total removal of vaginal tape NEC	11037	11035	Y
+M573	M57.3 Partial removal of vaginal tape NEC	11038	11035	Y
+M574	M57.4 Partial removal of transobturator tape	11039	11035	Y
+M578	M57.8 Other specified other vaginal operations to support outlet of female bladder	11040	11035	Y
+M579	M57.9 Unspecified other vaginal operations to support outlet of female bladder	11041	11035	Y
 M58	M58 Other operations on outlet of female bladder	5210	12	N
 M581	M58.1 Closed urethrotomy of outlet of female bladder	5211	5210	Y
 M582	M58.2 Dilation of outlet of female bladder	5212	5210	Y
@@ -5249,6 +5362,7 @@ M652	M65.2 Endoscopic resection of prostate using punch	5247	5245	Y
 M653	M65.3 Endoscopic resection of prostate NEC	5248	5245	Y
 M654	M65.4 Endoscopic resection of prostate using laser	5249	5245	Y
 M655	M65.5 Endoscopic resection of prostate using vapotrode	5250	5245	Y
+M656	M65.6 Endoscopic ablation of prostate using steam	11042	5245	Y
 M658	M65.8 Other specified endoscopic resection of outlet of male bladder	5251	5245	Y
 M659	M65.9 Unspecified endoscopic resection of outlet of male bladder	5252	5245	Y
 M66	M66 Other therapeutic endoscopic operations on outlet of male bladder	5253	12	N
@@ -5269,6 +5383,7 @@ M679	M67.9 Unspecified other therapeutic endoscopic operations on prostate	5267	
 M68	M68 Endoscopic insertion of prosthesis into prostate	5268	12	N
 M681	M68.1 Endoscopic insertion of prostatic stent	5269	5268	Y
 M682	M68.2 Endoscopic removal of prostatic stent	5270	5268	Y
+M683	M68.3 Endoscopic insertion of prosthesis to compress lobe of prostate	11043	5268	Y
 M688	M68.8 Other specified endoscopic insertion of prosthesis into prostate	5271	5268	Y
 M689	M68.9 Unspecified endoscopic insertion of prosthesis into prostate	5272	5268	Y
 M70	M70 Other operations on outlet of male bladder	5273	12	N
@@ -5553,11 +5668,15 @@ O03	O03 Transluminal stent assisted coil embolisation of aneurysm of artery	5551
 O031	O03.1 Percutaneous transluminal stent assisted coil embolisation of three or more aneurysms of artery	5552	5551	Y
 O032	O03.2 Percutaneous transluminal stent assisted coil embolisation of two aneurysms of artery	5553	5551	Y
 O033	O03.3 Percutaneous transluminal stent assisted coil embolisation of single aneurysm of artery	5554	5551	Y
+O034	O03.4 Percutaneous transluminal flow diverting stent assisted coil embolisation of three or more aneurysms of artery	11044	5551	Y
+O035	O03.5 Percutaneous transluminal flow diverting stent assisted coil embolisation of two aneurysms of artery	11045	5551	Y
+O036	O03.6 Percutaneous transluminal flow diverting stent assisted coil embolisation of single aneurysm of artery	11046	5551	Y
 O038	O03.8 Other specified transluminal stent assisted coil embolisation of aneurysm of artery	5555	5551	Y
 O039	O03.9 Unspecified transluminal stent assisted coil embolisation of aneurysm of artery	5556	5551	Y
 O04	O04 Other transluminal embolisation of aneurysm of artery	5557	14	N
 O041	O04.1 Percutaneous transluminal liquid polymer embolisation of aneurysm of artery	5558	5557	Y
 O042	O04.2 Percutaneous transluminal stent assisted liquid polymer embolisation of aneurysm of artery	5559	5557	Y
+O043	O04.3 Percutaneous transluminal flow diverting stent embolisation of aneurysm of artery	11047	5557	Y
 O048	O04.8 Other specified other transluminal embolisation of aneurysm of artery	5560	5557	Y
 O049	O04.9 Unspecified other transluminal embolisation of aneurysm of artery	5561	5557	Y
 O05	O05 Operations on dural arteriovenous fistula	5562	14	N
@@ -5613,6 +5732,7 @@ O139	O13.9 Other leg region NEC	5611	5607	Y
 O14	O14 Other lymph node	5612	14	N
 O141	O14.1 Pelvic lymph node	5613	5612	Y
 O142	O14.2 Sentinel lymph node	5614	5612	Y
+O143	O14.3 Mesenteric lymph node	11048	5612	Y
 O148	O14.8 Specified other lymph node NEC	5615	5612	Y
 O149	O14.9 Other lymph node NEC	5616	5612	Y
 O15	O15 Operations on blood vessel	5617	14	N
@@ -5624,6 +5744,7 @@ O159	O15.9 Unspecified operations on blood vessel	5622	5617	Y
 O16	O16 Body region	5623	14	N
 O161	O16.1 Pelvis NEC	5624	5623	Y
 O162	O16.2 Spine NEC	5625	5623	Y
+O163	O16.3 Axilla NEC	11049	5623	Y
 O168	O16.8 Specified body region NEC	5626	5623	Y
 O169	O16.9 Body region NEC	5627	5623	Y
 O17	O17 Secondary closed reduction of fracture of bone and internal fixation	5628	14	N
@@ -5632,6 +5753,7 @@ O172	O17.2 Remanipulation of fracture of long bone and rigid internal fixation N
 O173	O17.3 Remanipulation of fracture of long bone and flexible internal fixation HFQ	5631	5628	Y
 O174	O17.4 Remanipulation of fracture of small bone and fixation using screw	5632	5628	Y
 O175	O17.5 Remanipulation of fragment of bone and fixation using screw	5633	5628	Y
+O176	O17.6 Remanipulation of fracture of bone and fixation using plate	11050	5628	Y
 O178	O17.8 Other specified secondary closed reduction of fracture of bone and internal fixation	5634	5628	Y
 O179	O17.9 Unspecified secondary closed reduction of fracture of bone and internal fixation	5635	5628	Y
 O18	O18 Hybrid prosthetic replacement of knee joint using cement	5636	14	N
@@ -5739,6 +5861,63 @@ O33	O33 Bone of skull	5737	14	N
 O331	O33.1 Skull base	5738	5737	Y
 O338	O33.8 Specified bone of skull NEC	5739	5737	Y
 O339	O33.9 Bone of skull NEC	5740	5737	Y
+O34	O34 Other biliary tract	11051	14	N
+O341	O34.1 Lobe of liver NEC	11052	11051	Y
+O342	O34.2 Quadrate lobe of liver	11053	11051	Y
+O343	O34.3 Caudate lobe of liver	11054	11051	Y
+O344	O34.4 Porta hepatis	11055	11051	Y
+O345	O34.5 Falciform ligament of liver	11056	11051	Y
+O348	O34.8 Specified other biliary tract NEC	11057	11051	Y
+O349	O34.9 Other biliary tract NEC	11058	11051	Y
+O35	O35 Open operations on joint	11059	14	N
+O351	O35.1 Attention to therapeutic joint spacer	11060	11059	Y
+O358	O35.8 Other specified open operations on joint	11061	11059	Y
+O359	O35.9 Unspecified open operations on joint	11062	11059	Y
+O36	O36 Other mouth	11063	14	N
+O361	O36.1 Multiple teeth NEC	11064	11063	Y
+O368	O36.8 Specified other mouth NEC	11065	11063	Y
+O369	O36.9 Other mouth NEC	11066	11063	Y
+O37	O37 Reverse polarity total prosthetic replacement of shoulder joint using cement	11067	14	N
+O370	O37.0 Conversion from reverse polarity total prosthetic replacement of shoulder joint using cement	11068	11067	Y
+O371	O37.1 Conversion to reverse polarity total prosthetic replacement of shoulder joint using cement	11069	11067	Y
+O372	O37.2 Revision of one component of reverse polarity total prosthetic replacement of shoulder joint using cement	11070	11067	Y
+O378	O37.8 Other specified reverse polarity total prosthetic replacement of shoulder joint using cement	11071	11067	Y
+O379	O37.9 Unspecified reverse polarity total prosthetic replacement of shoulder joint using cement	11072	11067	Y
+O38	O38 Reverse polarity total prosthetic replacement of shoulder joint not using cement	11073	14	N
+O380	O38.0 Conversion from reverse polarity total prosthetic replacement of shoulder joint not using cement	11074	11073	Y
+O381	O38.1 Conversion to reverse polarity total prosthetic replacement of shoulder joint not using cement	11075	11073	Y
+O382	O38.2 Revision of one component of reverse polarity total prosthetic replacement of shoulder joint not using cement	11076	11073	Y
+O388	O38.8 Other specified reverse polarity total prosthetic replacement of shoulder joint not using cement	11077	11073	Y
+O389	O38.9 Unspecified reverse polarity total prosthetic replacement of shoulder joint not using cement	11078	11073	Y
+O39	O39 Reverse polarity total prosthetic replacement of shoulder joint	11079	14	N
+O390	O39.0 Conversion from reverse polarity total prosthetic replacement of shoulder joint NEC	11080	11079	Y
+O391	O39.1 Conversion to reverse polarity total prosthetic replacement of shoulder joint NEC	11081	11079	Y
+O392	O39.2 Attention to reverse polarity total prosthetic replacement of shoulder joint NEC	11082	11079	Y
+O393	O39.3 Revision of one component of reverse polarity total prosthetic replacement of shoulder joint NEC	11083	11079	Y
+O398	O39.8 Other specified reverse polarity total prosthetic replacement of shoulder joint	11084	11079	Y
+O399	O39.9 Unspecified reverse polarity total prosthetic replacement of shoulder joint	11085	11079	Y
+O40	O40 Reverse polarity hybrid prosthetic replacement of shoulder joint using cement	11086	14	N
+O400	O40.0 Conversion from previous reverse polarity hybrid prosthetic replacement of shoulder joint using cement	11087	11086	Y
+O401	O40.1 Primary reverse polarity hybrid prosthetic replacement of shoulder joint using cement	11088	11086	Y
+O402	O40.2 Conversion to reverse polarity hybrid total prosthetic replacement of shoulder joint using cement	11089	11086	Y
+O403	O40.3 Revision of reverse polarity hybrid prosthetic replacement of shoulder joint using cement	11090	11086	Y
+O404	O40.4 Attention to hybrid reverse polarity total prosthetic replacement of shoulder joint using cement	11091	11086	Y
+O408	O40.8 Other specified reverse polarity hybrid prosthetic replacement of shoulder joint using cement	11092	11086	Y
+O409	O40.9 Unspecified reverse polarity hybrid prosthetic replacement of shoulder joint using cement	11093	11086	Y
+O43	O43 Part of heart	11094	14	N
+O431	O43.1 Cardiac vein NEC	11095	11094	Y
+O432	O43.2 Coronary sinus	11096	11094	Y
+O438	O43.8 Specified part of heart NEC	11097	11094	Y
+O439	O43.9 Part of heart NEC	11098	11094	Y
+O44	O44 Other external beam radiotherapy	11099	14	N
+O441	O44.1 Proton radiotherapy	11100	11099	Y
+O448	O44.8 Other specified other external beam radiotherapy	11101	11099	Y
+O449	O44.9 Unspecified other external beam radiotherapy	11102	11099	Y
+O45	O45 Other aorta	11103	14	N
+O451	O45.1 Bifurcation of aorta	11104	11103	Y
+O452	O45.2 Juxtarenal abdominal aorta	11105	11103	Y
+O458	O45.8 Specified other aorta NEC	11106	11103	Y
+O459	O45.9 Other aorta NEC	11107	11103	Y
 P01	P01 Operations on clitoris	5741	15	N
 P011	P01.1 Clitoridectomy	5742	5741	Y
 P012	P01.2 Reduction of clitoris	5743	5741	Y
@@ -5767,6 +5946,7 @@ P061	P06.1 Laser destruction of lesion of vulva	5765	5764	Y
 P062	P06.2 Cryosurgery to lesion of vulva	5766	5764	Y
 P063	P06.3 Cauterisation of lesion of vulva	5767	5764	Y
 P064	P06.4 Implantation of radioactive substance into vulva	5768	5764	Y
+P065	P06.5 Excision of lesion of labia	11108	5764	Y
 P068	P06.8 Other specified extirpation of lesion of vulva	5769	5764	Y
 P069	P06.9 Unspecified extirpation of lesion of vulva	5770	5764	Y
 P07	P07 Repair of vulva	5771	15	N
@@ -5778,6 +5958,7 @@ P09	P09 Other operations on vulva	5776	15	N
 P091	P09.1 Biopsy of lesion of vulva	5777	5776	Y
 P092	P09.2 Drainage of lesion of vulva	5778	5776	Y
 P093	P09.3 Evacuation of haematoma from vulva	5779	5776	Y
+P094	P09.4 Biopsy of lesion of labia	11109	5776	Y
 P098	P09.8 Other specified other operations on vulva	5780	5776	Y
 P099	P09.9 Unspecified other operations on vulva	5781	5776	Y
 P11	P11 Extirpation of lesion of female perineum	5782	15	N
@@ -5891,8 +6072,14 @@ P27	P27 Exploration of vagina	5889	15	N
 P271	P27.1 Evacuation of haematoma from vagina	5890	5889	Y
 P272	P27.2 Toilet to vagina	5891	5889	Y
 P273	P27.3 Colposcopy of vagina	5892	5889	Y
+P274	P27.4 Exploration of vagina, Endoscopic examination of vagina	11110	5889	Y
 P278	P27.8 Other specified exploration of vagina	5893	5889	Y
 P279	P27.9 Unspecified exploration of vagina	5894	5889	Y
+P28	P28 Repair of prolapse of vagina	11111	15	N
+P281	P28.1 Total removal of prosthetic material from previous repair of vaginal prolapse	11112	11111	Y
+P282	P28.2 Partial removal of prosthetic material from previous repair of vaginal prolapse	11113	11111	Y
+P288	P28.8 Other specified repair of prolapse of vagina	11114	11111	Y
+P289	P28.9 Unspecified repair of prolapse of vagina	11115	11111	Y
 P29	P29 Other operations on vagina	5895	15	N
 P291	P29.1 Freeing of adhesions of vagina	5896	5895	Y
 P292	P29.2 Colpotomy NEC	5897	5895	Y
@@ -5901,6 +6088,11 @@ P294	P29.4 Removal of foreign body from vagina	5899	5895	Y
 P295	P29.5 Dilation of vagina	5900	5895	Y
 P298	P29.8 Other specified other operations on vagina	5901	5895	Y
 P299	P29.9 Unspecified other operations on vagina	5902	5895	Y
+P30	P30 Other repair of vault of vagina	11116	15	N
+P301	P30.1 Total removal of prosthetic material from previous repair of vaginal vault prolapse	11117	11116	Y
+P302	P30.2 Partial removal of prosthetic material from previous repair of vaginal vault prolapse	11118	11116	Y
+P308	P30.8 Other specified other repair of vault of vagina	11119	11116	Y
+P309	P30.9 Unspecified other repair of vault of vagina	11120	11116	Y
 P31	P31 Operations on pouch of Douglas	5903	15	N
 P311	P31.1 Culdoplasty	5904	5903	Y
 P312	P31.2 Drainage of pouch of Douglas	5905	5903	Y
@@ -5908,6 +6100,7 @@ P313	P31.3 Aspiration of pouch of Douglas	5906	5903	Y
 P314	P31.4 Culdotomy NEC	5907	5903	Y
 P315	P31.5 Removal of intrauterine contraceptive device from pouch of Douglas	5908	5903	Y
 P316	P31.6 Removal of foreign body from pouch of Douglas NEC	5909	5903	Y
+P317	P31.7 Extirpation of lesion of pouch of Douglas	11121	5903	Y
 P318	P31.8 Other specified operations on pouch of Douglas	5910	5903	Y
 P319	P31.9 Unspecified operations on pouch of Douglas	5911	5903	Y
 P32	P32 Other plastic operations on vagina	5912	15	N
@@ -6026,6 +6219,7 @@ Q163	Q16.3 Microwave ablation of endometrium NEC	6024	6021	Y
 Q164	Q16.4 Free circulating saline ablation of endometrium	6025	6021	Y
 Q165	Q16.5 Radiofrequency ablation of endometrium	6026	6021	Y
 Q166	Q16.6 Photodynamic ablation of endometrium	6027	6021	Y
+Q167	Q16.7 Radiofrequency ablation of lesion of uterus	11122	6021	Y
 Q168	Q16.8 Other specified other vaginal operations on uterus	6028	6021	Y
 Q169	Q16.9 Unspecified other vaginal operations on uterus	6029	6021	Y
 Q17	Q17 Therapeutic endoscopic operations on uterus	6030	16	N
@@ -6053,6 +6247,7 @@ Q203	Q20.3 Manual manipulation of uterus	6051	6048	Y
 Q204	Q20.4 Vaginofixation of uterus	6052	6048	Y
 Q205	Q20.5 Exploration of uterus NEC	6053	6048	Y
 Q206	Q20.6 Focused ultrasound to lesion of uterus	6054	6048	Y
+Q207	Q20.7 Destruction of lesion of uterus NEC	11123	6048	Y
 Q208	Q20.8 Other specified other operations on uterus	6055	6048	Y
 Q209	Q20.9 Unspecified other operations on uterus	6056	6048	Y
 Q21	Q21 Other introduction of gamete into uterine cavity	6057	16	N
@@ -6228,6 +6423,7 @@ Q543	Q54.3 Division of uteropelvic ligament	6226	6223	Y
 Q544	Q54.4 Suspension of uterus using mesh NEC	6227	6223	Y
 Q545	Q54.5 Sacrohysteropexy	6228	6223	Y
 Q546	Q54.6 Infracoccygeal hysteropexy	6229	6223	Y
+Q547	Q54.7 Total removal of prosthetic material from previous suspension of uterus	11124	6223	Y
 Q548	Q54.8 Other specified operations on other ligament of uterus	6230	6223	Y
 Q549	Q54.9 Unspecified operations on other ligament of uterus	6231	6223	Y
 Q55	Q55 Other examination of female genital tract	6232	16	N
@@ -6244,9 +6440,19 @@ Q561	Q56.1 Fertility investigation of female NEC	6242	6241	Y
 Q562	Q56.2 Fertiloscopy	6243	6241	Y
 Q568	Q56.8 Other specified other operations on female genital tract	6244	6241	Y
 Q569	Q56.9 Unspecified other operations on female genital tract	6245	6241	Y
+Q57	Q57 Other operations on other ligament of uterus	11125	16	N
+Q571	Q57.1 Partial removal of prosthetic material from previous suspension of uterus	11126	11125	Y
+Q578	Q57.8 Other specified other operations on other ligament of uterus	11127	11125	Y
+Q579	Q57.9 Unspecified other operations on other ligament of uterus	11128	11125	Y
+Q58	Q58 Delivery of terminated fetus	11129	16	N
+Q581	Q58.1 Cephalic delivery of terminated fetus	11130	11129	Y
+Q582	Q58.2 Breech delivery of terminated fetus	11131	11129	Y
+Q588	Q58.8 Other specified delivery of terminated fetus	11132	11129	Y
+Q589	Q58.9 Unspecified delivery of terminated fetus	11133	11129	Y
 R01	R01 Therapeutic endoscopic operations on fetus	6246	17	N
 R011	R01.1 Fetoscopic blood transfusion of fetus	6247	6246	Y
 R012	R01.2 Fetoscopic insertion of tracheal plug for congenital diaphragmatic hernia	6248	6246	Y
+R013	R01.3 Fetoscopic removal of tracheal plug	11134	6246	Y
 R018	R01.8 Other specified therapeutic endoscopic operations on fetus	6249	6246	Y
 R019	R01.9 Unspecified therapeutic endoscopic operations on fetus	6250	6246	Y
 R02	R02 Diagnostic endoscopic examination of fetus	6251	17	N
@@ -6278,6 +6484,7 @@ R059	R05.9 Unspecified diagnostic percutaneous examination of fetus	6276	6271	Y
 R06	R06 Destruction of fetus	6277	17	N
 R061	R06.1 Selective feticide	6278	6277	Y
 R062	R06.2 Feticide NEC	6279	6277	Y
+R063	R06.3 Percutaneous selective feticide by vascular occlusion of umbilical cord	11135	6277	Y
 R068	R06.8 Other specified	6280	6277	Y
 R069	R06.9 Unspecified	6281	6277	Y
 R07	R07 Therapeutic endoscopic operations for twin to twin transfusion syndrome	6282	17	N
@@ -6290,6 +6497,10 @@ R081	R08.1 Percutaneous laser ablation of placental arteriovenous anastomosis	62
 R082	R08.2 Percutaneous serial drainage of amniotic fluid for twin to twin transfusion syndrome	6289	6287	Y
 R088	R08.8 Other specified therapeutic percutaneous operations for twin to twin transfusion syndrome	6290	6287	Y
 R089	R08.9 Unspecified therapeutic percutaneous operations for twin to twin transfusion syndrome	6291	6287	Y
+R09	R09 Open operations on fetus	11136	17	N
+R091	R09.1 Open repair of meningomyelocele of fetus	11137	11136	Y
+R098	R09.8 Other specified open operations on fetus	11138	11136	Y
+R099	R09.9 Unspecified open operations on fetus	11139	11136	Y
 R10	R10 Other operations on amniotic cavity	6292	17	N
 R101	R10.1 Drainage of amniotic cavity	6293	6292	Y
 R102	R10.2 Diagnostic amniocentesis	6294	6292	Y
@@ -6298,6 +6509,10 @@ R104	R10.4 Sampling of chorionic villus NEC	6296	6292	Y
 R105	R10.5 Biopsy of placenta NEC	6297	6292	Y
 R108	R10.8 Other specified other operations on amniotic cavity	6298	6292	Y
 R109	R10.9 Unspecified other operations on amniotic cavity	6299	6292	Y
+R11	R11 Other therapeutic percutaneous operations on fetus	11140	17	N
+R111	R11.1 Percutaneous removal of fetal tracheal plug	11141	11140	Y
+R118	R11.8 Other specified other therapeutic percutaneous operations on fetus	11142	11140	Y
+R119	R11.9 Unspecified other therapeutic percutaneous operations on fetus	11143	11140	Y
 R12	R12 Operations on gravid uterus	6300	17	N
 R121	R12.1 Cerclage of cervix of gravid uterus	6301	6300	Y
 R122	R12.2 Removal of cerclage from cervix of gravid uterus	6302	6300	Y
@@ -6305,6 +6520,10 @@ R123	R12.3 Repositioning of retroverted gravid uterus	6303	6300	Y
 R124	R12.4 External cephalic version	6304	6300	Y
 R128	R12.8 Other specified operations on gravid uterus	6305	6300	Y
 R129	R12.9 Unspecified operations on gravid uterus	6306	6300	Y
+R13	R13 Other operations on fetus	11144	17	N
+R131	R13.1 Sampling of fetal blood NEC	11145	11144	Y
+R138	R13.8 Other specified other operations on fetus	11146	11144	Y
+R139	R13.9 Unspecified other operations on fetus	11147	11144	Y
 R14	R14 Surgical induction of labour	6307	17	N
 R141	R14.1 Forewater rupture of amniotic membrane	6308	6307	Y
 R142	R14.2 Hindwater rupture of amniotic membrane	6309	6307	Y
@@ -6408,6 +6627,7 @@ R379	R37.9 Unspecified non-routine obstetric scan for fetal observations	6406	63
 R38	R38 Other non-routine obstetric scan	6407	17	N
 R381	R38.1 Placental localisation scan	6408	6407	Y
 R382	R38.2 Liquor volume scan	6409	6407	Y
+R383	R38.3 Chorionicity scan	11148	6407	Y
 R388	R38.8 Other specified other non-routine obstetric scan	6410	6407	Y
 R389	R38.9 Unspecified other non-routine obstetric scan	6411	6407	Y
 R40	R40 Other maternal physiological assessments	6412	17	N
@@ -6419,6 +6639,7 @@ R42	R42 Obstetric doppler ultrasound	6417	17	N
 R421	R42.1 Doppler ultrasound scan of umbilical artery	6418	6417	Y
 R422	R42.2 Doppler ultrasound scan of uterine artery	6419	6417	Y
 R423	R42.3 Doppler ultrasound scan of middle cerebral artery of fetus	6420	6417	Y
+R424	R42.4 Doppler ultrasound scan of ductus venosus	11149	6417	Y
 R428	R42.8 Other specified obstetric doppler ultrasound	6421	6417	Y
 R429	R42.9 Unspecified obstetric doppler ultrasound	6422	6417	Y
 R43	R43 Ultrasound monitoring	6423	17	N
@@ -6472,6 +6693,7 @@ S068	S06.8 Other specified other excision of lesion of skin	6470	6462	Y
 S069	S06.9 Unspecified other excision of lesion of skin	6471	6462	Y
 S07	S07 Photodynamic therapy of skin	6472	18	N
 S071	S07.1 Photodynamic therapy of skin of whole body	6473	6472	Y
+S072	S07.2 Photodynamic laser therapy to lesion of skin (added v4.8)	11150	6472	Y
 S078	S07.8 Other specified photodynamic therapy of skin	6474	6472	Y
 S079	S07.9 Unspecified photodynamic therapy of skin	6475	6472	Y
 S08	S08 Curettage of lesion of skin	6476	18	N
@@ -6532,12 +6754,16 @@ S17	S17 Distant flap of skin and muscle	6530	18	N
 S171	S17.1 Distant myocutaneous subcutaneous pedicle flap to head or neck	6531	6530	Y
 S172	S17.2 Distant myocutaneous subcutaneous pedicle flap NEC	6532	6530	Y
 S173	S17.3 Distant myocutaneous flap to head or neck NEC	6533	6530	Y
+S174	S17.4 Distant myocutaneous free flap to head or neck	11151	6530	Y
+S175	S17.5 Distant myocutaneous free flap NEC	11152	6530	Y
 S178	S17.8 Other specified distant flap of skin and muscle	6534	6530	Y
 S179	S17.9 Unspecified distant flap of skin and muscle	6535	6530	Y
 S18	S18 Distant flap of skin and fascia	6536	18	N
 S181	S18.1 Distant fasciocutaneous subcutaneous pedicle flap to head or neck	6537	6536	Y
 S182	S18.2 Distant fasciocutaneous subcutaneous pedicle flap NEC	6538	6536	Y
 S183	S18.3 Distant fasciocutaneous flap to head or neck NEC	6539	6536	Y
+S184	S18.4 Distant fasciocutaneous free flap to head or neck	11153	6536	Y
+S185	S18.5 Distant fasciocutaneous free flap NEC	11154	6536	Y
 S188	S18.8 Other specified distant flap of skin and fascia	6540	6536	Y
 S189	S18.9 Unspecified distant flap of skin and fascia	6541	6536	Y
 S19	S19 Distant pedicle flap of skin	6542	18	N
@@ -6551,6 +6777,8 @@ S202	S20.2 Axial pattern distant flap of skin NEC	6549	6547	Y
 S203	S20.3 Random pattern distant flap of skin to head or neck	6550	6547	Y
 S204	S20.4 Random pattern distant flap of skin NEC	6551	6547	Y
 S205	S20.5 Distant flap of skin to head or neck NEC	6552	6547	Y
+S206	S20.6 Distant free flap of skin to head or neck NEC	11155	6547	Y
+S207	S20.7 Distant free flap of skin NEC	11156	6547	Y
 S208	S20.8 Other specified other distant flap of skin	6553	6547	Y
 S209	S20.9 Unspecified other distant flap of skin	6554	6547	Y
 S21	S21 Hair bearing flap of skin	6555	18	N
@@ -6606,6 +6834,14 @@ S28	S28 Flap of mucosa	6604	18	N
 S281	S28.1 Tongue flap	6605	6604	Y
 S288	S28.8 Other specified flap of mucosa	6606	6604	Y
 S289	S28.9 Unspecified flap of mucosa	6607	6604	Y
+S29	S29 Distant flap of skin and bone	11157	18	N
+S291	S29.1 Distant osteocutaneous pedicle flap to head or neck	11158	11157	Y
+S292	S29.2 Distant osteocutaneous pedicle flap NEC	11159	11157	Y
+S293	S29.3 Distant osteocutaneous flap to head or neck NEC	11160	11157	Y
+S294	S29.4 Distant osteocutaneous free flap to head or neck	11161	11157	Y
+S295	S29.5 Distant osteocutaneous free flap NEC	11162	11157	Y
+S298	S29.8 Other specified distant flap of skin and bone	11163	11157	Y
+S299	S29.9 Unspecified distant flap of skin and bone	11164	11157	Y
 S30	S30 Other operations on flap of skin to head or neck	6608	18	N
 S301	S30.1 Delay of flap of skin to head or neck	6609	6608	Y
 S302	S30.2 Transfer of flap of skin to head or neck	6610	6608	Y
@@ -6624,6 +6860,14 @@ S315	S31.5 Thinning of flap of skin NEC	6622	6617	Y
 S316	S31.6 Removal of flap of skin NEC	6623	6617	Y
 S318	S31.8 Other specified other operations on flap of skin to other site	6624	6617	Y
 S319	S31.9 Unspecified other operations on flap of skin to other site	6625	6617	Y
+S32	S32 Distant flap of skin and multiple tissues	11165	18	N
+S321	S32.1 Distant osteomusculocutaneous pedicle flap of head or neck	11166	11165	Y
+S322	S32.2 Distant osteomusculocutaneous pedicle flap NEC	11167	11165	Y
+S323	S32.3 Distant osteomusculocutaneous flap to head or neck NEC	11168	11165	Y
+S324	S32.4 Distant osteomusculocutaneous free flap to head or neck	11169	11165	Y
+S325	S32.5 Distant osteomusculocutaneous free flap NEC	11170	11165	Y
+S328	S32.8 Other specified distant flap of skin and multiple tissues	11171	11165	Y
+S329	S32.9 Unspecified distant flap of skin and multiple tissues	11172	11165	Y
 S33	S33 Hair bearing graft of skin to scalp	6626	18	N
 S331	S33.1 Hair bearing punch graft to scalp for male pattern baldness	6627	6626	Y
 S332	S33.2 Hair bearing strip graft to scalp for male pattern baldness	6628	6626	Y
@@ -6760,6 +7004,7 @@ S533	S53.3 Insertion of inert substance into skin	6758	6755	Y
 S534	S53.4 Injection of inert substance into skin	6759	6755	Y
 S535	S53.5 Insertion of diagnostic substance into skin	6760	6755	Y
 S536	S53.6 Injection of diagnostic substance into skin	6761	6755	Y
+S537	S53.7 Application of dermal substitute to skin	11173	6755	Y
 S538	S53.8 Other specified introduction of substance into skin	6762	6755	Y
 S539	S53.9 Unspecified introduction of substance into skin	6763	6755	Y
 S54	S54 Exploration of burnt skin of head or neck	6764	18	N
@@ -6926,6 +7171,8 @@ T122	T12.2 Drainage of pleural cavity NEC	6924	6922	Y
 T123	T12.3 Aspiration of pleural cavity	6925	6922	Y
 T124	T12.4 Insertion of tube drain into pleural cavity	6926	6922	Y
 T125	T12.5 Attention to tube drain into pleural cavity	6927	6922	Y
+T126	T12.6 Insertion of tunnelled catheter into pleural cavity	11174	6922	Y
+T127	T12.7 Attention to tunnelled catheter in pleural cavity	11175	6922	Y
 T128	T12.8 Other specified puncture of pleura	6928	6922	Y
 T129	T12.9 Unspecified puncture of pleura	6929	6922	Y
 T13	T13 Introduction of substance into pleural cavity	6930	19	N
@@ -7037,6 +7284,7 @@ T301	T30.1 Reopening of abdomen and re-exploration of intra-abdominal operation 
 T302	T30.2 Reopening of abdomen and re-exploration of intra-abdominal operation site NEC	7036	7034	Y
 T303	T30.3 Reopening of abdomen NEC	7037	7034	Y
 T304	T30.4 Opening of abdomen and exploration of groin	7038	7034	Y
+T305	T30.5 Packing of abdominal cavity	11176	7034	Y
 T308	T30.8 Other specified opening of abdomen	7039	7034	Y
 T309	T30.9 Unspecified opening of abdomen	7040	7034	Y
 T31	T31 Other operations on anterior abdominal wall	7041	19	N
@@ -7049,6 +7297,13 @@ T316	T31.6 Removal of foreign body from anterior abdominal wall	7047	7041	Y
 T317	T31.7 Exploration of groin NEC	7048	7041	Y
 T318	T31.8 Other specified other operations on anterior abdominal wall	7049	7041	Y
 T319	T31.9 Unspecified other operations on anterior abdominal wall	7050	7041	Y
+T32	T32 Reconstruction of anterior abdominal wall	11177	19	N
+T321	T32.1 Reconstruction of anterior abdominal wall using insert of natural material	11178	11177	Y
+T322	T32.2 Reconstruction of anterior abdominal wall using insert of prosthetic material	11179	11177	Y
+T323	T32.3 Reconstruction of anterior abdominal wall using flap NEC	11180	11177	Y
+T324	T32.4 Reconstruction of anterior abdominal wall using insert of prosthetic material and flap NEC	11181	11177	Y
+T328	T32.8 Other specified reconstruction of anterior abdominal wall	11182	11177	Y
+T329	T32.9 Unspecified reconstruction of anterior abdominal wall	11183	11177	Y
 T33	T33 Open extirpation of lesion of peritoneum	7051	19	N
 T331	T33.1 Open excision of lesion of peritoneum	7052	7051	Y
 T332	T33.2 Open destruction of lesion of peritoneum	7053	7051	Y
@@ -7094,6 +7349,7 @@ T412	T41.2 Division of band of peritoneum	7092	7090	Y
 T413	T41.3 Freeing of adhesions of peritoneum	7093	7090	Y
 T414	T41.4 Open removal of foreign body from peritoneum	7094	7090	Y
 T415	T41.5 Freeing of extensive adhesions of peritoneum	7095	7090	Y
+T416	T41.6 Excision of peritoneum	11184	7090	Y
 T418	T41.8 Other specified other open operations on peritoneum	7096	7090	Y
 T419	T41.9 Unspecified other open operations on peritoneum	7097	7090	Y
 T42	T42 Therapeutic endoscopic operations on peritoneum	7098	19	N
@@ -7101,6 +7357,7 @@ T421	T42.1 Endoscopic resection of lesion of peritoneum	7099	7098	Y
 T422	T42.2 Endoscopic destruction of lesion of peritoneum	7100	7098	Y
 T423	T42.3 Endoscopic division of adhesions of peritoneum	7101	7098	Y
 T424	T42.4 Endoscopic removal of foreign body from peritoneum	7102	7098	Y
+T425	T42.5 Endoscopic excision of peritoneum	11185	7098	Y
 T428	T42.8 Other specified therapeutic endoscopic operations on peritoneum	7103	7098	Y
 T429	T42.9 Unspecified therapeutic endoscopic operations on peritoneum	7104	7098	Y
 T43	T43 Diagnostic endoscopic examination of peritoneum	7105	19	N
@@ -7156,6 +7413,8 @@ T539	T53.9 Unspecified extirpation of lesion of fascia	7154	7150	Y
 T54	T54 Division of fascia	7155	19	N
 T541	T54.1 Division of palmar fascia	7156	7155	Y
 T542	T54.2 Division of plantar fascia	7157	7155	Y
+T543	T54.3 Needle fasciotomy of palmar fascia	11186	7155	Y
+T544	T54.4 Needle fasciotomy of plantar fascia	11187	7155	Y
 T548	T54.8 Other specified division of fascia	7158	7155	Y
 T549	T54.9 Unspecified division of fascia	7159	7155	Y
 T55	T55 Release of fascia	7160	19	N
@@ -7177,6 +7436,7 @@ T571	T57.1 Freeing of adhesions of fascia	7175	7174	Y
 T572	T57.2 Biopsy of lesion of fascia	7176	7174	Y
 T573	T57.3 Repair of fascia	7177	7174	Y
 T574	T57.4 Stripping of fascia	7178	7174	Y
+T575	T57.5 Injection of therapeutic substance into fascia	11188	7174	Y
 T578	T57.8 Other specified other operations on fascia	7179	7174	Y
 T579	T57.9 Unspecified other operations on fascia	7180	7174	Y
 T59	T59 Excision of ganglion	7181	19	N
@@ -7270,6 +7530,7 @@ T743	T74.3 Exploration of tendon NEC	7268	7265	Y
 T744	T74.4 Injection of therapeutic substance into tendon NEC	7269	7265	Y
 T745	T74.5 Extracorporeal shockwave lithotripsy of calculus of tendon	7270	7265	Y
 T746	T74.6 Autologous blood injection into tendon	7271	7265	Y
+T747	T74.7 Injection of stem cells into tendon	11189	7265	Y
 T748	T74.8 Other specified other operations on tendon	7272	7265	Y
 T749	T74.9 Unspecified other operations on tendon	7273	7265	Y
 T76	T76 Transplantation of muscle	7274	19	N
@@ -7385,6 +7646,9 @@ T961	T96.1 Excision of cystic hygroma	7383	7382	Y
 T962	T96.2 Excision of lesion of soft tissue NEC	7384	7382	Y
 T963	T96.3 Debridement of soft tissue NEC	7385	7382	Y
 T964	T96.4 Evacuation of seroma from soft tissue	7386	7382	Y
+T965	T96.5 Aspiration of soft tissue NEC	11190	7382	Y
+T966	T96.6 Biopsy of soft tissue NEC	11191	7382	Y
+T967	T96.7 Injection into soft tissue NEC	11192	7382	Y
 T968	T96.8 Other specified other operations on soft tissue	7387	7382	Y
 T969	T96.9 Unspecified other operations on soft tissue	7388	7382	Y
 T97	T97 Repair of recurrent umbilical hernia	7389	19	N
@@ -7577,6 +7841,7 @@ U251	U25.1 C14 urea helicobacter pylori breath test	7575	7574	Y
 U252	U25.2 C14 glycocholic acid breath test	7576	7574	Y
 U253	U25.3 Hydrogen breath test	7577	7574	Y
 U254	U25.4 Urea helicobacter pylori breath test NEC	7578	7574	Y
+U255	U25.5 Gastric emptying breath test	11193	7574	Y
 U258	U25.8 Other specified breath tests	7579	7574	Y
 U259	U25.9 Unspecified breath tests	7580	7574	Y
 U26	U26 Diagnostic testing of genitourinary system	7581	20	N
@@ -7645,6 +7910,7 @@ U351	U35.1 Thermography of blood flow	7643	7642	Y
 U352	U35.2 Laser doppler ultrasound velocimetry	7644	7642	Y
 U353	U35.3 Transcranial doppler ultrasound velocimetry	7645	7642	Y
 U354	U35.4 Computed tomography of pulmonary arteries	7646	7642	Y
+U355	U35.5 Computed tomography angiography	11194	7642	Y
 U358	U35.8 Other specified other diagnostic imaging of vascular system	7647	7642	Y
 U359	U35.9 Unspecified other diagnostic imaging of vascular system	7648	7642	Y
 U36	U36 Other diagnostic imaging procedures	7649	20	N
@@ -7652,6 +7918,7 @@ U361	U36.1 Thermography NEC	7650	7649	Y
 U362	U36.2 Positron emission tomography with computed tomography NEC	7651	7649	Y
 U363	U36.3 Single photon emission computed tomography with computed tomography NEC	7652	7649	Y
 U364	U36.4 Ultrasound elastography	7653	7649	Y
+U365	U36.5 Cone beam computed tomography NEC	11195	7649	Y
 U368	U36.8 Other specified other diagnostic imaging procedures	7654	7649	Y
 U369	U36.9 Unspecified other diagnostic imaging procedures	7655	7649	Y
 U37	U37 Other diagnostic imaging of genitourinary system	7656	20	N
@@ -7659,11 +7926,21 @@ U371	U37.1 Magnetic resonance imaging of kidneys	7657	7656	Y
 U372	U37.2 Computed tomography of kidneys	7658	7656	Y
 U378	U37.8 Other specified other diagnostic imaging of genitourinary system	7659	7656	Y
 U379	U37.9 Unspecified other diagnostic imaging of genitourinary system	7660	7656	Y
+U38	U38 Other diagnostic endocrinology	11196	20	N
+U381	U38.1 Saline suppression test	11197	11196	Y
+U388	U38.8 Other specified other diagnostic endocrinology	11198	11196	Y
+U389	U38.9 Unspecified other diagnostic endocrinology	11199	11196	Y
 U40	U40 Diagnostic tests on skin	7661	20	N
 U401	U40.1 Diagnostic intradermal inoculation of skin	7662	7661	Y
 U402	U40.2 Diagnostic ultraviolet skin test	7663	7661	Y
+U403	U40.3 Skin prick test	11200	7661	Y
 U408	U40.8 Other specified diagnostic tests on skin	7664	7661	Y
 U409	U40.9 Unspecified diagnostic tests on skin	7665	7661	Y
+U41	U41 Provocation test	11201	20	N
+U411	U41.1 Oral food provocation test	11202	11201	Y
+U412	U41.2 Oral drug provocation test	11203	11201	Y
+U418	U41.8 Other specified provocation test	11204	11201	Y
+U419	U41.9 Unspecified provocation test	11205	11201	Y
 U50	U50 Rehabilitation for musculoskeletal disorders	7666	20	N
 U501	U50.1 Delivery of rehabilitation for amputation of limb	7667	7666	Y
 U502	U50.2 Delivery of rehabilitation for hip fracture	7668	7666	Y
@@ -7872,6 +8149,8 @@ V242	V24.2 Primary decompression of thoracic spinal cord NEC	7870	7868	Y
 V243	V24.3 Revisional decompression of thoracic spinal cord NEC	7871	7868	Y
 V244	V24.4 Primary anterior corpectomy of thoracic spine and reconstruction HFQ	7872	7868	Y
 V245	V24.5 Revisional anterior corpectomy of thoracic spine and reconstruction HFQ	7873	7868	Y
+V246	V24.6 Primary posterior laminectomy decompression of thoracic spine	11206	7868	Y
+V247	V24.7 Revisional posterior laminectomy decompression of thoracic spine	11207	7868	Y
 V248	V24.8 Other specified decompression operations on thoracic spine	7874	7868	Y
 V249	V24.9 Unspecified decompression operations on thoracic spine	7875	7868	Y
 V25	V25 Primary decompression operations on lumbar spine	7876	21	N
@@ -8010,6 +8289,9 @@ V411	V41.1 Posterior attachment of correctional instrument to spine	8008	8007	Y
 V412	V41.2 Anterior attachment of correctional instrument to spine	8009	8007	Y
 V413	V41.3 Removal of correctional instrument from spine	8010	8007	Y
 V414	V41.4 Anterior and posterior attachment of correctional instrument to spine	8011	8007	Y
+V415	V41.5 Posterior attachment of spinal growing system	11208	8007	Y
+V416	V41.6 Attention to spinal growing system	11209	8007	Y
+V417	V41.7 Surgical distraction of spinal growing system	11210	8007	Y
 V418	V41.8 Other specified instrumental correction of deformity of spine	8012	8007	Y
 V419	V41.9 Unspecified instrumental correction of deformity of spine	8013	8007	Y
 V42	V42 Other correction of deformity of spine	8014	21	N
@@ -8078,6 +8360,10 @@ V50	V50 Manipulation of spine	8076	21	N
 V501	V50.1 Manipulation of spine using traction	8077	8076	Y
 V508	V50.8 Other specified manipulation of spine	8078	8076	Y
 V509	V50.9 Unspecified manipulation of spine	8079	8076	Y
+V51	V51 Other primary excision of lumbar intervertebral disc	11211	21	N
+V511	V51.1 Primary direct lateral excision of lumbar intervertebral disc and interbody fusion of joint of lumbar spine	11212	11211	Y
+V518	V51.8 Other specified other primary excision of lumbar intervertebral disc	11213	11211	Y
+V519	V51.9 Unspecified other primary excision of lumbar intervertebral disc	11214	11211	Y
 V52	V52 Other operations on intervertebral disc	8080	21	N
 V521	V52.1 Enzyme destruction of intervertebral disc	8081	8080	Y
 V522	V52.2 Destruction of intervertebral disc NEC	8082	8080	Y
@@ -8166,6 +8452,14 @@ V681	V68.1 Revisional posterior lumbar medial facetectomy	8164	8163	Y
 V682	V68.2 Revisional hemilaminectomy decompression of lumbar spine	8165	8163	Y
 V688	V68.8 Other specified other revisional decompression operations on lumbar spine	8166	8163	Y
 V689	V68.9 Unspecified other revisional decompression operations on lumbar spine	8167	8163	Y
+V69	V69 Other primary decompression operations on cervical spine	11215	21	N
+V691	V69.1 Primary posterior laminectomy decompression of cervical spine	11216	11215	Y
+V698	V69.8 Other specified other primary decompression operations on cervical spine	11217	11215	Y
+V699	V69.9 Unspecified other primary decompression operations on cervical spine	11218	11215	Y
+V70	V70 Other revisional decompression operations on cervical spine	11219	21	N
+V701	V70.1 Revisional posterior laminectomy decompression of cervical spine	11220	11219	Y
+V708	V70.8 Other specified other revisional decompression operations on cervical spine	11221	11219	Y
+V709	V70.9 Unspecified other revisional decompression operations on cervical spine	11222	11219	Y
 W01	W01 Complex reconstruction of thumb	8168	22	N
 W011	W01.1 Microvascular transfer of toe to thumb	8169	8168	Y
 W012	W01.2 Pollicisation of finger	8170	8168	Y
@@ -8302,6 +8596,7 @@ W172	W17.2 Traction lengthening of diaphysis of bone	8300	8298	Y
 W173	W17.3 Traction lengthening of epiphyseal plate of bone	8301	8298	Y
 W174	W17.4 Shortening of bone	8302	8298	Y
 W175	W17.5 Revision of reconstruction of bone	8303	8298	Y
+W176	W17.6 Traction lengthening of bone with intramedullary fixation	11223	8298	Y
 W178	W17.8 Other specified other reconstruction of bone	8304	8298	Y
 W179	W17.9 Unspecified other reconstruction of bone	8305	8298	Y
 W18	W18 Drainage of bone	8306	22	N
@@ -8360,6 +8655,7 @@ W243	W24.3 Closed reduction of fracture of long bone and flexible internal fixat
 W244	W24.4 Closed reduction of fracture of small bone and fixation using screw	8359	8355	Y
 W245	W24.5 Closed reduction of fragment of bone and fixation using screw	8360	8355	Y
 W246	W24.6 Closed reduction of fracture of bone and fixation using nail or screw	8361	8355	Y
+W247	W24.7 Closed reduction of fracture of bone and fixation using plate	11224	8355	Y
 W248	W24.8 Other specified closed reduction of fracture of bone and internal fixation	8362	8355	Y
 W249	W24.9 Unspecified closed reduction of fracture of bone and internal fixation	8363	8355	Y
 W25	W25 Closed reduction of fracture of bone and external fixation	8364	22	N
@@ -8727,6 +9023,7 @@ W711	W71.1 Open drilling of articular cartilage	8725	8724	Y
 W712	W71.2 Open excision of intra-articular osteophyte	8726	8724	Y
 W713	W71.3 Forage of joint	8727	8724	Y
 W714	W71.4 Open autologous chondrocyte implantation into articular structure	8728	8724	Y
+W715	W71.5 Open stem cell implantation into articular structure	11225	8724	Y
 W718	W71.8 Other specified other open operations on intra-articular structure	8729	8724	Y
 W719	W71.9 Unspecified other open operations on intra-articular structure	8730	8724	Y
 W72	W72 Prosthetic replacement of ligament	8731	22	N
@@ -8850,6 +9147,7 @@ W889	W88.9 Unspecified diagnostic endoscopic examination of other joint	8848	884
 W89	W89 Other therapeutic endoscopic operations on other articular cartilage	8849	22	N
 W891	W89.1 Endoscopic chondroplasty NEC	8850	8849	Y
 W892	W89.2 Endoscopic harvest of autologous chondrocytes	8851	8849	Y
+W893	W89.3 Endoscopic stem cell implantation into articular cartilage	11226	8849	Y
 W898	W89.8 Other specified other therapeutic endoscopic operations on other articular cartilage	8852	8849	Y
 W899	W89.9 Unspecified other therapeutic endoscopic operations on other articular cartilage	8853	8849	Y
 W90	W90 Puncture of joint	8854	22	N
@@ -8871,6 +9169,8 @@ W922	W92.2 Distension of joint	8869	8867	Y
 W923	W92.3 Examination of joint under image intensifier	8870	8867	Y
 W924	W92.4 Examination of joint under anaesthetic	8871	8867	Y
 W925	W92.5 Examination of joint NEC	8872	8867	Y
+W926	W92.6 Chemical synovectomy	11227	8867	Y
+W927	W92.7 Radiation synovectomy	11228	8867	Y
 W928	W92.8 Other specified other operations on joint	8873	8867	Y
 W929	W92.9 Unspecified other operations on joint	8874	8867	Y
 W93	W93 Hybrid prosthetic replacement of hip joint using cemented acetabular component	8875	22	N
@@ -9006,6 +9306,7 @@ X14	X14 Clearance of pelvis	9004	23	N
 X141	X14.1 Total exenteration of pelvis	9005	9004	Y
 X142	X14.2 Anterior exenteration of pelvis	9006	9004	Y
 X143	X14.3 Posterior exenteration of pelvis	9007	9004	Y
+X144	X14.4 Pelvic side wall clearance	11229	9004	Y
 X148	X14.8 Other specified clearance of pelvis	9008	9004	Y
 X149	X14.9 Unspecified clearance of pelvis	9009	9004	Y
 X15	X15 Operations for sexual transformation	9010	23	N
@@ -9346,6 +9647,11 @@ X682	X68.2 Preparation for intracavitary brachytherapy	9344	9342	Y
 X683	X68.3 Preparation for interstitial brachytherapy	9345	9342	Y
 X688	X68.8 Other specified preparation for brachytherapy	9346	9342	Y
 X689	X68.9 Unspecified preparation for brachytherapy	9347	9342	Y
+X69	X69 Other radiotherapy	11230	23	N
+X691	X69.1 Delivery of a fraction of hemi-body radiation	11231	11230	Y
+X692	X69.2 Delivery of a fraction of total skin radiotherapy	11232	11230	Y
+X698	X69.8 Other specified other radiotherapy	11233	11230	Y
+X699	X69.9 Unspecified other radiotherapy	11234	11230	Y
 X70	X70 Procurement of drugs for chemotherapy for neoplasm in Bands 1-5	9348	23	N
 X701	X70.1 Procurement of drugs for chemotherapy for neoplasm for regimens in Band 1	9349	9348	Y
 X702	X70.2 Procurement of drugs for chemotherapy for neoplasm for regimens in Band 2	9350	9348	Y
@@ -9406,6 +9712,7 @@ X852	X85.2 Amyotrophic lateral sclerosis drugs Band 1	9404	9402	Y
 X853	X85.3 Hypnotic drugs Band 1	9405	9402	Y
 X854	X85.4 Analgesic drugs Band 1	9406	9402	Y
 X855	X85.5 Neurodegenerative condition drugs Band 1	9407	9402	Y
+X856	X85.6 Neuromuscular disorder drugs Band 1	11235	9402	Y
 X858	X85.8 Other specified high cost neurology drugs	9408	9402	Y
 X859	X85.9 Unspecified high cost neurology drugs	9409	9402	Y
 X86	X86 High cost anti-infective drugs	9410	23	N
@@ -9524,6 +9831,7 @@ Y052	Y05.2 Partial excision of organ NOC	9522	9520	Y
 Y053	Y05.3 Excision of sinus track from organ NOC	9523	9520	Y
 Y054	Y05.4 Ex vivo resection of organ NOC	9524	9520	Y
 Y055	Y05.5 Debridement of organ NOC	9525	9520	Y
+Y056	Y05.6 Enucleation of organ NOC	11236	9520	Y
 Y058	Y05.8 Other specified excision of organ NOC	9526	9520	Y
 Y059	Y05.9 Unspecified excision of organ NOC	9527	9520	Y
 Y06	Y06 Excision of lesion of organ NOC	9528	24	N
@@ -9561,6 +9869,8 @@ Y099	Y09.9 Unspecified chemical destruction of organ NOC	9559	9555	Y
 Y10	Y10 Destruction of organ NOC	9560	24	N
 Y101	Y10.1 Coblation of organ NOC	9561	9560	Y
 Y102	Y10.2 Electrocauterisation of organ NOC	9562	9560	Y
+Y103	Y10.3 Steam ablation of organ NOC	11237	9560	Y
+Y104	Y10.4 Vapourisation of organ NOC	11238	9560	Y
 Y108	Y10.8 Other specified destruction of organ NOC	9563	9560	Y
 Y109	Y10.9 Unspecified destruction of organ NOC	9564	9560	Y
 Y11	Y11 Other destruction of organ NOC	9565	24	N
@@ -9616,6 +9926,10 @@ Y168	Y16.8 Other specified connection of organ NOC	9614	9610	Y
 Y169	Y16.9 Unspecified connection of organ NOC	9615	9610	Y
 Y17	Y17 Destruction of lesion of organ NOC	9616	24	N
 Y171	Y17.1 Electrocauterisation of lesion of organ NOC	9617	9616	Y
+Y172	Y17.2 Morcellation of lesion of organ NOC	11239	9616	Y
+Y173	Y17.3 Lithotripsy of lesion of organ NOC	11240	9616	Y
+Y174	Y17.4 Vapourisation of lesion of organ NOC	11241	9616	Y
+Y175	Y17.5 Steam ablation of lesion of organ NOC	11242	9616	Y
 Y178	Y17.8 Other specified	9618	9616	Y
 Y179	Y17.9 Unspecified	9619	9616	Y
 Y18	Y18 Release of organ NOC	9620	24	N
@@ -9629,6 +9943,7 @@ Y203	Y20.3 Biopsy of lesion of organ NOC	9627	9624	Y
 Y204	Y20.4 Fine needle aspiration NOC	9628	9624	Y
 Y205	Y20.5 Percutaneous biopsy NOC	9629	9624	Y
 Y206	Y20.6 Plugged biopsy NOC	9630	9624	Y
+Y207	Y20.7 Vacuum biopsy of lesion of organ NOC	11243	9624	Y
 Y208	Y20.8 Other specified biopsy of organ NOC	9631	9624	Y
 Y209	Y20.9 Unspecified biopsy of organ NOC	9632	9624	Y
 Y21	Y21 Cytology of organ NOC	9633	24	N
@@ -9660,6 +9975,8 @@ Y262	Y26.2 Plastic repair of organ NOC	9658	9656	Y
 Y263	Y26.3 Stapling of organ NOC	9659	9656	Y
 Y264	Y26.4 Removal of other repair material from organ NOC	9660	9656	Y
 Y265	Y26.5 Other attention to repair of organ NOC	9661	9656	Y
+Y266	Y26.6 Partial removal of mesh from organ NOC	11244	9656	Y
+Y267	Y26.7 Total removal of mesh from organ NOC	11245	9656	Y
 Y268	Y26.8 Other specified other repair of organ NOC	9662	9656	Y
 Y269	Y26.9 Unspecified other repair of organ NOC	9663	9656	Y
 Y27	Y27 Graft to organ NOC	9664	24	N
@@ -9671,6 +9988,13 @@ Y275	Y27.5 Vein graft NOC	9669	9664	Y
 Y276	Y27.6 Prosthetic graft NOC	9670	9664	Y
 Y278	Y27.8 Other specified graft to organ NOC	9671	9664	Y
 Y279	Y27.9 Unspecified graft to organ NOC	9672	9664	Y
+Y28	Y28 Insertion of other material into organ NOC	11246	24	N
+Y281	Y28.1 Insertion of synthetic mesh into organ NOC	11247	11246	Y
+Y282	Y28.2 Insertion of biological mesh into organ NOC	11248	11246	Y
+Y283	Y28.3 Insertion of composite mesh into organ NOC	11249	11246	Y
+Y284	Y28.4 Insertion of mesh into organ NOC	11250	11246	Y
+Y288	Y28.8 Other specified insertion of other material into organ NOC	11251	11246	Y
+Y289	Y28.9 Unspecified insertion of other material into organ NOC	11252	11246	Y
 Y29	Y29 Removal of foreign body from organ NOC	9673	24	N
 Y291	Y29.1 Surgical removal of foreign body from organ NOC	9674	9673	Y
 Y292	Y29.2 Manipulative removal of foreign body from organ NOC	9675	9673	Y
@@ -9700,6 +10024,7 @@ Y351	Y35.1 Introduction of radioactive caesium into organ NOC	9698	9697	Y
 Y352	Y35.2 Introduction of iridium wire into organ NOC	9699	9697	Y
 Y353	Y35.3 Introduction of radium into organ NOC	9700	9697	Y
 Y354	Y35.4 Introduction of radioactive substance into organ for brachytherapy NOC	9701	9697	Y
+Y355	Y35.5 Insertion of radioactive marker into organ NOC	11253	9697	Y
 Y358	Y35.8 Other specified introduction of removable radioactive material into organ NOC	9702	9697	Y
 Y359	Y35.9 Unspecified introduction of removable radioactive material into organ NOC	9703	9697	Y
 Y36	Y36 Introduction of non-removable material into organ NOC	9704	24	N
@@ -9707,10 +10032,16 @@ Y361	Y36.1 Introduction of gold seeds into organ NOC	9705	9704	Y
 Y362	Y36.2 Introduction of therapeutic implant into organ NOC	9706	9704	Y
 Y363	Y36.3 Radioactive seed implantation NOC	9707	9704	Y
 Y364	Y36.4 Introduction of non-removable radioactive substance into organ for brachytherapy NOC	9708	9704	Y
+Y365	Y36.5 Introduction of biological scaffold into organ NOC	11254	9704	Y
+Y366	Y36.6 Introduction of synthetic scaffold into organ NOC	11255	9704	Y
+Y367	Y36.7 Introduction of other scaffold into organ NOC	11256	9704	Y
 Y368	Y36.8 Other specified introduction of non-removable material into organ NOC	9709	9704	Y
 Y369	Y36.9 Unspecified introduction of non-removable material into organ NOC	9710	9704	Y
 Y37	Y37 Introduction of other substance into organ NOC	9711	24	N
 Y371	Y37.1 Introduction of photodynamic substance into organ NOC	9712	9711	Y
+Y372	Y37.2 Introduction of substance into organ using drug-eluting balloon NOC	11257	9711	Y
+Y373	Y37.3 Insertion of wire marker into organ NOC	11258	9711	Y
+Y374	Y37.4 Insertion of marker into organ NOC	11259	9711	Y
 Y378	Y37.8 Other specified introduction of other substance into organ NOC	9713	9711	Y
 Y379	Y37.9 Unspecified introduction of other substance into organ NOC	9714	9711	Y
 Y38	Y38 Injection of therapeutic substance into organ NOC	9715	24	N
@@ -9748,6 +10079,11 @@ Y443	Y44.3 Temporary occlusion of organ NOC	9746	9743	Y
 Y444	Y44.4 Removal of calculus from organ NOC	9747	9743	Y
 Y448	Y44.8 Other specified other methods of operation on organ NOC	9748	9743	Y
 Y449	Y44.9 Unspecified other methods of operation on organ NOC	9749	9743	Y
+Y45	Y45 Approach to organ under other control	11260	24	N
+Y451	Y45.1 Approach to organ under electromyography control	11261	11260	Y
+Y452	Y45.2 Approach to organ under robotic control NEC	11262	11260	Y
+Y458	Y45.8 Other specified approach to organ under other control	11263	11260	Y
+Y459	Y45.9 Unspecified approach to organ under other control	11264	11260	Y
 Y46	Y46 Open approach to contents of cranium	9750	24	N
 Y461	Y46.1 Trans-sphenoidal open approach to contents of cranium	9751	9750	Y
 Y462	Y46.2 Frontal open approach to contents of cranium	9752	9750	Y
@@ -9913,6 +10249,10 @@ Y671	Y67.1 Harvest of composite of skin and cartilage from ear	9911	9910	Y
 Y672	Y67.2 Harvest of composite of skin and fat	9912	9910	Y
 Y678	Y67.8 Other specified harvest of other multiple tissue	9913	9910	Y
 Y679	Y67.9 Unspecified harvest of other multiple tissue	9914	9910	Y
+Y68	Y68 Other approach to organ under image control	11265	24	N
+Y681	Y68.1 Approach to organ under contrast enhanced ultrasonic control	11266	11265	Y
+Y688	Y68.8 Other specified other approach to organ under image control	11267	11265	Y
+Y689	Y68.9 Unspecified other approach to organ under image control	11268	11265	Y
 Y69	Y69 Harvest of other tissue	9915	24	N
 Y691	Y69.1 Harvest of omentum	9916	9915	Y
 Y692	Y69.2 Harvest of cartilage from ear	9917	9915	Y
@@ -9945,6 +10285,7 @@ Y733	Y73.3 Ventilatory support	9943	9940	Y
 Y734	Y73.4 Modified ultrafiltration adjunct to cardiopulmonary bypass	9944	9940	Y
 Y735	Y73.5 Circulatory arrest	9945	9940	Y
 Y736	Y73.6 Intraoperative fluid monitoring	9946	9940	Y
+Y737	Y73.7 Ex utero intrapartum approach to fetus	11269	9940	Y
 Y738	Y73.8 Other specified facilitating operations NOC	9947	9940	Y
 Y739	Y73.9 Unspecified facilitating operations NOC	9948	9940	Y
 Y74	Y74 Minimal access to thoracic cavity	9949	24	N
@@ -9987,6 +10328,7 @@ Y791	Y79.1 Transluminal approach to organ through subclavian artery	9985	9984	Y
 Y792	Y79.2 Transluminal approach to organ through brachial artery	9986	9984	Y
 Y793	Y79.3 Transluminal approach to organ through femoral artery	9987	9984	Y
 Y794	Y79.4 Transluminal approach to organ through aortic artery	9988	9984	Y
+Y795	Y79.5 Transluminal approach to organ through radial artery	11270	9984	Y
 Y798	Y79.8 Other specified approach to organ through artery	9989	9984	Y
 Y799	Y79.9 Unspecified approach to organ through artery	9990	9984	Y
 Y80	Y80 General anaesthetic	9991	24	N
@@ -10032,6 +10374,8 @@ Y912	Y91.2 Megavoltage treatment for simple radiotherapy	10030	10028	Y
 Y913	Y91.3 Superficial or orthovoltage treatment for radiotherapy	10031	10028	Y
 Y914	Y91.4 Megavoltage treatment for adaptive radiotherapy	10032	10028	Y
 Y915	Y91.5 Megavoltage treatment for hypofractionated stereotactic radiotherapy	10033	10028	Y
+Y916	Y91.6 Intraoperative electron beam radiotherapy	11271	10028	Y
+Y917	Y91.7 Electron beam radiotherapy NEC	11272	10028	Y
 Y918	Y91.8 Other specified external beam radiotherapy	10034	10028	Y
 Y919	Y91.9 Unspecified external beam radiotherapy	10035	10028	Y
 Y92	Y92 Support for preparation for radiotherapy	10036	24	N
@@ -10213,6 +10557,7 @@ Z153	Z15.3 Lower inner quadrant of breast	10211	10208	Y
 Z154	Z15.4 Lower outer quadrant of breast	10212	10208	Y
 Z155	Z15.5 Axillary tail of breast	10213	10208	Y
 Z156	Z15.6 Nipple	10214	10208	Y
+Z157	Z15.7 Areola	11273	10208	Y
 Z158	Z15.8 Specified breast NEC	10215	10208	Y
 Z159	Z15.9 Breast NEC	10216	10208	Y
 Z16	Z16 External structure of eye	10217	25	N
@@ -10419,6 +10764,7 @@ Z383	Z38.3 Common femoral artery	10417	10414	Y
 Z384	Z38.4 Deep femoral artery	10418	10414	Y
 Z385	Z38.5 Superficial femoral artery	10419	10414	Y
 Z386	Z38.6 Popliteal artery	10420	10414	Y
+Z387	Z38.7 Prostate artery	11274	10414	Y
 Z388	Z38.8 Specified terminal branch of aorta NEC	10421	10414	Y
 Z389	Z38.9 Terminal branch of aorta NEC	10422	10414	Y
 Z39	Z39 Vein	10423	25	N
@@ -10474,6 +10820,7 @@ Z443	Z44.3 Vulva	10472	10469	Y
 Z444	Z44.4 Female perineum	10473	10469	Y
 Z445	Z44.5 Introitus of vagina	10474	10469	Y
 Z446	Z44.6 Pouch of Douglas	10475	10469	Y
+Z447	Z44.7 Labia	11275	10469	Y
 Z448	Z44.8 Specified vagina NEC	10476	10469	Y
 Z449	Z44.9 Vagina NEC	10477	10469	Y
 Z45	Z45 Uterus	10478	25	N
@@ -10540,6 +10887,7 @@ Z533	Z53.3 Peritoneum	10538	10535	Y
 Z534	Z53.4 Peritoneal cavity	10539	10535	Y
 Z535	Z53.5 Omentum	10540	10535	Y
 Z536	Z53.6 Mesentery	10541	10535	Y
+Z537	Z53.7 Abdominal cavity	11276	10535	Y
 Z538	Z53.8 Specified abdominal wall NEC	10542	10535	Y
 Z539	Z53.9 Abdominal wall NEC	10543	10535	Y
 Z54	Z54 Muscle of shoulder or upper arm	10544	25	N
@@ -10699,6 +11047,7 @@ Z721	Z72.1 Shafts of radius and ulna in combination	10697	10696	Y
 Z722	Z72.2 Scaphoid bone	10698	10696	Y
 Z723	Z72.3 Lunate	10699	10696	Y
 Z724	Z72.4 Carpal bone	10700	10696	Y
+Z725	Z72.5 Trapezium	11277	10696	Y
 Z728	Z72.8 Specified bone of arm or wrist NEC	10701	10696	Y
 Z729	Z72.9 Bone of arm or wrist NEC	10702	10696	Y
 Z73	Z73 Other bone of hand	10703	25	N
@@ -10706,6 +11055,7 @@ Z731	Z73.1 First metacarpal	10704	10703	Y
 Z732	Z73.2 Metacarpal NEC	10705	10703	Y
 Z733	Z73.3 Phalanx of thumb	10706	10703	Y
 Z734	Z73.4 Phalanx of finger	10707	10703	Y
+Z735	Z73.5 Multiple metacarpals	11278	10703	Y
 Z738	Z73.8 Specified bone of hand NEC	10708	10703	Y
 Z739	Z73.9 Bone of hand NEC	10709	10703	Y
 Z74	Z74 Rib cage	10710	25	N
@@ -10733,6 +11083,7 @@ Z762	Z76.2 Neck of femur	10731	10729	Y
 Z763	Z76.3 Trochanter of femur	10732	10729	Y
 Z764	Z76.4 Shaft of femur	10733	10729	Y
 Z765	Z76.5 Lower end of femur NEC	10734	10729	Y
+Z766	Z76.6 Trochlear surface of femur	11279	10729	Y
 Z768	Z76.8 Specified femur NEC	10735	10729	Y
 Z769	Z76.9 Femur NEC	10736	10729	Y
 Z77	Z77 Tibia	10737	25	N
@@ -10766,6 +11117,7 @@ Z801	Z80.1 First metatarsal	10764	10763	Y
 Z802	Z80.2 Metatarsal NEC	10765	10763	Y
 Z803	Z80.3 Phalanx of great toe	10766	10763	Y
 Z804	Z80.4 Phalanx of toe NEC	10767	10763	Y
+Z805	Z80.5 Multiple metatarsals	11280	10763	Y
 Z808	Z80.8 Specified bone of foot NEC	10768	10763	Y
 Z809	Z80.9 Bone of foot NEC	10769	10763	Y
 Z81	Z81 Joint of shoulder girdle or arm	10770	25	N
@@ -10828,6 +11180,12 @@ Z873	Z87.3 Capsule of joint	10826	10823	Y
 Z874	Z87.4 Joint NEC	10827	10823	Y
 Z878	Z87.8 Specified part of musculoskeletal system NEC	10828	10823	Y
 Z879	Z87.9 Musculoskeletal system NEC	10829	10823	Y
+Z88	Z88 Respiratory tract	11281	25	N
+Z881	Z88.1 Hyoid	11282	11281	Y
+Z882	Z88.2 Epiglottis	11283	11281	Y
+Z883	Z88.3 Glottis	11284	11281	Y
+Z888	Z88.8 Specified respiratory tract NEC	11285	11281	Y
+Z889	Z88.9 Respiratory tract NEC	11286	11281	Y
 Z89	Z89 Arm region	10830	25	N
 Z891	Z89.1 Shoulder NEC	10831	10830	Y
 Z892	Z89.2 Upper arm NEC	10832	10830	Y
@@ -10854,6 +11212,8 @@ Z912	Z91.2 Brachiocephalic vein	10852	10850	Y
 Z913	Z91.3 Brachial vein	10853	10850	Y
 Z914	Z91.4 Subclavian vein	10854	10850	Y
 Z915	Z91.5 Axillary vein	10855	10850	Y
+Z916	Z91.6 Basilic vein	11287	10850	Y
+Z917	Z91.7 Jugular vein	11288	10850	Y
 Z918	Z91.8 Specified vein of upper body NEC	10856	10850	Y
 Z919	Z91.9 Vein of upper body NEC	10857	10850	Y
 Z92	Z92 Other region of body	10858	25	N

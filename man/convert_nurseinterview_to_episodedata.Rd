@@ -10,7 +10,8 @@ convert_nurseinterview_to_episodedata(
   field_sr_date = "20008",
   field_sr_date_type = "interpolated_year",
   qc_threshold_year = 10,
-  event_code = 2
+  event_code = 2,
+  codetype = "numeric"
 )
 }
 \arguments{

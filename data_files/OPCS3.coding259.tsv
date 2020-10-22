@@ -1,194 +1,194 @@
 coding	meaning	node_id	parent_id	selectable
-001	001 Craniotomy, not elsewhere classified	16	1	Y
-0011	001.1 Craniotomy, not elsewhere classified : burr-hole	17	1	Y
-0012	001.2 Craniotomy, not elsewhere classified : trephine	18	1	Y
-0014	001.4 Craniotomy, not elsewhere classified : puncture of brain	19	1	Y
-004	004 Excision of lesion of skull	20	1	Y
-005	005 Cranioplasty	21	1	Y
-0051	005.1 Cranioplasty : natural material	22	1	Y
-0052	005.2 Cranioplasty : inert material	23	1	Y
-0053	005.3 Cranioplasty : opening of sutures	24	1	Y
-0054	005.4 Cranioplasty : restoration of orbital region	25	1	Y
-007	007 Repair of cerebral meninges	26	1	Y
-0071	007.1 Repair of cerebral meninges : lamina cribrosa fistula	27	1	Y
-0072	007.2 Repair of cerebral meninges : meningo encephalocele	28	1	Y
-008	008 Ventricular puncture and anastomosis	29	1	Y
-0081	008.1 Ventricular puncture and anastomosis : drainage	30	1	Y
-0083	008.3 Ventricular puncture and anastomosis : ventriculo-cisternostomy	31	1	Y
-0084	008.4 Ventricular puncture and anastomosis : ventriculo-vascular anastomosis	32	1	Y
-0085	008.5 Ventricular puncture and anastomosis : subcutaneous reservoir	33	1	Y
-009	009 Other operations on skull and meninges	34	1	Y
-0091	009.1 Other operations on skull and meninges : biopsy	35	1	Y
-0092	009.2 Other operations on skull and meninges : fractured skull	36	1	Y
-0095	009.5 Other operations on skull and meninges : meningeal lesion	37	1	Y
-0096	009.6 Other operations on skull and meninges : removal of foreign body	38	1	Y
-013	013 Operations on thalamus and globus pallidus	39	1	Y
-014	014 Other division or destruction of brain tissue	40	1	Y
-015	015 Ventriculography	41	1	Y
-016	016 Revision or irrigation of ventricular shunt	42	1	Y
-017	017 Cranial puncture, not elsewhere classified	43	1	Y
-0171	017.1 Cranial puncture, not elsewhere classified : needle biopsy of brain	44	1	Y
-0172	017.2 Cranial puncture, not elsewhere classified : aspiration (brain substance, abscess)	45	1	Y
-018	018 Cisternal puncture	46	1	Y
-020	020 Laminotomy and laminectomy	47	1	Y
-0201	020.1 Laminotomy and laminectomy : laminotomy	48	1	Y
-0202	020.2 Laminotomy and laminectomy : excision of bone (tumour)	49	1	Y
-0203	020.3 Laminotomy and laminectomy : elevation of depressed bone	50	1	Y
-0204	020.4 Laminotomy and laminectomy : drainage (abscess, haematoma)	51	1	Y
-0205	020.5 Laminotomy and laminectomy : opening of dura, decompression	52	1	Y
-0206	020.6 Laminotomy and laminectomy : biopsy of bone	53	1	Y
-021	021 Open reduction of fracture of spine	54	1	Y
-0211	021.1 Open reduction of fracture of spine : with fixation	55	1	Y
-022	022 Spinal fusion and bone operation	56	1	Y
-0221	022.1 Spinal fusion and bone operation : bone graft	57	1	Y
-0222	022.2 Spinal fusion and bone operation : arthroplasty of spine	58	1	Y
-023	023 Operation on intervertebral disc, not elsewhere classified	59	1	Y
-0231	023.1 Operation on intervertebral disc, not elsewhere classified : excision	60	1	Y
-0232	023.2 Operation on intervertebral disc, not elsewhere classified : with radiculotomy	61	1	Y
-0233	023.3 Operation on intervertebral disc, not elsewhere classified : with bone graft	62	1	Y
-0234	023.4 Operation on intervertebral disc, not elsewhere classified : exploration	63	1	Y
-024	024 Section of intraspinal nerve roots	64	1	Y
-0241	024.1 Section of intraspinal nerve roots : cauda equina	65	1	Y
-025	025 Division of cord or spinal tracts	66	1	Y
-026	026 Extirpation of intraspinal lesion	67	1	Y
-0261	026.1 Extirpation of intraspinal lesion : extramedullary	68	1	Y
-0262	026.2 Extirpation of intraspinal lesion : intradedullary	69	1	Y
-0263	026.3 Extirpation of intraspinal lesion : extrusion technique	70	1	Y
-027	027 Repair of spinal cord and meninges	71	1	Y
-0275	027.5 Repair of spinal cord and meninges : freeing of adhesions	72	1	Y
-028	028 Spinal puncture	73	1	Y
-0281	028.1 Spinal puncture : spinal myelography	74	1	Y
-0282	028.2 Spinal puncture : injection of destructive agent	75	1	Y
-0283	028.3 Spinal puncture : drainage	76	1	Y
-0284	028.4 Spinal puncture : manometry	77	1	Y
-0285	028.5 Spinal puncture : diagnostic, not elsewhere classified	78	1	Y
-0286	028.6 Spinal puncture : cauda equine block	79	1	Y
-029	029 Other operation on spine and contents	80	1	Y
-0291	029.1 Other operation on spine and contents : biopsy of cord or meninges	81	1	Y
-0292	029.2 Other operation on spine and contents : removal of foreign body	82	1	Y
-0293	029.3 Other operation on spine and contents : operation for spinal deformity	83	1	Y
-0295	029.5 Other operation on spine and contents : aspiration (cyst, abscess)	84	1	Y
-0296	029.6 Other operation on spine and contents : neuropacemaker, insertion	85	1	Y
-032	032 Decompression of cranial nerve	86	1	Y
-034	034 Injection of cranial nerve or ganglion	87	1	Y
-0342	034.2 Injection of cranial nerve or ganglion : destructive	88	1	Y
-035	035 Other operations on cranial nerves and ganglia	89	1	Y
-0351	035.1 Other operations on cranial nerves and ganglia : avulsion	90	1	Y
-0352	035.2 Other operations on cranial nerves and ganglia : transection	91	1	Y
-0353	035.3 Other operations on cranial nerves and ganglia : ganglionectomy	92	1	Y
-0355	035.5 Other operations on cranial nerves and ganglia : repair or anastomosis	93	1	Y
-036	036 Sympathectomy	94	1	Y
-0361	036.1 Sympathectomy : cervical	95	1	Y
-0362	036.2 Sympathectomy : stellate	96	1	Y
-0363	036.3 Sympathectomy : lumbar	97	1	Y
-0364	036.4 Sympathectomy : splanchnic, presacral	98	1	Y
-037	037 Injection into sympathetic nerve or ganglion	99	1	Y
-0372	037.2 Injection into sympathetic nerve or ganglion : destructive	100	1	Y
-0373	037.3 Injection into sympathetic nerve or ganglion : para cervical	101	1	Y
-039	039 Other operation on autonomic nervous system	102	1	Y
-0391	039.1 Other operation on autonomic nervous system : biopsy	103	1	Y
-0392	039.2 Other operation on autonomic nervous system : extirpation	104	1	Y
-0393	039.3 Other operation on autonomic nervous system : periaterial sympathetic	105	1	Y
-040	040 Neurectomy and neurotomy	106	1	Y
-0401	040.1 Neurectomy and neurotomy : biopsy	107	1	Y
-0402	040.2 Neurectomy and neurotomy : excision	108	1	Y
-0403	040.3 Neurectomy and neurotomy : section	109	1	Y
-041	041 Decompression of nerve	110	1	Y
-0411	041.1 Decompression of nerve : carpel tunnel	111	1	Y
-0412	041.2 Decompression of nerve : tarsal tunnel	112	1	Y
-043	043 Freeing of adhesions	113	1	Y
-0431	043.1 Freeing of adhesions : exploration, not elsewhere classified	114	1	Y
-045	045 Extirpation of lesion of peripheral nerve	115	1	Y
-046	046 Neuroplasty and neurorrhaphy	116	1	Y
-0461	046.1 Neuroplasty and neurorrhaphy : anastomosis	117	1	Y
-0462	046.2 Neuroplasty and neurorrhaphy : suture	118	1	Y
-0463	046.3 Neuroplasty and neurorrhaphy : transposition	119	1	Y
-048	048 Injection of peripheral nerve	120	1	Y
-0481	048.1 Injection of peripheral nerve : destructive	121	1	Y
-049	049 Other operations on peripheral nerves	122	1	Y
-0492	049.2 Other operations on peripheral nerves : removal of foreign body	123	1	Y
-052	052 Operations on vessels of brain	124	1	Y
-0521	052.1 Operations on vessels of brain : clip or ligation	125	1	Y
-0522	052.2 Operations on vessels of brain : other operations on aneurysm nec	126	1	Y
-0523	052.3 Operations on vessels of brain : excision	127	1	Y
-053	053 Evacuation of haematoma or cyst	128	1	Y
-0531	053.1 Evacuation of haematoma or cyst : subdural	129	1	Y
-0532	053.2 Evacuation of haematoma or cyst : temporal lobe	130	1	Y
-0533	053.3 Evacuation of haematoma or cyst : extradural	131	1	Y
-054	054 Infective lesion of brain	132	1	Y
-0541	054.1 Infective lesion of brain : drainage of abscess	133	1	Y
-055	055 Excision of intracranial lesion	134	1	Y
-0552	055.2 Excision of intracranial lesion : trans-sphenoidal	135	1	Y
-0553	055.3 Excision of intracranial lesion : infra-tentorial approach	136	1	Y
-0554	055.4 Excision of intracranial lesion : frontal approach	137	1	Y
-0555	055.5 Excision of intracranial lesion : cortical excision	138	1	Y
-0556	055.6 Excision of intracranial lesion : hernia	139	1	Y
-057	057 Biopsy of brain	140	1	Y
-059	059 Intracranial operations, not elsewhere classified	141	1	Y
-0591	059.1 Intracranial operations, not elsewhere classified : exploration	142	1	Y
-061	061 Hypophysectomy	143	2	Y
-0611	061.1 Hypophysectomy : paranasal trans-sphenoidal	144	2	Y
-0612	061.2 Hypophysectomy : intracranial trans-frontal	145	2	Y
-062	062 Destruction of pituitary gland or lesion	146	2	Y
-063	063 Other operations related to pituitary or pineal gland	147	2	Y
-0631	063.1 Other operations related to pituitary or pineal gland : pituitary stalk	148	2	Y
-0633	063.3 Other operations related to pituitary or pineal gland : pineal	149	2	Y
-065	065 Partial adrenalectomy	150	2	Y
-066	066 Excision of adrenal gland, not otherwise classified	151	2	Y
-067	067 Bilateral adrenalectomy	152	2	Y
-068	068 Bilateral adrenalectomy and oophorectomy	153	2	Y
-069	069 Other operations on adrenal gland	154	2	Y
-0691	069.1 Other operations on adrenal gland : biopsy	155	2	Y
-070	070 Incision of thyroid field	156	2	Y
-071	071 Partial thyroidectomy	157	2	Y
-0711	071.1 Partial thyroidectomy : biopsy	158	2	Y
-0712	071.2 Partial thyroidectomy : nodule	159	2	Y
-0713	071.3 Partial thyroidectomy : isthmectomy	160	2	Y
-0714	071.4 Partial thyroidectomy : isthmectomy	161	2	Y
-0715	071.5 Partial thyroidectomy : lobectomy	162	2	Y
-0716	071.6 Partial thyroidectomy : hemithyroidectomy	163	2	Y
-072	072 Thyroidectomy, not elsewhere classified	164	2	Y
-0721	072.1 Thyroidectomy, not elsewhere classified : total thyroidectomy	165	2	Y
-0722	072.2 Thyroidectomy, not elsewhere classified : with wide block dissection	166	2	Y
-074	074 Thyroidectomy of aberrant thyroid	167	2	Y
-0741	074.1 Thyroidectomy of aberrant thyroid : substernal thyroid	168	2	Y
-075	075 Other operations on thyroid gland	169	2	Y
-0751	075.1 Other operations on thyroid gland : biopsy, retrosternal	170	2	Y
-076	076 Operations on parathyroid glands	171	2	Y
-0761	076.1 Operations on parathyroid glands : biopsy	172	2	Y
-0763	076.3 Operations on parathyroid glands : partial parathyroidectomy	173	2	Y
-0764	076.4 Operations on parathyroid glands : global parathyroidectomy	174	2	Y
-0765	076.5 Operations on parathyroid glands : transplant	175	2	Y
-077	077 Thymectomy	176	2	Y
-078	078 Other operations on thymus	177	2	Y
-079	079 Other glandular operations, not elsewhere classified	178	2	Y
-0792	079.2 Other glandular operations, not elsewhere classified : carotid body	179	2	Y
-0793	079.3 Other glandular operations, not elsewhere classified : other vascular bodies	180	2	Y
-0794	079.4 Other glandular operations, not elsewhere classified : aortic bodies	181	2	Y
-080	080 Excision of cervical lymph nodes	182	2	Y
-0801	080.1 Excision of cervical lymph nodes : biopsy (scalene node)	183	2	Y
-0802	080.2 Excision of cervical lymph nodes : block dissection	184	2	Y
-0803	080.3 Excision of cervical lymph nodes : radical cervical	185	2	Y
-0806	080.6 Excision of cervical lymph nodes : simple excision	186	2	Y
-081	081 Removal of cervical rib	187	2	Y
-082	082 Operations on arteries in neck, not elsewhere classified	188	2	Y
-0822	082.2 Operations on arteries in neck, not elsewhere classified : embolectomy	189	2	Y
-0823	082.3 Operations on arteries in neck, not elsewhere classified : resection with graft	190	2	Y
-0824	082.4 Operations on arteries in neck, not elsewhere classified : bypass graft	191	2	Y
-0825	082.5 Operations on arteries in neck, not elsewhere classified : implantation of graft	192	2	Y
-0826	082.6 Operations on arteries in neck, not elsewhere classified : resection with reanastomosis	193	2	Y
-0827	082.7 Operations on arteries in neck, not elsewhere classified : suture of vessel	194	2	Y
-083	083 Perfusion of head and neck	195	2	Y
-084	084 Cerebral arteriography	196	2	Y
-085	085 Excision of cyst or fistula	197	2	Y
-0851	085.1 Excision of cyst or fistula : incision thyroglossal tract or duct	198	2	Y
-0852	085.2 Excision of cyst or fistula : excision thyroglossal tract or duct	199	2	Y
-0853	085.3 Excision of cyst or fistula : incision branchial cleft, sinus or fistula	200	2	Y
-0854	085.4 Excision of cyst or fistula : excision branchial cleft, sinus or fistula	201	2	Y
-089	089 Other operations in neck region, not elsewhere classified	202	2	Y
-0891	089.1 Other operations in neck region, not elsewhere classified : drainage of abscess	203	2	Y
-0892	089.2 Other operations in neck region, not elsewhere classified : ligation of vein venous anastomsis	204	2	Y
-0893	089.3 Other operations in neck region, not elsewhere classified : catheterization of vessel, not elsewhere	205	2	Y
+1	001 Craniotomy, not elsewhere classified	16	1	Y
+11	001.1 Craniotomy, not elsewhere classified : burr-hole	17	1	Y
+12	001.2 Craniotomy, not elsewhere classified : trephine	18	1	Y
+14	001.4 Craniotomy, not elsewhere classified : puncture of brain	19	1	Y
+4	004 Excision of lesion of skull	20	1	Y
+5	005 Cranioplasty	21	1	Y
+51	005.1 Cranioplasty : natural material	22	1	Y
+52	005.2 Cranioplasty : inert material	23	1	Y
+53	005.3 Cranioplasty : opening of sutures	24	1	Y
+54	005.4 Cranioplasty : restoration of orbital region	25	1	Y
+7	007 Repair of cerebral meninges	26	1	Y
+71	007.1 Repair of cerebral meninges : lamina cribrosa fistula	27	1	Y
+72	007.2 Repair of cerebral meninges : meningo encephalocele	28	1	Y
+8	008 Ventricular puncture and anastomosis	29	1	Y
+81	008.1 Ventricular puncture and anastomosis : drainage	30	1	Y
+83	008.3 Ventricular puncture and anastomosis : ventriculo-cisternostomy	31	1	Y
+84	008.4 Ventricular puncture and anastomosis : ventriculo-vascular anastomosis	32	1	Y
+85	008.5 Ventricular puncture and anastomosis : subcutaneous reservoir	33	1	Y
+9	009 Other operations on skull and meninges	34	1	Y
+91	009.1 Other operations on skull and meninges : biopsy	35	1	Y
+92	009.2 Other operations on skull and meninges : fractured skull	36	1	Y
+95	009.5 Other operations on skull and meninges : meningeal lesion	37	1	Y
+96	009.6 Other operations on skull and meninges : removal of foreign body	38	1	Y
+13	013 Operations on thalamus and globus pallidus	39	1	Y
+14	014 Other division or destruction of brain tissue	40	1	Y
+15	015 Ventriculography	41	1	Y
+16	016 Revision or irrigation of ventricular shunt	42	1	Y
+17	017 Cranial puncture, not elsewhere classified	43	1	Y
+171	017.1 Cranial puncture, not elsewhere classified : needle biopsy of brain	44	1	Y
+172	017.2 Cranial puncture, not elsewhere classified : aspiration (brain substance, abscess)	45	1	Y
+18	018 Cisternal puncture	46	1	Y
+20	020 Laminotomy and laminectomy	47	1	Y
+201	020.1 Laminotomy and laminectomy : laminotomy	48	1	Y
+202	020.2 Laminotomy and laminectomy : excision of bone (tumour)	49	1	Y
+203	020.3 Laminotomy and laminectomy : elevation of depressed bone	50	1	Y
+204	020.4 Laminotomy and laminectomy : drainage (abscess, haematoma)	51	1	Y
+205	020.5 Laminotomy and laminectomy : opening of dura, decompression	52	1	Y
+206	020.6 Laminotomy and laminectomy : biopsy of bone	53	1	Y
+21	021 Open reduction of fracture of spine	54	1	Y
+211	021.1 Open reduction of fracture of spine : with fixation	55	1	Y
+22	022 Spinal fusion and bone operation	56	1	Y
+221	022.1 Spinal fusion and bone operation : bone graft	57	1	Y
+222	022.2 Spinal fusion and bone operation : arthroplasty of spine	58	1	Y
+23	023 Operation on intervertebral disc, not elsewhere classified	59	1	Y
+231	023.1 Operation on intervertebral disc, not elsewhere classified : excision	60	1	Y
+232	023.2 Operation on intervertebral disc, not elsewhere classified : with radiculotomy	61	1	Y
+233	023.3 Operation on intervertebral disc, not elsewhere classified : with bone graft	62	1	Y
+234	023.4 Operation on intervertebral disc, not elsewhere classified : exploration	63	1	Y
+24	024 Section of intraspinal nerve roots	64	1	Y
+241	024.1 Section of intraspinal nerve roots : cauda equina	65	1	Y
+25	025 Division of cord or spinal tracts	66	1	Y
+26	026 Extirpation of intraspinal lesion	67	1	Y
+261	026.1 Extirpation of intraspinal lesion : extramedullary	68	1	Y
+262	026.2 Extirpation of intraspinal lesion : intradedullary	69	1	Y
+263	026.3 Extirpation of intraspinal lesion : extrusion technique	70	1	Y
+27	027 Repair of spinal cord and meninges	71	1	Y
+275	027.5 Repair of spinal cord and meninges : freeing of adhesions	72	1	Y
+28	028 Spinal puncture	73	1	Y
+281	028.1 Spinal puncture : spinal myelography	74	1	Y
+282	028.2 Spinal puncture : injection of destructive agent	75	1	Y
+283	028.3 Spinal puncture : drainage	76	1	Y
+284	028.4 Spinal puncture : manometry	77	1	Y
+285	028.5 Spinal puncture : diagnostic, not elsewhere classified	78	1	Y
+286	028.6 Spinal puncture : cauda equine block	79	1	Y
+29	029 Other operation on spine and contents	80	1	Y
+291	029.1 Other operation on spine and contents : biopsy of cord or meninges	81	1	Y
+292	029.2 Other operation on spine and contents : removal of foreign body	82	1	Y
+293	029.3 Other operation on spine and contents : operation for spinal deformity	83	1	Y
+295	029.5 Other operation on spine and contents : aspiration (cyst, abscess)	84	1	Y
+296	029.6 Other operation on spine and contents : neuropacemaker, insertion	85	1	Y
+32	032 Decompression of cranial nerve	86	1	Y
+34	034 Injection of cranial nerve or ganglion	87	1	Y
+342	034.2 Injection of cranial nerve or ganglion : destructive	88	1	Y
+35	035 Other operations on cranial nerves and ganglia	89	1	Y
+351	035.1 Other operations on cranial nerves and ganglia : avulsion	90	1	Y
+352	035.2 Other operations on cranial nerves and ganglia : transection	91	1	Y
+353	035.3 Other operations on cranial nerves and ganglia : ganglionectomy	92	1	Y
+355	035.5 Other operations on cranial nerves and ganglia : repair or anastomosis	93	1	Y
+36	036 Sympathectomy	94	1	Y
+361	036.1 Sympathectomy : cervical	95	1	Y
+362	036.2 Sympathectomy : stellate	96	1	Y
+363	036.3 Sympathectomy : lumbar	97	1	Y
+364	036.4 Sympathectomy : splanchnic, presacral	98	1	Y
+37	037 Injection into sympathetic nerve or ganglion	99	1	Y
+372	037.2 Injection into sympathetic nerve or ganglion : destructive	100	1	Y
+373	037.3 Injection into sympathetic nerve or ganglion : para cervical	101	1	Y
+39	039 Other operation on autonomic nervous system	102	1	Y
+391	039.1 Other operation on autonomic nervous system : biopsy	103	1	Y
+392	039.2 Other operation on autonomic nervous system : extirpation	104	1	Y
+393	039.3 Other operation on autonomic nervous system : periaterial sympathetic	105	1	Y
+40	040 Neurectomy and neurotomy	106	1	Y
+401	040.1 Neurectomy and neurotomy : biopsy	107	1	Y
+402	040.2 Neurectomy and neurotomy : excision	108	1	Y
+403	040.3 Neurectomy and neurotomy : section	109	1	Y
+41	041 Decompression of nerve	110	1	Y
+411	041.1 Decompression of nerve : carpel tunnel	111	1	Y
+412	041.2 Decompression of nerve : tarsal tunnel	112	1	Y
+43	043 Freeing of adhesions	113	1	Y
+431	043.1 Freeing of adhesions : exploration, not elsewhere classified	114	1	Y
+45	045 Extirpation of lesion of peripheral nerve	115	1	Y
+46	046 Neuroplasty and neurorrhaphy	116	1	Y
+461	046.1 Neuroplasty and neurorrhaphy : anastomosis	117	1	Y
+462	046.2 Neuroplasty and neurorrhaphy : suture	118	1	Y
+463	046.3 Neuroplasty and neurorrhaphy : transposition	119	1	Y
+48	048 Injection of peripheral nerve	120	1	Y
+481	048.1 Injection of peripheral nerve : destructive	121	1	Y
+49	049 Other operations on peripheral nerves	122	1	Y
+492	049.2 Other operations on peripheral nerves : removal of foreign body	123	1	Y
+52	052 Operations on vessels of brain	124	1	Y
+521	052.1 Operations on vessels of brain : clip or ligation	125	1	Y
+522	052.2 Operations on vessels of brain : other operations on aneurysm nec	126	1	Y
+523	052.3 Operations on vessels of brain : excision	127	1	Y
+53	053 Evacuation of haematoma or cyst	128	1	Y
+531	053.1 Evacuation of haematoma or cyst : subdural	129	1	Y
+532	053.2 Evacuation of haematoma or cyst : temporal lobe	130	1	Y
+533	053.3 Evacuation of haematoma or cyst : extradural	131	1	Y
+54	054 Infective lesion of brain	132	1	Y
+541	054.1 Infective lesion of brain : drainage of abscess	133	1	Y
+55	055 Excision of intracranial lesion	134	1	Y
+552	055.2 Excision of intracranial lesion : trans-sphenoidal	135	1	Y
+553	055.3 Excision of intracranial lesion : infra-tentorial approach	136	1	Y
+554	055.4 Excision of intracranial lesion : frontal approach	137	1	Y
+555	055.5 Excision of intracranial lesion : cortical excision	138	1	Y
+556	055.6 Excision of intracranial lesion : hernia	139	1	Y
+57	057 Biopsy of brain	140	1	Y
+59	059 Intracranial operations, not elsewhere classified	141	1	Y
+591	059.1 Intracranial operations, not elsewhere classified : exploration	142	1	Y
+61	061 Hypophysectomy	143	2	Y
+611	061.1 Hypophysectomy : paranasal trans-sphenoidal	144	2	Y
+612	061.2 Hypophysectomy : intracranial trans-frontal	145	2	Y
+62	062 Destruction of pituitary gland or lesion	146	2	Y
+63	063 Other operations related to pituitary or pineal gland	147	2	Y
+631	063.1 Other operations related to pituitary or pineal gland : pituitary stalk	148	2	Y
+633	063.3 Other operations related to pituitary or pineal gland : pineal	149	2	Y
+65	065 Partial adrenalectomy	150	2	Y
+66	066 Excision of adrenal gland, not otherwise classified	151	2	Y
+67	067 Bilateral adrenalectomy	152	2	Y
+68	068 Bilateral adrenalectomy and oophorectomy	153	2	Y
+69	069 Other operations on adrenal gland	154	2	Y
+691	069.1 Other operations on adrenal gland : biopsy	155	2	Y
+70	070 Incision of thyroid field	156	2	Y
+71	071 Partial thyroidectomy	157	2	Y
+711	071.1 Partial thyroidectomy : biopsy	158	2	Y
+712	071.2 Partial thyroidectomy : nodule	159	2	Y
+713	071.3 Partial thyroidectomy : isthmectomy	160	2	Y
+714	071.4 Partial thyroidectomy : isthmectomy	161	2	Y
+715	071.5 Partial thyroidectomy : lobectomy	162	2	Y
+716	071.6 Partial thyroidectomy : hemithyroidectomy	163	2	Y
+72	072 Thyroidectomy, not elsewhere classified	164	2	Y
+721	072.1 Thyroidectomy, not elsewhere classified : total thyroidectomy	165	2	Y
+722	072.2 Thyroidectomy, not elsewhere classified : with wide block dissection	166	2	Y
+74	074 Thyroidectomy of aberrant thyroid	167	2	Y
+741	074.1 Thyroidectomy of aberrant thyroid : substernal thyroid	168	2	Y
+75	075 Other operations on thyroid gland	169	2	Y
+751	075.1 Other operations on thyroid gland : biopsy, retrosternal	170	2	Y
+76	076 Operations on parathyroid glands	171	2	Y
+761	076.1 Operations on parathyroid glands : biopsy	172	2	Y
+763	076.3 Operations on parathyroid glands : partial parathyroidectomy	173	2	Y
+764	076.4 Operations on parathyroid glands : global parathyroidectomy	174	2	Y
+765	076.5 Operations on parathyroid glands : transplant	175	2	Y
+77	077 Thymectomy	176	2	Y
+78	078 Other operations on thymus	177	2	Y
+79	079 Other glandular operations, not elsewhere classified	178	2	Y
+792	079.2 Other glandular operations, not elsewhere classified : carotid body	179	2	Y
+793	079.3 Other glandular operations, not elsewhere classified : other vascular bodies	180	2	Y
+794	079.4 Other glandular operations, not elsewhere classified : aortic bodies	181	2	Y
+80	080 Excision of cervical lymph nodes	182	2	Y
+801	080.1 Excision of cervical lymph nodes : biopsy (scalene node)	183	2	Y
+802	080.2 Excision of cervical lymph nodes : block dissection	184	2	Y
+803	080.3 Excision of cervical lymph nodes : radical cervical	185	2	Y
+806	080.6 Excision of cervical lymph nodes : simple excision	186	2	Y
+81	081 Removal of cervical rib	187	2	Y
+82	082 Operations on arteries in neck, not elsewhere classified	188	2	Y
+822	082.2 Operations on arteries in neck, not elsewhere classified : embolectomy	189	2	Y
+823	082.3 Operations on arteries in neck, not elsewhere classified : resection with graft	190	2	Y
+824	082.4 Operations on arteries in neck, not elsewhere classified : bypass graft	191	2	Y
+825	082.5 Operations on arteries in neck, not elsewhere classified : implantation of graft	192	2	Y
+826	082.6 Operations on arteries in neck, not elsewhere classified : resection with reanastomosis	193	2	Y
+827	082.7 Operations on arteries in neck, not elsewhere classified : suture of vessel	194	2	Y
+83	083 Perfusion of head and neck	195	2	Y
+84	084 Cerebral arteriography	196	2	Y
+85	085 Excision of cyst or fistula	197	2	Y
+851	085.1 Excision of cyst or fistula : incision thyroglossal tract or duct	198	2	Y
+852	085.2 Excision of cyst or fistula : excision thyroglossal tract or duct	199	2	Y
+853	085.3 Excision of cyst or fistula : incision branchial cleft, sinus or fistula	200	2	Y
+854	085.4 Excision of cyst or fistula : excision branchial cleft, sinus or fistula	201	2	Y
+89	089 Other operations in neck region, not elsewhere classified	202	2	Y
+891	089.1 Other operations in neck region, not elsewhere classified : drainage of abscess	203	2	Y
+892	089.2 Other operations in neck region, not elsewhere classified : ligation of vein venous anastomsis	204	2	Y
+893	089.3 Other operations in neck region, not elsewhere classified : catheterization of vessel, not elsewhere	205	2	Y
 1	1 Operations on thoracic duct	206	1	Y
 100	100 Orbitotomy	208	3	Y
 1001	100.1 Orbitotomy : biopsy of orbit	209	3	Y

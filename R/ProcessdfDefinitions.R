@@ -526,12 +526,18 @@ expand_dfDefinitions_processed2 <-
 
     for (cls in classifications) {
       fmap=paste(code_map_dir,unique(lst.data.settings[lst.data.settings$classification==cls,]$code_map),sep="")
-
+      #look up if case sensitive
+      ignore.case = unique(lst.data.settings[lst.data.settings$classification %in% cls, 'ignore.case'])[1]
+      # read file
       message(glue::glue("Read from codings for {cls} from {fmap}"))
-
       lst.codemap[[cls]]<-fread(fmap)
       # rename the column
       names(lst.codemap[[cls]])[grep("^cod", names(lst.codemap[[cls]]))] <- "coding"
+      # if case insensitive,
+      # always change to upper letters as this has been done in the preprocessingg of definitiion
+      if (isTRUE(ignore.case[1]$ignore.case)) {
+        lst.codemap[[cls]]$coding <- toupper(lst.codemap[[cls]]$coding)
+      }
       for (r in 1:nrow(dfDefinitions_processed)) {
         # for loops just as fast as apply in this case..
         VctStr = unlist(strsplit(dfDefinitions_processed[r, cls], ","))
@@ -544,7 +550,7 @@ expand_dfDefinitions_processed2 <-
           dfDefinitions_processed[r, cls] <- Str_expanded
         } else{
           # otherwise grep patterns (codes) that starts with the input code
-          ignore.case = unique(lst.data.settings[lst.data.settings$classification %in% cls, 'ignore.case'])[1]
+
           Str_expanded <- paste(unique(unlist(
             lapply(VctStr,  function(x)
               lst.codemap[[cls]]$coding [grep(paste("^", x, sep = ""),
@@ -577,7 +583,7 @@ expand_dfDefinitions_processed2 <-
 #' check_dfDefinitions_codes(dfDefinitions_processed,lst.data.settings,code_map_dir ="code_map_dir/")
 check_dfDefinitions_codes <-function(dfDefinitions_processed,
                                      lst.data.settings,code_map_dir="data/",check_expandable_codes_only=T){
-   all_missing_codes<-character()
+   all_missing_codes<-lst()
    #  get all codings needed in data.settings
    if (!check_expandable_codes_only){
      classifications <-
@@ -590,25 +596,41 @@ check_dfDefinitions_codes <-function(dfDefinitions_processed,
 
    lst.codemap<-list()
    for (cls in classifications) {
+     # no code to compare to
      if (is.na(unique(lst.data.settings[lst.data.settings$classification==cls,]$code_map))) next
     fmap=paste(code_map_dir,unique(lst.data.settings[lst.data.settings$classification==cls,]$code_map),sep="")
+    #look up if case sensitive
+    ignore.case = unique(lst.data.settings[lst.data.settings$classification %in% cls, 'ignore.case'])[1]
 
+    # read file
     message(glue::glue("Read from codings for {cls} from {fmap}"))
-    # read maps from files
-
     lst.codemap[[cls]]<-fread(fmap)
     # rename the column
     names(lst.codemap[[cls]])[grep("^cod", names(lst.codemap[[cls]]))] <- "coding"
-    # get the column from definition table
-    # print(na.omit(unlist(strsplit(dfDefinitions_processed[[cls]],","))))
+    # if case insensitive,
+    # always change to upper letters as this has been done in the preprocessingg of definitiion
+    if (isTRUE(ignore.case[1]$ignore.case)){
+      lst.codemap[[cls]]$coding <- toupper(lst.codemap[[cls]]$coding)
+    }
 
-    missing_codes<-dplyr::setdiff(na.omit(unlist(strsplit(dfDefinitions_processed[[cls]],","))),lst.codemap[[cls]]$coding)
+    codes<-na.omit(unlist(strsplit(dfDefinitions_processed[[cls]],",")))
+    # direct match
+    missing_codes<-dplyr::setdiff(codes,lst.codemap[[cls]]$coding)
+
+    # grep match
+    if (!( unique(lst.data.settings[lst.data.settings$classification==cls,]$hierarchical_map))&(unique(lst.data.settings[lst.data.settings$classification==cls,]$expand_codes==1) )) {
+
+    extended_matches <- lapply(codes,  function(x) any(stringr::str_detect(lst.codemap[[cls]]$coding,stringr::regex(paste("^", x, sep = ""),ignore_case =ignore.case ))))
+
+    missing_codes<-codes[!extended_matches]
+
+    }
+
     missing_codes<-na.omit(missing_codes)
 
     message(glue::glue("Missing in {cls}: \n{glue::glue_collapse(missing_codes,sep=',')} \n******************************"))
-    all_missing_codes<-c(all_missing_codes,missing_codes)
+    all_missing_codes<-append(all_missing_codes,setNames(as.data.frame(missing_codes,stringsAsFactors =F),cls))
    }
-
 
    return(all_missing_codes)
 }

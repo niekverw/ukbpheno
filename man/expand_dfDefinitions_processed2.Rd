@@ -14,11 +14,13 @@ expand_dfDefinitions_processed2(
 \item{dfDefinitions_processed}{definition table as dataframe}
 
 \item{lst.data.settings}{data.setting as dataframe, it includes settings that should be used, e.g. if ICD10 should be looked up case sensitive or not (incase of READ cases are important, dotts should also NOT be interpreted)}
+
+\item{code_map_dir}{the directory storing the coding files}
 }
 \value{
 definition table as dataframe
 }
 \description{
-Explicitly fill in codes covered by the parent codes stated in the definition table. This differs from \code{expand_dfDefinitions_processed()} in the dictionaries taken - it reads the code dictionaries stated in lst.data.setting and expand to available codes accordingly.
+Explicitly fill in codes covered by the parent codes stated in the definition table. This differs from \code{expand_dfDefinitions_processed()} in the dictionaries taken - it reads the code dictionaries stated in lst.data.setting and expand to available codes accordingly. Codes not present \strong{will be removed}.
 }
 \keyword{definition}
