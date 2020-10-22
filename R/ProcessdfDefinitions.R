@@ -618,17 +618,17 @@ check_dfDefinitions_codes <-function(dfDefinitions_processed,
     missing_codes<-dplyr::setdiff(codes,lst.codemap[[cls]]$coding)
 
     # grep match
-    if (!( unique(lst.data.settings[lst.data.settings$classification==cls,]$hierarchical_map))&(unique(lst.data.settings[lst.data.settings$classification==cls,]$expand_codes==1) )) {
-
+    # this is not a very ideal line as it doesn't recognize 2 different expand code options for the same classification (if needed) and will always onlt take the first row
+    if ((! unique(lst.data.settings[lst.data.settings$classification==cls,]$hierarchical_map))&(unique(lst.data.settings[lst.data.settings$classification==cls,]$expand_codes==1) )) {
     extended_matches <- lapply(codes,  function(x) any(stringr::str_detect(lst.codemap[[cls]]$coding,stringr::regex(paste("^", x, sep = ""),ignore_case =ignore.case ))))
 
-    missing_codes<-codes[!extended_matches]
+    missing_codes<-codes[!unlist(extended_matches)]
 
     }
 
     missing_codes<-na.omit(missing_codes)
 
-    message(glue::glue("Missing in {cls}: \n{glue::glue_collapse(missing_codes,sep=',')} \n******************************"))
+    message(glue::glue("Missing in {cls} (will be ignored): \n{glue::glue_collapse(missing_codes,sep=',')} \n******************************"))
     all_missing_codes<-append(all_missing_codes,setNames(as.data.frame(missing_codes,stringsAsFactors =F),cls))
    }
 
