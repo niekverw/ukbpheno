@@ -167,13 +167,13 @@ get_incidence_prevalence <- function(all_event_dt,
   ###########################################################
   # in case of empty rows , the entire column will be cast to default of class NA i.e. logical
   # this could create error for downstream functions "Error in bmerge....Incompatible join types"
-  col_num<-c("count","sum.epidur","median.epidur","max.epidur", "survival_days", "death.primary","death.secondary" , "Hx_days", "Fu_days" ,"Hx" , "Fu","Ref" , "first_diagnosis_days","Any")
+  col_num<-c("count","sum.epidur","median.epidur","max.epidur", "survival_days", "death.primary","death.any" , "Hx_days", "Fu_days" ,"Hx" , "Fu","Ref" , "first_diagnosis_days","Any")
   col_chr<-"f.eid"
   col_date<-"reference_date"
   # catch if there is no event, return an empty table which can be merged
   if (nrow(all_event_dt)==0){
     message("No event found.")
-    results_cols<-c("f.eid","count","sum.epidur","median.epidur","max.epidur", "survival_days", "death.primary","death.secondary" , "Hx_days", "Fu_days" ,"Hx" , "Fu","Ref" , "first_diagnosis_days", "reference_date","Any")
+    results_cols<-c("f.eid","count","sum.epidur","median.epidur","max.epidur", "survival_days", "death.primary","death.any" , "Hx_days", "Fu_days" ,"Hx" , "Fu","Ref" , "first_diagnosis_days", "reference_date","Any")
     all_event_dt.summary <- setNames(data.table(matrix(nrow = 0, ncol = 16)),results_cols )
     all_event_dt.summary[, (col_num) := lapply(.SD, as.numeric), .SDcols = col_num]
     all_event_dt.summary[, (col_chr) := lapply(.SD, as.character), .SDcols = col_chr]
@@ -208,10 +208,10 @@ get_incidence_prevalence <- function(all_event_dt,
 
   dfDth$death.secondary<- NA
   dfDth$death.secondary[lst.data.settings[match(dfDth$.id ,lst.data.settings$datasource),]$diagnosis==2] <- 2
+  dfDth$death.secondary<-data.table::fcoalesce(dfDth$death.primary,dfDth$death.secondary)
   # dfDth
   dfDth<-dfDth[,c("f.eid","days","death.primary","death.secondary")]
-  colnames(dfDth)<-c("f.eid","survival_days","death.primary","death.secondary")
-
+  colnames(dfDth)<-c("f.eid","survival_days","death.primary","death.any")
   # in the case of duplicate death records,one per primary /secondary
   dfDth_extrastats <- suppressWarnings(dfDth[, .(mindy= min(survival_days,na.rm = T),maxdy= max(survival_days,na.rm = T),meandy= mean(survival_days,na.rm=T) ), keyby=list(f.eid)])
   id.diff.deathdt<-unique(dfDth_extrastats[dfDth_extrastats$mindy!=dfDth_extrastats$meandy|dfDth_extrastats$maxdy!=dfDth_extrastats$meandy,]$f.eid)
@@ -296,7 +296,7 @@ get_incidence_prevalence <- function(all_event_dt,
 
   all_event_dt.summary <- Reduce(function(...) merge(..., all = TRUE,by='f.eid'), list(
       stats,
-      unique(dfDth[ , c("f.eid","survival_days","death.primary","death.secondary")]),
+      unique(dfDth[ , c("f.eid","survival_days","death.primary","death.any")]),
       Hx_days,
       Fu_days,
       unique(dfHx[,c("f.eid","Hx")]),
@@ -349,6 +349,11 @@ get_cases <- function(definitions,
   if(length(unique(definitions$TRAIT))>1){
     message("more than 1 TRAIT in definitions")
   }
+  if(length(definitions$TRAIT)==0){
+    message("No TRAIT in definitions.Stop.")
+    return(0)
+  }
+
 
   all_event_dt.Include_in_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,lst.data.settings)   #MI
   all_event_dt.Include_in_cases.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.Include_in_cases,lst.data.settings,
@@ -395,6 +400,11 @@ get_cases_controls <- function (definitions,
                                  reference_date=NULL,
                                  lst.identifiers=NULL # Used to define controls if reference_date is not given (NULL)
 ) {
+
+  if(length(definitions$TRAIT)==0){
+    message("No TRAIT in definitions.Stop.")
+    return(0)
+  }
 
   #reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid)
 
