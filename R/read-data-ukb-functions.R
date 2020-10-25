@@ -296,7 +296,9 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
               tte.hesin.icd9.secondary = tte.hesin.icd9.secondary)
 
   lst <- lapply(lst,function(x) {setkey(x,code) })
-  lst <- lapply(lst,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
+  lst <- lapply(lst,function(x) {x[, c('f.eid','code') := lapply(.SD, as.character), .SDcols = c('f.eid','code')] })
+  # lst <- lapply(lst,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
+
   return(lst)
 
 }
@@ -378,9 +380,9 @@ read_gp_script_data <- function(fgp){
   maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?.
 
   # TODO: some way to preprocess such huge file ?
-
+  # fgp<-fgp_scripts
   # 1.eid	data_provider	issue_date	read_2	bnf_code	dmd_code	drug_name	8.quantity
-  dfgp <- data.table::fread(fgp ,sep = "\t",colClasses = c("integer","integer","string","string","string","string","string","string")) #,select=cols_tokeep) ," | head -10000 "
+  dfgp <- data.table::fread(fgp ,sep = "\t",colClasses = c("integer","integer","character","character","character","character","character","character")) #,select=cols_tokeep) ," | head -10000 "
 
   names(dfgp) <-  c("eid","data_provider","event_dt",	"read_2",	"bnf_code",	"dmd_code",	"drug_name",	"quantity")
   dfgp$event_dt <- as.Date(as.character(dfgp$event_dt),format="%d/%m/%Y")
@@ -401,27 +403,35 @@ read_gp_script_data <- function(fgp){
   # note BNF codings are used differently between data sources i.e. Scotland / England TPP, refer to official doc
   # DMD used in England Vision, note one prescription may be described differently and coded differently
   # TODO standardize med codes:  varies in length (how to deal with this?), some with "." in between (strip all dots?)
-  # England Vision
+  ########################################################################################
+  # England Vision, only provider using dmd codes
+  # Sep2020: all records have dmd codes, ~2% has no read2 -> take dmd for these records
   tte.gpscript.dmd.england <-  dfgp %>% dplyr::filter(dmd_code !="")  %>% dplyr::select(eid,event_dt,dmd_code,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = dmd_code,event=event)  %>% data.table::as.data.table()
-  # data_provider 1= England(Vision), 2= Scotland, 3 = England (TPP), 4 = Wales
-  tte.gpscript.bnf.england <-  dfgp %>% dplyr::filter(bnf_code !="" && data_provider == 3 )  %>% dplyr::select(eid,event_dt,bnf_code,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% data.table::as.data.table()
-
-  tte.gpscript.bnf.scotland <-  dfgp %>% dplyr::filter(bnf_code !="" && data_provider == 2 )  %>% dplyr::select(eid,event_dt,bnf_code,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% data.table::as.data.table()
-  # Wales : read_2
-  tte.gpscript.read2.wales <-  dfgp %>% dplyr::filter(read_2 !="")  %>% dplyr::select(eid,event_dt,read_2,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% data.table::as.data.table()
+  # England TPP , bnf
+  # data_provider 1= England(Vision), 2= Scotland, 3 = England (TPP), 4 = Wales bnf_code !="" &
+  tte.gpscript.bnf.england <-  dfgp %>% dplyr::filter( data_provider == 3 & bnf_code !="")   %>%  dplyr::select(eid,event_dt,bnf_code,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% data.table::as.data.table()
+ #######################################################################################
+  #Scotland
+  # majority of records have bnf codes , while some have BOTH bnf codes and read 2!
+  # Sep2020: 2 records have only read2 but not bnf! -> take bnf
+  # somehow if filter with && then no result is returned??????????????? but filter twice works....
+  tte.gpscript.bnf.scotland <-  dfgp %>% dplyr::filter((data_provider == 2 )&(bnf_code !="")) %>% dplyr::select(eid,event_dt,bnf_code,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% data.table::as.data.table()
+# to avoid double counting the record
+  # tte.gpscript.read2.scotland <-  dfgp %>% dplyr::filter(read_2 !="" && data_provider == 2 )  %>% dplyr::select(eid,event_dt,read_2,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% data.table::as.data.table()
+  ########################################################################################
+  # Wales , read_2
+  tte.gpscript.read2.wales <-  dfgp %>% dplyr::filter(data_provider == 4 & read_2 !="")  %>% dplyr::select(eid,event_dt,read_2,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% data.table::as.data.table()
 
 
   # TODO count by tables
   # counts <- dfgp[, .N, by=.(read_2, dmd_code,bnf_code,drug_name)] # add unique per individual.
-
-
 
   # dfgp[ dfgp$read_2!="" & dfgp$dmd_code !="",]
   # names(dfgp) <-  c("eid",	"event_dt",	"read_2",	"bnf")
 
   #dfgp$event_dt <- format(fasttime::fastPOSIXct(dfgp$event_dt),format="%Y-%m-%d") # needs specific input format, making that format takes more time...
 
-
+  # lst <- list(tte.gpscript.dmd.england=tte.gpscript.dmd.england,tte.gpscript.bnf.england=tte.gpscript.bnf.england,tte.gpscript.bnf.scotland=tte.gpscript.bnf.scotland,tte.gpscript.read2.scotland=tte.gpscript.read2.scotland,tte.gpscript.read2.wales=tte.gpscript.read2.wales)
   lst <- list(tte.gpscript.dmd.england=tte.gpscript.dmd.england,tte.gpscript.bnf.england=tte.gpscript.bnf.england,tte.gpscript.bnf.scotland=tte.gpscript.bnf.scotland,tte.gpscript.read2.wales=tte.gpscript.read2.wales)
   lst <- lapply(lst,function(x) {data.table::setkey(x,code) })
   lst <- lapply(lst,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
