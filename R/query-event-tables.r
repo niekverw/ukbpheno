@@ -1,4 +1,4 @@
-
+#' @export
 to_datatype <- function(vct=c(),datatype){
   if(datatype=='numeric'){return(as.numeric(vct)) }
   if(datatype=='character'){return(as.character(vct)) }
@@ -17,7 +17,6 @@ to_datatype <- function(vct=c(),datatype){
 #' @examples
 #' get_all_events(dfDefinitions_processed_expanded[14,],lst.data,lst.data.settings)
 get_all_events <- function (definition,lst.data=lst.data,lst.data.settings){
-  # definitions=dfDefinitions_processed_expanded[9,]
 
   # look up for all dataframes in list
   if(is.null(definition) | nrow(definition)==0 ){
