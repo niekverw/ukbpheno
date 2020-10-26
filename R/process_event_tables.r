@@ -228,7 +228,7 @@ get_incidence_prevalence <- function(all_event_dt,
   }else{
     # no records, take f.eid for the merge later
     dfDth<-unique(df[,"f.eid"])
-    dfDth[,c("survival_days","death.primary","death.secondary")]<-as.numeric(NA)
+    dfDth[,c("survival_days","death.primary","death.any")]<-as.numeric(NA)
   }
   ###############################################################################################################################
 
