@@ -78,7 +78,7 @@ plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst
   df <- unique(df)
 
   #############
-  df$date <- with(df, ymd(sprintf('%04d%02d%02d', year, month, 1)))
+  df$date <- with(df, lubridate::ymd(sprintf('%04d%02d%02d', year, month, 1)))
   df <- df[with(df, order(date)), ]
   # head(df)
 
@@ -139,17 +139,17 @@ plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst
   timeline_plot<-timeline_plot+ggplot2::geom_segment(data=df[df$month_count == 1,], ggplot2::aes(y=position,yend=0,xend=date), color='black', size=0.2)
 
   # Plot scatter points at zero and date
-  timeline_plot<-timeline_plot+ggplot2::geom_point(aes(y=0), size=3)
+  timeline_plot<-timeline_plot+ggplot2::geom_point(ggplot2::aes(y=0), size=3)
 
   # Don't show axes, appropriately position legend
-  timeline_plot<-timeline_plot+ggplot2::theme(axis.line.y=element_blank(),
-                                     axis.text.y=element_blank(),
-                                     axis.title.x=element_blank(),
-                                     axis.title.y=element_blank(),
-                                     axis.ticks.y=element_blank(),
-                                     axis.text.x=element_blank(),
-                                     axis.ticks.x =element_blank(),
-                                     axis.line.x =element_blank(),
+  timeline_plot<-timeline_plot+ggplot2::theme(axis.line.y=ggplot2::element_blank(),
+                                     axis.text.y=ggplot2::element_blank(),
+                                     axis.title.x=ggplot2::element_blank(),
+                                     axis.title.y=ggplot2::element_blank(),
+                                     axis.ticks.y=ggplot2::element_blank(),
+                                     axis.text.x=ggplot2::element_blank(),
+                                     axis.ticks.x =ggplot2::element_blank(),
+                                     axis.line.x =ggplot2::element_blank(),
                                      legend.position = "bottom"
   )
 

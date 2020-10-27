@@ -40,7 +40,7 @@ get_stats_for_events <- function(all_event_dt){
     ggplot2::geom_tile()+
     ggplot2::scale_fill_distiller(palette = "RdYlBu",na.value = "grey85") +
     ggplot2::labs(x="Classfication of co-occurence", y="Classification present",title="Co-occurence of diagnosis by sources",caption = "[In the presence of row, column coexists with row by %]") +
-    ggplot2::geom_text(aes(label = `%`))
+    ggplot2::geom_text(ggplot2::aes(label = `%`))
  # ########################################################################################################################
   # show co-occurences of codes
   stats.coocurrence <- table(all_event_dt[,c("f.eid" ,"code")])
@@ -53,7 +53,7 @@ get_stats_for_events <- function(all_event_dt){
 
   # stats.codes.cooccur.p <- pheatmap::pheatmap(mat,fontsize = 6,cluster_cols = F,cluster_rows = F)
   # filter on codes that with co-occurence of at least 10% to reduce sparseness and make clustering more informative.
-  stats.codes.cooccur.filtered.table <- stats.codes.cooccur.table[rowMaxs(stats.codes.cooccur.table,na.rm=T)>10,colMaxs(stats.codes.cooccur.table,na.rm=T)>10]
+  stats.codes.cooccur.filtered.table <- stats.codes.cooccur.table[matrixStats::rowMaxs(stats.codes.cooccur.table,na.rm=T)>10,matrixStats::colMaxs(stats.codes.cooccur.table,na.rm=T)>10]
   # stats.codes.cooccur.filtered.p <- pheatmap::pheatmap( stats.codes.cooccur.filtered.table  ,fontsize = 6)
   # ########## ggplot implementation#################################################################################
   # Create ggplot version dendrogram from ggdendro
@@ -66,19 +66,19 @@ get_stats_for_events <- function(all_event_dt){
   lab_gp$group <- stats.codes[match(lab_gp$label,stats.codes$code),]$classification
 
   stats.codes.cooccur.filtered.p.dendro <- ggplot2::ggplot(ggdendro::segment(ddata_x)) +
-    ggplot2::geom_segment(aes(x=x, y=y+10, xend=xend, yend=yend+10)) +  ggplot2::geom_text(data=label(ddata_x),
-    ggplot2::aes(label=label, x=x, y=-5, colour=lab_gp$group),size =3,angle=45) +ggplot2::theme(axis.line=element_blank(),
-         axis.text.x=element_blank(),
-         axis.text.y=element_blank(),
-         axis.ticks=element_blank(),
-         axis.title.x=element_blank(),
-         axis.title.y=element_blank(),
+    ggplot2::geom_segment(ggplot2::aes(x=x, y=y+10, xend=xend, yend=yend+10)) +  ggplot2::geom_text(data=ggdendro::label(ddata_x),
+    ggplot2::aes(label=label, x=x, y=-5, colour=lab_gp$group),size =3,angle=45) +ggplot2::theme(axis.line=ggplot2::element_blank(),
+         axis.text.x=ggplot2::element_blank(),
+         axis.text.y=ggplot2::element_blank(),
+         axis.ticks=ggplot2::element_blank(),
+         axis.title.x=ggplot2::element_blank(),
+         axis.title.y=ggplot2::element_blank(),
            # legend.position="none",
-         panel.background=element_blank(),
-         panel.border=element_blank(),
-         panel.grid.major=element_blank(),
-         panel.grid.minor=element_blank(),
-         plot.background=element_blank())
+         panel.background=ggplot2::element_blank(),
+         panel.border=ggplot2::element_blank(),
+         panel.grid.major=ggplot2::element_blank(),
+         panel.grid.minor=ggplot2::element_blank(),
+         plot.background=ggplot2::element_blank())
   # ggplot version heatmap
   # code.order <- order.dendrogram(code.dendro)
   # TODO maker heatmap ordered like dendrogram?
@@ -88,7 +88,7 @@ get_stats_for_events <- function(all_event_dt){
   stats.codes.cooccur.filtered.p.heat <- ggplot2::ggplot(longData, ggplot2::aes(x = Code_occur , y =Code_presence,fill=`%`)) +
     ggplot2::geom_tile()+
     ggplot2::scale_fill_distiller(palette = "RdYlBu",na.value = "grey85") +
-    ggplot2::labs(x="Code of co-occurence", y="Code present",title="Co-occurence of diagnosis code",caption = "[In the presence of row, column coexists with row by %]") + ggplot2::theme(axis.text.x = element_text(angle = 45))
+    ggplot2::labs(x="Code of co-occurence", y="Code present",title="Co-occurence of diagnosis code",caption = "[In the presence of row, column coexists with row by %]") + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45))
 ###############################################################################################################
 
 
