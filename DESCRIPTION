@@ -1,0 +1,40 @@
+Package: ukbpheno
+Title: Extraction and processing UK Biobank data to generate health outcome phenotypes
+Version: 0.0.0.9000
+Authors@R: 
+    c(person(given = "Niek",
+           family = "Verweij",
+           role = c("aut", "cph"),
+           email = "mail@niekverweij.com",
+           comment = c(ORCID = "0000-0002-4303-7685")),
+     person(given = "Ming Wai",
+     family = "Yeung",
+     role = c("aut", "cre","cph"),
+     email = "m.w.yeung@umcg.nl",
+     comment = c(ORCID = "0000-0001-9794-3109")))
+Description: A package to efficiently integrate the main dataset and record-level datafiles, to process, harmonize and explore the health outcome data for the definition of binary phenotypes in a reproducible and machine-actionable manner 
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.2
+Imports:
+	data.table (>= 1.13.0),
+	dplyr,
+	fasttime,
+	ggdendro,
+	ggplot2,
+	ggpubr,
+	ggrepel,
+	ComplexUpset,
+	glue,
+	jsonlite,
+	lubridate,
+	magrittr,
+	matrixStats,
+	readxl,
+	RColorBrewer,
+	stringr,
+	tictoc,
+	tidyr,
+	XML
