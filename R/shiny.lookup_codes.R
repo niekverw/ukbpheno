@@ -8,7 +8,7 @@ library(readxl)
 library(dplyr)
 library(data.table)
 library(stringr)
-# fcoding.xls="data/all_lkps_maps.xlsx"
+
 
 load_data <- function(){
 
@@ -31,7 +31,7 @@ load_data <- function(){
   dfCodesheet.read_v2_lkp$text <- str_replace_all(dfCodesheet.read_v2_lkp$text,"[^/[:^punct:]]", "")
 
   # meds; read to ukb code
-  load("data/dfCodesheetREAD_SR.Coding.RData")
+  load("../data_files/dfCodesheetREAD_SR.Coding.RData")
   colnames(dfCodesheetREAD_SR.Coding)<- c("UKB.Coding","text","read_code","term.id")
   dfCodesheet.read_v2_UKBmeds <- dfCodesheetREAD_SR.Coding[,c(3,1)]
   dfCodesheet.read_v2_lkp<-rbind(dfCodesheet.read_v2_lkp,dfCodesheetREAD_SR.Coding[!dfCodesheetREAD_SR.Coding$READ.CODE %in% dfCodesheet.read_v2_lkp$read_code,c("read_code","text")])
@@ -78,7 +78,7 @@ load_data <- function(){
   colnames(dfCodesheet.icd10_icd9) <- c("ICD10","ICD9")
   dfCodesheet.icd10_lkp <- as.data.frame(read_xlsx(fcoding.xls,sheet="icd10_lkp"))[,c(2,5)] # not complete (e.g. X*)
   names(dfCodesheet.icd10_lkp) <- c("ICD10","text")
-  dfCodesheet.ICD10.coding19 <- data.frame(fread("data/ICD10.coding19.tsv"))[,1:2] # <- contains all of the above.
+  dfCodesheet.ICD10.coding19 <- data.frame(fread("../data_files/ICD10.coding19.tsv"))[,1:2] # <- contains all of the above.
   names(dfCodesheet.ICD10.coding19) <- c("ICD10","text")
 
   dfCodesheet.icd10_lkp <- rbind(dfCodesheet.icd10_lkp,dfCodesheet.ICD10.coding19[!dfCodesheet.ICD10.coding19$ICD10 %in% dfCodesheet.icd10_lkp$ICD10,])
@@ -98,7 +98,7 @@ load_data <- function(){
   ####### # ICD9 depscription, dfCodesheet.icd9_lkp
   dfCodesheet.icd9_lkp <- as.data.frame(read_xlsx(fcoding.xls,sheet="icd9_lkp")) # certainly not complete!
   colnames(dfCodesheet.icd9_lkp) <- c("ICD9","text")
-  dfCodesheet.ICD9.coding87 <- data.frame(fread("data/ICD9.coding87.tsv"))[,1:2] # UKB
+  dfCodesheet.ICD9.coding87 <- data.frame(fread("../data_files/ICD9.coding87.tsv"))[,1:2] # UKB
   names(dfCodesheet.ICD9.coding87)<- c("ICD9","text")
   dfCodesheet.icd9_lkp <- rbind(dfCodesheet.icd9_lkp,dfCodesheet.ICD9.coding87[!dfCodesheet.ICD9.coding87$ICD9 %in% dfCodesheet.icd9_lkp$ICD9,])
 
@@ -115,7 +115,7 @@ load_data <- function(){
   setkey(dfCodesheet.ICD9,"ICD9")
 
   ###### OPCS4
-  dfCodesheet.OPCS4.coding240 <- data.frame(fread("data/OPCS4.coding240.tsv"))[,c(1,2)]
+  dfCodesheet.OPCS4.coding240 <- data.frame(fread("../data_files/OPCS4.coding240.tsv"))[,c(1,2)]
   names(dfCodesheet.OPCS4.coding240) <- c("OPCS4","text")
   dfCodesheet.OPCS4 <- dfCodesheet.OPCS4.coding240
   dfCodesheet.OPCS4$ICD10 <- NA
@@ -130,7 +130,7 @@ load_data <- function(){
 
   ### n_20003
 
-  dfCodesheet.n_20003 <- data.frame(fread("data/20003_coding4.tsv"))[,c(1,2)]
+  dfCodesheet.n_20003 <- data.frame(fread("../data_files/20003.coding4.tsv"))[,c(1,2)]
   names(dfCodesheet.n_20003) <- c("n_20003","text")
   dfCodesheet.n_20003$n_20003 <- as.character(dfCodesheet.n_20003$n_20003) ### LOOKUPS ASSUME CHARACTER, SO NEEDS TO BE CHARACTER
   dfCodesheet.n_20003$OPCS4 <- NA
@@ -310,82 +310,85 @@ lookup_codes <- function(codes=row, LstdfCodesheets=LstdfCodesheets,expand_input
               lst_lookup_anno=lst_lookup_anno,
               df_lookup_anno=df_lookup_anno))
 }
-#
-# #codes.lookup$lst_lookup_anno$ICD10$c_text[match(codes.lookup$df_lookup[,get("ICD10")] ,codes.lookup$lst_lookup_anno[["ICD10"]]$c)]
-# ########################################
-# ##### LOAD DATA.
-# ########################################
-# # if(!exists("LstdfCodesheets")){ LstdfCodesheets <- load_data() }
-# #
-# # gc()
-# # ########################################
-# # ##### STAND ALONE EXAMPLE FOR 1 ROW.
-# # ########################################
-# # # ICD10, icd9, read2,ct3,
-# # dfDefinitions_file="definitions.tsv"
-# # df = data.frame(fread(dfDefinitions_file))
-# # df <- ProcessDfDefinitions(df=df,fill_dependencies = F)
-# # df <- df[,c("TRAIT","DESCRIPTION", "ICD10","ICD9","READ","CTV3","OPCS4")]
-# #
-# # # DO IIT FOR 1 ROW suggest codes for 1 selected row.
-# # irow=13 #12 #3#12
-# # row <- df[irow,]
-# # #row$OPCS4 <- "K02"
-# # codes.lookup <- lookup_codes(codes = row,LstdfCodesheets=LstdfCodesheets,expand_input=T)
-# #
-# # codes.lookup$df_lookup
-# # #### SHINY:
-#
-#
-# library(shiny)
-# library(DT)
-# # Define UI for app that draws a histogram ----
-# ui <- fluidPage(
-#   # App title ----
-#   titlePanel("UKB code explorer"),
-#   # Sidebar layout with input and output definitions ----
-#   sidebarLayout(
-#     # Sidebar panel for inputs ----
-#     sidebarPanel(
-#       # Input: Slider for the number of bins ----
-#       textAreaInput(inputId="iICD10", label="ICD10", value = "Z951 (cabg)", width = NULL, placeholder = NULL),
-#       textAreaInput(inputId="iICD9", label="ICD9", value = "", width = NULL, placeholder = NULL),
-#       textAreaInput(inputId="iREAD", label="READ", value = "", width = NULL, placeholder = NULL),
-#       textAreaInput(inputId="iCTV3", label="CTV3", value = "", width = NULL, placeholder = NULL),
-#       textAreaInput(inputId="iOPCS4", label="OPCS4", value = "K40,K41,K43,K44,K45,K46(cabg),K471(endarterectomy),K49, K50,K75 (pci)", width = NULL, placeholder = NULL),
-#       checkboxInput(inputId = "iExpandcodes", "Expand codes, e.g. I50 -> I501,I502, etc.  ", FALSE),
-#       actionButton("goButton", "Go!"),
-#       HTML("<br><br>note; this is a tryout - for exploration, translations are not reliable. - BNF/DMD not included.")
-#     ),
-#     # Main panel for displaying outputs ----
-#     mainPanel(
-#       #verbatimTextOutput("oICD10")
-#       #DT::dataTableOutput("table_input")
-#
-#       tabsetPanel(
-#         tabPanel("ICD10 ", DT::dataTableOutput("table_oICD10")),
-#         tabPanel("ICD9",  DT::dataTableOutput("table_oICD9")),
-#         tabPanel("READ",  DT::dataTableOutput("table_oREAD")),
-#         tabPanel("CTV3",  DT::dataTableOutput("table_oCTV3")),
-#         tabPanel("OPCS4",  DT::dataTableOutput("table_oOPCS4")),
-#         tabPanel("n_20003",  DT::dataTableOutput("table_on_20003")),
-#         tabPanel("output",
-#                  checkboxInput(inputId = "iIncludetext", "include description", FALSE),
-#                  h4("ICD10"),textOutput("codes_oICD10"),
-#                  h4("ICD9"),textOutput("codes_oICD9"),
-#                  h4("READ"),textOutput("codes_oREAD"),
-#                  h4("CTV3"),textOutput("codes_oCTV3"),
-#                  h4("OPCS4"),textOutput("codes_oOPCS4"),
-#                  h4("n_20003"),textOutput("codes_on_20003")
-#                  ),
-#         tabPanel("lookuptable",  DT::dataTableOutput("table_oraw"))
-#
-#
-#
-#       )
-#     )
-#   )
-# )
+
+# # codes.lookup$lst_lookup_anno$ICD10$c_text[match(codes.lookup$df_lookup[,get("ICD10")] ,codes.lookup$lst_lookup_anno[["ICD10"]]$c)]
+#######################################
+#### LOAD DATA.
+#######################################
+setwd("/Users/niek/repos/ukbpheno/R")
+source("ProcessdfDefinitions.R")
+fcoding.xls="../data_files/all_lkps_maps.xlsx"
+if(!exists("LstdfCodesheets")){ LstdfCodesheets <- load_data() }
+
+gc()
+########################################
+##### STAND ALONE EXAMPLE FOR 1 ROW.
+########################################
+# ICD10, icd9, read2,ct3,
+dfDefinitions_file="../data_files/definitions.tsv"
+df = data.frame(fread(dfDefinitions_file))
+df <- ProcessDfDefinitions(df=df,fill_dependencies = F)
+df <- df[,c("TRAIT","DESCRIPTION", "ICD10","ICD9","READ2","CTV3","OPCS4")]
+names(df) <- c("TRAIT","DESCRIPTION", "ICD10","ICD9","READ","CTV3","OPCS4") # READ2 > READ 
+# # DO IIT FOR 1 ROW suggest codes for 1 selected row.
+irow=13 #12 #3#12
+row <- df[irow,]
+#row$OPCS4 <- "K02"
+codes.lookup <- lookup_codes(codes = row,LstdfCodesheets=LstdfCodesheets,expand_input=T)
+
+codes.lookup$df_lookup
+#### SHINY:
+
+
+library(shiny)
+library(DT)
+# Define UI for app that draws a histogram ----
+ui <- fluidPage(
+  # App title ----
+  titlePanel("UKB code explorer"),
+  # Sidebar layout with input and output definitions ----
+  sidebarLayout(
+    # Sidebar panel for inputs ----
+    sidebarPanel(
+      # Input: Slider for the number of bins ----
+      textAreaInput(inputId="iICD10", label="ICD10", value = "Z951 (cabg)", width = NULL, placeholder = NULL),
+      textAreaInput(inputId="iICD9", label="ICD9", value = "", width = NULL, placeholder = NULL),
+      textAreaInput(inputId="iREAD", label="READ", value = "", width = NULL, placeholder = NULL),
+      textAreaInput(inputId="iCTV3", label="CTV3", value = "", width = NULL, placeholder = NULL),
+      textAreaInput(inputId="iOPCS4", label="OPCS4", value = "K40,K41,K43,K44,K45,K46(cabg),K471(endarterectomy),K49, K50,K75 (pci)", width = NULL, placeholder = NULL),
+      checkboxInput(inputId = "iExpandcodes", "Expand codes, e.g. I50 -> I501,I502, etc.  ", FALSE),
+      actionButton("goButton", "Go!"),
+      HTML("<br><br>note; this is a tryout - for exploration, translations are not reliable. - BNF/DMD not included.")
+    ),
+    # Main panel for displaying outputs ----
+    mainPanel(
+      #verbatimTextOutput("oICD10")
+      #DT::dataTableOutput("table_input")
+
+      tabsetPanel(
+        tabPanel("ICD10 ", DT::dataTableOutput("table_oICD10")),
+        tabPanel("ICD9",  DT::dataTableOutput("table_oICD9")),
+        tabPanel("READ",  DT::dataTableOutput("table_oREAD")),
+        tabPanel("CTV3",  DT::dataTableOutput("table_oCTV3")),
+        tabPanel("OPCS4",  DT::dataTableOutput("table_oOPCS4")),
+        tabPanel("n_20003",  DT::dataTableOutput("table_on_20003")),
+        tabPanel("output",
+                 checkboxInput(inputId = "iIncludetext", "include description", FALSE),
+                 h4("ICD10"),textOutput("codes_oICD10"),
+                 h4("ICD9"),textOutput("codes_oICD9"),
+                 h4("READ"),textOutput("codes_oREAD"),
+                 h4("CTV3"),textOutput("codes_oCTV3"),
+                 h4("OPCS4"),textOutput("codes_oOPCS4"),
+                 h4("n_20003"),textOutput("codes_on_20003")
+                 ),
+        tabPanel("lookuptable",  DT::dataTableOutput("table_oraw"))
+
+
+
+      )
+    )
+  )
+)
 
 
 server <- function(input, output) {
@@ -394,11 +397,11 @@ server <- function(input, output) {
 
     observeEvent(input$goButton, {
     showModal(modalDialog( "please wait" ,easyClose = FALSE,footer=NULL))
-    row <- data.frame(ICD10=input$iICD10,
-               ICD9=input$iICD9,
-               READ=input$iREAD,
-               CTV3=input$iCTV3,
-               OPCS4=input$iOPCS4)
+    row <- data.frame(ICD10=gsub("\\|",",",input$iICD10),
+               ICD9=gsub("\\|",",",input$iICD9),
+               READ=gsub("\\|",",",input$iREAD),
+               CTV3=gsub("\\|",",",input$iCTV3),
+               OPCS4=gsub("\\|",",",input$iOPCS4))
 
 
     codes.lookup <- lookup_codes(codes = row,LstdfCodesheets=LstdfCodesheets,expand_input=input$iExpandcodes)
@@ -510,7 +513,7 @@ server <- function(input, output) {
   },filter = "top")
   #output$oICD10 <- renderText({ })
 }
-# shinyApp(ui, server)
+shinyApp(ui, server)
 
 
 
