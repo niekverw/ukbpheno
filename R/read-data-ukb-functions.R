@@ -452,7 +452,16 @@ read_gp_script_data <- function(fgp){
 
 
 sumcounts <- function(dfs){
-  df <- suppressWarnings(Reduce(function(...) merge(..., all = TRUE, by = "code"), dfs))
+
+  # df <- suppressWarnings(Reduce(function(...) merge(..., all = TRUE, by = "code"), dfs))
+  df<-suppressWarnings(Reduce((function() {counter = 0
+  function(x, y) {
+    counter <<- counter + 1
+    d = merge(x, y, all = T, by = 'code')
+    setnames(d, c(head(names(d), -1), paste0('N.', counter)))
+  }})(), dfs))
+
+
   names(df)<-c("code",names(dfs))
   df <- data.table::as.data.table(cbind(df,N=df[ ,rowSums(.SD,na.rm = T), .SDcols =names(df)[!names(df) %in% "code"] ]))
   return(df)
@@ -475,22 +484,32 @@ sumcounts <- function(dfs){
 #' lst.data$tte.sr.20002 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20002",field_sr_date = "20008",qc_treshold_year = 10)
 #' lst.data <- append(lst.data,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper ))
 #' get_lst_counts(lst.data,lst.data.settings)
-get_lst_counts <- function(lst.data,lst.data.settings=lst.data.settings ) {
+get_lst_counts <- function(lst.data,lst.data.setting) {
 
   print("counting")
   lst.counts <- lapply(lst.data, function(x) x[, .N, by=.(code)] )
-
+  # print(lst.counts)
   lst.counts.aggregate <- list()
-  for (c in unique(lst.data.settings$classification)){
+  for (cls in unique(lst.data.settings$classification)){
 
-    print(c)
-    dfs <- lst.data.settings[lst.data.settings$classification %in% c,'datasource']
-    if(any(names(lst.counts) %in% dfs)){
-      i.na <- which(is.na(names(lst.counts[dfs])))
+    # print(cls)
+    dfs <- lst.data.settings[lst.data.settings$classification %in% cls,'datasource']
+
+    if(any(names(lst.counts) %in% dfs$datasource)){
+      # lst.counts[[dfs]]
+      # class(lst.counts)
+      dfs_<-as.vector(unlist(dfs$datasource))
+      i.na <- which(is.na(names(lst.counts[dfs_])))
+      # print(i.na)
       if(length(i.na)>0) {message(paste("WARNING unavailable: ", dfs[i.na])); dfs <- dfs[-i.na] }
-      lst.counts.aggregate[[c]] <- sumcounts(lst.counts[dfs])
+
+      lst.counts.aggregate[[cls]] <- sumcounts(lst.counts[dfs_])
     } else{
-      message(glue::glue("{c} not found in lst.counts"))
+      # print(i.na)
+
+      # print(length(i.na))
+      # print(is.na(names(lst.counts[dfs_])))
+      message(glue::glue("{cls} not found in lst.counts"))
     }
 
   }
