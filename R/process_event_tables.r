@@ -167,13 +167,13 @@ get_incidence_prevalence <- function(all_event_dt,
   ###########################################################
   # in case of empty rows , the entire column will be cast to default of class NA i.e. logical
   # this could create error for downstream functions "Error in bmerge....Incompatible join types"
-  col_num<-c("count","sum.epidur","median.epidur","max.epidur", "survival_days", "death_primary","death_any" , "Hx_days", "Fu_days" ,"Hx" , "Fu","Ref" , "first_diagnosis_days","Any")
+  col_num<-c("count","sum.epidur","median.epidur","max.epidur", "survival_days", "Death_primary","Death_any" , "Hx_days", "Fu_days" ,"Hx" , "Fu","Ref" , "first_diagnosis_days","Any")
   col_chr<-"f.eid"
   col_date<-"reference_date"
   # catch if there is no event, return an empty table which can be merged
   if (nrow(all_event_dt)==0){
     message("No event found.")
-    results_cols<-c("f.eid","count","sum.epidur","median.epidur","max.epidur", "survival_days", "death_primary","death_any" , "Hx_days", "Fu_days" ,"Hx" , "Fu","Ref" , "first_diagnosis_days", "reference_date","Any")
+    results_cols<-c("f.eid","count","sum.epidur","median.epidur","max.epidur", "survival_days", "Death_primary","Death_any" , "Hx_days", "Fu_days" ,"Hx" , "Fu","Ref" , "first_diagnosis_days", "reference_date","Any")
     all_event_dt.summary <- setNames(data.table(matrix(nrow = 0, ncol = 16)),results_cols )
     all_event_dt.summary[, (col_num) := lapply(.SD, as.numeric), .SDcols = col_num]
     all_event_dt.summary[, (col_chr) := lapply(.SD, as.character), .SDcols = col_chr]
@@ -203,15 +203,15 @@ get_incidence_prevalence <- function(all_event_dt,
   # ### flag secondary death records
   # dfDth$death.secondary<-ifelse((lst.data.settings[match(dfDth$.id ,lst.data.settings$datasource),]$diagnosis==2),2,NA)
   ### this seems faster
-  dfDth$death_primary <- NA
-  dfDth$death_primary[lst.data.settings[match(dfDth$.id ,lst.data.settings$datasource),]$diagnosis==1] <- 2
+  dfDth$Death_primary <- NA
+  dfDth$Death_primary[lst.data.settings[match(dfDth$.id ,lst.data.settings$datasource),]$diagnosis==1] <- 2
 
   dfDth$death_secondary<- NA
   dfDth$death_secondary[lst.data.settings[match(dfDth$.id ,lst.data.settings$datasource),]$diagnosis==2] <- 2
-  dfDth$death_secondary<-data.table::fcoalesce(dfDth$death_primary,dfDth$death_secondary)
+  dfDth$death_secondary<-data.table::fcoalesce(dfDth$Death_primary,dfDth$death_secondary)
   # dfDth
-  dfDth<-dfDth[,c("f.eid","days","death_primary","death_secondary")]
-  colnames(dfDth)<-c("f.eid","survival_days","death_primary","death_any")
+  dfDth<-dfDth[,c("f.eid","days","Death_primary","death_secondary")]
+  colnames(dfDth)<-c("f.eid","survival_days","Death_primary","Death_any")
   # in the case of duplicate death records,one per primary /secondary
   dfDth_extrastats <- suppressWarnings(dfDth[, .(mindy= min(survival_days,na.rm = T),maxdy= max(survival_days,na.rm = T),meandy= mean(survival_days,na.rm=T) ), keyby=list(f.eid)])
   id.diff.deathdt<-unique(dfDth_extrastats[dfDth_extrastats$mindy!=dfDth_extrastats$meandy|dfDth_extrastats$maxdy!=dfDth_extrastats$meandy,]$f.eid)
@@ -228,7 +228,7 @@ get_incidence_prevalence <- function(all_event_dt,
   }else{
     # no records, take f.eid for the merge later
     dfDth<-unique(df[,"f.eid"])
-    dfDth[,c("survival_days","death_primary","death_any")]<-as.numeric(NA)
+    dfDth[,c("survival_days","Death_primary","Death_any")]<-as.numeric(NA)
   }
   ###############################################################################################################################
 
@@ -296,7 +296,7 @@ get_incidence_prevalence <- function(all_event_dt,
 
   all_event_dt.summary <- Reduce(function(...) merge(..., all = TRUE,by='f.eid'), list(
       stats,
-      unique(dfDth[ , c("f.eid","survival_days","death_primary","death_any")]),
+      unique(dfDth[ , c("f.eid","survival_days","Death_primary","Death_any")]),
       Hx_days,
       Fu_days,
       unique(dfHx[,c("f.eid","Hx")]),
@@ -464,6 +464,9 @@ get_cases_controls <- function (definitions,
 
   # 2 => case -2 => non-case  -1 => non-control , set control to 1
   df.casecontrol[is.na(df.casecontrol$Any),]$Any <- 1
+  df.casecontrol[is.na(df.casecontrol$Death_primary),]$Death_primary <- 1
+  df.casecontrol[is.na(df.casecontrol$Death_any),]$Death_any <- 1
+
   # as control has no event the event count is NA after merge, set it to 1
   df.casecontrol[is.na(df.casecontrol$count),]$count <- 1
   df.casecontrol[(is.na(df.casecontrol$Hx)&(df.casecontrol$Any == 1)),]$Hx <- 1

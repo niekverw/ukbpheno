@@ -4,7 +4,7 @@
 \alias{get_lst_counts}
 \title{Get summary counts on a list of data tables}
 \usage{
-get_lst_counts(lst.data, lst.data.settings = lst.data.settings)
+get_lst_counts(lst.data, lst.data.setting)
 }
 \arguments{
 \item{lst.data}{list of data tables}
