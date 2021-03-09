@@ -39,7 +39,7 @@ get_stats_for_events <- function(all_event_dt){
   stats.class.cooccur.p <- ggplot2::ggplot(longData, ggplot2::aes(x = Code_occur , y =Code_presence,fill=`%`)) +
     ggplot2::geom_tile()+
     ggplot2::scale_fill_distiller(palette = "RdYlBu",na.value = "grey85") +
-    ggplot2::labs(x="Classfication of co-occurence", y="Classification present",title="Co-occurence of diagnosis by sources",caption = "[In the presence of row, column coexists with row by %]") +
+    ggplot2::labs(x="Classfication of co-occurence", y="Classification present",title="Co-occurence of diagnosis by sources",caption = "[% of column covered by row]") +
     ggplot2::geom_text(ggplot2::aes(label = `%`))
  # ########################################################################################################################
   # show co-occurences of codes
@@ -88,7 +88,7 @@ get_stats_for_events <- function(all_event_dt){
   stats.codes.cooccur.filtered.p.heat <- ggplot2::ggplot(longData, ggplot2::aes(x = Code_occur , y =Code_presence,fill=`%`)) +
     ggplot2::geom_tile()+
     ggplot2::scale_fill_distiller(palette = "RdYlBu",na.value = "grey85") +
-    ggplot2::labs(x="Code of co-occurence", y="Code present",title="Co-occurence of diagnosis code",caption = "[In the presence of row, column coexists with row by %]") + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45))
+    ggplot2::labs(x="Code of co-occurence", y="Code present",title="Co-occurence of diagnosis code",caption = "[% of column covered by row]") + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45))
 ###############################################################################################################
 
 
