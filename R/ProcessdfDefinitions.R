@@ -53,7 +53,9 @@ pasteRemoveNA <- function(..., sep = " ", collapse = NULL, na.rm = F) {
 #' @keywords auxiliary
 #' @export
 CheckDuplicateTRAITS<-function(df){
-  if(length(unique(duplicated(df["TRAIT"])))>1){stop("TRAIT column contains duplicate ID's")}
+  if(length(unique(duplicated(df["TRAIT"])))>1){
+    print(df[duplicated(df["TRAIT"]),])
+    stop("TRAIT column contains duplicate ID's")}
 }
 
 
@@ -207,7 +209,7 @@ ProcessDfDefinitions<-function(df,
                                                "ICD10", "ICD9", "OPCS4","OPCS3",
                                                "READ2","READ2_drugs", "CTV3",
                                                "BNF","DMD",
-                                               "f.20001(sr_cancer)",    "f.20002(sr_noncancer)", "f.20003(sr_med)", "f.20004(sr_oper)"
+                                               "f.20001(sr_cancer)",    "f.20002(sr_noncancer)", "f.20003(sr_med)", "f.20004(sr_oper)","Minimum_Episode_duration"
                                                ),
                                VctColstoupper=c("ICD10","ICD9","OPCS4","OPCS3"),
                                fill_dependencies=T){
@@ -274,15 +276,19 @@ lookup.codes <- function(df,lookupcolumn="Exclude_from_cases",VctAllColumns){
   # copy the rows that needs to be looked up
   dfInEx<-df[!(df[[lookupcolumn]] == "" |is.na(df[[lookupcolumn]])),]
   print(paste(nrow(dfInEx),"traits with dependent trait in",lookupcolumn,sep=" "))
+  if (nrow(dfInEx) !=0){
   # update these columns
   dfInEx[,VctAllColumns]<-NA
-  # for each row , extract the codes from the definition table
-  for(i in 1:nrow(dfInEx)) {
-    def=unlist(strsplit(dfInEx[i,lookupcolumn],","))
-    for(col in VctAllColumns){
-      Vctcol <- df[df$TRAIT %in% def,col]
-      dfInEx[i,col] <- pasteRemoveNA(Vctcol ,collapse=",",na.rm=T)
+
+    # for each row , extract the codes from the definition table
+    for(i in 1:nrow(dfInEx)) {
+      def=unlist(strsplit(dfInEx[i,lookupcolumn],","))
+      for(col in VctAllColumns){
+        Vctcol <- df[df$TRAIT %in% def,col]
+        dfInEx[i,col] <- pasteRemoveNA(Vctcol ,collapse=",",na.rm=T)
+      }
     }
+
   }
   dfInEx <- dfInEx[,c("TRAIT","DESCRIPTION",VctAllColumns)]
   return(dfInEx)

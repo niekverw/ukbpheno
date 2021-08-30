@@ -332,7 +332,6 @@ get_incidence_prevalence <- function(all_event_dt,
 #' @param lst.data list of data table with all episode data
 #' @param lst.data.settings data frame containing data settings
 #' @param reference_date reference dates for each individuals in the whole cohort as a named vector
-
 #' @return  a list of 2 data tables : all events for valid cases and an event summary containing time to event information for these individuals.
 #' @keywords time-to-event
 #' @export
@@ -379,7 +378,7 @@ get_cases <- function(definitions,
 
 
 
-######
+
 #' Get case and controls for a phenotype
 #'
 #' Given a phenotype, a list of episode data and reference dates per individual, identify valid cases/controls and compute the time to event data for these individuals respectively.  If no reference date is given then the date of first available event will be taken as reference date for each individual.
@@ -388,23 +387,23 @@ get_cases <- function(definitions,
 #' @param lst.data.settings data frame containing data settings
 #' @param reference_date reference dates for each individuals in the whole cohort as a named vector
 #' @param lst.identifiers character vector listing the identifiers in the cohort. This is used to define controls if reference_date is not given
-
 #' @return  a list of 2 data tables : all events for valid cases and an event summary containing time to event information for these individuals.
 #' @keywords time-to-event
 #' @export
 #' @examples
 #' get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,lst.data.settings,  reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
-get_cases_controls <- function (definitions,
-                                 lst.data,
-                                 lst.data.settings,
+get_cases_controls <-function(definitions,
+                               lst.data,
+                               lst.data.settings,
                                  reference_date=NULL,
-                                 lst.identifiers=NULL # Used to define controls if reference_date is not given (NULL)
-) {
-
+                                 lst.identifiers=NULL
+                                ) {
+  # lst.identifiers <-Used to define controls if reference_date is not given (NULL)
   if(length(definitions$TRAIT)==0){
     message("No TRAIT in definitions.Stop.")
     return(0)
   }
+
 
   #reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid)
 
@@ -492,6 +491,9 @@ get_cases_controls <- function (definitions,
               all_event_dt.Include_in_cases.summary=all_event_dt.Include_in_cases.summary)
   )
 }
+
+
+
 
 #' Get survival data
 #'
