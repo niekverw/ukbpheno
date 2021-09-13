@@ -311,209 +311,209 @@ lookup_codes <- function(codes=row, LstdfCodesheets=LstdfCodesheets,expand_input
               df_lookup_anno=df_lookup_anno))
 }
 
-# # codes.lookup$lst_lookup_anno$ICD10$c_text[match(codes.lookup$df_lookup[,get("ICD10")] ,codes.lookup$lst_lookup_anno[["ICD10"]]$c)]
-#######################################
-#### LOAD DATA.
-#######################################
-setwd("/Users/niek/repos/ukbpheno/R")
-source("ProcessdfDefinitions.R")
-fcoding.xls="../data_files/all_lkps_maps.xlsx"
-if(!exists("LstdfCodesheets")){ LstdfCodesheets <- load_data() }
-
-gc()
-########################################
-##### STAND ALONE EXAMPLE FOR 1 ROW.
-########################################
-# ICD10, icd9, read2,ct3,
-dfDefinitions_file="../data_files/definitions.tsv"
-df = data.frame(fread(dfDefinitions_file))
-df <- ProcessDfDefinitions(df=df,fill_dependencies = F)
-df <- df[,c("TRAIT","DESCRIPTION", "ICD10","ICD9","READ2","CTV3","OPCS4")]
-names(df) <- c("TRAIT","DESCRIPTION", "ICD10","ICD9","READ","CTV3","OPCS4") # READ2 > READ 
-# # DO IIT FOR 1 ROW suggest codes for 1 selected row.
-irow=13 #12 #3#12
-row <- df[irow,]
-#row$OPCS4 <- "K02"
-codes.lookup <- lookup_codes(codes = row,LstdfCodesheets=LstdfCodesheets,expand_input=T)
-
-codes.lookup$df_lookup
-#### SHINY:
-
-
-library(shiny)
-library(DT)
-# Define UI for app that draws a histogram ----
-ui <- fluidPage(
-  # App title ----
-  titlePanel("UKB code explorer"),
-  # Sidebar layout with input and output definitions ----
-  sidebarLayout(
-    # Sidebar panel for inputs ----
-    sidebarPanel(
-      # Input: Slider for the number of bins ----
-      textAreaInput(inputId="iICD10", label="ICD10", value = "Z951 (cabg)", width = NULL, placeholder = NULL),
-      textAreaInput(inputId="iICD9", label="ICD9", value = "", width = NULL, placeholder = NULL),
-      textAreaInput(inputId="iREAD", label="READ", value = "", width = NULL, placeholder = NULL),
-      textAreaInput(inputId="iCTV3", label="CTV3", value = "", width = NULL, placeholder = NULL),
-      textAreaInput(inputId="iOPCS4", label="OPCS4", value = "K40,K41,K43,K44,K45,K46(cabg),K471(endarterectomy),K49, K50,K75 (pci)", width = NULL, placeholder = NULL),
-      checkboxInput(inputId = "iExpandcodes", "Expand codes, e.g. I50 -> I501,I502, etc.  ", FALSE),
-      actionButton("goButton", "Go!"),
-      HTML("<br><br>note; this is a tryout - for exploration, translations are not reliable. - BNF/DMD not included.")
-    ),
-    # Main panel for displaying outputs ----
-    mainPanel(
-      #verbatimTextOutput("oICD10")
-      #DT::dataTableOutput("table_input")
-
-      tabsetPanel(
-        tabPanel("ICD10 ", DT::dataTableOutput("table_oICD10")),
-        tabPanel("ICD9",  DT::dataTableOutput("table_oICD9")),
-        tabPanel("READ",  DT::dataTableOutput("table_oREAD")),
-        tabPanel("CTV3",  DT::dataTableOutput("table_oCTV3")),
-        tabPanel("OPCS4",  DT::dataTableOutput("table_oOPCS4")),
-        tabPanel("n_20003",  DT::dataTableOutput("table_on_20003")),
-        tabPanel("output",
-                 checkboxInput(inputId = "iIncludetext", "include description", FALSE),
-                 h4("ICD10"),textOutput("codes_oICD10"),
-                 h4("ICD9"),textOutput("codes_oICD9"),
-                 h4("READ"),textOutput("codes_oREAD"),
-                 h4("CTV3"),textOutput("codes_oCTV3"),
-                 h4("OPCS4"),textOutput("codes_oOPCS4"),
-                 h4("n_20003"),textOutput("codes_on_20003")
-                 ),
-        tabPanel("lookuptable",  DT::dataTableOutput("table_oraw"))
-
-
-
-      )
-    )
-  )
-)
-
-
-server <- function(input, output) {
-
-    values_lookup <- reactiveValues(codes.lookup.shinyready = NULL)
-
-    observeEvent(input$goButton, {
-    showModal(modalDialog( "please wait" ,easyClose = FALSE,footer=NULL))
-    row <- data.frame(ICD10=gsub("\\|",",",input$iICD10),
-               ICD9=gsub("\\|",",",input$iICD9),
-               READ=gsub("\\|",",",input$iREAD),
-               CTV3=gsub("\\|",",",input$iCTV3),
-               OPCS4=gsub("\\|",",",input$iOPCS4))
-
-
-    codes.lookup <- lookup_codes(codes = row,LstdfCodesheets=LstdfCodesheets,expand_input=input$iExpandcodes)
-
-
-    convert_lookup_to_df <- function(codes,input_c=row_exp$ICD10){
-      df <- data.frame(codes=codes$c,text=codes$text,c_text=codes$c_text, input=codes$c %in% input_c)
-
-      if(nrow(df)==0){
-        df <- data.frame(codes="",text="",c_text="",input=FALSE)
-      }
-      return(df)
-    }
-    values_lookup$codes.lookup.shinyready <<- lapply(codes.lookup$cols,function(x) convert_lookup_to_df(codes = codes.lookup$lst_lookup_anno[[x]], input_c = codes.lookup$input_c[[x]] ))
-    names(values_lookup$codes.lookup.shinyready) <<- codes.lookup$cols
-
-    dtoptions=list(pageLength = 25, info = FALSE,lengthMenu = list(c(25,50,100,200, -1), c("25","50","100","200", "All")))
-
-    output$table_oICD10 = DT::renderDataTable({
-      values_lookup$codes.lookup.shinyready$ICD10[,c(1,2,4)]
-    },filter = "top",options=dtoptions,
-    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$ICD10$input) ))
-
-    output$table_oICD9 = DT::renderDataTable({
-      values_lookup$codes.lookup.shinyready$ICD9[,c(1,2,4)]
-    },filter = "top",options=dtoptions,
-    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$ICD9$input) ))
-
-
-    output$table_oREAD = DT::renderDataTable({
-      values_lookup$codes.lookup.shinyready$READ[,c(1,2,4)]
-    },filter = "top",options=dtoptions,
-    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$READ$input) ))
-
-    output$table_oCTV3 = DT::renderDataTable({
-      values_lookup$codes.lookup.shinyready$CTV3[,c(1,2,4)]
-    },filter = "top",options=dtoptions,
-    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$CTV3$input) ))
-
-
-    output$table_oOPCS4 = DT::renderDataTable({
-      values_lookup$codes.lookup.shinyready$OPCS4[,c(1,2,4)]
-    },filter = "top",options=dtoptions,
-    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$OPCS4$input) ))
-
-    output$table_on_20003 = DT::renderDataTable({
-      values_lookup$codes.lookup.shinyready$n_20003[,c(1,2,4)]
-    },filter = "top",options=dtoptions,
-    selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$n_20003$input) ))
-
-   # data.frame(x="123",t="asd")
-    removeModal()
-  })
-
-  output$codes_oICD10 <- renderPrint({
-    s = input$table_oICD10_rows_selected
-    if(input$iIncludetext){
-     paste(values_lookup$codes.lookup.shinyready$ICD10[s,]$c_text,collapse=", ")
-  } else{
-    paste(values_lookup$codes.lookup.shinyready$ICD10[s,]$codes,collapse=", ")
-  }
-
-  })
-  output$codes_oICD9 <- renderPrint({
-    s = input$table_oICD9_rows_selected
-    if(input$iIncludetext){
-      paste(values_lookup$codes.lookup.shinyready$ICD9[s,]$c_text,collapse=", ")
-    } else {
-      paste(values_lookup$codes.lookup.shinyready$ICD9[s,]$codes,collapse=", ")
-    }
-
-  })
-  output$codes_oREAD <- renderPrint({
-    s = input$table_oREAD_rows_selected
-    if(input$iIncludetext){
-      paste(values_lookup$codes.lookup.shinyready$READ[s,]$c_text,collapse=", ")
-    } else{
-      paste(values_lookup$codes.lookup.shinyready$READ[s,]$codes,collapse=", ")
-    }
-  })
-  output$codes_oCTV3 <- renderPrint({
-    s = input$table_oCTV3_rows_selected
-    if(input$iIncludetext){
-      paste(values_lookup$codes.lookup.shinyready$CTV3[s,]$c_text,collapse=", ")
-    } else {
-      paste(values_lookup$codes.lookup.shinyready$CTV3[s,]$codes,collapse=", ")
-    }
-  })
-  output$codes_oOPCS4 <- renderPrint({
-    s = input$table_oOPCS4_rows_selected
-    if(input$iIncludetext){
-      paste(values_lookup$codes.lookup.shinyready$OPCS4[s,]$c_text,collapse=", ")
-    } else {
-      paste(values_lookup$codes.lookup.shinyready$OPCS4[s,]$codes,collapse=", ")
-    }
-  })
-  output$codes_on_20003 <- renderPrint({
-    s = input$table_on_20003_rows_selected
-    if(input$iIncludetext){
-      paste(values_lookup$codes.lookup.shinyready$n_20003[s,]$c_text,collapse=", ")
-    } else {
-      paste(values_lookup$codes.lookup.shinyready$n_20003[s,]$codes,collapse=", ")
-    }
-  })
-
+# # # codes.lookup$lst_lookup_anno$ICD10$c_text[match(codes.lookup$df_lookup[,get("ICD10")] ,codes.lookup$lst_lookup_anno[["ICD10"]]$c)]
+# #######################################
+# #### LOAD DATA.
+# #######################################
+# setwd("/Users/niek/repos/ukbpheno/R")
+# source("ProcessdfDefinitions.R")
+# fcoding.xls="../data_files/all_lkps_maps.xlsx"
+# if(!exists("LstdfCodesheets")){ LstdfCodesheets <- load_data() }
 #
-  output$table_oraw = DT::renderDataTable({
-    LstdfCodesheets$ALL
-  },filter = "top")
-  #output$oICD10 <- renderText({ })
-}
-shinyApp(ui, server)
+# gc()
+# ########################################
+# ##### STAND ALONE EXAMPLE FOR 1 ROW.
+# ########################################
+# # ICD10, icd9, read2,ct3,
+# dfDefinitions_file="../data_files/definitions.tsv"
+# df = data.frame(fread(dfDefinitions_file))
+# df <- ProcessDfDefinitions(df=df,fill_dependencies = F)
+# df <- df[,c("TRAIT","DESCRIPTION", "ICD10","ICD9","READ2","CTV3","OPCS4")]
+# names(df) <- c("TRAIT","DESCRIPTION", "ICD10","ICD9","READ","CTV3","OPCS4") # READ2 > READ
+# # # DO IIT FOR 1 ROW suggest codes for 1 selected row.
+# irow=13 #12 #3#12
+# row <- df[irow,]
+# #row$OPCS4 <- "K02"
+# codes.lookup <- lookup_codes(codes = row,LstdfCodesheets=LstdfCodesheets,expand_input=T)
+#
+# codes.lookup$df_lookup
+# #### SHINY:
+#
+#
+# library(shiny)
+# library(DT)
+# # Define UI for app that draws a histogram ----
+# ui <- fluidPage(
+#   # App title ----
+#   titlePanel("UKB code explorer"),
+#   # Sidebar layout with input and output definitions ----
+#   sidebarLayout(
+#     # Sidebar panel for inputs ----
+#     sidebarPanel(
+#       # Input: Slider for the number of bins ----
+#       textAreaInput(inputId="iICD10", label="ICD10", value = "Z951 (cabg)", width = NULL, placeholder = NULL),
+#       textAreaInput(inputId="iICD9", label="ICD9", value = "", width = NULL, placeholder = NULL),
+#       textAreaInput(inputId="iREAD", label="READ", value = "", width = NULL, placeholder = NULL),
+#       textAreaInput(inputId="iCTV3", label="CTV3", value = "", width = NULL, placeholder = NULL),
+#       textAreaInput(inputId="iOPCS4", label="OPCS4", value = "K40,K41,K43,K44,K45,K46(cabg),K471(endarterectomy),K49, K50,K75 (pci)", width = NULL, placeholder = NULL),
+#       checkboxInput(inputId = "iExpandcodes", "Expand codes, e.g. I50 -> I501,I502, etc.  ", FALSE),
+#       actionButton("goButton", "Go!"),
+#       HTML("<br><br>note; this is a tryout - for exploration, translations are not reliable. - BNF/DMD not included.")
+#     ),
+#     # Main panel for displaying outputs ----
+#     mainPanel(
+#       #verbatimTextOutput("oICD10")
+#       #DT::dataTableOutput("table_input")
+#
+#       tabsetPanel(
+#         tabPanel("ICD10 ", DT::dataTableOutput("table_oICD10")),
+#         tabPanel("ICD9",  DT::dataTableOutput("table_oICD9")),
+#         tabPanel("READ",  DT::dataTableOutput("table_oREAD")),
+#         tabPanel("CTV3",  DT::dataTableOutput("table_oCTV3")),
+#         tabPanel("OPCS4",  DT::dataTableOutput("table_oOPCS4")),
+#         tabPanel("n_20003",  DT::dataTableOutput("table_on_20003")),
+#         tabPanel("output",
+#                  checkboxInput(inputId = "iIncludetext", "include description", FALSE),
+#                  h4("ICD10"),textOutput("codes_oICD10"),
+#                  h4("ICD9"),textOutput("codes_oICD9"),
+#                  h4("READ"),textOutput("codes_oREAD"),
+#                  h4("CTV3"),textOutput("codes_oCTV3"),
+#                  h4("OPCS4"),textOutput("codes_oOPCS4"),
+#                  h4("n_20003"),textOutput("codes_on_20003")
+#                  ),
+#         tabPanel("lookuptable",  DT::dataTableOutput("table_oraw"))
+#
+#
+#
+#       )
+#     )
+#   )
+# )
 
+
+# server <- function(input, output) {
+#
+#     values_lookup <- reactiveValues(codes.lookup.shinyready = NULL)
+#
+#     observeEvent(input$goButton, {
+#     showModal(modalDialog( "please wait" ,easyClose = FALSE,footer=NULL))
+#     row <- data.frame(ICD10=gsub("\\|",",",input$iICD10),
+#                ICD9=gsub("\\|",",",input$iICD9),
+#                READ=gsub("\\|",",",input$iREAD),
+#                CTV3=gsub("\\|",",",input$iCTV3),
+#                OPCS4=gsub("\\|",",",input$iOPCS4))
+#
+#
+#     codes.lookup <- lookup_codes(codes = row,LstdfCodesheets=LstdfCodesheets,expand_input=input$iExpandcodes)
+#
+#
+#     convert_lookup_to_df <- function(codes,input_c=row_exp$ICD10){
+#       df <- data.frame(codes=codes$c,text=codes$text,c_text=codes$c_text, input=codes$c %in% input_c)
+#
+#       if(nrow(df)==0){
+#         df <- data.frame(codes="",text="",c_text="",input=FALSE)
+#       }
+#       return(df)
+#     }
+#     values_lookup$codes.lookup.shinyready <<- lapply(codes.lookup$cols,function(x) convert_lookup_to_df(codes = codes.lookup$lst_lookup_anno[[x]], input_c = codes.lookup$input_c[[x]] ))
+#     names(values_lookup$codes.lookup.shinyready) <<- codes.lookup$cols
+#
+#     dtoptions=list(pageLength = 25, info = FALSE,lengthMenu = list(c(25,50,100,200, -1), c("25","50","100","200", "All")))
+#
+#     output$table_oICD10 = DT::renderDataTable({
+#       values_lookup$codes.lookup.shinyready$ICD10[,c(1,2,4)]
+#     },filter = "top",options=dtoptions,
+#     selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$ICD10$input) ))
+#
+#     output$table_oICD9 = DT::renderDataTable({
+#       values_lookup$codes.lookup.shinyready$ICD9[,c(1,2,4)]
+#     },filter = "top",options=dtoptions,
+#     selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$ICD9$input) ))
+#
+#
+#     output$table_oREAD = DT::renderDataTable({
+#       values_lookup$codes.lookup.shinyready$READ[,c(1,2,4)]
+#     },filter = "top",options=dtoptions,
+#     selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$READ$input) ))
+#
+#     output$table_oCTV3 = DT::renderDataTable({
+#       values_lookup$codes.lookup.shinyready$CTV3[,c(1,2,4)]
+#     },filter = "top",options=dtoptions,
+#     selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$CTV3$input) ))
+#
+#
+#     output$table_oOPCS4 = DT::renderDataTable({
+#       values_lookup$codes.lookup.shinyready$OPCS4[,c(1,2,4)]
+#     },filter = "top",options=dtoptions,
+#     selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$OPCS4$input) ))
+#
+#     output$table_on_20003 = DT::renderDataTable({
+#       values_lookup$codes.lookup.shinyready$n_20003[,c(1,2,4)]
+#     },filter = "top",options=dtoptions,
+#     selection = list(mode = 'multiple', selected = which(values_lookup$codes.lookup.shinyready$n_20003$input) ))
+#
+#    # data.frame(x="123",t="asd")
+#     removeModal()
+#   })
+#
+#   output$codes_oICD10 <- renderPrint({
+#     s = input$table_oICD10_rows_selected
+#     if(input$iIncludetext){
+#      paste(values_lookup$codes.lookup.shinyready$ICD10[s,]$c_text,collapse=", ")
+#   } else{
+#     paste(values_lookup$codes.lookup.shinyready$ICD10[s,]$codes,collapse=", ")
+#   }
+#
+#   })
+#   output$codes_oICD9 <- renderPrint({
+#     s = input$table_oICD9_rows_selected
+#     if(input$iIncludetext){
+#       paste(values_lookup$codes.lookup.shinyready$ICD9[s,]$c_text,collapse=", ")
+#     } else {
+#       paste(values_lookup$codes.lookup.shinyready$ICD9[s,]$codes,collapse=", ")
+#     }
+#
+#   })
+#   output$codes_oREAD <- renderPrint({
+#     s = input$table_oREAD_rows_selected
+#     if(input$iIncludetext){
+#       paste(values_lookup$codes.lookup.shinyready$READ[s,]$c_text,collapse=", ")
+#     } else{
+#       paste(values_lookup$codes.lookup.shinyready$READ[s,]$codes,collapse=", ")
+#     }
+#   })
+#   output$codes_oCTV3 <- renderPrint({
+#     s = input$table_oCTV3_rows_selected
+#     if(input$iIncludetext){
+#       paste(values_lookup$codes.lookup.shinyready$CTV3[s,]$c_text,collapse=", ")
+#     } else {
+#       paste(values_lookup$codes.lookup.shinyready$CTV3[s,]$codes,collapse=", ")
+#     }
+#   })
+#   output$codes_oOPCS4 <- renderPrint({
+#     s = input$table_oOPCS4_rows_selected
+#     if(input$iIncludetext){
+#       paste(values_lookup$codes.lookup.shinyready$OPCS4[s,]$c_text,collapse=", ")
+#     } else {
+#       paste(values_lookup$codes.lookup.shinyready$OPCS4[s,]$codes,collapse=", ")
+#     }
+#   })
+#   output$codes_on_20003 <- renderPrint({
+#     s = input$table_on_20003_rows_selected
+#     if(input$iIncludetext){
+#       paste(values_lookup$codes.lookup.shinyready$n_20003[s,]$c_text,collapse=", ")
+#     } else {
+#       paste(values_lookup$codes.lookup.shinyready$n_20003[s,]$codes,collapse=", ")
+#     }
+#   })
+#
+# #
+#   output$table_oraw = DT::renderDataTable({
+#     LstdfCodesheets$ALL
+#   },filter = "top")
+#   #output$oICD10 <- renderText({ })
+# }
+# shinyApp(ui, server)
+#
 
 

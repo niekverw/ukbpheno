@@ -60,7 +60,7 @@ get_case_status_by_source <- function(source_lst,definitions,
   }
   return(case_status)
 }
-case_status<-get_case_status_by_source(source_lst=source_lst,definitions,lst.data,lst.data.settings,lst.identifiers=vct.identifiers,reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
+# case_status<-get_case_status_by_source(source_lst=source_lst,definitions,lst.data,lst.data.settings,lst.identifiers=vct.identifiers,reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
 
 
 

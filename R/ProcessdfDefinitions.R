@@ -520,7 +520,7 @@ add_child_nodes <-function(dfcode,codeVct){
 #' @keywords definition
 #' @export
 #' @example
-#' expand_dfDefinitions_processed2(dfDefinitions_processed,lst.data.settings,"code_map_dir/")
+#' expand_dfDefinitions_processed2(dfDefinitions_processed,lst.data.settings,"inst/extdata/")
 expand_dfDefinitions_processed2 <-
   function(dfDefinitions_processed,
            lst.data.settings,code_map_dir="data/") {
@@ -587,7 +587,7 @@ expand_dfDefinitions_processed2 <-
 #' @keywords definition
 #' @export
 #' @example
-#' check_dfDefinitions_codes(dfDefinitions_processed,lst.data.settings,code_map_dir ="code_map_dir/")
+#' check_dfDefinitions_codes(dfDefinitions_processed,lst.data.settings,code_map_dir ="inst/extdata/")
 check_dfDefinitions_codes <-function(dfDefinitions_processed,
                                      lst.data.settings,code_map_dir="data/",check_expandable_codes_only=T){
    all_missing_codes<-lst()
