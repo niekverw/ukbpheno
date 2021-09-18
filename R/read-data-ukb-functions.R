@@ -319,11 +319,18 @@ read_gp_clinical_data <- function(fgp){
   # records potentially erroneous have date changed to 01/01/1901 (occured before birth), 02/02/1902 (occured on DOB), 03/03/1903 (same year as DOB), 07/07/2037 (occured after the time of extraction)
   mindate = as.Date("1930-01-01")
   maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?.
+  ####################################################
   # in current structure of gp_clinical.txt
+  ###################################################
   # $1 eid $3 event_dt $4 read_2 $5 read3
   # $2 data_provider  $6 - $8 are free-text fields "value" entries differ depending on the data source
-  dfgp <- data.table::fread(cmd = paste("awk -F'\t'  '$6==\"\" && $7==\"\" && $8==\"\" {print $1,$3,$4,$5}' OFS='\t'",fgp) ,sep = "\t",
-                colClasses = c("integer","character","character","character")) #,select=cols_tokeep)
+  # eid	data_provider	event_dt	read_2	read_3	value1	value2	value3
+
+    # dfgp <- data.table::fread(cmd = paste("awk -F'\t'  '$6==\"\" && $7==\"\" && $8==\"\" {print $1,$3,$4,$5}' OFS='\t'",fgp) ,sep = "\t",
+                # colClasses = c("integer","character","character","character")) #,select=cols_tokeep)
+  dfgp <- data.table::fread(fgp ,sep = "\t",select=c(eid="integer", event_dt="character",read_2="character",read_3="character")) # ," | head -10000 "
+# temp<-fread(paste0(fgp,".head"),sep = "\t",select=c(eid="integer", event_dt="character",read_2="character",read_3="character"))
+
   #names(dfgp) <-  c("eid",	"data_provider",	"event_dt",	"read_2",	"read_3",	"value1","value2","value3")
 
   names(dfgp) <-  c("eid",	"event_dt",	"read_2",	"read_3")
