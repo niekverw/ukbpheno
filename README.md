@@ -1,43 +1,30 @@
 # ukbpheno
 
-`run.r` test script. for development. 
+## Description
+ukbpheno is an R package for efficiently munging the files provided by UK Biobank to generate data tables of with unified format for further analysis such as making dichotomous phenotypes for UKbio and a composite time-to-event variable combining record level data (HESIN/GP/cancer registry) and main dataset (self reports i.e. nurse interview / touchscreen). The package can also be used to efficiently extract required columns from a huge main dataset for exploration which is aided by visualization functionalities included in the package. 
 
-Currently it only reads in the data and converts data into dataframes with 4-5 colums: Identifier, event-date, event-code, event (yes/no), episode-duration (optional) 
 
-
-## data types
-### Time to event data
-- HESIN: ICD9, ICD10, OPCS3, OPCS4. decide how to optionize with primary and secondary diagnoses. 
-- Primary care: clinical (ReadV2, CTV3) scripts(readv2, BNF, DMD) 
-- Death records 
-- Self report: non-cancer (20002 + 20009), cancer and operation. 
-- medication nurse interview
-
-### Other data, e.g. yes/no, categorical without dates. 
-- touchscreen variables, sometimes corresponding age of diagnosis. 
-- abnormal biomarker cutoffs? 
+## Installation
 
 
 
-## 
-Given a visit-date or other date (e.g. date of  diagnosis) and some codes, calculate:
-- days to first event in history
-- days to first event in future
-- if participant is positive +/- 5? days from the visit (e.g. relevant to see if individual is on medication)
-- days to death (primary cause)
-- days to death (secondary cause)
-- some number on severity? 
-- some number about if data looks strange? 
 
+## Data Source
+- main dataset (ukb12345.tab)
 
---------
+- metadata of the main dataset (.html)
 
--  age of first diagnosis. 
--  censoring dates (e.g. cancer have different censoring dates). can we make further variables that summarize full censoring columns that can be used in cox/kaplan for age-of-diagnosis or (new-onset) event from baseline ? 
--  how to merge data where you have no days to event. 
--  more complicated queries, e.g. need at least X codes for primary care to be considered? 
--  more complex combinations e.g. specific combination of codes like operation + diagnosis.  
--  more complex phenotype schemes, e.g. exclude asthma from COPD cases. 
--  scoring cases/intersections e.g. to define high confidence cases vs low confidence vs controls. 
-- functions that can help with defining a disease, e.g. suggest codes based on others. 
+- record level data from data portal
 
+- definition table  
+
+- data setting 
+
+(see tutorial - data preparation)
+
+## Usage
+
+`library(ukbpheno)
+timeline
+code plot (heatmap/radar)
+`
