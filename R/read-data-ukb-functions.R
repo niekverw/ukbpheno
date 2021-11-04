@@ -492,7 +492,10 @@ sumcounts <- function(dfs){
 #' lst.data <- append(lst.data,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper ))
 #' get_lst_counts(lst.data,lst.data.settings)
 get_lst_counts <- function(lst.data,lst.data.settings) {
-
+  if(nrow(lst.data.settings[!lst.data.settings$datasource %in% names(lst.data),])>0)  {
+    message(paste("NOTE not in lst.data:", paste( lst.data.settings[!lst.data.settings$datasource %in% names(lst.data),'datasource'],sep=",",collapse=",") ))
+    }
+  lst.data.settings <- lst.data.settings[lst.data.settings$datasource %in% names(lst.data),]
   print("counting")
   lst.counts <- lapply(lst.data, function(x) x[, .N, by=.(code)] )
   # print(lst.counts)
