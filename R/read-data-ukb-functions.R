@@ -491,7 +491,7 @@ sumcounts <- function(dfs){
 #' lst.data$tte.sr.20002 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20002",field_sr_date = "20008",qc_treshold_year = 10)
 #' lst.data <- append(lst.data,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper ))
 #' get_lst_counts(lst.data,lst.data.settings)
-get_lst_counts <- function(lst.data,lst.data.setting) {
+get_lst_counts <- function(lst.data,lst.data.settings) {
 
   print("counting")
   lst.counts <- lapply(lst.data, function(x) x[, .N, by=.(code)] )
