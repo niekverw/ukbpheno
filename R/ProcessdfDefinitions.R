@@ -629,7 +629,9 @@ check_dfDefinitions_codes <-function(dfDefinitions_processed,
     if ((! unique(lst.data.settings[lst.data.settings$classification==cls,]$hierarchical_map))&(unique(lst.data.settings[lst.data.settings$classification==cls,]$expand_codes==1) )) {
     extended_matches <- lapply(codes,  function(x) any(stringr::str_detect(lst.codemap[[cls]]$coding,stringr::regex(paste("^", x, sep = ""),ignore_case =ignore.case ))))
 
-    missing_codes<-codes[!unlist(extended_matches)]
+    if (length(extended_matches)>0){
+      missing_codes<-codes[!unlist(extended_matches)]
+    }
 
     }
 
