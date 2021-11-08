@@ -429,6 +429,7 @@ get_allvarnames <- function(dfDefinitions_processed,dfhtml=NULL){
   }else{
     fields_missed<- all_ukb_fields[!all_ukb_fields %in%dfhtml$field.showcase]
     message(glue::glue("WARNING: {length(fields_missed)} fields not found in the main dataset: {glue::glue_collapse(fields_missed, sep = ',')}"))
+    return(NULL)
   }
 
   }
