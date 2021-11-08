@@ -10,55 +10,6 @@ repo_dir=".../repos/ukbpheno/"
 pheno_dir=".../data/ukb12345/"
 
 
-
-
-#############################################################################
-# load the example definition table and data setting included in the package
-#############################################################################
-data_dir<-paste(repo_dir,"/inst/extdata/",sep="")
-fdefinitions = paste(data_dir,"definitions_CadDcmHcmAfHf_CTV_READ2.tsv",sep="")
-fdata_setting = paste(data_dir,"data.settings.tsv",sep="")
-
-# ##########################################
-# read setting
-############################################
-lst.data.settings <-fread(fdata_setting)
-
-####################################################
-# # read definitions.
-###################################################
-dfDefinitions <- fread(fdefinitions, colClasses = 'character', data.table = FALSE)
-dfDefinitions_processed <- ProcessDfDefinitions(dfDefinitions)
-# check the codes in the definition table against the code maps
-# the code maps are either downloaded from UK biobank showcase (codingxx.tsv) for which has been checked to include all codes present in data  (Oct 2020, ukb41823)
-# or created from the current data (.code)
-# WHAT IT MEANS: Codes that are not present will be removed in the expand_dfDefinitions...() as the they will be removed
-# in theory these extra codes will not cause crashes of the pipeline unless the whole line is empty (no codes from any source)
-missing_codes<-check_dfDefinitions_codes(dfDefinitions_processed,lst.data.settings,code_map_dir=data_dir,F)
-data.table::fwrite(list(missing_codes),paste(pheno_dir,"ukbphenodata_feb2021.Rdata_notInData.code"))
-
-# expand, because of performance, grepping on many columns is slow
-############################################################################
-###########################################################################
-# TODO maybe write a function to generate those code maps?
-# TODO remove the hierchical part of the expand_dfDefinitions_processed2 () and grep everything?
-########################################################################
-########################################################################
-dfDefinitions_processed_expanded <-expand_dfDefinitions_processed2(dfDefinitions_processed,lst.data.settings,code_map_dir =data_dir )
-
-#TODO wrap the session to this function
-generate_harmonized_long_format_datatable <- function(f.ukbtab=NULL,f.html=NULL,fhesin=NULL,....){
-
-
-}
-
-
-
-
-# ##################################################
-# # Prepare UKB data:
-####################################################
-
 fukbtab = paste(pheno_dir,"ukb47316.tab",sep="")
 fhtml = paste(pheno_dir,"ukb47316.html",sep="")
 fhesin=paste(pheno_dir,"hesin.txt",sep="")
@@ -66,29 +17,102 @@ fhesin_diag=paste(pheno_dir,"hesin_diag.txt",sep="")
 fhesin_oper=paste(pheno_dir,"hesin_oper.txt",sep="")
 fgp_clinical =paste(pheno_dir,"gp_clinical.txt",sep="")
 fgp_scripts =paste(pheno_dir,"gp_scripts.txt",sep="")
-
-
 fdeath_portal=paste(pheno_dir,"death.txt",sep="")
 fdeath_cause_portal=paste(pheno_dir,"death_cause.txt",sep="")
-# output file:
-fukbphenodata <- paste(pheno_dir,"ukbphenodata_dataPortal_june2021_defv3.1.Rdata",sep="") #where to store final object
 
+
+#############################################################################
+# load the example definition table and data setting included in the package
+#############################################################################
+data_dir<-paste(repo_dir,"inst/extdata/",sep="")
+fdefinitions = paste(data_dir,"definitions_CadDcmHcmAfHf_CTV_READ2.tsv",sep="")
+fdata_setting = paste(data_dir,"data.settings.tsv",sep="")
+
+# ##########################################
+# read setting
+############################################
+rm(dt.data.settings)
+dt.data.settings <-fread(fdata_setting)
+class(dt.data.settings)
+####################################################
+# # read definitions.
+###################################################
+dfDefinitions <- fread(fdefinitions, colClasses = 'character', data.table = FALSE)
+dfDefinitions_processed <- ProcessDfDefinitions(dfDefinitions)
+# Next we check the codes in the definition table against the code maps
+# The code maps are either downloaded from UK biobank showcase (codingxx.tsv) [search corresponding Data-Coding in showcase] for which has been checked to include all codes present in data # or to be created from the current data at hand (.code)
+
+# currently 2 coding systems exist for gp_clinical
+cf_read3<-dt.data.settings[dt.data.settings$classification=="CTV3",]$code_map
+cf_read2<-dt.data.settings[dt.data.settings$classification=="READ2",]$code_map
+# corresponding column names from the .txt file
+get_all_exsiting_codes(fgp_clinical,c("read_2","read_3"),c(paste0(data_dir,cf_read2),paste0(data_dir,cf_read3)))
+
+#  3 gp_script
+cf_dmd<-dt.data.settings[dt.data.settings$classification=="DMD",]$code_map
+# bnf.england bnf.scotland are separated because they appear to be coded slightly differently according to the official documentation...hence different post-processing may be needed
+cf_bnf<-unique(dt.data.settings[dt.data.settings$classification=="BNF",]$code_map)
+cf_read2d<-dt.data.settings[dt.data.settings$classification=="READ2_drugs",]$code_map
+get_all_exsiting_codes(fgp_scripts,c("read_2","bnf_code","dmd_code"),c(paste0(data_dir,cf_read2d),paste0(data_dir,cf_bnf),paste0(data_dir,cf_dmd)))
+
+
+
+
+# With the code maps, we check the codes in the definition table
+#
+missing_codes<-check_dfDefinitions_codes(dfDefinitions_processed,dt.data.settings,code_map_dir=data_dir,F)
+data.table::fwrite(list(missing_codes),paste(pheno_dir,"ukbphenodata_feb2021.Rdata_notInData.code"))
+
+# WHAT IT MEANS: Codes that are not present will be removed in the expand_dfDefinitions...() as the they will be removed
+# in theory these extra codes will not cause crashes of the pipeline unless the whole line is empty (no codes from any source)
+dfDefinitions_processed_expanded <-expand_dfDefinitions_processed2(dfDefinitions_processed,dt.data.settings,code_map_dir =data_dir )
+
+########################################################################
+########################################################################
+# TODO remove the hierchical part of the expand_dfDefinitions_processed2 () and grep everything?
+# reason not to do this : ICD 9/10 codes are used HESIN (portal),DEATH (portal)and CANCER (ukb.tab column) -> to gather all available codes in the data means we need to first get lst.data which is the same as dfDefinitions_processed()!
+
+########################################################################
+########################################################################
+
+
+
+
+
+
+
+
+
+
+#TODO wrap the below(?) session to this function
+generate_harmonized_long_format_datatable <- function(f.ukbtab=NULL,f.html=NULL,fhesin=NULL,....){
+
+
+}
+# ##################################################
+# # Prepare UKB data:
+####################################################
 
 # # read ukb data from ukbconv (.html + .tab)
 tictoc::tic("converting data")
 # # ukb's .tab meta data
 dfhtml <- read_ukb_metadata(fhtml) # 9 columns in dfhtml: "field.number","field.count","field.showcase","field.html","field.tab","field.description","col.type","col.name","fread_column_type"
+
 # # ukb's .tab file; extract only relevant fields
-dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions_processed,dfhtml) ## regarding downstream functions, what happens if å field is not present, will we get an error? YES a check now is performed in get_allvarnames()
-#
-#
 
 
-# subset for minimal data loading
-dfukb <- read_ukb_tabdata(fukbtab,dfhtml,fields_to_keep = dfDefinitions_ukb_fields$all_ukb_fields) # 439.52 sec
+# we then use this meta-data to check if all fields we need are inside the .tab file
+# the function outputs a list of fields that are required
+dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions_processed,dfhtml)
+
+
+# Next is to extract those columns required from the .tab file
+dfukb <- read_ukb_tabdata(fukbtab,dfhtml,fields_to_keep = dfDefinitions_ukb_fields$all_ukb_fields)
+
+
+
 vct.identifiers <- as.character(dfukb$f.eid)
 gc()
-
 
 
 ################################################################################
@@ -160,10 +184,16 @@ lst.data <- lapply(lst.data,function(x) {setkey(x,code) })
 lst.data <- lapply(lst.data,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
 lst.data <- lapply(lst.data,function(x) {x[,'eventdate'] <-  round(x$eventdate);return(x) })
 
+
+
+# fukbphenodata <- paste(pheno_dir,"ukbphenodata_dataPortal_june2021_defv3.1.Rdata",sep="") #where to store final object
+
+
+
 # tictoc::toc() #  1111.306 sec elapsed, 18min.
 
 # here it is stored as .Rdata
-save(dfhtml,dfukb,lst.data,lst.data.settings,file=fukbphenodata)
+save(dfhtml,dfukb,lst.data,dt.data.settings,file=fukbphenodata)
 
 
 
@@ -214,7 +244,7 @@ load(fukbphenodata)
       # !!!!!!if there is study population reference date will not be considered! HENCE dealt separately
 
       message(glue::glue("Reference date for **{unique(dfDefinitions_processed_expanded[dfDefinitions_processed_expanded$TRAIT==trait,]$DESCRIPTION)} ** will be first event of trait in Study Population"))
-      lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==trait), lst.data,lst.data.settings,reference_date = NULL,vct.identifiers)
+      lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==trait), lst.data,dt.data.settings,reference_date = NULL,vct.identifiers)
       # keep a subset to reduce file size
       lst.case_control$df.casecontrol<-lst.case_control$df.casecontrol[,c("f.eid","survival_days",  "Death_any", "Hx_days","Fu_days","Hx","Fu","Any")]
       # rename col names
@@ -239,7 +269,7 @@ load(fukbphenodata)
         # visit=0
         visitdatefield = visitdatefields[visit+1]
         # trait="RxChol"
-        lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==trait), lst.data,lst.data.settings, reference_date=setNames(as.Date(as.character(dfukb[[visitdatefield]]),format="%Y-%m-%d"),dfukb$f.eid))
+        lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==trait), lst.data,dt.data.settings, reference_date=setNames(as.Date(as.character(dfukb[[visitdatefield]]),format="%Y-%m-%d"),dfukb$f.eid))
 
         if (stringr::str_detect(trait,"Death")){
           # keep only death related columns to avoid confusion
@@ -284,7 +314,7 @@ load(fukbphenodata)
   tictoc::toc()
 
 # trait="Cad"
-# lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==trait), lst.data,lst.data.settings,reference_date = NULL,vct.identifiers)
+# lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==trait), lst.data,dt.data.settings,reference_date = NULL,vct.identifiers)
 # View(lst.case_control$df.casecontrol)
 # colnames(lst.case_control$df.casecontrol)
 # rm(trait)
