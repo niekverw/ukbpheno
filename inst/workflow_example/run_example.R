@@ -82,107 +82,137 @@ dfDefinitions_processed_expanded <-expand_dfDefinitions_processed2(dfDefinitions
 
 
 
-
+# ##################################################
+# # Prepare UKB data:
+####################################################
 
 #TODO wrap the below(?) session to this function
 generate_harmonized_long_format_datatable <- function(f.ukbtab=NULL,f.html=NULL,fhesin=NULL,....){
 
 
+
+  # # read ukb data from ukbconv (.html + .tab)
+  message("Start data harmonization")
+
+
+  if (!is.null(f.html)){
+    message("Read metadata file ")
+  # # ukb's .tab meta data
+  dfhtml <- read_ukb_metadata(fhtml) # 9 columns in dfhtml: "field.number","field.count","field.showcase","field.html","field.tab","field.description","col.type","col.name","fread_column_type"`
+  }else{
+    message("Required metadata file (.html) is missing, please generate it with ukbconv. Exit!")
+    return()
+  }
+
+  message("Verify all required fields from the definitions are present in the main dataset (.tab)")
+
+  # # ukb's .tab file; extract only relevant fields
+  # we then use this meta-data to check if all fields we need are inside the .tab file
+  # the function outputs a list of fields that are required
+  dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions_processed,dfhtml)
+  if (is.null(dfDefinitions_ukb_fields)){
+    message("Please ensure all required fields are present in the main dataset, abort!")
+    return()
+  }else{
+  message("Read .tab file and retrieve required fields.")
+  tictoc::tic()
+  # Next is to extract those columns required from the .tab file
+  dfukb <- read_ukb_tabdata(fukbtab,dfhtml,fields_to_keep = dfDefinitions_ukb_fields$all_ukb_fields)
+  tictoc::toc("time elapsed processing .tab file")
+  }
+  vct.identifiers <- as.character(dfukb$f.eid)
+  gc()
+
+
+  ################################################################################
+  # converting data
+  ################################################################################
+  lst.data <- list()
+  ################################################################################
+  # touchscreen (event==2: only the first occurence is an event)
+  ################################################################################
+  message("Convert touchscreen data")
+  lst.data$ts <- convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions_processed$TS) #154.964sec
+  ################################################################################
+  # self reported data  (event==2: only the first occurence is an event)
+  ################################################################################
+  message("Convert self-reported data")
+  message(" ->Self-reported cancer codes (field 20001)")
+  # cancer
+  lst.data$tte.sr.20001 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20001",field_sr_date = "20006",qc_threshold_year = 10)
+  message(" ->Self-reported non-cancer codes(field 20002)")
+  # non cancer
+  lst.data$tte.sr.20002 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20002",field_sr_date = "20008",qc_threshold_year = 10)
+  message(" ->Self-reported operation codes(field 20004)")
+  # operation
+  lst.data$tte.sr.20004 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20004",field_sr_date = "20010",qc_threshold_year = 10)
+  message(" ->Self-reported medication codes(field 20003)")
+  # medication (event==0, since no age of diagnosis)
+  lst.data$sr.20003 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20003",field_sr_date = "",qc_threshold_year = 10)
+
+
+
+  ################################################################################
+  # cancer registry
+  ################################################################################
+  message("Convert cancer registry data(field 40006/40013)")
+  # qc_threshold set to zeros, because cancer recurrence is fairly common (?)
+  lst.data$tte.cancer.icd10 <- convert_cancerregister_to_episodedata(dfukb,field_diagnosis = "40006",field_date = "40005",field_date_type="date",qc_threshold_year = 0,codetype = "character")
+  lst.data$tte.cancer.icd9 <- convert_cancerregister_to_episodedata(dfukb,field_diagnosis = "40013",field_date = "40005",field_date_type="date",qc_threshold_year = 0,codetype ="character")
+
+  ################################################################################
+  # death record
+  ################################################################################
+  # death registry from tab file (event==1: every occurence is a real event)
+  # lst.data$tte.death.icd10.primary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40001",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
+  # lst.data$tte.death.icd10.secondary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
+  # death registry from data portal , same data as the main dataset but more up to date, refer document DeathLinkage
+  # this is merged with the death from tab file for completeness, but it is the same data now.
+  message("Convert death registry data(data portal)")
+  lst.data_dth <- read_death_data(fdeath_portal,fdeath_cause_portal)
+  # take only the death record from portal for now
+  lst.data$tte.death.icd10.primary <-lst.data_dth$primary
+  lst.data$tte.death.icd10.secondary<-lst.data_dth$secondary
+  rm(lst.data_dth)
+  # View(lst.data$tte.death.icd10.primary)
+
+  ################################################################################
+  # hesin  (event==1)
+  ################################################################################
+  tictoc::tic("Convert Hospital Inpatient data(data portal)")
+
+  lst.data <- append(lst.data,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.primary + tte.hes.secondary
+
+  tictoc::toc()
+
+  ################################################################################
+  # primary care, gp  (event==1)
+  ################################################################################
+  tictoc::tic("Convert GP diagnosis data(data portal")
+  #individuals in gp clinical: 229436 ~55.6 millions entries
+  lst.data <- append(lst.data,read_gp_clinical_data(fgp=fgp_clinical)) # 311.128 sec, also thousands!
+  tictoc::toc()
+
+  gc()
+  tictoc::tic("Convert GP prescription data(data portal")
+  # without prescriptions #individuals in gp script: 222104 ~57.8 million entries
+  # this one does medication
+  lst.data <- append(lst.data,read_gp_script_data(fgp=fgp_scripts)) # 2798.576 sec
+  gc()
+  tictoc::toc()
+
+  # make sure eeverything is in the right format:
+  lst.data <- lapply(lst.data,function(x) {setkey(x,code) })
+  lst.data <- lapply(lst.data,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
+  lst.data <- lapply(lst.data,function(x) {x[,'eventdate'] <-  round(x$eventdate);return(x) })
+
+
+  return(lst.data,vct.identifiers)
+
 }
-# ##################################################
-# # Prepare UKB data:
-####################################################
-
-# # read ukb data from ukbconv (.html + .tab)
-tictoc::tic("converting data")
-# # ukb's .tab meta data
-dfhtml <- read_ukb_metadata(fhtml) # 9 columns in dfhtml: "field.number","field.count","field.showcase","field.html","field.tab","field.description","col.type","col.name","fread_column_type"
-
-# # ukb's .tab file; extract only relevant fields
-
-
-# we then use this meta-data to check if all fields we need are inside the .tab file
-# the function outputs a list of fields that are required
-dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions_processed,dfhtml)
-
-
-# Next is to extract those columns required from the .tab file
-dfukb <- read_ukb_tabdata(fukbtab,dfhtml,fields_to_keep = dfDefinitions_ukb_fields$all_ukb_fields)
 
 
 
-vct.identifiers <- as.character(dfukb$f.eid)
-gc()
-
-
-################################################################################
-# converting data
-
-lst.data <- list()
-
-################################################################################
-# touchscreen (event==2: only the first occurence is an event)
-################################################################################
-lst.data$ts <- convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions_processed$TS) #154.964sec
-################################################################################
-# self reported data  (event==2: only the first occurence is an event)
-################################################################################
-# cancer
-lst.data$tte.sr.20001 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20001",field_sr_date = "20006",qc_threshold_year = 10)
-# non cancer
-lst.data$tte.sr.20002 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20002",field_sr_date = "20008",qc_threshold_year = 10)
-# operation
-lst.data$tte.sr.20004 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20004",field_sr_date = "20010",qc_threshold_year = 10)
-# medication (event==0, since no age of diagnosis)
-lst.data$sr.20003 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20003",field_sr_date = "",qc_threshold_year = 10)
-################################################################################
-# cancer registry
-################################################################################
-# qc_threshold set to zeros, because cancer recurrence is fairly common (?)
-lst.data$tte.cancer.icd10 <- convert_cancerregister_to_episodedata(dfukb,field_diagnosis = "40006",field_date = "40005",field_date_type="date",qc_threshold_year = 0,codetype = "character")
-lst.data$tte.cancer.icd9 <- convert_cancerregister_to_episodedata(dfukb,field_diagnosis = "40013",field_date = "40005",field_date_type="date",qc_threshold_year = 0,codetype ="character")
-
-################################################################################
-# death record
-################################################################################
-# death registry from tab file (event==1: every occurence is a real event)
-# lst.data$tte.death.icd10.primary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40001",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
-# lst.data$tte.death.icd10.secondary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
-# death registry from data portal , same data as the main dataset but more up to date, refer document DeathLinkage
-# this is merged with the death from tab file for completeness, but it is the same data now.
-lst.data_dth <- read_death_data(fdeath_portal,fdeath_cause_portal)
-# take only the death record from portal for now
-lst.data$tte.death.icd10.primary <-lst.data_dth$primary
-lst.data$tte.death.icd10.secondary<-lst.data_dth$secondary
-rm(lst.data_dth)
-# View(lst.data$tte.death.icd10.primary)
-
-################################################################################
-# hesin  (event==1)
-################################################################################
-lst.data <- append(lst.data,read_hesin_data(fhesin ,fhesin_diag ,fhesin_oper )) #tte.hes.primary + tte.hes.secondary
-
-tictoc::toc()
-
-################################################################################
-# primary care, gp  (event==1)
-################################################################################
-tictoc::tic()
-#individuals in gp clinical: 229436 ~55.6 millions entries
-lst.data <- append(lst.data,read_gp_clinical_data(fgp=fgp_clinical)) # 311.128 sec, also thousands!
-gc()
-tictoc::toc()
-tictoc::tic()
-# without prescriptions #individuals in gp script: 222104 ~57.8 million entries
-# this one does medication
-lst.data <- append(lst.data,read_gp_script_data(fgp=fgp_scripts)) # 2798.576 sec
-gc()
-tictoc::toc()
-
-# make sure eeverything is in the right format:
-lst.data <- lapply(lst.data,function(x) {setkey(x,code) })
-lst.data <- lapply(lst.data,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
-lst.data <- lapply(lst.data,function(x) {x[,'eventdate'] <-  round(x$eventdate);return(x) })
 
 
 
