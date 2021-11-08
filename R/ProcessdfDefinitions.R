@@ -613,7 +613,13 @@ check_dfDefinitions_codes <-function(dfDefinitions_processed,
     message(glue::glue("Read from codings for {cls} from {fmap}"))
     lst.codemap[[cls]]<-fread(fmap)
     # rename the column
-    names(lst.codemap[[cls]])[grep("^cod", names(lst.codemap[[cls]]))] <- "coding"
+    if (ncol(lst.codemap[[cls]])!=1){
+      # for files downloaded from showcase
+      names(lst.codemap[[cls]])[grep("^cod", names(lst.codemap[[cls]]))] <- "coding"
+    }else{
+      # for codes created locally / if there is only 1 column it has to be the code
+      names(lst.codemap[[cls]])<-"coding"
+    }
     # if case insensitive,
     # always change to upper letters as this has been done in the preprocessingg of definitiion
     if (isTRUE(ignore.case[1]$ignore.case)){
