@@ -573,8 +573,32 @@ read_death_data <- function(fdeath_portal, fdeath_cause_portal){
 }
 
 
+get_all_exsiting_codes <- function(fportaldata,code.colname,fout){
+  if (length(code.colname)!=length(fout)){
+    message("Please check the number of code columns should equal to the number of out file paths, \n Abort!")
+    return()
+    }
+  tictoc::tic()
+  message(glue::glue("read files for column(s):{glue::glue_collapse(code.colname,sep=',')}"))
+  dt <- data.table::fread(fportaldata, sep="\t", select = code.colname)
+  message(glue::glue("number of lines in input file: {nrow(dt)}"))
+  if (length(code.colname)>1){
+    for (i in 1:length(code.colname)){
+      message(glue::glue("{code.colname[i]}"))
+      dt_out<-unique(dt[,code.colname[i],with=FALSE])
+      # use double brackets for data tables when selecting column(s) by string
+      dt_out<-dt_out[order(dt_out[[code.colname[i]]])]
+      dt_out<-dt_out[!apply(dt_out == "", 1, all),]
+      print(head(dt_out))
+      message(glue::glue("number of lines in data table:{nrow(dt_out)}"))
+      message(glue::glue("write all available {code.colname[i]} codes to file {fout[i]}."))
 
-
+      # code.colnames and fout should have identical length
+      data.table::fwrite(dt_out,file=fout[i])
+          }
+  }
+  tictoc::toc()
+}
 
 
 
