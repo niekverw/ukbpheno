@@ -417,7 +417,7 @@ get_cases_controls <-function(definitions,
     }
   }
   # define population
-  all_event_dt.population <- get_all_events(definitions %>% filter(Definitions =="Study_population"),lst.data,lst.data.settings)   #MI
+  all_event_dt.population <- get_all_events(definitions %>% dplyr::filter(Definitions =="Study_population"),lst.data,lst.data.settings)   #MI
 
   if(!is.null(all_event_dt.population)) {
     # only consider event with real event date in study population, set those with visitdate to NA
