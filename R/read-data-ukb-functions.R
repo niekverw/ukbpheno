@@ -88,7 +88,7 @@ read_ukb_metadata <- function(fhtml) {
   # Column types as described by UKB
   # http://biobank.ctsu.ox.ac.uk/crystal/help.cgi?cd=value_type
   col_type <- c(
-    "Sequence" = "integer",
+    "Sequence" = "double",
     "Integer" = "integer",
     "Categorical (single)" = "character",
     "Categorical (multiple)" = "character",
