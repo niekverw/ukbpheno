@@ -582,7 +582,7 @@ get_all_exsiting_codes <- function(fportaldata,code.colname,fout){
   message(glue::glue("read files for column(s):{glue::glue_collapse(code.colname,sep=',')}"))
   dt <- data.table::fread(fportaldata, sep="\t", select = code.colname)
   message(glue::glue("number of lines in input file: {nrow(dt)}"))
-  if (length(code.colname)>1){
+  if (length(code.colname)>0){
     for (i in 1:length(code.colname)){
       message(glue::glue("{code.colname[i]}"))
       dt_out<-unique(dt[,code.colname[i],with=FALSE])
@@ -595,7 +595,8 @@ get_all_exsiting_codes <- function(fportaldata,code.colname,fout){
 
       # code.colnames and fout should have identical length
       data.table::fwrite(dt_out,file=fout[i])
-          }
+    }
+
   }
   tictoc::toc()
 }
