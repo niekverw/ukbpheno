@@ -30,8 +30,8 @@ plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst
   # ###############################################################################
   # Why to character? it throws an error when fetching the events for the individual
   # Error in bmerge .....Incompatible join types: x.f.eid (double) and i.V1 (character)
-  identifier <- as.character(identifier)
-  # identifier<-as.numeric(identifier)
+  # identifier <- as.character(identifier)
+  identifier<-as.numeric(identifier)
   # ###################################################################################33
   if(is.null(ind_all_event_dt) & is.null(lst.data.eid)){
     message("ind_all_event_dt and lst.data.eid are null, please provide one")
