@@ -196,14 +196,18 @@ read_ukb_tabdata <- function(fukb,
                sep = "\t",
                showProgress = TRUE)
   print(format(object.size(df), units = "Gb"))
-  tictoc::toc()
+  # rename f.eid to identifier
+  names(df)[names(df) == names(df)[grepl("eid", names(df))]]<-"identifier"
+  #  change from integer to double; numeric sorting is ~150x faster than character sort
+  df$identifer<-as.numeric(df$identifier)
+
+    tictoc::toc()
 
   # library(vroom)
   # which(freadcolclasses !="NULL")
   # tic("vroom")
   # df <- vroom(fukb,delim = "\t",col_types="", col_select =which(freadcolclasses !="NULL")  , progress=F) # which(freadcolclasses !="NULL")  #fields_to_keep.tab
   # toc()
-
 
   return(df)
 }
@@ -274,15 +278,15 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   dfhesin_oper <- dfhesin_oper[, event:=as.integer(event)]
 
   # filter + rename
-  tte.hesin.oper3.primary <- dfhesin_oper %>% dplyr::filter(level==1 & !is.na(oper3))  %>% dplyr::select(eid,eventdate,epidur,oper3,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% data.table::as.data.table()
-  tte.hesin.oper4.primary <- dfhesin_oper %>% dplyr::filter(level==1 & !is.na(oper4))  %>% dplyr::select(eid,eventdate,epidur,oper4,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% data.table::as.data.table()
-  tte.hesin.icd10.primary <- dfhesin_diag %>% dplyr::filter( level==1 & !is.na(diag_icd10))  %>% dplyr::select(eid,eventdate,epidur,diag_icd10,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% data.table::as.data.table()
-  tte.hesin.icd9.primary <- dfhesin_diag %>% dplyr::filter( level==1 & !is.na(diag_icd9))  %>% dplyr::select(eid,eventdate,epidur,diag_icd9,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% data.table::as.data.table()
+  tte.hesin.oper3.primary <- dfhesin_oper %>% dplyr::filter(level==1 & !is.na(oper3))  %>% dplyr::select(eid,eventdate,epidur,oper3,event)  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% data.table::as.data.table()
+  tte.hesin.oper4.primary <- dfhesin_oper %>% dplyr::filter(level==1 & !is.na(oper4))  %>% dplyr::select(eid,eventdate,epidur,oper4,event)  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% data.table::as.data.table()
+  tte.hesin.icd10.primary <- dfhesin_diag %>% dplyr::filter( level==1 & !is.na(diag_icd10))  %>% dplyr::select(eid,eventdate,epidur,diag_icd10,event)  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% data.table::as.data.table()
+  tte.hesin.icd9.primary <- dfhesin_diag %>% dplyr::filter( level==1 & !is.na(diag_icd9))  %>% dplyr::select(eid,eventdate,epidur,diag_icd9,event)  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% data.table::as.data.table()
 
-  tte.hesin.oper3.secondary <- dfhesin_oper %>% dplyr::filter(level==2 & !is.na(oper3))  %>% dplyr::select(eid,eventdate,epidur,oper3,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% data.table::as.data.table()
-  tte.hesin.oper4.secondary <- dfhesin_oper %>% dplyr::filter(level==2 & !is.na(oper4))  %>% dplyr::select(eid,eventdate,epidur,oper4,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% data.table::as.data.table()
-  tte.hesin.icd10.secondary <- dfhesin_diag %>% dplyr::filter( level==2 & !is.na(diag_icd10))  %>% dplyr::select(eid,eventdate,epidur,diag_icd10,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% data.table::as.data.table()
-  tte.hesin.icd9.secondary <- dfhesin_diag %>% dplyr::filter( level==2 & !is.na(diag_icd9))  %>% dplyr::select(eid,eventdate,epidur,diag_icd9,event)  %>% dplyr::rename(f.eid=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% data.table::as.data.table()
+  tte.hesin.oper3.secondary <- dfhesin_oper %>% dplyr::filter(level==2 & !is.na(oper3))  %>% dplyr::select(eid,eventdate,epidur,oper3,event)  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% data.table::as.data.table()
+  tte.hesin.oper4.secondary <- dfhesin_oper %>% dplyr::filter(level==2 & !is.na(oper4))  %>% dplyr::select(eid,eventdate,epidur,oper4,event)  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% data.table::as.data.table()
+  tte.hesin.icd10.secondary <- dfhesin_diag %>% dplyr::filter( level==2 & !is.na(diag_icd10))  %>% dplyr::select(eid,eventdate,epidur,diag_icd10,event)  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% data.table::as.data.table()
+  tte.hesin.icd9.secondary <- dfhesin_diag %>% dplyr::filter( level==2 & !is.na(diag_icd9))  %>% dplyr::select(eid,eventdate,epidur,diag_icd9,event)  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% data.table::as.data.table()
 
 
   lst <- list(tte.hesin.oper3.primary = tte.hesin.oper3.primary,
@@ -294,14 +298,19 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
               tte.hesin.oper4.secondary = tte.hesin.oper4.secondary,
               tte.hesin.icd10.secondary = tte.hesin.icd10.secondary,
               tte.hesin.icd9.secondary = tte.hesin.icd9.secondary)
-
+  #  change from integer to double; numeric sorting is ~150x faster than character sort
+  lst<-lapply(lst,function(x) {x[, identifier:=as.numeric(identifier)] })
+  # set key
   lst <- lapply(lst,function(x) {setkey(x,code) })
-  lst <- lapply(lst,function(x) {x[, c('f.eid','code') := lapply(.SD, as.character), .SDcols = c('f.eid','code')] })
+  lst <- lapply(lst,function(x) {x[, c('code') := lapply(.SD, as.character), .SDcols = c('code')] })
   # lst <- lapply(lst,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
 
   return(lst)
 
 }
+
+
+
 
 
 #' Read Primary Care clinical event records
@@ -349,13 +358,13 @@ read_gp_clinical_data <- function(fgp){
 
 
   #  parse versions
-  tte.gpclincal.read3 <-  dfgp %>% dplyr::filter(read_3 !="")  %>% dplyr::select(eid,event_dt,read_3,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = read_3,event=event)  %>% data.table::as.data.table()
-  tte.gpclincal.read2 <-  dfgp %>% dplyr::filter(read_2 !="")  %>% dplyr::select(eid,event_dt,read_2,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% data.table::as.data.table()
+  tte.gpclincal.read3 <-  dfgp %>% dplyr::filter(read_3 !="")  %>% dplyr::select(eid,event_dt,read_3,event)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = read_3,event=event)  %>% data.table::as.data.table()
+  tte.gpclincal.read2 <-  dfgp %>% dplyr::filter(read_2 !="")  %>% dplyr::select(eid,event_dt,read_2,event)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = read_2,event=event)  %>% data.table::as.data.table()
 
 
   lst <- list(tte.gpclincal.read2=tte.gpclincal.read2,tte.gpclincal.read3=tte.gpclincal.read3)
   lst <- lapply(lst,function(x) {data.table::setkey(x,code) })
-  lst <- lapply(lst,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
+  lst <- lapply(lst,function(x) {x[, ('identifier') := lapply(.SD, as.numeric), .SDcols = 'identifier'] })
 
   # ############################################################################################
   # ##instance filter
@@ -389,7 +398,7 @@ read_gp_script_data <- function(fgp){
   # TODO: some way to preprocess such huge file ?
   # fgp<-fgp_scripts
   # 1.eid	data_provider	issue_date	read_2	bnf_code	dmd_code	drug_name	8.quantity
-  dfgp <- data.table::fread(fgp ,sep = "\t",colClasses = c("integer","integer","character","character","character","character","character","character")) #,select=cols_tokeep) ," | head -10000 "
+  dfgp <- data.table::fread(fgp ,sep = "\t",colClasses = c("numeric","integer","character","character","character","character","character","character")) #,select=cols_tokeep) ," | head -10000 "
 
   names(dfgp) <-  c("eid","data_provider","event_dt",	"read_2",	"bnf_code",	"dmd_code",	"drug_name",	"quantity")
   dfgp$event_dt <- as.Date(as.character(dfgp$event_dt),format="%d/%m/%Y")
@@ -413,21 +422,21 @@ read_gp_script_data <- function(fgp){
   ########################################################################################
   # England Vision, only provider using dmd codes
   # Sep2020: all records have dmd codes, ~2% has no read2 -> take dmd for these records
-  tte.gpscript.dmd.england <-  dfgp %>% dplyr::filter(dmd_code !="")  %>% dplyr::select(eid,event_dt,dmd_code,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = dmd_code,event=event)  %>% data.table::as.data.table()
+  tte.gpscript.dmd.england <-  dfgp %>% dplyr::filter(dmd_code !="")  %>% dplyr::select(eid,event_dt,dmd_code,event)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = dmd_code,event=event)  %>% data.table::as.data.table()
   # England TPP , bnf
   # data_provider 1= England(Vision), 2= Scotland, 3 = England (TPP), 4 = Wales bnf_code !="" &
-  tte.gpscript.bnf.england <-  dfgp %>% dplyr::filter( data_provider == 3 & bnf_code !="")   %>%  dplyr::select(eid,event_dt,bnf_code,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% data.table::as.data.table()
+  tte.gpscript.bnf.england <-  dfgp %>% dplyr::filter( data_provider == 3 & bnf_code !="")   %>%  dplyr::select(eid,event_dt,bnf_code,event)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% data.table::as.data.table()
  #######################################################################################
   #Scotland
   # majority of records have bnf codes , while some have BOTH bnf codes and read 2!
   # Sep2020: 2 records have only read2 but not bnf! -> take bnf
   # somehow if filter with && then no result is returned??????????????? but filter twice works....
-  tte.gpscript.bnf.scotland <-  dfgp %>% dplyr::filter((data_provider == 2 )&(bnf_code !="")) %>% dplyr::select(eid,event_dt,bnf_code,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% data.table::as.data.table()
+  tte.gpscript.bnf.scotland <-  dfgp %>% dplyr::filter((data_provider == 2 )&(bnf_code !="")) %>% dplyr::select(eid,event_dt,bnf_code,event)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% data.table::as.data.table()
 # to avoid double counting the record
   # tte.gpscript.read2.scotland <-  dfgp %>% dplyr::filter(read_2 !="" && data_provider == 2 )  %>% dplyr::select(eid,event_dt,read_2,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% data.table::as.data.table()
   ########################################################################################
   # Wales , read_2
-  tte.gpscript.read2.wales <-  dfgp %>% dplyr::filter(data_provider == 4 & read_2 !="")  %>% dplyr::select(eid,event_dt,read_2,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% data.table::as.data.table()
+  tte.gpscript.read2.wales <-  dfgp %>% dplyr::filter(data_provider == 4 & read_2 !="")  %>% dplyr::select(eid,event_dt,read_2,event)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = read_2,event=event)  %>% data.table::as.data.table()
 
 
   # TODO count by tables
@@ -441,7 +450,7 @@ read_gp_script_data <- function(fgp){
   # lst <- list(tte.gpscript.dmd.england=tte.gpscript.dmd.england,tte.gpscript.bnf.england=tte.gpscript.bnf.england,tte.gpscript.bnf.scotland=tte.gpscript.bnf.scotland,tte.gpscript.read2.scotland=tte.gpscript.read2.scotland,tte.gpscript.read2.wales=tte.gpscript.read2.wales)
   lst <- list(tte.gpscript.dmd.england=tte.gpscript.dmd.england,tte.gpscript.bnf.england=tte.gpscript.bnf.england,tte.gpscript.bnf.scotland=tte.gpscript.bnf.scotland,tte.gpscript.read2.wales=tte.gpscript.read2.wales)
   lst <- lapply(lst,function(x) {data.table::setkey(x,code) })
-  lst <- lapply(lst,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
+  lst <- lapply(lst,function(x) {x[, ('identifier') := lapply(.SD, as.numeric), .SDcols = 'identifier'] })
 
 
   # ############################################################################################
@@ -548,18 +557,18 @@ read_death_data <- function(fdeath_portal, fdeath_cause_portal){
   dfdeath<-merge(death.portal,death.cause.portal,by=c("eid","ins_index"))
   # level indicate primary or secondary cause
   dfdeath<-dplyr::select(dfdeath,eid , cause_icd10, date_of_death,level)
-  names(dfdeath) <- c("f.eid","code","eventdate","level")
+  names(dfdeath) <- c("identifier","code","eventdate","level")
   # class change for consistency
-  dfdeath <- dfdeath[, f.eid:=as.character(f.eid)]
+  dfdeath <- dfdeath[, identifier:=as.numeric(identifier)]
   # note the difference in format of the date between tables
   dfdeath <- dfdeath[, eventdate:=as.Date(eventdate,format="%d/%m/%Y")]
   dfdeath <- subset(dfdeath, eventdate < maxdate ) # remove deaths that occurs after today
 
   # parse primary and secondary cause; add event flag with all considered valid; drop col level
-  dfdeath.primary<-dfdeath %>% dplyr::filter(level ==1 ) %>% dplyr::mutate(event=1) %>% dplyr::select(f.eid , code, eventdate,event)
+  dfdeath.primary<-dfdeath %>% dplyr::filter(level ==1 ) %>% dplyr::mutate(event=1) %>% dplyr::select(identifier , code, eventdate,event)
   dfdeath.primary <- dfdeath.primary[, event:=as.integer(event)]
 
-  dfdeath.secondary<-dfdeath %>% dplyr::filter(level ==2 ) %>% dplyr::mutate(event=1) %>% dplyr::select(f.eid , code, eventdate,event)
+  dfdeath.secondary<-dfdeath %>% dplyr::filter(level ==2 ) %>% dplyr::mutate(event=1) %>% dplyr::select(identifier , code, eventdate,event)
   dfdeath.secondary <- dfdeath.secondary[, event:=as.integer(event)]
 
   tictoc::toc()
@@ -567,7 +576,7 @@ read_death_data <- function(fdeath_portal, fdeath_cause_portal){
   lst_death <- list("primary" = dfdeath.primary, "secondary" = dfdeath.secondary)
   message("setkey(code)")
   lst_death <- lapply(lst_death,function(x) {data.table::setkey(x,code) })
-  lst_death <- lapply(lst_death,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
+  # lst_death <- lapply(lst_death,function(x) {x[, ('identifier') := lapply(.SD, as.character), .SDcols = 'identifier'] })
   return(lst_death)
 
 }
