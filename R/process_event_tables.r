@@ -13,7 +13,7 @@
 get_stats_for_events <- function(all_event_dt){
 
   # show stats on codes
-  stats.codes <- all_event_dt[, .(count=.N,sum.event = sum(event,na.rm = T),sum.epidur= sum(epidur,na.rm = T),median.epidur= median(epidur,na.rm = T),max.epidur= max(epidur,na.rm=T) ), keyby=list(f.eid,classification, code)]
+  stats.codes <- all_event_dt[, .(count=.N,sum.event = sum(event,na.rm = T),sum.epidur= sum(epidur,na.rm = T),median.epidur= median(epidur,na.rm = T),max.epidur= max(epidur,na.rm=T) ), keyby=list(identifier,classification, code)]
   stats.codes <- stats.codes %>% dplyr::group_by(classification, code) %>% summarise(count=n() )
   stats.codes <- stats.codes %>% arrange(count)
   stats.codes$rank <- 1:nrow(stats.codes)
@@ -24,7 +24,7 @@ get_stats_for_events <- function(all_event_dt){
   stats.codes.summary.p <- ggpubr::ggarrange(p1,p2,nrow = 1, ncol = 2,common.legend = TRUE)
 
   # show co-occurences of classifications
-  stats.coocurrence <- table(all_event_dt[,c("f.eid" ,"classification")])#[1:10,]
+  stats.coocurrence <- table(all_event_dt[,c("identifier" ,"classification")])#[1:10,]
   stats.coocurrence[stats.coocurrence>0] <-1
 
   mat <- crossprod(as.matrix(stats.coocurrence))
@@ -43,7 +43,7 @@ get_stats_for_events <- function(all_event_dt){
     ggplot2::geom_text(ggplot2::aes(label = `%`))
  # ########################################################################################################################
   # show co-occurences of codes
-  stats.coocurrence <- table(all_event_dt[,c("f.eid" ,"code")])
+  stats.coocurrence <- table(all_event_dt[,c("identifier" ,"code")])
   stats.coocurrence[stats.coocurrence>0] <-1
   mat <- crossprod(as.matrix(stats.coocurrence))
   mat <- floor(t(mat * 100 / diag(mat)))                 # calculate the percentage
@@ -118,11 +118,11 @@ get_stats_for_events <- function(all_event_dt){
 #' @export
 #' @examples
 #' all_event_dt <- get_all_events(dfDefinitions_processed_expanded[1,],lst.data,lst.data.settings)
-#' get_incidence_prevalence(all_event_dt,lst.data.settings, reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
+#' get_incidence_prevalence(all_event_dt,lst.data.settings, reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$identifier))
 ### get prevalence (move this.. )
 get_incidence_prevalence <- function(all_event_dt,
                                      lst.data.settings,
-                                     reference_date=NULL,
+                                     df_reference_date=NULL,
                                      include_secondary_recurrence=FALSE,
                                      #return_dates=FALSE, # TODO: not working yet.
                                      window_ref_days_include=0,##  indicate number of days around the reference date (visit) that should be used to indicates if individuals had the event on the reference date. For example, relevant if you want to know if participant took medication on the visit
@@ -135,7 +135,7 @@ get_incidence_prevalence <- function(all_event_dt,
   # define window arround reference_dates? -- e.g. if you're diagnosed with XX, count follow-up events only after 20 days of no-events.
   # define window to score the diagnosis on refereence date.
   # reference_dates # should be a vector of dates, with the identifier as name.
-  #reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid)
+  #reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$identifier)
 
   ### Future: 1) count any new event==1 code (icd10 etc)
   ###         2) count any primary event==1 if Hx==1 (recurrence) if 'include_secondary_recurrence'==TRUE
@@ -148,15 +148,16 @@ get_incidence_prevalence <- function(all_event_dt,
   # reference_date <- reference_date[!is.na(reference_date)]
 
 
-  if(length(reference_date)==0){reference_date<-NULL}
-  if(!is.null(reference_date)){
-    df_referencedate <-data.table::data.table(reference_date)
-    df_referencedate$f.eid <- names(reference_date)
+  if(nrow(df_reference_date)==0){df_reference_date<-NULL}
+  if(!is.null(df_reference_date)){
+    # referencedate <-data.table::data.table(reference_date)
+    # referencedate$identifier <- names(reference_date)
+    name(df_reference_date)<-c("identifier","reference_date")
 
     message(glue::glue("non missing reference_date: {length(reference_date)}"))
   } else{
     message("no reference_date given, taking the first available event as reference")
-    df_referencedate <- all_event_dt[,.(reference_date= min(eventdate,na.rm = T)),by=f.eid]
+    df_referencedate <- all_event_dt[,.(reference_date= min(eventdate,na.rm = T)),by=identifier]
   }
   if(include_secondary_recurrence){
     sources_recurrence_events <- lst.data.settings$datasource
@@ -168,12 +169,12 @@ get_incidence_prevalence <- function(all_event_dt,
   # in case of empty rows , the entire column will be cast to default of class NA i.e. logical
   # this could create error for downstream functions "Error in bmerge....Incompatible join types"
   col_num<-c("count","sum.epidur","median.epidur","max.epidur", "survival_days", "Death_primary","Death_any" , "Hx_days", "Fu_days" ,"Hx" , "Fu","Ref" , "first_diagnosis_days","Any")
-  col_chr<-"f.eid"
+  col_chr<-"identifier"
   col_date<-"reference_date"
   # catch if there is no event, return an empty table which can be merged
   if (nrow(all_event_dt)==0){
     message("No event found.")
-    results_cols<-c("f.eid","count","sum.epidur","median.epidur","max.epidur", "survival_days", "Death_primary","Death_any" , "Hx_days", "Fu_days" ,"Hx" , "Fu","Ref" , "first_diagnosis_days", "reference_date","Any")
+    results_cols<-c("identifier","count","sum.epidur","median.epidur","max.epidur", "survival_days", "Death_primary","Death_any" , "Hx_days", "Fu_days" ,"Hx" , "Fu","Ref" , "first_diagnosis_days", "reference_date","Any")
     all_event_dt.summary <- setNames(data.table(matrix(nrow = 0, ncol = 16)),results_cols )
     all_event_dt.summary[, (col_num) := lapply(.SD, as.numeric), .SDcols = col_num]
     all_event_dt.summary[, (col_chr) := lapply(.SD, as.character), .SDcols = col_chr]
@@ -182,13 +183,13 @@ get_incidence_prevalence <- function(all_event_dt,
   }
 
 
-  df <- merge(all_event_dt,df_referencedate,by = 'f.eid') %>% dplyr::arrange(eventdate) %>% data.table::as.data.table()
+  df <- merge(all_event_dt,df_referencedate,by = 'identifier') %>% dplyr::arrange(eventdate) %>% data.table::as.data.table()
 
-  # df <- df %>% filter(!is.na(reference_date)) # comment out if missing f.eids is fixed.
+  # df <- df %>% filter(!is.na(reference_date)) # comment out if missing identifiers is fixed.
   df$days <- df$eventdate - df$reference_date
 
-  data.table::setkey(df,days) # i don't know why, but setkey was alreaday on f.eid and cannot refresh..
-  data.table::setkey(df,f.eid)
+  data.table::setkey(df,days) # i don't know why, but setkey was alreaday on identifier and cannot refresh..
+  data.table::setkey(df,identifier)
 
 
   #################################################################################
@@ -210,76 +211,76 @@ get_incidence_prevalence <- function(all_event_dt,
   dfDth$death_secondary[lst.data.settings[match(dfDth$.id ,lst.data.settings$datasource),]$diagnosis==2] <- 2
   dfDth$death_secondary<-data.table::fcoalesce(dfDth$Death_primary,dfDth$death_secondary)
   # dfDth
-  dfDth<-dfDth[,c("f.eid","days","Death_primary","death_secondary")]
-  colnames(dfDth)<-c("f.eid","survival_days","Death_primary","Death_any")
+  dfDth<-dfDth[,c("identifier","days","Death_primary","death_secondary")]
+  colnames(dfDth)<-c("identifier","survival_days","Death_primary","Death_any")
   # in the case of duplicate death records,one per primary /secondary
-  dfDth_extrastats <- suppressWarnings(dfDth[, .(mindy= min(survival_days,na.rm = T),maxdy= max(survival_days,na.rm = T),meandy= mean(survival_days,na.rm=T) ), keyby=list(f.eid)])
-  id.diff.deathdt<-unique(dfDth_extrastats[dfDth_extrastats$mindy!=dfDth_extrastats$meandy|dfDth_extrastats$maxdy!=dfDth_extrastats$meandy,]$f.eid)
+  dfDth_extrastats <- suppressWarnings(dfDth[, .(mindy= min(survival_days,na.rm = T),maxdy= max(survival_days,na.rm = T),meandy= mean(survival_days,na.rm=T) ), keyby=list(identifier)])
+  id.diff.deathdt<-unique(dfDth_extrastats[dfDth_extrastats$mindy!=dfDth_extrastats$meandy|dfDth_extrastats$maxdy!=dfDth_extrastats$meandy,]$identifier)
 
   if (length(id.diff.deathdt)>0){
   message(glue::glue("Inconsistent death records for these individuals: {glue::glue_collapse(id.diff.deathdt,sep = ',')}"))
   message("Mean survival day will be taken.")
   }
   # in case of multiple death records with different death dates , take mean
-  dfDth<-stats::aggregate(x=dfDth[,!(names(dfDth) %in% c("f.eid")),with=FALSE], by=list(f.eid=dfDth$f.eid), mean, na.rm = TRUE)
+  dfDth<-stats::aggregate(x=dfDth[,!(names(dfDth) %in% c("identifier")),with=FALSE], by=list(identifier=dfDth$identifier), mean, na.rm = TRUE)
   # Nan to NA
   dfDth[is.na(dfDth)]<-NA
 
   }else{
-    # no records, take f.eid for the merge later
-    dfDth<-unique(df[,"f.eid"])
+    # no records, take identifier for the merge later
+    dfDth<-unique(df[,"identifier"])
     dfDth[,c("survival_days","Death_primary","Death_any")]<-as.numeric(NA)
   }
   ###############################################################################################################################
 
   ### History
   dfHx <- df[days<=0]
-  Hx_days <- suppressWarnings(unique(dfHx[event>0][, .(Hx_days=min(days,na.rm=T)), keyby=list(f.eid)] ))
+  Hx_days <- suppressWarnings(unique(dfHx[event>0][, .(Hx_days=min(days,na.rm=T)), keyby=list(identifier)] ))
   dfHx[,Hx:=2]
 
   ### Future
   # window_fu_days_mask
-  dfFu <- df[  ((days>(0+window_fu_days_mask) & event==1) & (!f.eid %in% dfHx$Hx)) |
-               (days>(0+window_fu_days_mask) & event==1 & (f.eid %in% dfHx$Hx) & .id %in% sources_recurrence_events ) |
-               (days>(0+window_fu_days_mask) & event==2  & (!f.eid %in% dfHx$Hx)) ]
-  dfFu[,Fu:=2] #unique(dfFu$f.eid)
-  Fu_days <- suppressWarnings( unique(dfFu[,.(Fu_days= min(days,na.rm=T)), keyby=list(f.eid)] ))
+  dfFu <- df[  ((days>(0+window_fu_days_mask) & event==1) & (!identifier %in% dfHx$Hx)) |
+               (days>(0+window_fu_days_mask) & event==1 & (identifier %in% dfHx$Hx) & .id %in% sources_recurrence_events ) |
+               (days>(0+window_fu_days_mask) & event==2  & (!identifier %in% dfHx$Hx)) ]
+  dfFu[,Fu:=2] #unique(dfFu$identifier)
+  Fu_days <- suppressWarnings( unique(dfFu[,.(Fu_days= min(days,na.rm=T)), keyby=list(identifier)] ))
   ### age of diagnosis
-  #system.time({ df %>% filter(event>0) %>% group_by(f.eid) %>% summarise(first_diagnosis_days=min(days)) }) # <- slow..
-  #system.time({ df[df$event>0][,.(first_diagnosis_days=min(days,na.rm=T) ), by=f.eid] }) # <- fast..
-  #df[df$event>0][df[, .I[which.max(days)], by=f.eid]$V1] # <- aanother way..
+  #system.time({ df %>% filter(event>0) %>% group_by(identifier) %>% summarise(first_diagnosis_days=min(days)) }) # <- slow..
+  #system.time({ df[df$event>0][,.(first_diagnosis_days=min(days,na.rm=T) ), by=identifier] }) # <- fast..
+  #df[df$event>0][df[, .I[which.max(days)], by=identifier]$V1] # <- aanother way..
   #
-  # first_diagnosis_days <- df[  ,.(first_diagnosis_days=min(days,na.rm=T)), by=f.eid]
+  # first_diagnosis_days <- df[  ,.(first_diagnosis_days=min(days,na.rm=T)), by=identifier]
   #
   #
-  # first_diagnosis_days <- df[  ,.SD[which.min(days)], by=f.eid]
+  # first_diagnosis_days <- df[  ,.SD[which.min(days)], by=identifier]
   #
-  # df %>% filter(f.eid==1025336 )
-  # first_diagnosis_days %>% filter(f.eid==1025336 )
+  # df %>% filter(identifier==1025336 )
+  # first_diagnosis_days %>% filter(identifier==1025336 )
 
   ### Data if participant had event/med  reference date (visit);+/- x day
   #TODO I think episodes for visitdate (event=0 rows) is messing up with this flag! i.e. almost all of them have this flag on
-  dfRef <- df[df$eventdate>=(df$reference_date-window_ref_days_include) & df$eventdate<=(df$reference_date+window_ref_days_include),c("f.eid")]
+  dfRef <- df[df$eventdate>=(df$reference_date-window_ref_days_include) & df$eventdate<=(df$reference_date+window_ref_days_include),c("identifier")]
   dfRef[,Ref:=2]
 
 
   ## some other stats, and to include event==0 individuals:
   # allow abesence of HES data , sr/death does not have epidur
   if(!all(unique(all_event_dt$event==0)) & !all(is.na(all_event_dt$epidur))){
-    stats <- suppressWarnings( all_event_dt[, .(count = .N,sum.epidur= sum(epidur,na.rm = T),median.epidur= median(epidur,na.rm = T),max.epidur= max(epidur,na.rm=T)), by = f.eid] )
+    stats <- suppressWarnings( all_event_dt[, .(count = .N,sum.epidur= sum(epidur,na.rm = T),median.epidur= median(epidur,na.rm = T),max.epidur= max(epidur,na.rm=T)), by = identifier] )
     stats[is.infinite(stats$max.epidur),]$max.epidur <-NA
   } else{
-    stats <- all_event_dt[, .(count = .N,sum.epidur= NA,median.epidur= NA,max.epidur=NA), by = f.eid]
+    stats <- all_event_dt[, .(count = .N,sum.epidur= NA,median.epidur= NA,max.epidur=NA), by = identifier]
   }
 
 
 
-  # test <- Reduce(function(...) merge(..., all = TRUE,by='f.eid'), list(df,
+  # test <- Reduce(function(...) merge(..., all = TRUE,by='identifier'), list(df,
   #                                                                      Hx_days,
   #                                                                      Fu_days,
-  #                                                                      unique(dfHx[,c("f.eid","Hx")]),
-  #                                                                      unique(dfFu[,c("f.eid","Fu")]),
-  #                                                                      unique(dfRef[,c("f.eid","Ref")]),
+  #                                                                      unique(dfHx[,c("identifier","Hx")]),
+  #                                                                      unique(dfFu[,c("identifier","Fu")]),
+  #                                                                      unique(dfRef[,c("identifier","Ref")]),
   #                                                                      first_diagnosis_days,
   #                                                                      df.referencedate
   #                                                                      stats)
@@ -290,25 +291,25 @@ get_incidence_prevalence <- function(all_event_dt,
   # Hx_days
   # Fu_days
   # dfDth
-  # dfHx[,c("f.eid","Hx")]
+  # dfHx[,c("identifier","Hx")]
   # dfHx
-  # dfRef[,c("f.eid","Ref")]
+  # dfRef[,c("identifier","Ref")]
 
-  all_event_dt.summary <- Reduce(function(...) merge(..., all = TRUE,by='f.eid'), list(
+  all_event_dt.summary <- Reduce(function(...) merge(..., all = TRUE,by='identifier'), list(
       stats,
-      unique(dfDth[ , c("f.eid","survival_days","Death_primary","Death_any")]),
+      unique(dfDth[ , c("identifier","survival_days","Death_primary","Death_any")]),
       Hx_days,
       Fu_days,
-      unique(dfHx[,c("f.eid","Hx")]),
-      unique(dfFu[,c("f.eid","Fu")]),
-      unique(dfRef[,c("f.eid","Ref")])
+      unique(dfHx[,c("identifier","Hx")]),
+      unique(dfFu[,c("identifier","Fu")]),
+      unique(dfRef[,c("identifier","Ref")])
   ))
 
 
   all_event_dt.summary$first_diagnosis_days <- pmin(all_event_dt.summary$Hx_days,all_event_dt.summary$Fu_days,na.rm = T)
   all_event_dt.summary[ Hx==2 & is.na(Hx_days),'first_diagnosis_days'] <- NA
 
-  all_event_dt.summary <- merge(all_event_dt.summary,df_referencedate,by="f.eid")
+  all_event_dt.summary <- merge(all_event_dt.summary,df_referencedate,by="identifier")
   all_event_dt.summary[,Any:=2]
   all_event_dt.summary <- data.table::data.table(all_event_dt.summary)
 
@@ -336,7 +337,7 @@ get_incidence_prevalence <- function(all_event_dt,
 #' @keywords time-to-event
 #' @export
 #' @examples
-#' get_cases(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,lst.data.settings, reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
+#' get_cases(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,lst.data.settings, reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$identifier))
 get_cases <- function(definitions,
                        lst.data,
                        lst.data.settings,
@@ -362,13 +363,13 @@ get_cases <- function(definitions,
   message(glue::glue("including {nrow(all_event_dt.Include_in_cases.summary)} cases"))
   all_event_dt.Exclude_from_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Exclude_from_cases"),lst.data,lst.data.settings)   #MI
   if(!is.null(all_event_dt.Exclude_from_cases)){
-    exclude=all_event_dt.Include_in_cases.summary$f.eid %in% unique(all_event_dt.Exclude_from_cases$f.eid)
+    exclude=all_event_dt.Include_in_cases.summary$identifier %in% unique(all_event_dt.Exclude_from_cases$identifier)
     message(glue::glue("excluding {sum(exclude)} cases"))
-    set_to_na <- names(all_event_dt.Include_in_cases.summary)[!names(all_event_dt.Include_in_cases.summary) %in% c("f.eid","reference_date")]
+    set_to_na <- names(all_event_dt.Include_in_cases.summary)[!names(all_event_dt.Include_in_cases.summary) %in% c("identifier","reference_date")]
     # the .summary needed to be flagged for the get_case_control() functoin
     all_event_dt.Include_in_cases.summary[exclude,(set_to_na):=-2]
     # remove these in all_event_dt
-    all_event_dt.Include_in_cases<-all_event_dt.Include_in_cases[! (all_event_dt.Include_in_cases$f.eid %in% unique(all_event_dt.Exclude_from_cases$f.eid)),]
+    all_event_dt.Include_in_cases<-all_event_dt.Include_in_cases[! (all_event_dt.Include_in_cases$identifier %in% unique(all_event_dt.Exclude_from_cases$identifier)),]
     message(glue::glue("{nrow(all_event_dt.Include_in_cases)} events fulfiling criteria in include_in_cases"))
   }
   return(list(all_event_dt.Include_in_cases=all_event_dt.Include_in_cases,
@@ -391,11 +392,11 @@ get_cases <- function(definitions,
 #' @keywords time-to-event
 #' @export
 #' @examples
-#' get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,lst.data.settings,  reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid))
+#' get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,lst.data.settings,  reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$identifier))
 get_cases_controls <-function(definitions,
                                lst.data,
                                lst.data.settings,
-                                 reference_date=NULL,
+                                 df_reference_date=NULL,
                                  lst.identifiers=NULL
                                 ) {
   # lst.identifiers <-Used to define controls if reference_date is not given (NULL)
@@ -405,11 +406,23 @@ get_cases_controls <-function(definitions,
   }
 
 
-  #reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$f.eid)
+  # reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$identifier)
+  # reference_date_<-df.casecontrol
+  names(reference_date)<-c("identifier","reference_date")
+  # rm(reference_date)
+  # gc()
 
-  reference_date <- reference_date[!is.na(reference_date)]
-  reference_date <- reference_date[!is.na(names(reference_date))]
-  if(is.null(reference_date)){
+  # class(reference_date)
+  df_reference_date <- df_reference_date[!is.na(reference_date$identifier),]
+  df_reference_date <- df_reference_date[!is.na(reference_date$reference_date),]
+
+  # reference_date <- reference_date[!is.na(reference_date)]
+  # reference_date <- reference_date[!is.na(names(reference_date))]
+
+
+
+
+  if(is.null(df_reference_date)){
     message("reference_date=NULL, taking first occurence of case and all available identifiers (lst.data$all_identifiers)")
     if(length(lst.identifiers)<=1){
       message("ERROR: lst.identifiers is empty, please provide either reference_date or a list of lst.identifiers that should be used as population.")
@@ -424,40 +437,55 @@ get_cases_controls <-function(definitions,
     all_event_dt.population[all_event_dt.population$event==0,]$eventdate <-NA
     # get everyone , take the date of relevant events respectively
     all_event_dt.population.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.population,lst.data.settings,reference_date = NULL,window_fu_days_mask = 15)
-    reference_date = setNames(as.Date(as.character(all_event_dt.population.summary$reference_date),format="%Y-%m-%d"),all_event_dt.population.summary$f.eid)
-    message(glue::glue("Population: {length(unique(all_event_dt.population.summary$f.eid))} individuals "))
+
+    # reference_date = setNames(as.Date(as.character(all_event_dt.population.summary$reference_date),format="%Y-%m-%d"),all_event_dt.population.summary$identifier)
+    df_reference_date = all_event_dt.population.summary[, c("identifier","reference_date")]
+    names(df_reference_date)<-c("identifier","reference_date")
+    df_reference_date$reference_date<-as.Date(as.character(df_reference_date$reference_date),format="%Y-%m-%d")
+
+
+    message(glue::glue("Population: {length(unique(all_event_dt.population.summary$identifier))} individuals "))
   } else {
     message(glue::glue("Population: total non-missing reference date = {sum(!is.na(reference_date))}, total missing reference date= {sum(is.na(reference_date))} "))
   }
 
   # define cases
-  cases <- get_cases(definitions,lst.data,lst.data.settings,reference_date,window_ref_days_include=0,window_fu_days_mask=0)
+  cases <- get_cases(definitions,lst.data,lst.data.settings,df_reference_date,window_ref_days_include=0,window_fu_days_mask=0)
   all_event_dt.Include_in_cases.summary <- cases$all_event_dt.Include_in_cases.summary
   all_event_dt.Include_in_cases <- cases$all_event_dt.Include_in_cases
   # define exclude controls
   all_event_dt.Exclude_from_controls <- get_all_events(definitions %>% dplyr::filter(Definitions =="Exclude_from_controls"),lst.data,lst.data.settings)
   ### define case & control
-  if(is.null(reference_date)){
-    reference_date = setNames(as.Date(rep(NA,length(lst.identifiers))),lst.identifiers)
+  if(is.null(df_reference_date)){
+    # reference_date = setNames(as.Date(rep(NA,length(lst.identifiers))),lst.identifiers)
+    df_reference_date <- as.data.table(lst.identifiers)
+    setnames(df_reference_date,"lst.identifiers","identifier")
+    df_reference_date[, reference_date := as.Date(NA)]
   }
 
-  # NOTE that if the rownames are not unique it will be discarded at data.frame() i.e. f.eid replaced by the running row number
-  df.casecontrol <- data.frame(reference_date=reference_date) %>% tibble::rownames_to_column('f.eid') %>% data.table::as.data.table()
+  # NOTE that if the rownames are not unique it will be discarded at data.frame() i.e. identifier replaced by the running row number
+  # df.casecontrol <- data.frame(reference_date=reference_date) %>% tibble::rownames_to_column('identifier') %>% data.table::as.data.table()
+  # df.casecontrol$identifier<-as.numeric(df.casecontrol$identifier)
+
+  df.casecontrol <- df_reference_date
+
+
+
   # exlude id in case_include & case_exclude from summary => potential control
-  df.casecontrol <- df.casecontrol[!df.casecontrol$f.eid %in% all_event_dt.Include_in_cases.summary$f.eid,]
+  df.casecontrol <- df.casecontrol[!df.casecontrol$identifier %in% all_event_dt.Include_in_cases.summary$identifier,]
   df.casecontrol$reference_date <- as.Date(as.character(df.casecontrol$reference_date),format="%Y-%m-%d")
 
   # merge it with the cases
-  df.casecontrol <- merge(df.casecontrol,all_event_dt.Include_in_cases.summary,by=c("f.eid","reference_date"),all=T)
+  df.casecontrol <- merge(df.casecontrol,all_event_dt.Include_in_cases.summary,by=c("identifier","reference_date"),all=T)
 
 
   if(!is.null(all_event_dt.Exclude_from_controls)) {
     # !is.na(df.casecontrol$Any) for cases i.e. from all_event_dt.Include_in_cases.summary
     # here to exclude = 1)not a case  2) in exclude_from_control
-    exclude=(is.na(df.casecontrol$Any) & (df.casecontrol$f.eid %in% all_event_dt.Exclude_from_controls$f.eid))
+    exclude=(is.na(df.casecontrol$Any) & (df.casecontrol$identifier %in% all_event_dt.Exclude_from_controls$identifier))
     message(glue::glue("excluding {sum(exclude)} controls"))
     # cols to be set to na
-    set_to_na <- names(df.casecontrol)[!names(df.casecontrol) %in% c("f.eid","reference_date")]
+    set_to_na <- names(df.casecontrol)[!names(df.casecontrol) %in% c("identifier","reference_date")]
     df.casecontrol[exclude,(set_to_na):=-1] #mark the non-control as -1
   }
 
@@ -519,15 +547,15 @@ get_survival_data<-function(def,lst.data,
   death_event_dt<-get_all_events(def,lst.data.death,lst.data.settings)
 
   # check consistency in the records w.r.t date
-  discrepant_deaths<-death_event_dt%>%  dplyr::group_by(f.eid) %>% dplyr::summarize(max_date = max(eventdate, na.rm = TRUE),min_date = min(eventdate),same_date=(max_date==min_date))%>% dplyr::filter(!same_date)
+  discrepant_deaths<-death_event_dt%>%  dplyr::group_by(identifier) %>% dplyr::summarize(max_date = max(eventdate, na.rm = TRUE),min_date = min(eventdate),same_date=(max_date==min_date))%>% dplyr::filter(!same_date)
 
   if (nrow(discrepant_deaths)>0){
     message(glue::glue("Number of individuals have inconsistent death dates: {nrow(discrepant_deaths))}"))
     print(discrepant_deaths)
 
     # drop these individuals?
-    lst.data.death$tte.death.icd10.primary<-lst.data.death$tte.death.icd10.primary[! lst.data.death$tte.death.icd10.primary$f.eid %in% discrepant_deaths$f.eid,]
-    lst.data.death$tte.death.icd10.secondary<-lst.data.death$tte.death.icd10.secondary[! lst.data.death$tte.death.icd10.secondary$f.eid %in% discrepant_deaths$f.eid,]
+    lst.data.death$tte.death.icd10.primary<-lst.data.death$tte.death.icd10.primary[! lst.data.death$tte.death.icd10.primary$identifier %in% discrepant_deaths$identifier,]
+    lst.data.death$tte.death.icd10.secondary<-lst.data.death$tte.death.icd10.secondary[! lst.data.death$tte.death.icd10.secondary$identifier %in% discrepant_deaths$identifier,]
   }
 
   # reference date is the first event date excluding the death records
@@ -537,14 +565,14 @@ get_survival_data<-function(def,lst.data,
   #
   all_evt_dt <- get_all_events(def,lst.data,lst.data.settings)
 
-  df_referencedate <- all_evt_dt[,.(reference_date= min(eventdate,na.rm = T)),by=f.eid]
+  df_referencedate <- all_evt_dt[,.(reference_date= min(eventdate,na.rm = T)),by=identifier]
 
-  death_event_dt.summary<-get_incidence_prevalence(death_event_dt,lst.data.settings,reference_date=setNames(df_referencedate$reference_date,df_referencedate$f.eid), include_secondary_recurrence,0, window_days_mask)
+  death_event_dt.summary<-get_incidence_prevalence(death_event_dt,lst.data.settings,df_reference_date=df_referencedate[,c('identifier','reference_date')], include_secondary_recurrence,0, window_days_mask)
   # fu_days_mask masks FU event but not day==0 which is considered as Hx so apply the mask on the df
 
   # make the table cleaner
-  death_event_dt.summary<-death_event_dt.summary %>% dplyr::select(f.eid,first_diagnosis_days,reference_date,Any )
-  names(death_event_dt.summary) <-  c("f.eid",	"days_after_diagnosis",	"reference_date",	"Any")
+  death_event_dt.summary<-death_event_dt.summary %>% dplyr::select(identifier,first_diagnosis_days,reference_date,Any )
+  names(death_event_dt.summary) <-  c("identifier",	"days_after_diagnosis",	"reference_date",	"Any")
 
   death_event_dt.summary[death_event_dt.summary$days_after_diagnosis<window_days_mask ,"days_after_diagnosis"] <- NA
 
