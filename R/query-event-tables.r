@@ -46,7 +46,7 @@ get_all_events <- function (definition,lst.data=lst.data,lst.data.settings){
   all_event_dt <- plyr::ldply(all_event_lst, data.frame) %>% data.table::as.data.table()
   all_event_dt$classification <- lst.data.settings[match(all_event_dt$.id ,lst.data.settings$datasource),]$classification
   if (nrow(all_event_dt) >0){
-  data.table::setkey(all_event_dt,f.eid)
+  data.table::setkey(all_event_dt,identifier)
   }
     return (all_event_dt)
 

@@ -95,7 +95,8 @@ convert_nurseinterview_to_episodedata <- function(df,field_sr_diagnosis = "20002
   field_birth_month="52"
   birthyearfield = names(df)[grepl(paste0("[^0-9]",field_birth_year,"[^0-9]"), names(df))]
   birthmonthfield = names(df)[grepl(paste0("[^0-9]",field_birth_month,"[^0-9]"), names(df))]
-  identifierfield = names(df)[grepl("eid", names(df))]
+  # identifierfield = names(df)[grepl("eid", names(df))]
+  identifierfield = names(df)[grepl("identifier", names(df))]
 
 
 
