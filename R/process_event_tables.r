@@ -390,7 +390,7 @@ get_cases <- function(definitions,
 #' @param definitions phenotype/trait specified in definition table (a row in the table)
 #' @param lst.data list of data table with all episode data
 #' @param lst.data.settings data frame containing data settings
-#' @param reference_date reference dates for each individuals in the whole cohort as a named vector
+#' @param df_reference_date dataframe where first column is the identifier and second column the reference dates
 #' @param lst.identifiers character vector listing the identifiers in the cohort. This is used to define controls if reference_date is not given
 #' @return  a list of 2 data tables : all events for valid cases and an event summary containing time to event information for these individuals.
 #' @keywords time-to-event
