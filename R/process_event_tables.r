@@ -146,18 +146,21 @@ get_incidence_prevalence <- function(all_event_dt,
   #print(glue::glue("window_fu_days_mask: {window_fu_days_mask}"))
 
   # reference_date <- reference_date[!is.na(reference_date)]
+  # change class of the column to date
+  df_reference_date$reference_date<- as.Date(df_reference_date$reference)
+
 
 
   if(nrow(df_reference_date)==0){df_reference_date<-NULL}
   if(!is.null(df_reference_date)){
     # referencedate <-data.table::data.table(reference_date)
     # referencedate$identifier <- names(reference_date)
-    name(df_reference_date)<-c("identifier","reference_date")
-
-    message(glue::glue("non missing reference_date: {length(reference_date)}"))
+    names(df_reference_date)<-c("identifier","reference_date")
+    df_reference_date<-df_reference_date[!is.na(df_reference_date$reference_date)]
+    message(glue::glue("non missing reference_date: {nrow(df_reference_date)}"))
   } else{
     message("no reference_date given, taking the first available event as reference")
-    df_referencedate <- all_event_dt[,.(reference_date= min(eventdate,na.rm = T)),by=identifier]
+    df_reference_date <- all_event_dt[,.(reference_date= min(eventdate,na.rm = T)),by=identifier]
   }
   if(include_secondary_recurrence){
     sources_recurrence_events <- lst.data.settings$datasource
@@ -168,8 +171,9 @@ get_incidence_prevalence <- function(all_event_dt,
   ###########################################################
   # in case of empty rows , the entire column will be cast to default of class NA i.e. logical
   # this could create error for downstream functions "Error in bmerge....Incompatible join types"
-  col_num<-c("count","sum.epidur","median.epidur","max.epidur", "survival_days", "Death_primary","Death_any" , "Hx_days", "Fu_days" ,"Hx" , "Fu","Ref" , "first_diagnosis_days","Any")
-  col_chr<-"identifier"
+  #  move identifier column to type numeric
+  col_num<-c("identifier","count","sum.epidur","median.epidur","max.epidur", "survival_days", "Death_primary","Death_any" , "Hx_days", "Fu_days" ,"Hx" , "Fu","Ref" , "first_diagnosis_days","Any")
+  # col_chr<-"identifier"
   col_date<-"reference_date"
   # catch if there is no event, return an empty table which can be merged
   if (nrow(all_event_dt)==0){
@@ -183,7 +187,7 @@ get_incidence_prevalence <- function(all_event_dt,
   }
 
 
-  df <- merge(all_event_dt,df_referencedate,by = 'identifier') %>% dplyr::arrange(eventdate) %>% data.table::as.data.table()
+  df <- merge(all_event_dt,df_reference_date,by = 'identifier') %>% dplyr::arrange(eventdate) %>% data.table::as.data.table()
 
   # df <- df %>% filter(!is.na(reference_date)) # comment out if missing identifiers is fixed.
   df$days <- df$eventdate - df$reference_date
@@ -309,13 +313,13 @@ get_incidence_prevalence <- function(all_event_dt,
   all_event_dt.summary$first_diagnosis_days <- pmin(all_event_dt.summary$Hx_days,all_event_dt.summary$Fu_days,na.rm = T)
   all_event_dt.summary[ Hx==2 & is.na(Hx_days),'first_diagnosis_days'] <- NA
 
-  all_event_dt.summary <- merge(all_event_dt.summary,df_referencedate,by="identifier")
+  all_event_dt.summary <- merge(all_event_dt.summary,df_reference_date,by="identifier")
   all_event_dt.summary[,Any:=2]
   all_event_dt.summary <- data.table::data.table(all_event_dt.summary)
 
   ####################################type check######################################################
   all_event_dt.summary[, (col_num) := lapply(.SD, as.numeric), .SDcols = col_num]
-  all_event_dt.summary[, (col_chr) := lapply(.SD, as.character), .SDcols = col_chr]
+  # all_event_dt.summary[, (col_chr) := lapply(.SD, as.character), .SDcols = col_chr]
   all_event_dt.summary[, (col_date) := lapply(.SD, as.Date), .SDcols = col_date]
   #####################################################################################################
   return(all_event_dt.summary)
@@ -341,7 +345,7 @@ get_incidence_prevalence <- function(all_event_dt,
 get_cases <- function(definitions,
                        lst.data,
                        lst.data.settings,
-                       reference_date=NULL,
+                      df_reference_dt=NULL,
                        ...
                          ) {
 
@@ -357,7 +361,7 @@ get_cases <- function(definitions,
 
   all_event_dt.Include_in_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,lst.data.settings)   #MI
   all_event_dt.Include_in_cases.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.Include_in_cases,lst.data.settings,
-                                                                    reference_date = reference_date)
+                                                                    df_reference_date = df_reference_dt)
                                                                     #...)
 
   message(glue::glue("including {nrow(all_event_dt.Include_in_cases.summary)} cases"))
@@ -408,13 +412,13 @@ get_cases_controls <-function(definitions,
 
   # reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$identifier)
   # reference_date_<-df.casecontrol
-  names(reference_date)<-c("identifier","reference_date")
+  names(df_reference_date)<-c("identifier","reference_date")
   # rm(reference_date)
   # gc()
 
   # class(reference_date)
-  df_reference_date <- df_reference_date[!is.na(reference_date$identifier),]
-  df_reference_date <- df_reference_date[!is.na(reference_date$reference_date),]
+  df_reference_date <- df_reference_date[!is.na(df_reference_date$identifier),]
+  df_reference_date <- df_reference_date[!is.na(df_reference_date$reference_date),]
 
   # reference_date <- reference_date[!is.na(reference_date)]
   # reference_date <- reference_date[!is.na(names(reference_date))]
@@ -423,7 +427,7 @@ get_cases_controls <-function(definitions,
 
 
   if(is.null(df_reference_date)){
-    message("reference_date=NULL, taking first occurence of case and all available identifiers (lst.data$all_identifiers)")
+    message("df_reference_date=NULL, taking first occurence of case and all available identifiers (lst.data$all_identifiers)")
     if(length(lst.identifiers)<=1){
       message("ERROR: lst.identifiers is empty, please provide either reference_date or a list of lst.identifiers that should be used as population.")
       return(0)
@@ -436,7 +440,15 @@ get_cases_controls <-function(definitions,
     # only consider event with real event date in study population, set those with visitdate to NA
     all_event_dt.population[all_event_dt.population$event==0,]$eventdate <-NA
     # get everyone , take the date of relevant events respectively
-    all_event_dt.population.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.population,lst.data.settings,reference_date = NULL,window_fu_days_mask = 15)
+    all_event_dt.population.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.population,lst.data.settings,df_reference_date = NULL,window_fu_days_mask = 15)
+
+
+
+    print(class(all_event_dt.population.summary$identifier))
+
+
+
+
 
     # reference_date = setNames(as.Date(as.character(all_event_dt.population.summary$reference_date),format="%Y-%m-%d"),all_event_dt.population.summary$identifier)
     df_reference_date = all_event_dt.population.summary[, c("identifier","reference_date")]
@@ -446,7 +458,7 @@ get_cases_controls <-function(definitions,
 
     message(glue::glue("Population: {length(unique(all_event_dt.population.summary$identifier))} individuals "))
   } else {
-    message(glue::glue("Population: total non-missing reference date = {sum(!is.na(reference_date))}, total missing reference date= {sum(is.na(reference_date))} "))
+    message(glue::glue("Population: total non-missing reference date = {sum(!is.na(df_reference_date))}, total missing reference date= {sum(is.na(df_reference_date))} "))
   }
 
   # define cases

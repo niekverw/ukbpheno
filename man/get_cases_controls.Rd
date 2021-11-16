@@ -8,7 +8,7 @@ get_cases_controls(
   definitions,
   lst.data,
   lst.data.settings,
-  reference_date = NULL,
+  df_reference_date = NULL,
   lst.identifiers = NULL
 )
 }
@@ -19,9 +19,9 @@ get_cases_controls(
 
 \item{lst.data.settings}{data frame containing data settings}
 
-\item{reference_date}{reference dates for each individuals in the whole cohort as a named vector}
-
 \item{lst.identifiers}{character vector listing the identifiers in the cohort. This is used to define controls if reference_date is not given}
+
+\item{reference_date}{reference dates for each individuals in the whole cohort as a named vector}
 }
 \value{
 a list of 2 data tables : all events for valid cases and an event summary containing time to event information for these individuals.
@@ -30,6 +30,6 @@ a list of 2 data tables : all events for valid cases and an event summary contai
 Given a phenotype, a list of episode data and reference dates per individual, identify valid cases/controls and compute the time to event data for these individuals respectively.  If no reference date is given then the date of first available event will be taken as reference date for each individual.
 }
 \examples{
-get_cases_controls(definitions=dfDefinitions_processed_expanded \%>\% filter(TRAIT=="Nicm"), lst.data,lst.data.settings,  reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="\%Y-\%m-\%d"),dfukb$f.eid))
+get_cases_controls(definitions=dfDefinitions_processed_expanded \%>\% filter(TRAIT=="Nicm"), lst.data,lst.data.settings,  reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="\%Y-\%m-\%d"),dfukb$identifier))
 }
 \keyword{time-to-event}

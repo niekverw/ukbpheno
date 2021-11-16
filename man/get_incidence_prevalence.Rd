@@ -7,7 +7,7 @@
 get_incidence_prevalence(
   all_event_dt,
   lst.data.settings,
-  reference_date = NULL,
+  df_reference_date = NULL,
   include_secondary_recurrence = FALSE,
   window_ref_days_include = 0,
   window_fu_days_mask = 0
@@ -18,11 +18,11 @@ get_incidence_prevalence(
 
 \item{lst.data.settings}{data frame containing data settings}
 
-\item{reference_date}{reference dates for each individuals in the whole cohort as a named vector}
-
 \item{window_ref_days_include}{number of days around the reference date (visit) that should be used to indicates if individuals had the event on the reference date. Relevant if you want to know if participant took medication on the visit}
 
 \item{window_fu_days_mask}{number of days that future events should not be counted}
+
+\item{reference_date}{reference dates for each individuals in the whole cohort as a named vector}
 }
 \value{
 a data table with individual with time to event information
@@ -32,6 +32,6 @@ Given a data.table with all events for a phenotype and reference dates per indiv
 }
 \examples{
 all_event_dt <- get_all_events(dfDefinitions_processed_expanded[1,],lst.data,lst.data.settings)
-get_incidence_prevalence(all_event_dt,lst.data.settings, reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="\%Y-\%m-\%d"),dfukb$f.eid))
+get_incidence_prevalence(all_event_dt,lst.data.settings, reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="\%Y-\%m-\%d"),dfukb$identifier))
 }
 \keyword{time-to-event}

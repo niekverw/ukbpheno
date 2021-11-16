@@ -81,7 +81,7 @@ read_defnition_table <-function(f.definition,f.data.setting,dir.code.map){
 }
 
 # data.table::fwrite(list(missing_codes),paste(pheno_dir,"ukbphenodata_feb2021.Rdata_notInData.code"))
-test_read_def<-read_defnition_table(fdefinitions,fdata_setting,data_dir)
+dfDefinitions_processed_expanded<-read_defnition_table(fdefinitions,fdata_setting,data_dir)
 
 
 
@@ -128,7 +128,7 @@ generate_harmonized_long_format_datatable <- function(f.ukbtab=NULL,f.html=NULL,
     }
   }
   # vector of eid needed for subsequent function
-  vct.identifiers <- as.numeric(dfukb$f.eid)
+  vct.identifiers <- as.numeric(dfukb$identifier)
   gc()
 
   ################################################################################
@@ -221,7 +221,8 @@ generate_harmonized_long_format_datatable <- function(f.ukbtab=NULL,f.html=NULL,
   # make sure eeverything is in the right format:
   lst.data <- lapply(lst.data,function(x) {setkey(x,code) })
   # lst.data <- lapply(lst.data,function(x) {x[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid'] })
-  lst.data <- lapply(lst.data,function(x) {x[, ('f.eid') := lapply(.SD, as.numeric), .SDcols = 'f.eid'] })
+  # lst.data <- lapply(lst.data,function(x) {x[, ('f.eid') := lapply(.SD, as.numeric), .SDcols = 'f.eid'] })
+  lst.data <- lapply(lst.data,function(x) {x[, ('identifier') := lapply(.SD, as.numeric), .SDcols = 'identifier'] })
 
   lst.data <- lapply(lst.data,function(x) {x[,'eventdate'] <-  round(x$eventdate);return(x) })
 
@@ -232,8 +233,18 @@ generate_harmonized_long_format_datatable <- function(f.ukbtab=NULL,f.html=NULL,
 
 test1_noDef_lst.data_id<-generate_harmonized_long_format_datatable(f.ukbtab = paste0(fukbtab,".50k"),f.html = fhtml,f.gp_clinical = paste0(fgp_clinical,'.50k'),f.gp_scripts = paste0(fgp_scripts,'.50k'),f.hesin = fhesin,f.hesin_diag = fhesin_diag,f.hesin_oper =fhesin_oper,f.death_portal = fdeath_portal,f.death_cause_portal = fdeath_cause_portal )
 
+trait<-"Dcm"
+# definitions,
+# lst.data,
+# lst.data.settings,
+# df_reference_date=NULL,
+# lst.identifiers=NULL
+lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==trait), lst.data,dfData.settings, df_reference_date=dfukb[,c("identifier","f.53.0.0")],vct.identifiers)
 
 
+
+sum(is.na(dfukb[,c("identifier","f.53.0.0")]))
+nrow(dfukb[!is.na(dfukb$f.53.0.0)])
 
 
 
