@@ -59,7 +59,7 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
   # visit date code
   field_visit_date="53"
   # vector with name of the identifier col
-  identifierfield = "f.eid"
+  identifierfield = "identifier"
   #  vector with names of all visit cols : "f.53.0.0" "f.53.1.0" "f.53.2.0" "f.53.3.0"
   visitdatefields = names(df)[grepl(paste0("[^0-9]",field_visit_date,"[^0-9]"), names(df))]
   visits = length(visitdatefields) #sum(grepl("53_", names(df)))
@@ -152,8 +152,8 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
       df_sub[[diagfield]]<-col #paste(field_ts_diagnosis,cdn,sep="")
       # add visit instance
       df_sub$visit <- v
-      names(df_sub) <- c("f.eid","code","eventdate","visitdate","birthyearmonth","visit")
-      df_out <- rbind(df_out,as.matrix(df_sub[,c("f.eid","code","eventdate","visit","visitdate","birthyearmonth"),with=FALSE]))
+      names(df_sub) <- c("identifier","code","eventdate","visitdate","birthyearmonth","visit")
+      df_out <- rbind(df_out,as.matrix(df_sub[,c("identifier","code","eventdate","visit","visitdate","birthyearmonth"),with=FALSE]))
     }
 
   }
@@ -180,9 +180,9 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
 
   # deduplicate
   message("Deduplicate")
-  data.table::setkey(df_out,f.eid,code)
-  dfout_extrastats <- suppressWarnings(df_out[, .(mindt= min(eventdate,na.rm = T),maxdt= max(eventdate,na.rm = T),meandt= mean(eventdate,na.rm=T) ), keyby=list(f.eid,code)])
-  dfout_extrastats <- merge(df_out[,c('f.eid','code','eventdate')] ,dfout_extrastats,by=c('f.eid','code'))
+  data.table::setkey(df_out,identifier,code)
+  dfout_extrastats <- suppressWarnings(df_out[, .(mindt= min(eventdate,na.rm = T),maxdt= max(eventdate,na.rm = T),meandt= mean(eventdate,na.rm=T) ), keyby=list(identifier,code)])
+  dfout_extrastats <- merge(df_out[,c('identifier','code','eventdate')] ,dfout_extrastats,by=c('identifier','code'))
 
   # time between oldest and newest record in unit of year
   dfout_extrastats$diffdt <- (dfout_extrastats$maxdt - dfout_extrastats$mindt)/daysinyear
@@ -192,7 +192,7 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
   #  take meandt as the event date , i.e. duplicate records with time difference > qc threshold will be changed to NA
   df_out$eventdate <- dfout_extrastats$meandt
   df_out <- df_out[order(df_out$visitdate),]
-  df_out <- df_out[!duplicated(df_out[,c("f.eid","code","eventdate"),with=FALSE]),] #sorted on visit, so first occurence is always first visit.
+  df_out <- df_out[!duplicated(df_out[,c("identifier","code","eventdate"),with=FALSE]),] #sorted on visit, so first occurence is always first visit.
 
 
   # record which can be set as an event or not (when no event_date is reported, only visit)
@@ -209,9 +209,9 @@ convert_touchscreen_to_episodedata<- function(df,ts_conditions=dfDefinitions_pro
   df_out_visit$eventdate <- df_out_visit$visitdate
   df_out<- unique(rbind(df_out,df_out_visit))
 
-  df_out <- df_out[,c("f.eid","code","eventdate","event"),with=FALSE]
+  df_out <- df_out[,c("identifier","code","eventdate","event"),with=FALSE]
   setkey(df_out,code)
-  df_out[, ('f.eid') := lapply(.SD, as.character), .SDcols = 'f.eid']
+  df_out[, ('identifier') := lapply(.SD, as.character), .SDcols = 'identifier']
 
   gc()
   print(format(object.size(df_out), units = "Mb"))
