@@ -4,14 +4,14 @@
 \alias{get_cases}
 \title{Get case for a phenotype}
 \usage{
-get_cases(definitions, lst.data, lst.data.settings, reference_date = NULL, ...)
+get_cases(definitions, lst.data, df.data.settings, df_reference_dt = NULL, ...)
 }
 \arguments{
 \item{definitions}{phenotype/trait specified in definition table (a row in the table)}
 
 \item{lst.data}{list of data table with all episode data}
 
-\item{lst.data.settings}{data frame containing data settings}
+\item{df.data.settings}{data frame containing data settings}
 
 \item{reference_date}{reference dates for each individuals in the whole cohort as a named vector}
 }
@@ -22,6 +22,6 @@ a list of 2 data tables : all events for valid cases and an event summary contai
 Given a phenotype, a list of episode data and reference dates per individual, identify cases and compute the time to event data for these individuals.  If no reference date is given then the date of first available event will be taken as reference date for each individual.
 }
 \examples{
-get_cases(definitions=dfDefinitions_processed_expanded \%>\% filter(TRAIT=="Nicm"), lst.data,lst.data.settings, reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="\%Y-\%m-\%d"),dfukb$identifier))
+get_cases(definitions=dfDefinitions_processed_expanded \%>\% filter(TRAIT=="Nicm"), lst.data,df.data.settings, reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="\%Y-\%m-\%d"),dfukb$identifier))
 }
 \keyword{time-to-event}

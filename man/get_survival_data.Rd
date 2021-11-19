@@ -7,7 +7,7 @@
 get_survival_data(
   def,
   lst.data,
-  lst.data.settings,
+  df.data.settings,
   include_secondary_recurrence = FALSE,
   window_days_mask = 0
 )
@@ -17,7 +17,7 @@ get_survival_data(
 
 \item{lst.data}{list of data table with all episode data}
 
-\item{lst.data.settings}{data frame containing data settings}
+\item{df.data.settings}{data frame containing data settings}
 
 \item{window_days_mask}{number of days that future events should not be counted since first diagnosis.Relevant when the death record is the only record i.e. t=0}
 }
@@ -28,6 +28,6 @@ a data table summarizing time to event information for these individuals.
 Given a phenotype and a list of episode data , compute the survival time after first diagnoisis in cases only
 }
 \examples{
-get_survival_data(dfDefinitions_processed_expanded[14,],lst.data,lst.data.settings)
+get_survival_data(dfDefinitions_processed_expanded[14,],lst.data,df.data.settings)
 }
 \keyword{time-to-event}
