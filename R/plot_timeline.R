@@ -1,5 +1,3 @@
-
-
 # library(scales)
 # library(lubridate)
 
@@ -17,19 +15,19 @@
 #' @keywords time-to-event
 #' @export
 #' @examples
-#' lst.data.f.eid<-lapply(lst.data,function(x) {x[, ("f.eid") := lapply(.SD, as.numeric), .SDcols = "f.eid"] })  set eid to numeric
-#' lst.data.f.eid<-lapply(lst.data,function(x) {setkey(x,f.eid) }) # double check that everything has the same setkey.
-#' plot_individual_timeline(lst.data.settings,NULL,lst.data.f.eid,identifier="1234567")
+#' lst.data.identifier<-lapply(lst.data,function(x) {x[, ("identifier") := lapply(.SD, as.numeric), .SDcols = "identifier"] })  set eid to numeric
+#' lst.data.identifier<-lapply(lst.data,function(x) {setkey(x,identifier) }) # double check that everything has the same setkey.
+#' plot_individual_timeline(lst.data.settings,NULL,lst.data.identifier,identifier="1234567")
 plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst.data.eid=NULL,identifier=1234567) {
   # credit:  https://benalexkeen.com/creating-a-timeline-graphic-using-r-and-ggplot2/
   # input: a collapsed datatable with ind_all_event_dt for one participant, e.g. for disease codes.
   # alternative input: lst.data.eid and identifier, so that it generates the ind_all_event_dt based on all available data.
-  # lst.data.eid, can be keyed on f.eid which is MUCH faster, we can create a functiion that checks the key and returns a new keyed object as global var if it iis not right.  lst.data.eid.f.eid<-lapply(lst.data.eid,function(x) {setkey(x,f.eid) }) # double check that everything has the same setkey.
-  # lst.data.eid, TODO: make f.eid integers (fastest type): lst.data.eid.f.eid<-lapply(lst.data.eid,function(x) {x[, ('f.eid') := lapply(.SD, as.numeric), .SDcols = 'f.eid'] }) # double check that everything has the same setkey.
+  # lst.data.eid, can be keyed on identifier which is MUCH faster, we can create a functiion that checks the key and returns a new keyed object as global var if it iis not right.  lst.data.eid.identifier<-lapply(lst.data.eid,function(x) {setkey(x,identifier) }) # double check that everything has the same setkey.
+  # lst.data.eid, TODO: make identifier integers (fastest type): lst.data.eid.identifier<-lapply(lst.data.eid,function(x) {x[, ('identifier') := lapply(.SD, as.numeric), .SDcols = 'identifier'] }) # double check that everything has the same setkey.
 
   # ###############################################################################
   # Why to character? it throws an error when fetching the events for the individual
-  # Error in bmerge .....Incompatible join types: x.f.eid (double) and i.V1 (character)
+  # Error in bmerge .....Incompatible join types: x.identifier (double) and i.V1 (character)
   # identifier <- as.character(identifier)
   identifier<-as.numeric(identifier)
   # ###################################################################################33
@@ -40,10 +38,10 @@ plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst
 
   if(is.null(ind_all_event_dt)){
     all_event_lst <- lapply(names(lst.data.eid), function(x) {
-      if(data.table::key(lst.data.eid[[x]]) =="f.eid"){
+      if(data.table::key(lst.data.eid[[x]]) =="identifier"){
         lst.data.eid[[x]] [ .(identifier),nomatch=NULL] # nomatch is important
       } else{
-        lst.data.eid[[x]] [ lst.data.eid[[x]]$f.eid %in% identifier]
+        lst.data.eid[[x]] [ lst.data.eid[[x]]$identifier %in% identifier]
       }
     } )
     names(all_event_lst)<-names(lst.data.eid)
@@ -52,15 +50,15 @@ plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst
     # set key to be eid
     ind_all_event_dt <- plyr::ldply(all_event_lst, data.frame) %>% as.data.table()
     ind_all_event_dt$classification <- lst.data.settings[match(ind_all_event_dt$.id ,lst.data.settings$datasource),]$classification
-    data.table::setkey(ind_all_event_dt,f.eid)
+    data.table::setkey(ind_all_event_dt,identifier)
     ######
   }
-  if (any(!ind_all_event_dt$f.eid %in% identifier)){
+  if (any(!ind_all_event_dt$identifier %in% identifier)){
     message(glue::glue("no data on {identifier}"))
     return(0)
   }
   ### get iit ini the right formatt.
-  df <- ind_all_event_dt %>% dplyr::filter(f.eid %in% identifier) %>% as.data.frame()
+  df <- ind_all_event_dt %>% dplyr::filter(identifier %in% identifier) %>% as.data.frame()
   df <- data.frame(month=month(df$eventdate),
             year=year(df$eventdate),
             code= df$code,
@@ -162,4 +160,3 @@ plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst
   print(timeline_plot)
   return(timeline_plot)
 }
-
