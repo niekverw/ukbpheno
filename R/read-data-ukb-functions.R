@@ -200,15 +200,7 @@ read_ukb_tabdata <- function(fukb,
   names(df)[names(df) == names(df)[grepl("eid", names(df))]]<-"identifier"
   #  change from integer to double; numeric sorting is ~150x faster than character sort
   df$identifer<-as.numeric(df$identifier)
-
-    tictoc::toc()
-
-  # library(vroom)
-  # which(freadcolclasses !="NULL")
-  # tic("vroom")
-  # df <- vroom(fukb,delim = "\t",col_types="", col_select =which(freadcolclasses !="NULL")  , progress=F) # which(freadcolclasses !="NULL")  #fields_to_keep.tab
-  # toc()
-
+  tictoc::toc()
   return(df)
 }
 #col.classes[col.classes %in% "integer64"] <- "character" #integer64 not supported, unsupported in disk.frame? but not in data.table
@@ -221,7 +213,7 @@ read_ukb_tabdata <- function(fukb,
 #' @param fhesin Path to HESIN (master file)
 #' @param fhesin_diag Path to HESIN_DIAG file containing diagnosis codes
 #' @param fhesin_oper Path to HESIN_OPER file containing Operations and procedural codes
-#' @return   a data.table object with all episodes
+#' @return  list of data.table objects with all episodes
 #' @export
 #' @examples
 #' read_hesin_data("hesin.txt" ,"hesin_diag.txt" ,"hesin_oper.txt" )
@@ -317,7 +309,7 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
 #'
 #' This function reads the record-level clinical events from General Practitioner (GP) data. Refer to official UKB documetation for more information regarding this data.
 #' @param fgp Path to GP clinical event records
-#' @return   a data.table object with all episodes
+#' @return   list of data.table objects with all episodes
 #' @export
 #' @examples
 #' read_gp_clinical_data("gpclinical.txt" )
@@ -385,7 +377,7 @@ read_gp_clinical_data <- function(fgp){
 #'
 #' This function reads the prescription records from General Practitioner (GP) data. Refer to official UKB documetation for more information regarding this data.
 #' @param fgp Path to GP prescription records
-#' @return   a data.table object with all episodes
+#' @return   list of data.table objects with all episodes
 #' @export
 #' @examples
 #' read_gp_clinical_data("gpscripts.txt" )
