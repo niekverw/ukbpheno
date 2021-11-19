@@ -389,7 +389,6 @@ get_cases <- function(definitions,
 
 
 
-all_event_dt.population <- get_all_events(dfDefinitions_processed_expanded %>% filter(TRAIT==trait)%>% dplyr::filter(Definitions =="Study_population"),lst.data,df.data.settings)
 
 #' Get case and controls for a phenotype
 #'
@@ -422,7 +421,10 @@ get_cases_controls <-function(definitions,
     # reference_date <- reference_date[!is.na(names(reference_date))]
     names(df_reference_date)<-c("identifier","reference_date")
     df_reference_date <- df_reference_date[!is.na(df_reference_date$identifier),]
-    df_reference_date <- df_reference_date[!is.na(df_reference_date$reference_date),]
+    # df_reference_date <- df_reference_date[!is.na(df_reference_date$reference_date),]
+    if (nrow(df_reference_date)==0){
+      message("Please verify there is individual in df_reference_date")
+    }
     # if there are multiple reference dates for one individual, the calculation will mess up
     df_reference_date<-unique(df_reference_date,by="identifier")
 
@@ -444,6 +446,7 @@ get_cases_controls <-function(definitions,
       # names(df_reference_date)<-c("identifier","reference_date")
     }
     message(glue::glue("Take first event date as reference date"))
+
     all_event_dt.population <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,dfData.settings)
     # only keep date with real event
     all_event_dt.population[all_event_dt.population$event==0,]$eventdate <-NA
@@ -493,18 +496,26 @@ get_cases_controls <-function(definitions,
   all_event_dt.Exclude_from_controls <- get_all_events(definitions %>% dplyr::filter(Definitions =="Exclude_from_controls"),lst.data,df.data.settings)
 
   ### define case & control
-
-
   df.casecontrol <- df_reference_date
 
 
-
-  # exlude id in case_include & case_exclude from summary => potential control
+  # exclude id in case_include & case_exclude from summary => potential control
   df.casecontrol <- df.casecontrol[!df.casecontrol$identifier %in% all_event_dt.Include_in_cases.summary$identifier,]
   df.casecontrol$reference_date <- as.Date(as.character(df.casecontrol$reference_date),format="%Y-%m-%d")
-
+  potential_control<-df.casecontrol$identifier
+  # case without eventdate
+  non_proper_case<-dplyr::intersect(potential_control,all_event_dt.Include_in_cases$identifier)
   # merge it with the cases
   df.casecontrol <- merge(df.casecontrol,all_event_dt.Include_in_cases.summary,by=c("identifier","reference_date"),all=T)
+
+
+  if(length(non_proper_case)>0) {
+    message(glue::glue("Warning: {length(non_proper_case)} cases without valid event date"))
+    # cols to be set to na
+    set_to_na <- names(df.casecontrol)[!names(df.casecontrol) %in% c("identifier","reference_date")]
+    # df.casecontrol[df.casecontrol$identifier %in% non_proper_case,(set_to_na):=-2] #mark the non-case as -2
+    df.casecontrol[df.casecontrol$identifier %in% non_proper_case,(c("Any")):=2] #mark the non-case as -2
+  }
 
 
   if(!is.null(all_event_dt.Exclude_from_controls)) {
@@ -539,11 +550,11 @@ get_cases_controls <-function(definitions,
   df.casecontrol[(is.na(df.casecontrol$Fu)&(df.casecontrol$Any == 2)& (!is.na(df.casecontrol$Hx_days))& (is.na(df.casecontrol$Fu_days))),]$Fu <-  1
   ############################################################################################################
 
-
   print(table(df.casecontrol$Any))
 
+
   return(list(df.casecontrol=df.casecontrol,
-              all_event_dt.Include_in_cases=all_event_dt.Include_in_cases,
+              all_event_dt.Include_in_cases=all_event_dt.Include_in_cases[all_event_dt.Include_in_cases$identifier %in% all_event_dt.Include_in_cases.summary$identifier,],
               all_event_dt.Include_in_cases.summary=all_event_dt.Include_in_cases.summary)
   )
 }
