@@ -106,7 +106,18 @@ lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expan
 # The dates of the first event will be taken as reference date for the calculation of time to disease
 lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==trait), lst.harmonized.data$lst.data,dfData.settings, vct.identifiers=lst.harmonized.data$vct.identifiers)
 
+# it is a good practice to check if all the identifiers are in the main dataset, as non-existing identifier will be classified as a control (no events)
+my.curated.identifiers<-df_reference_dt_v2[1:20]$identifier
+my.curated.identifiers[1]<-10000011
+all(my.curated.identifiers %in% lst.harmonized.data$vct.identifiers) #FALSE
 
 
+
+all_event_dt <- get_all_events(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait),lst.data=lst.harmonized.data$lst.data,df.data.settings=dfData.settings)   #Af
+df_reference_date<-df_reference_dt_v0
+df.data.settings[df.data.settings$datasource=="tte.sr.20002"]$minimum_instance<-2
+all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,df.data.settings,df_reference_date = df_reference_date,window_fu_days_mask = 15)
+df.data.settings[df.data.settings$datasource=="tte.sr.20002"]$minimum_instance<-1
+all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,df.data.settings,df_reference_date = df_reference_date,window_fu_days_mask = 15)
 
 
