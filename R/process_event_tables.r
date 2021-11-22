@@ -120,6 +120,7 @@ get_stats_for_events <- function(all_event_dt){
 #' all_event_dt <- get_all_events(dfDefinitions_processed_expanded[1,],lst.data,df.data.settings)
 #' get_incidence_prevalence(all_event_dt,df.data.settings, reference_date = setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$identifier))
 ### get prevalence (move this.. )
+
 get_incidence_prevalence <- function(all_event_dt,
                                      df.data.settings,
                                      df_reference_date=NULL,
@@ -192,8 +193,46 @@ get_incidence_prevalence <- function(all_event_dt,
     return(all_event_dt.summary)
   }
 
+  ############################################
+  # min instance filter
+  #  TODO: an extra record with visitdate as event data & event ==0 is always created regardless of whether a valid event date had been reported for  TS/Nurse interview/Cancer registry
+  #  if set min_inst for these to n*2  / remove all rows with event ==0 -> create a bias as the events without event dates will be more likely filtered out?????
+  #  c.f. Line 220-225 convert_nurseinterview_to_episodedata.r
+  # # records for people with eventdates :2/4/6/8/...2n   VS  1/2/3/4/...n  which n depends not only on #visit but also available codes 1471,1483 for AF
+  # those cases can be distinguished in theory : with eventdate -> multiple of 2  records one event==2 , one event==0  VS without eventdate  -> 1 record event==0
+  # something like: group_by(code) %>% count(n())
+  #  that means we can reverse engineer to fish out ppl without eventdate ....which sounds a convoluted operation (what is the advantage of adding the Line220-225 block?)
+  # on the other hand , given the data is only collected during visits to assessment centres, how often does one expect to use min_instance>1 ?
+  ############################################
+  message("Filter records by thresholds specified in data setting")
+
+  # first merge the datasource specific threshold values to df
+  all_event_dt$min.ins<- with(df.data.settings, minimum_instance[match(all_event_dt$.id,datasource)])
+
+  # TODO how to make the message look better?
+  # #records by data type after filtering:c("tte.death.icd10.primary", "tte.death.icd10.secondary", "tte.hesin.icd10.primary", "tte.hesin.icd10.secondary", "tte.hesin.icd9.primary", "tte.hesin.icd9.secondary", "tte.hesin.oper4.primary", "tte.hesin.oper4.secondary", "tte.sr.20002")
+  # c(8900, 75114, 1234716, 7340, 1711, 337, 244658, 1604, 129186)
+
+  message(glue::glue("#records by data type before filtering: {glue::glue_collapse(all_event_dt%>% dplyr::group_by(.id)%>% count(),sep='\n')}"))
+  # print(all_event_dt%>% dplyr::group_by(.id)%>% count())
+
+  # split df by .id, , group by identifier and filter records
+  all_event_dt<-plyr::ddply(.data=all_event_dt,.variables=".id",function(x) {
+    # print(head(x$.id,1))
+    # print(nrow(x))
+    x%>% dplyr::group_by(identifier)%>% dplyr::filter(n()>=min.ins)
+    # ins.min<-df.data.settings[df.data.settings$datasource==".id",]$minimum_instance
+    # print(ins.min)
+    # x%>%dplyr::group_by(identifier)%>% dplyr::filter(n()>ins.min)
+  })
+  all_event_dt<-as.data.table(all_event_dt)
+  message(glue::glue("#records by data type after filtering:{glue::glue_collapse(all_event_dt%>% dplyr::group_by(.id)%>% count(),sep='\n')}"))
+  #############################################################################################################
+
 
   df <- merge(all_event_dt,df_reference_date,by = 'identifier') %>% dplyr::arrange(eventdate) %>% data.table::as.data.table()
+
+
 
   # df <- df %>% filter(!is.na(reference_date)) # comment out if missing identifiers is fixed.
   df$days <- df$eventdate - df$reference_date
@@ -206,7 +245,7 @@ get_incidence_prevalence <- function(all_event_dt,
   # death
   dfDth<-df[df$.id %in% df.data.settings[df.data.settings$death,]$datasource,]
 
-  if (nrow(dfDth) >0){
+  if (nrow(dfDth)>0){
   # get death records
   # dfDth<-df[(df$.id %in% df.data.settings[df.data.settings$death,]$datasource),]
   # ### flag primary death records
@@ -264,9 +303,6 @@ get_incidence_prevalence <- function(all_event_dt,
   #
   #
   # first_diagnosis_days <- df[  ,.SD[which.min(days)], by=identifier]
-  #
-  # df %>% filter(identifier==1025336 )
-  # first_diagnosis_days %>% filter(identifier==1025336 )
 
   ### Data if participant had event/med  reference date (visit);+/- x day
   #TODO I think episodes for visitdate (event=0 rows) is messing up with this flag! i.e. almost all of them have this flag on
