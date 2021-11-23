@@ -153,8 +153,8 @@ get_incidence_prevalence <- function(all_event_dt,
   if(!is.null(df_reference_date)){
     # 1.1 not NULL but empty -> same treatment as of NULL
     if(nrow(df_reference_date)==0){
-      message("empyty reference_date table given, taking the first available event as reference")
-      df_reference_date <- all_event_dt[,.(reference_date= min(eventdate,na.rm = T)),by=identifier]
+      # message("empyty reference_date table given, taking the first available event as reference")
+      df_reference_date <- suppressWarnings(all_event_dt[,.(reference_date= min(eventdate,na.rm = T)),by=identifier])
     } else{
     # 1.2 not NULL and not empty
     # referencedate <-data.table::data.table(reference_date)
@@ -166,8 +166,8 @@ get_incidence_prevalence <- function(all_event_dt,
     }
     #scenario 2: df_reference_date is NULL
   } else{
-    message("no reference_date given, taking the first available event as reference")
-    df_reference_date <- all_event_dt[,.(reference_date= min(eventdate,na.rm = T)),by=identifier]
+    # message("no reference_date given, taking the first available event as reference")
+    df_reference_date <- suppressWarnings(all_event_dt[,.(reference_date= min(eventdate,na.rm = T)),by=identifier])
   }
   if(include_secondary_recurrence){
     sources_recurrence_events <- df.data.settings$datasource
@@ -212,8 +212,8 @@ get_incidence_prevalence <- function(all_event_dt,
   # TODO how to make the message look better?
   # #records by data type after filtering:c("tte.death.icd10.primary", "tte.death.icd10.secondary", "tte.hesin.icd10.primary", "tte.hesin.icd10.secondary", "tte.hesin.icd9.primary", "tte.hesin.icd9.secondary", "tte.hesin.oper4.primary", "tte.hesin.oper4.secondary", "tte.sr.20002")
   # c(8900, 75114, 1234716, 7340, 1711, 337, 244658, 1604, 129186)
-
-  message(glue::glue("#records by data type before filtering: {glue::glue_collapse(all_event_dt%>% dplyr::group_by(.id)%>% count(),sep='\n')}"))
+  # too much information to read
+  # message(glue::glue("#records by data type before filtering: {glue::glue_collapse(all_event_dt%>% dplyr::group_by(.id)%>% count(),sep='\n')}"))
   # print(all_event_dt%>% dplyr::group_by(.id)%>% count())
 
   # split df by .id, , group by identifier and filter records
@@ -226,7 +226,7 @@ get_incidence_prevalence <- function(all_event_dt,
     # x%>%dplyr::group_by(identifier)%>% dplyr::filter(n()>ins.min)
   })
   all_event_dt<-as.data.table(all_event_dt)
-  message(glue::glue("#records by data type after filtering:{glue::glue_collapse(all_event_dt%>% dplyr::group_by(.id)%>% count(),sep='\n')}"))
+  # message(glue::glue("#records by data type after filtering:{glue::glue_collapse(all_event_dt%>% dplyr::group_by(.id)%>% count(),sep='\n')}"))
   #############################################################################################################
 
 
@@ -316,7 +316,7 @@ get_incidence_prevalence <- function(all_event_dt,
     stats <- suppressWarnings( all_event_dt[, .(count = .N,sum.epidur= sum(epidur,na.rm = T),median.epidur= median(epidur,na.rm = T),max.epidur= max(epidur,na.rm=T)), by = identifier] )
     stats[is.infinite(stats$max.epidur),]$max.epidur <-NA
   } else{
-    stats <- all_event_dt[, .(count = .N,sum.epidur= NA,median.epidur= NA,max.epidur=NA), by = identifier]
+    stats <- suppressWarnings(all_event_dt[, .(count = .N,sum.epidur= NA,median.epidur= NA,max.epidur=NA), by = identifier])
   }
 
 
@@ -370,8 +370,6 @@ get_incidence_prevalence <- function(all_event_dt,
 }
 
 
-
-
 #' Get case for a phenotype
 #'
 #' Given a phenotype, a list of episode data and reference dates per individual, identify cases and compute the time to event data for these individuals.  If no reference date is given then the date of first available event will be taken as reference date for each individual.
@@ -399,7 +397,7 @@ get_cases <- function(definitions,
     message("No TRAIT in definitions.Stop.")
     return(0)
   }
-
+  message("..Identify case status")
 
   all_event_dt.Include_in_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,df.data.settings)   #MI
   all_event_dt.Include_in_cases.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.Include_in_cases,df.data.settings,
@@ -469,7 +467,7 @@ get_cases_controls <-function(definitions,
     message("df_reference_date=NULL, read vct.identifiers")
     if(length(vct.identifiers)<=1){
       # scenario 2.1 if no vct.identifiers
-      message("vct.identifiers is empty, create the vct.identifiers from lst.data")
+      message("...vct.identifiers is empty, create the vct.identifiers from lst.data")
       # subset the identifier columns from list of data tables ->concatenate -> keep unique identifiers
       df_reference_date<-unique(data.table::rbindlist(lapply(lst.data,function(x) subset(x,select="identifier"))))
       # df_reference_date[, reference_date := as.Date(NA)]
@@ -481,7 +479,7 @@ get_cases_controls <-function(definitions,
       # df_reference_date[, reference_date := as.Date(NA)]
       # names(df_reference_date)<-c("identifier","reference_date")
     }
-    message(glue::glue("Take first event date as reference date"))
+    message(glue::glue("...No reference date information supplied, take first event date as reference date"))
 
     all_event_dt.population <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,dfData.settings)
     # only keep date with real event
@@ -493,7 +491,7 @@ get_cases_controls <-function(definitions,
     df_reference_date<-merge(df_reference_date,all_event_dt.population.summary[, c("identifier","reference_date")],by="identifier",all.x=TRUE)
     #  should be already be in Date format but just to be sure
     df_reference_date$reference_date<-as.Date(as.character(df_reference_date$reference_date),format="%Y-%m-%d")
-    message(glue::glue("Population: {length(unique(df_reference_date$identifier))} individuals "))
+    # message(glue::glue("Population: {length(unique(df_reference_date$identifier))} individuals "))
 
    }
 
@@ -503,7 +501,7 @@ get_cases_controls <-function(definitions,
     # scenario 3: if there is study population stated in the definition, df_reference_date is replaced
     if(! is.null(all_event_dt.population)) {
     # Study population field of the definition is not empty , derive the df_reference_date from the study population trait
-    message(glue::glue("Study population column not empty, take first event date of this trait as reference date"))
+    message(glue::glue("...Study population column not empty, take first event date of this trait as reference date instead"))
     # only consider event with real event date in study population, set those with visitdate to NA
     all_event_dt.population[all_event_dt.population$event==0,]$eventdate <-NA
     # get everyone , take the date of relevant events respectively
@@ -515,7 +513,7 @@ get_cases_controls <-function(definitions,
     # df_reference_date <- all_event_dt.population.summary[, c("identifier","reference_date")]
     ###############################################
     ###############################################
-    df_reference_date<-merge(df_reference_data[,c("identifier")],all_event_dt.population.summary[, c("identifier","reference_date")],by="identifier",all.x=TRUE)
+    df_reference_date<-merge(df_reference_date[,c("identifier")],all_event_dt.population.summary[, c("identifier","reference_date")],by="identifier",all.x=TRUE)
     df_reference_date$reference_date<-as.Date(as.character(df_reference_date$reference_date),format="%Y-%m-%d")
     message(glue::glue("Population: {length(unique(df_reference_date$identifier))} individuals "))
 
@@ -640,7 +638,7 @@ get_survival_data<-function(def,lst.data,
   #
   all_evt_dt <- get_all_events(def,lst.data,df.data.settings)
 
-  df_referencedate <- all_evt_dt[,.(reference_date= min(eventdate,na.rm = T)),by=identifier]
+  df_referencedate <- suppressWarnings(all_evt_dt[,.(reference_date= min(eventdate,na.rm = T)),by=identifier])
 
   death_event_dt.summary<-get_incidence_prevalence(death_event_dt,df.data.settings,df_reference_date=df_referencedate[,c('identifier','reference_date')], include_secondary_recurrence,0, window_days_mask)
   # fu_days_mask masks FU event but not day==0 which is considered as Hx so apply the mask on the df
