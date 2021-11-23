@@ -26,6 +26,8 @@ fdeath_cause_portal=paste(pheno_dir,"death_cause.txt",sep="")
 #############################################################################
 data_dir<-paste(repo_dir,"inst/extdata/",sep="")
 fdefinitions = paste(data_dir,"definitions_CadDcmHcmAfHf_CTV_READ2.tsv",sep="")
+fdefinitions = paste(data_dir,"definitions_v3.1.tsv",sep="")
+
 fdata_setting = paste(data_dir,"data.settings.tsv",sep="")
 
 # ##########################################
@@ -82,7 +84,7 @@ lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,dfDefi
 ####################################################
 # we need 1) definition of the target trait, 2)harmonized data tables, 3) data.setting dataframe and # 4) target set of individuals either specified via df_reference_date or vct.identifiers
 # 1) definition of the target trait
-trait<-"Af"
+trait<-"HfInCad_TEST"
 # dfDefinitions_processed_expanded[dfDefinitions_processed_expanded$TRAIT==trait,]$DESCRIPTION
 # [1] "Atrial fibrillation/Atrial flutter"
 
