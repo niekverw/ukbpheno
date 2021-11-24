@@ -114,12 +114,17 @@ my.curated.identifiers[1]<-10000011
 all(my.curated.identifiers %in% lst.harmonized.data$vct.identifiers) #FALSE
 
 
-
-all_event_dt <- get_all_events(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait),lst.data=lst.harmonized.data$lst.data,df.data.settings=dfData.settings)   #Af
+trait
+all_event_dt <- get_all_events(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait)%>%filter(Definitions=="Include_in_cases"),lst.data=lst.harmonized.data$lst.data,df.data.settings=dfData.settings)   #Af
 df_reference_date<-df_reference_dt_v0
-df.data.settings[df.data.settings$datasource=="tte.sr.20002"]$minimum_instance<-2
+
+# test instance filter
+dfData.settings[df.data.settings$datasource=="tte.sr.20002"]$minimum_instance<-2
 all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,df.data.settings,df_reference_date = df_reference_date,window_fu_days_mask = 15)
-df.data.settings[df.data.settings$datasource=="tte.sr.20002"]$minimum_instance<-1
-all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,df.data.settings,df_reference_date = df_reference_date,window_fu_days_mask = 15)
+dfData.settings[dfData.settings$datasource=="tte.sr.20002"]$minimum_instance<-1
+all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,dfData.settings,df_reference_date = df_reference_date,window_fu_days_mask = 15)
 
 
+plot_individual_timeline(df.data.settings = dfData.settings,lst.data=lst.harmonized.data$lst.data,ind_identifier = 1111111)
+
+setdiff(all_event_dt[all_event_dt$event==0,]$identifier,all_event_dt[all_event_dt$event==2,]$identifier)

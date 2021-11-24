@@ -7,58 +7,68 @@
 #'
 #' Given a phenotype and a list of episode data , extract events for this phenotype from all data sources
 #'
-#' @param lst.data.settings data frame containing data settings
+#' @param df.data.settings data frame containing data settings
 #' @param ind_all_event_dt a data table containing all events for the target individual
-#' @param lst.data.eid list of data table with all episode data collapsed to 1 datatable, with key set to the identifier.
-#' @param identifier identifier of the target individual for the timeline to be visualized
+#' @param lst.data list of data tables with all episode data collapsed to separate datatables
+#' @param ind_identifier identifier of the target individual for the timeline to be visualized
 #' @return  a data table with all events
 #' @keywords time-to-event
 #' @export
 #' @examples
 #' lst.data.identifier<-lapply(lst.data,function(x) {x[, ("identifier") := lapply(.SD, as.numeric), .SDcols = "identifier"] })  set eid to numeric
 #' lst.data.identifier<-lapply(lst.data,function(x) {setkey(x,identifier) }) # double check that everything has the same setkey.
-#' plot_individual_timeline(lst.data.settings,NULL,lst.data.identifier,identifier="1234567")
-plot_individual_timeline <- function(lst.data.settings,ind_all_event_dt=NULL,lst.data.eid=NULL,identifier=1234567) {
+#' plot_individual_timeline(df.data.settings,NULL,lst.data.identifier,ind_identifier="1234567")
+plot_individual_timeline <- function(df.data.settings,ind_all_event_dt=NULL,lst.data=NULL,ind_identifier=1234567,plot_med=FALSE) {
   # credit:  https://benalexkeen.com/creating-a-timeline-graphic-using-r-and-ggplot2/
   # input: a collapsed datatable with ind_all_event_dt for one participant, e.g. for disease codes.
-  # alternative input: lst.data.eid and identifier, so that it generates the ind_all_event_dt based on all available data.
-  # lst.data.eid, can be keyed on identifier which is MUCH faster, we can create a functiion that checks the key and returns a new keyed object as global var if it iis not right.  lst.data.eid.identifier<-lapply(lst.data.eid,function(x) {setkey(x,identifier) }) # double check that everything has the same setkey.
-  # lst.data.eid, TODO: make identifier integers (fastest type): lst.data.eid.identifier<-lapply(lst.data.eid,function(x) {x[, ('identifier') := lapply(.SD, as.numeric), .SDcols = 'identifier'] }) # double check that everything has the same setkey.
+  # alternative input: lst.data and identifier, so that it generates the ind_all_event_dt based on all available data.
+  # lst.data, can be keyed on identifier which is MUCH faster, we can create a functiion that checks the key and returns a new keyed object as global var if it iis not right.  lst.data.identifier<-lapply(lst.data,function(x) {setkey(x,identifier) }) # double check that everything has the same setkey.
 
-  # ###############################################################################
+
+  # ####################################################################################
   # Why to character? it throws an error when fetching the events for the individual
   # Error in bmerge .....Incompatible join types: x.identifier (double) and i.V1 (character)
   # identifier <- as.character(identifier)
-  identifier<-as.numeric(identifier)
-  # ###################################################################################33
-  if(is.null(ind_all_event_dt) & is.null(lst.data.eid)){
-    message("ind_all_event_dt and lst.data.eid are null, please provide one")
+  ind_identifier<-as.numeric(ind_identifier)
+  # ####################################################################################
+  if(is.null(ind_all_event_dt) & is.null(lst.data)){
+    message("ind_all_event_dt and lst.data are null, please provide one")
     return(NULL)
   }
-
   if(is.null(ind_all_event_dt)){
-    all_event_lst <- lapply(names(lst.data.eid), function(x) {
-      if(data.table::key(lst.data.eid[[x]]) =="identifier"){
-        lst.data.eid[[x]] [ .(identifier),nomatch=NULL] # nomatch is important
+    #  need to catch non-exisiting identifier first if this line is uncommented
+    # lst.data<-lapply(lst.data,function(x) {data.table::setkey(x,identifier) })
+    print("extract records for this individual")
+      all_event_lst <- lapply(names(lst.data), function(x) {
+          if(data.table::key(lst.data[[x]]) =="identifier"){
+        lst.data[[x]] [ .(ind_identifier),nomatch=NULL] # nomatch is important
       } else{
-        lst.data.eid[[x]] [ lst.data.eid[[x]]$identifier %in% identifier]
+        lst.data[[x]] [ lst.data[[x]]$identifier %in% ind_identifier]
       }
     } )
-    names(all_event_lst)<-names(lst.data.eid)
+    names(all_event_lst)<-names(lst.data)
     # remove empty dfs frame list
     all_event_lst <- all_event_lst[lapply(all_event_lst,nrow)>0]
     # set key to be eid
     ind_all_event_dt <- plyr::ldply(all_event_lst, data.frame) %>% as.data.table()
-    ind_all_event_dt$classification <- lst.data.settings[match(ind_all_event_dt$.id ,lst.data.settings$datasource),]$classification
+    ind_all_event_dt$classification <- df.data.settings[match(ind_all_event_dt$.id ,df.data.settings$datasource),]$classification
+    # if there is any event not belonging to the individual or if the whole table is empty which return *logical(0)* instead of FALSE
+    if (any(!ind_all_event_dt$identifier %in% ind_identifier) | nrow(ind_all_event_dt) ==0 ){
+      message(glue::glue("no data on {ind_identifier}"))
+      return(0)
+    }
     data.table::setkey(ind_all_event_dt,identifier)
     ######
   }
-  if (any(!ind_all_event_dt$identifier %in% identifier)){
-    message(glue::glue("no data on {identifier}"))
-    return(0)
-  }
+
   ### get iit ini the right formatt.
-  df <- ind_all_event_dt %>% dplyr::filter(identifier %in% identifier) %>% as.data.frame()
+  df <- ind_all_event_dt %>% dplyr::filter(identifier %in% ind_identifier) %>% as.data.frame()
+
+  # Rationale for this: medication codes easily overwhelm the plot
+  if (plot_med==FALSE){
+    df<-df[! df$classification %in% c("f.20003","READ2_drugs","DMD","BNF"),]
+  }
+
   df <- data.frame(month=month(df$eventdate),
             year=year(df$eventdate),
             code= df$code,
