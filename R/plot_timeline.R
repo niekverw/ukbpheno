@@ -18,7 +18,7 @@
 #' lst.data.identifier<-lapply(lst.data,function(x) {x[, ("identifier") := lapply(.SD, as.numeric), .SDcols = "identifier"] })  set eid to numeric
 #' lst.data.identifier<-lapply(lst.data,function(x) {setkey(x,identifier) }) # double check that everything has the same setkey.
 #' plot_individual_timeline(df.data.settings,NULL,lst.data.identifier,ind_identifier="1234567")
-plot_individual_timeline <- function(df.data.settings,ind_all_event_dt=NULL,lst.data=NULL,ind_identifier=1234567,plot_med=FALSE) {
+plot_individual_timeline <- function(df.data.settings,ind_all_event_dt=NULL,lst.data=NULL,ind_identifier=1234567,plot_medication=FALSE) {
   # credit:  https://benalexkeen.com/creating-a-timeline-graphic-using-r-and-ggplot2/
   # input: a collapsed datatable with ind_all_event_dt for one participant, e.g. for disease codes.
   # alternative input: lst.data and identifier, so that it generates the ind_all_event_dt based on all available data.
@@ -65,7 +65,7 @@ plot_individual_timeline <- function(df.data.settings,ind_all_event_dt=NULL,lst.
   df <- ind_all_event_dt %>% dplyr::filter(identifier %in% ind_identifier) %>% as.data.frame()
 
   # Rationale for this: medication codes easily overwhelm the plot
-  if (plot_med==FALSE){
+  if (plot_medication==FALSE){
     df<-df[! df$classification %in% c("f.20003","READ2_drugs","DMD","BNF"),]
   }
 
