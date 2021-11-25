@@ -591,7 +591,7 @@ expand_dfDefinitions_processed2 <-
 #' check_dfDefinitions_codes(dfDefinitions_processed,lst.data.settings,code_map_dir ="inst/extdata/")
 check_dfDefinitions_codes <-function(dfDefinitions_processed,
                                      lst.data.settings,code_map_dir="data/",check_expandable_codes_only=T){
-   all_missing_codes<-lst()
+   all_missing_codes<-list()
    #  get all codings needed in data.settings
    if (!check_expandable_codes_only){
      classifications <-
