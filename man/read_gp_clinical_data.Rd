@@ -10,7 +10,7 @@ read_gp_clinical_data(fgp)
 \item{fgp}{Path to GP clinical event records}
 }
 \value{
-a data.table object with all episodes
+list of data.table objects with all episodes
 }
 \description{
 This function reads the record-level clinical events from General Practitioner (GP) data. Refer to official UKB documetation for more information regarding this data.

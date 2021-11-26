@@ -4,7 +4,14 @@
 \alias{get_cases}
 \title{Get case for a phenotype}
 \usage{
-get_cases(definitions, lst.data, df.data.settings, df_reference_dt = NULL, ...)
+get_cases(
+  definitions,
+  lst.data,
+  df.data.settings,
+  df_reference_dt = NULL,
+  verbose = TRUE,
+  ...
+)
 }
 \arguments{
 \item{definitions}{phenotype/trait specified in definition table (a row in the table)}

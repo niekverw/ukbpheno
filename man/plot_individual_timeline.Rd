@@ -5,20 +5,21 @@
 \title{Get all episodes for a phenotype}
 \usage{
 plot_individual_timeline(
-  lst.data.settings,
+  df.data.settings,
   ind_all_event_dt = NULL,
-  lst.data.eid = NULL,
-  identifier = 1234567
+  lst.data = NULL,
+  ind_identifier = 1234567,
+  plot_medication = FALSE
 )
 }
 \arguments{
-\item{lst.data.settings}{data frame containing data settings}
+\item{df.data.settings}{data frame containing data settings}
 
 \item{ind_all_event_dt}{a data table containing all events for the target individual}
 
-\item{lst.data.eid}{list of data table with all episode data collapsed to 1 datatable, with key set to the identifier.}
+\item{lst.data}{list of data tables with all episode data collapsed to separate datatables}
 
-\item{identifier}{identifier of the target individual for the timeline to be visualized}
+\item{ind_identifier}{identifier of the target individual for the timeline to be visualized}
 }
 \value{
 a data table with all events
@@ -27,8 +28,8 @@ a data table with all events
 Given a phenotype and a list of episode data , extract events for this phenotype from all data sources
 }
 \examples{
-lst.data.f.eid<-lapply(lst.data,function(x) {x[, ("f.eid") := lapply(.SD, as.numeric), .SDcols = "f.eid"] })  set eid to numeric
-lst.data.f.eid<-lapply(lst.data,function(x) {setkey(x,f.eid) }) # double check that everything has the same setkey.
-plot_individual_timeline(lst.data.settings,NULL,lst.data.f.eid,identifier="1234567")
+lst.data.identifier<-lapply(lst.data,function(x) {x[, ("identifier") := lapply(.SD, as.numeric), .SDcols = "identifier"] })  set eid to numeric
+lst.data.identifier<-lapply(lst.data,function(x) {setkey(x,identifier) }) # double check that everything has the same setkey.
+plot_individual_timeline(df.data.settings,NULL,lst.data.identifier,ind_identifier="1234567")
 }
 \keyword{time-to-event}

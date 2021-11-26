@@ -18,6 +18,7 @@ Given a data.table with all events for a phenotype, get the summary of code occu
 \examples{
 all_event_dt <- get_all_events(dfDefinitions_processed_expanded[1,],lst.data,df.data.settings)
 get_stats_for_events(all_event_dt)
+TODO:move this function
 }
 \keyword{event}
 \keyword{stats}

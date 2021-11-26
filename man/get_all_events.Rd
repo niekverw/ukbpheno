@@ -4,14 +4,14 @@
 \alias{get_all_events}
 \title{Get all episodes for a phenotype}
 \usage{
-get_all_events(definition, lst.data = lst.data, lst.data.settings)
+get_all_events(definition, lst.data = lst.data, df.data.settings)
 }
 \arguments{
 \item{definition}{phenotype/trait specified in definition table (a row in the table)}
 
 \item{lst.data}{list of data table with all episode data collapsed to 1 datatable}
 
-\item{lst.data.settings}{data frame containing data settings}
+\item{df.data.settings}{data frame containing data settings}
 }
 \value{
 a data table with all events
@@ -20,6 +20,6 @@ a data table with all events
 Given a phenotype and a list of episode data , extract events for this phenotype from all data sources
 }
 \examples{
-get_all_events(dfDefinitions_processed_expanded[14,],lst.data,lst.data.settings)
+get_all_events(dfDefinitions_processed_expanded[14,],lst.data,df.data.settings)
 }
 \keyword{time-to-event}

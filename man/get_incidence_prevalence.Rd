@@ -10,7 +10,8 @@ get_incidence_prevalence(
   df_reference_date = NULL,
   include_secondary_recurrence = FALSE,
   window_ref_days_include = 0,
-  window_fu_days_mask = 0
+  window_fu_days_mask = 0,
+  verbose = TRUE
 )
 }
 \arguments{

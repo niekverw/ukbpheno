@@ -10,7 +10,7 @@ read_gp_script_data(fgp)
 \item{fgp}{Path to GP prescription records}
 }
 \value{
-a data.table object with all episodes
+list of data.table objects with all episodes
 }
 \description{
 This function reads the prescription records from General Practitioner (GP) data. Refer to official UKB documetation for more information regarding this data.

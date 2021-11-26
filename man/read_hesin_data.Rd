@@ -14,7 +14,7 @@ read_hesin_data(fhesin, fhesin_diag, fhesin_oper)
 \item{fhesin_oper}{Path to HESIN_OPER file containing Operations and procedural codes}
 }
 \value{
-a data.table object with all episodes
+list of data.table objects with all episodes
 }
 \description{
 This function reads the record-level HospitalEpisodeStatistics (HES) data organized in several data tables
