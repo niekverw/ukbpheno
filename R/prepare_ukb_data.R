@@ -25,9 +25,9 @@ read_defnition_table <-function(f.definition,f.data.setting,dir.code.map){
   return(dfDefinitions_processed_expanded)
 }
 
-#' @param fhesin Path to HESIN (master file)
-#' @param fhesin_diag Path to HESIN_DIAG file containing diagnosis codes
-#' @param fhesin_oper Path to HESIN_OPER file containing Operations and procedural codes
+
+
+
 #' Prepare harmonized long format data from various data sources
 #'
 #' This function reads ukb files including main dataset (ukbxxxxx.tab) and record based (.txt) files from data portal. It returns a list of 3 elements:

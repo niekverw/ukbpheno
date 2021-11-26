@@ -10,6 +10,7 @@
 #' @examples
 #' all_event_dt <- get_all_events(dfDefinitions_processed_expanded[1,],lst.data,df.data.settings)
 #' get_stats_for_events(all_event_dt)
+#' TODO:move this function
 get_stats_for_events <- function(all_event_dt){
 
   # show stats on codes
@@ -127,7 +128,8 @@ get_incidence_prevalence <- function(all_event_dt,
                                      include_secondary_recurrence=FALSE,
                                      #return_dates=FALSE, # TODO: not working yet.
                                      window_ref_days_include=0,##  indicate number of days around the reference date (visit) that should be used to indicates if individuals had the event on the reference date. For example, relevant if you want to know if participant took medication on the visit
-                                     window_fu_days_mask=0 ## indicates number of days that future events should not be counted; e.g. you could only count events after 10 days from the reference visit to avoid events related to the reference date. e.g. you could also use it to only count events after X years, in order to avoid assesment bias.
+                                     window_fu_days_mask=0, ## indicates number of days that future events should not be counted; e.g. you could only count events after 10 days from the reference visit to avoid events related to the reference date. e.g. you could also use it to only count events after X years, in order to avoid assesment bias.
+                                     verbose=TRUE
                                      ) {
   # event==0, event cannot be used forr age - of - diagnosiis or new events.
   # event==1, event can be used for any type of future events, as it is based on ICD10 type of data
@@ -162,7 +164,9 @@ get_incidence_prevalence <- function(all_event_dt,
     names(df_reference_date)<-c("identifier","reference_date")
     df_reference_date$reference_date<- as.Date(df_reference_date$reference)
     df_reference_date<-df_reference_date[!is.na(df_reference_date$reference_date)]
-    message(glue::glue("non missing reference_date: {nrow(df_reference_date)}"))
+    if(verbose){
+      message(glue::glue("non missing reference_date: {nrow(df_reference_date)}"))
+    }
     }
     #scenario 2: df_reference_date is NULL
   } else{
@@ -204,8 +208,9 @@ get_incidence_prevalence <- function(all_event_dt,
   #  that means we can reverse engineer to fish out ppl without eventdate ....which sounds a convoluted operation (what is the advantage of adding the Line220-225 block?)
   # on the other hand , given the data is only collected during visits to assessment centres, how often does one expect to use min_instance>1 ?
   ############################################
+  if(verbose){
   message("Filter records by thresholds specified in data setting")
-
+  }
   # first merge the datasource specific threshold values to df
   all_event_dt$min.ins<- with(df.data.settings, minimum_instance[match(all_event_dt$.id,datasource)])
 
@@ -386,6 +391,7 @@ get_cases <- function(definitions,
                        lst.data,
                        df.data.settings,
                       df_reference_dt=NULL,
+                      verbose=TRUE,
                        ...
                          ) {
 
@@ -397,24 +403,30 @@ get_cases <- function(definitions,
     message("No TRAIT in definitions.Stop.")
     return(0)
   }
+  if(verbose){
   message("..Identify case status")
-
+  }
   all_event_dt.Include_in_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,df.data.settings)   #MI
   all_event_dt.Include_in_cases.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.Include_in_cases,df.data.settings,
-                                                                    df_reference_date = df_reference_dt)
+                                                                    df_reference_date = df_reference_dt,verbose = verbose)
                                                                     #...)
-
+  if(verbose){
   message(glue::glue("including {nrow(all_event_dt.Include_in_cases.summary)} cases"))
+  }
   all_event_dt.Exclude_from_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Exclude_from_cases"),lst.data,df.data.settings)   #MI
   if(!is.null(all_event_dt.Exclude_from_cases)){
     exclude=all_event_dt.Include_in_cases.summary$identifier %in% unique(all_event_dt.Exclude_from_cases$identifier)
+    if(verbose){
     message(glue::glue("excluding {sum(exclude)} cases"))
+    }
     set_to_na <- names(all_event_dt.Include_in_cases.summary)[!names(all_event_dt.Include_in_cases.summary) %in% c("identifier","reference_date")]
     # the .summary needed to be flagged for the get_case_control() functoin
     all_event_dt.Include_in_cases.summary[exclude,(set_to_na):=-2]
     # remove these in all_event_dt
     all_event_dt.Include_in_cases<-all_event_dt.Include_in_cases[! (all_event_dt.Include_in_cases$identifier %in% unique(all_event_dt.Exclude_from_cases$identifier)),]
+    if(verbose){
     message(glue::glue("{nrow(all_event_dt.Include_in_cases)} events fulfiling criteria in include_in_cases"))
+    }
   }
   return(list(all_event_dt.Include_in_cases=all_event_dt.Include_in_cases,
               all_event_dt.Include_in_cases.summary=all_event_dt.Include_in_cases.summary)
@@ -438,13 +450,18 @@ get_cases <- function(definitions,
 #' @examples
 #' get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,df.data.settings,  reference_date=setNames(as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d"),dfukb$identifier))
 get_cases_controls <-function(definitions,
-                               lst.data,
-                               df.data.settings,
-                                 df_reference_date=NULL,
-                                 vct.identifiers=NULL
+                                lst.data,
+                                df.data.settings,
+                                df_reference_date=NULL,
+                                vct.identifiers=NULL,
+                                verbose=TRUE
                                 ) {
   # vct.identifiers <-Used to define controls if reference_date is not given (NULL)
-  if(length(definitions$TRAIT)==0){
+  if(nrow(definitions)==0){
+    message("No definition is provided.Stop.")
+    return(0)
+  }
+  if (length(definitions$TRAIT)==0){
     message("No TRAIT in definitions.Stop.")
     return(0)
   }
@@ -464,10 +481,14 @@ get_cases_controls <-function(definitions,
 
   }else {
     # scenario 2: if df_reference_date is empty
+    if(verbose){
     message("df_reference_date=NULL, read vct.identifiers")
+    }
     if(length(vct.identifiers)<=1){
       # scenario 2.1 if no vct.identifiers
+      if(verbose){
       message("...vct.identifiers is empty, create the vct.identifiers from lst.data")
+      }
       # subset the identifier columns from list of data tables ->concatenate -> keep unique identifiers
       df_reference_date<-unique(data.table::rbindlist(lapply(lst.data,function(x) subset(x,select="identifier"))))
       # df_reference_date[, reference_date := as.Date(NA)]
@@ -479,13 +500,15 @@ get_cases_controls <-function(definitions,
       # df_reference_date[, reference_date := as.Date(NA)]
       # names(df_reference_date)<-c("identifier","reference_date")
     }
+    if(verbose){
     message(glue::glue("...No reference date information supplied, take first event date as reference date"))
+    }
 
     all_event_dt.population <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,dfData.settings)
     # only keep date with real event
     all_event_dt.population[all_event_dt.population$event==0,]$eventdate <-NA
     # get everyone , take the date of relevant events respectively
-    all_event_dt.population.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.population,df.data.settings,df_reference_date = NULL,window_fu_days_mask = 15)
+    all_event_dt.population.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.population,df.data.settings,df_reference_date = NULL,window_fu_days_mask = 15,verbose = verbose)
 
     #  merge, NA for those without an event
     df_reference_date<-merge(df_reference_date,all_event_dt.population.summary[, c("identifier","reference_date")],by="identifier",all.x=TRUE)
@@ -501,11 +524,13 @@ get_cases_controls <-function(definitions,
     # scenario 3: if there is study population stated in the definition, df_reference_date is replaced
     if(! is.null(all_event_dt.population)) {
     # Study population field of the definition is not empty , derive the df_reference_date from the study population trait
-    message(glue::glue("...Study population column not empty, take first event date of this trait as reference date instead"))
+      if(verbose){
+      message(glue::glue("...Study population column not empty, take first event date of this trait as reference date instead"))
+      }
     # only consider event with real event date in study population, set those with visitdate to NA
     all_event_dt.population[all_event_dt.population$event==0,]$eventdate <-NA
     # get everyone , take the date of relevant events respectively
-    all_event_dt.population.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.population,df.data.settings,df_reference_date = NULL,window_fu_days_mask = 15)
+    all_event_dt.population.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.population,df.data.settings,df_reference_date = NULL,window_fu_days_mask = 15,verbose = verbose)
 
 
     # update the dates in the original df_reference_date
@@ -515,15 +540,20 @@ get_cases_controls <-function(definitions,
     ###############################################
     df_reference_date<-merge(df_reference_date[,c("identifier")],all_event_dt.population.summary[, c("identifier","reference_date")],by="identifier",all.x=TRUE)
     df_reference_date$reference_date<-as.Date(as.character(df_reference_date$reference_date),format="%Y-%m-%d")
-    message(glue::glue("Population: {length(unique(df_reference_date$identifier))} individuals "))
+    if(verbose){
+
+      message(glue::glue("Population: {length(unique(df_reference_date$identifier))} individuals "))
+      }
 
    } else {
     # Study population field of the definition is empty, keep reference date as it is
-    message(glue::glue("Population: total non-missing reference date = {nrow(df_reference_date[!is.na(df_reference_date$reference_date),])}, total missing reference date= {nrow(df_reference_date[is.na(df_reference_date$reference_date),])} "))
+     if(verbose){
+       message(glue::glue("Population: total non-missing reference date = {nrow(df_reference_date[!is.na(df_reference_date$reference_date),])}, total missing reference date= {nrow(df_reference_date[is.na(df_reference_date$reference_date),])} "))
+     }
      }
 
   # define cases
-  cases <- get_cases(definitions,lst.data,df.data.settings,df_reference_date,window_ref_days_include=0,window_fu_days_mask=0)
+  cases <- get_cases(definitions,lst.data,df.data.settings,df_reference_date,window_ref_days_include=0,window_fu_days_mask=0,verbose=verbose)
   all_event_dt.Include_in_cases.summary <- cases$all_event_dt.Include_in_cases.summary
   all_event_dt.Include_in_cases <- cases$all_event_dt.Include_in_cases
   # define exclude controls
@@ -544,7 +574,9 @@ get_cases_controls <-function(definitions,
 
 
   if(length(non_proper_case)>0) {
+    if(verbose){
     message(glue::glue("Warning: {length(non_proper_case)} cases without valid event date"))
+    }
     # cols to be set to na
     set_to_na <- names(df.casecontrol)[!names(df.casecontrol) %in% c("identifier","reference_date")]
     # df.casecontrol[df.casecontrol$identifier %in% non_proper_case,(set_to_na):=-2] #mark the non-case as -2
@@ -556,7 +588,9 @@ get_cases_controls <-function(definitions,
     # !is.na(df.casecontrol$Any) for cases i.e. from all_event_dt.Include_in_cases.summary
     # here to exclude = 1)not a case  2) in exclude_from_control
     exclude=(is.na(df.casecontrol$Any) & (df.casecontrol$identifier %in% all_event_dt.Exclude_from_controls$identifier))
+    if(verbose){
     message(glue::glue("excluding {sum(exclude)} controls"))
+    }
     # cols to be set to na
     set_to_na <- names(df.casecontrol)[!names(df.casecontrol) %in% c("identifier","reference_date")]
     df.casecontrol[exclude,(set_to_na):=-1] #mark the non-control as -1
@@ -583,8 +617,9 @@ get_cases_controls <-function(definitions,
   # ******************but this is also affected by the sources_recurrence_events option in get_incidence_rate()?***************
   df.casecontrol[(is.na(df.casecontrol$Fu)&(df.casecontrol$Any == 2)& (!is.na(df.casecontrol$Hx_days))& (is.na(df.casecontrol$Fu_days))),]$Fu <-  1
   ############################################################################################################
-
-  print(table(df.casecontrol$Any))
+  if(verbose){
+      print(table(df.casecontrol$Any))
+  }
 
 
   return(list(df.casecontrol=df.casecontrol,
