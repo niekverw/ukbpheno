@@ -1,4 +1,5 @@
-# library(ggplot2)
+
+
 #' return random colors of specified length
 #'
 #' Given a phenotype, a list of episode data and reference dates per individual, identify cases and control status as of *reference date" by source.
@@ -18,7 +19,7 @@ rand_col_vec<- function(vec_leng=5,alpha=0.75,cust_seed=NULL){
     rgb_int<-sample( 0:255 , 3 , replace=T)/255
     col_vec<-c(col_vec,do.call(rgb, as.list(c(rgb_int,alpha))))
     if (! is.null(cust_seed)){
-      cust_seed<-cust_seed+13*i
+      cust_seed<-cust_seed+7*i
       set.seed(cust_seed)
     }
   }
@@ -45,23 +46,22 @@ rand_col_vec<- function(vec_leng=5,alpha=0.75,cust_seed=NULL){
 get_case_count_by_source <- function(definition,
                       lst.data,
                       df.data.settings,
-                      df_reference_dates=NULL,
-                      vct_identifiers=NULL,
+                      df.reference.dates=NULL,
+                      vct.identifiers=NULL,
                       standardize=TRUE
                       ) {
   if(nrow(definition)==0){
     message("No definition is provided.Stop.")
     return(0)
   }
-  if (!is.null(df_reference_dates)){
-    lst.case_control <- get_cases_controls(definition, lst.data,dfData.settings, df_reference_date=df_reference_dates,verbose=FALSE)
-  }else if (!is.null(vct_identifiers)){
-    lst.case_control <- get_cases_controls(definition, lst.data,dfData.settings, vct.identifiers=vct_identifiers,verbose=FALSE)
+  if (!is.null(df.reference.dates)){
+    lst.case_control <- get_cases_controls(definition, lst.data,dfData.settings, df_reference_date=df.reference.dates,verbose=FALSE)
+  }else if (!is.null(vct.identifiers)){
+    lst.case_control <- get_cases_controls(definition, lst.data,dfData.settings, vct.identifiers=vct.identifiers,verbose=FALSE)
   }else{
-      message("Both df_reference_dates and vct_identifiers are NULL, Please provide one of them.Exit.")
+      message("Both df.reference.dates and vct.identifiers are NULL, Please provide one of them.Exit.")
     return()
   }
-
   ###########################################################################
   # NOTE: this function depends on the get_cases_controls! modify accordingly
   ##########################################################################
@@ -72,6 +72,11 @@ get_case_count_by_source <- function(definition,
   cases<- lst.case_control$df.casecontrol[lst.case_control$df.casecontrol$Any==2,]
   # only those ppl with only future events are excluded, because these ppl would be considered as control at the reference date
   ppl_future_only<-cases[cases$Fu==2 & cases$Any==2 & cases$Hx!=2,]$identifier
+  if(nrow(definition)>1){
+    # take first row for the message
+    definition<-definition[1]
+  }
+  definition<-
   message(glue::glue("{definition$DESCRIPTION}: {length(ppl_future_only)} indivduals have events after reference dates and are not considered"))
   # discard future events
   lst.case_control$all_event_dt.Include_in_cases<-lst.case_control$all_event_dt.Include_in_cases[ (! lst.case_control$all_event_dt.Include_in_cases$identifier %in% ppl_future_only)]
@@ -118,107 +123,214 @@ get_case_count_by_source <- function(definition,
   df_prop<-df_prop[order(df_prop$source),]
   return(df_prop)
 }
-#
-# prop_af_v0<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait),lst.data,dfData.settings,df_reference_dates=df_reference_dt_v0,standardize = TRUE)
-# prop_af_v2<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait),lst.data,dfData.settings,df_reference_dates=df_reference_dt_v2,standardize = TRUE)
-#
-#
-#
-# #############################################################
-# # data source trajectory over time
-# #############################################################
-# # TODO:
-# plot_source_proportion_over_time<-function(...){
-#   prop_af_time <- Reduce(
-#     function(x, y, ...) merge(x, y, by="source",all = TRUE, ...),
-#     list(prop_af_v0,prop_af_v2,prop_af_today)
-#   )
-#
-#
-#   colnames(prop_af_time)<-c("source","baseline","v2","25-11-2021")
-#   prop_af_time<-reshape2::melt(prop_af_time)
-#
-#   ggplot(prop_af_time, aes(x = variable, y = value, colour = source,group=source)) +
-#     geom_line() +
-#     geom_point()
-#
-#
-# }
-#
-#
-#
-#
-# #############################################################
-# # radar plot  by data source
-# #############################################################
-# # TODO 1) a function to make the table 2) radar function taking 1) putput as input
-# test_af<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait),lst.data,dfData.settings,vct_identifiers = dfukb$identifier)
-#
-#
-# df_reference_dt_today<-df_reference_dt_v0
-# df_reference_dt_today$f.53.0.0<-as.Date(as.character("2021-11-25"),format="%Y-%m-%d")
-# df_reference_dt_today$f.53.0.0<-as.Date(df_reference_dt_today$f.53.0.0,format="%Y-%m-%d")
-# as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d")
-# rm(test_cad)
-#
-#
-# prop_af_today<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait),lst.data,dfData.settings,df_reference_dates=df_reference_dt_today,standardize = TRUE)
-# prop_cad_today<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT=="Cad"),lst.data,dfData.settings,df_reference_dates=df_reference_dt_today,standardize = TRUE)
-# prop_hf_today<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT=="Hf"),lst.data,dfData.settings,df_reference_dates=df_reference_dt_today,standardize = TRUE)
-# prop_hcm_today<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT=="Hcm"),lst.data,dfData.settings,df_reference_dates=df_reference_dt_today,standardize = TRUE)
-# prop_dcm_today<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT=="dcm"),lst.data,dfData.settings,df_reference_dates=df_reference_dt_today,standardize = TRUE)
-#
-#
-#
-# make_radar_plot(df_prev,sort(cardiovascular_traits[[1]]),sources_vec =c("All","SR","GP","HESIN","Death") )
-#
-#   lst.proportion<-list()
-#   for (trait in vct_diseases){
-#     dt_disease_prop<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait))
-#     lst.codemap[[cls]]<-fread(fmap)
-#
-#   }
-#
-#
-#
-# make_radar_plot<-function(df_prevalence,vct_diseases,sources_vec=c("All","SR","Cancer","HESIN","Death")){
-#
-#
-#   prev_subset<-df_prevalence[,(names(df_prevalence) %in% vct_diseases)]
-#   # prev_subset<-df_prevalence[,vct_diseases]
-#
-#   plot_data <- rbind(rep(max(prev_subset),ncol(prev_subset)) , rep(min(prev_subset),ncol(prev_subset)) , prev_subset[sources_vec,])
-#
-#   plot_data<-plot_data[,sort(colnames(prev_subset))]
-#
-#   disease_names<-dfDefinitions%>% filter(TRAIT %in% names(prev_subset))%>%select(TRAIT,DESCRIPTION) %>% arrange(TRAIT)
-#
-#   colnames(plot_data)<-disease_names$DESCRIPTION
-#   colors_border=rand_col_vec(ncol(prev_subset),0.7,cust_seed=34)
-#   colors_in=rand_col_vec(ncol(prev_subset),0.2,cust_seed=34)
-#   radarchart( plot_data  , axistype=1 ,
-#               #custom polygon
-#               pcol=colors_border , pfcol=colors_in , plwd=2 , plty=1,
-#               #custom the grid
-#               cglcol="grey", cglty=1, axislabcol="grey", seg=4,caxislabels=round(seq(min(prev_subset),max(prev_subset),length.out=5),1), cglwd=1,
-#               #custom labels
-#               vlcex=1)
-#   # Add a legend
-#   legend(x=1.5, y=0.8, legend = rownames(plot_data[-c(1,2),]), bty = "n", pch=20 , col=colors_border , text.col = "black", cex=1.2, pt.cex=3)
-# }
-#
-#
-#
-#
-#
-# # head(case_status)
-# #
-# # count(case_status,Any.sr)
-# # count(case_status,Any.hes)
-#
-#
-# #TODO
-# # a function to show (number of case) unique to each source
-#
-# #add radarplots
+#' gc()
+#' #
+#' # prop_af_v0<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait),lst.data,dfData.settings,df.reference.dates=df_reference_dt_v0,standardize = TRUE)
+#' # prop_af_v2<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait),lst.data,dfData.settings,df.reference.dates=df_reference_dt_v2,standardize = TRUE)
+#' #
+#' #
+#' #
+#############################################################
+# data source trajectory over time
+#############################################################
 
+# lst_df_ref_dt<-list(Baseline=df_reference_dt_v0,Visit2=df_reference_dt_v2,Nov21=df_reference_dt_today)
+# plt_test<-plot_source_proportion_over_time(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait),lst_df_ref_dt,lst.data,dfData.settings,FALSE)
+
+plot_source_proportion_over_time<-function(definition,lst.dfReferenceDate,lst.data,
+                                           df.data.settings,standardize=TRUE){
+  time.lab<-names(lst.dfReferenceDate)
+  # lst.dfprop<-list()
+  lst.dfprop<-lapply(lst.dfReferenceDate, function(x){
+    df_prof<-get_case_count_by_source(definition=definition,lst.data,df.data.settings,df.reference.dates=x,standardize =standardize)
+    df_prof
+  })
+  # print(lst.dfprop)
+  # print(time.lab)
+  # rename for merging
+    lst.dfprop<-lapply(time.lab,function(x){
+        # print(names(lst.dfprop[[x]]))
+        # print(x)
+        if(standardize){
+        names(lst.dfprop[[x]])[names(lst.dfprop[[x]])=='proportion']<-x
+      }else{
+        names(lst.dfprop[[x]])[names(lst.dfprop[[x]])=='n']<-x
+      }
+    lst.dfprop[[x]]
+  })
+
+ # merge the data tables
+  prop_df_time <- Reduce(
+    function(x, y, ...) merge(x, y, by="source",all = TRUE, ...),
+    lst.dfprop
+  )
+  color_vec<-rand_col_vec(nrow(prop_df_time))
+  # long table for plotting
+  prop_df_time<-reshape2::melt(prop_df_time)
+
+
+  plt_source_over_time<-ggplot2::ggplot(prop_df_time, ggplot2::aes(x = variable, y = value, colour = source,group=source)) +
+    ggplot2::scale_color_manual(values = color_vec) +
+    ggplot2::geom_line() +
+    ggplot2::geom_point() +ggplot2::xlab("Time point")
+
+  if(standardize){
+    plt_source_over_time<-plt_source_over_time + ggplot2::labs(y = "Proportion")
+  }else{
+    plt_source_over_time<-plt_source_over_time + ggplot2::labs(y = "Count")
+  }
+
+   return(plt_source_over_time)
+}
+
+#'
+#' View(test)
+#'
+#'
+#' #############################################################
+#' # radar plot  --> dot plot by data source
+#' #############################################################
+#' # TODO 1) a function to make the table 2) radar function taking 1) putput as input
+#' test_af<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait),lst.data,dfData.settings,vct.identifiers = dfukb$identifier)
+#'
+#'
+#' df_reference_dt_today<-df_reference_dt_v0
+#' df_reference_dt_today$f.53.0.0<-as.Date(as.character("2021-11-25"),format="%Y-%m-%d")
+#' df_reference_dt_today$f.53.0.0<-as.Date(df_reference_dt_today$f.53.0.0,format="%Y-%m-%d")
+#' as.Date(as.character(dfukb$f.53.0.0),format="%Y-%m-%d")
+#' rm(test_cad)
+#'
+#'
+#' dotplot_diseases_by_source<-function(lst.dfprop,disease_lab=NULL){
+#'
+#'
+#' }
+#'
+#'
+#' prop_af_today<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait),lst.data,dfData.settings,df.reference.dates=df_reference_dt_today,standardize = TRUE)
+#' prop_cad_today<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT=="Cad"),lst.data,dfData.settings,df.reference.dates=df_reference_dt_today,standardize = TRUE)
+#' prop_hf_today<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT=="Hf"),lst.data,dfData.settings,df.reference.dates=df_reference_dt_today,standardize = TRUE)
+#' prop_hcm_today<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT=="Hcm"),lst.data,dfData.settings,df.reference.dates=df_reference_dt_today,standardize = TRUE)
+#' prop_dcm_today<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT=="Dcm"),lst.data,dfData.settings,df.reference.dates=df_reference_dt_today,standardize = TRUE)
+#' prop_DysLip_today<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT=="HyperLip"),lst.data,dfData.settings,df.reference.dates=df_reference_dt_today,standardize = TRUE)
+#' prop_Dm_today<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT=="Dm"),lst.data,dfData.settings,df.reference.dates=df_reference_dt_today,standardize = TRUE)
+#' disease_vec<-c('AF','CAD','DCM','HCM','HF','Hyperlipidemia','DM')
+#'
+#' lst_prop<-list(AF=prop_af_today,CAD=prop_cad_today,DCM=prop_dcm_today,HCM=prop_hcm_today,HF=prop_hf_today,Hyperlipidemia=prop_DysLip_today,DM=prop_Dm_today)
+#'   # for (i in 1:length(lst_prop)){
+#'   #   names(lst_prop[[i]])[names(lst_prop[[i]])=='proportion']<-disease_vec[[i]]
+#'   #   print(lst_prop[[i]])
+#'   #   }
+#'
+#'
+#' lst_prop<-lapply(disease_vec,function(x){
+#'   # names(x)[names(x)=='proportion']<-names(lst_prop)[names(lst_prop)==x]
+#'   # print(colnames(lst_prop[[x]])[colnames(lst_prop[[x]])=='proportion'])
+#'   # print(x)
+#'   names(lst_prop[[x]])[names(lst_prop[[x]])=='proportion']<-x
+#'   lst_prop[[x]]
+#'   # names(lst.case_control$df.casecontrol)[names(lst.case_control$df.casecontrol) == paste(trait,visit,"f.eid",  sep = "_")]<-"f_eid"
+#'   #
+#'
+#'   })
+#'
+#' lst_prop
+#'
+#'
+#' gc()
+#' class(names(lst_prop))
+#'
+#'
+#' View(lst_prop$AF)
+#' cardio_prop<- Reduce(
+#'   function(x, y, ...) merge(x, y, by="source",all = TRUE, ...),
+#'   lst_prop)
+#'
+#' df3<-reshape2::melt(cardio_prop)
+#' df3[is.na(df3)]<-0
+#' ggpubr::ggdotchart(
+#'   df3, x = "variable", y = "value",
+#'   group = "source", color = "source", palette = 'rickandmorty', ggtheme = ggpubr::theme_pubclean(base_size = 12),dot.size = 3.5,shape=18 ,                              # Large dot size
+#'    size = 1,
+#'   add = "segment", position = ggplot2::position_dodge(0.3),
+#'   sorting = "descending"
+#' )
+#' # "rickandmorty"
+#' ggpubr::show_point_shapes()
+#'
+#' df_plot<-cardio_prop[,2:6]
+#' df_plot[is.na(df_plot)] <- 0
+#' class(df_plot)
+#' # colnames(plot_data)<-disease_names$DESCRIPTION
+#' colors_border=rand_col_vec(nrow(df_plot),0.7,cust_seed=33)
+#' colors_in=rand_col_vec(nrow(df_plot),0.2,cust_seed=34)
+#' fmsb::radarchart( df_plot  , axistype=1 ,
+#'             #custom polygon
+#'             pcol=colors_border , pfcol=colors_in , plwd=2 , plty=1,
+#'             #custom the grid
+#'             cglcol="grey", cglty=1, axislabcol="grey", seg=4,caxislabels=round(seq(min(df_plot),max(df_plot),length.out=5),1), cglwd=1,
+#'             #custom labels
+#'             vlcex=1)
+#' # Add a legend
+#' legend(x=1.5, y=0.8, legend = cardio_prop[,1], bty = "n", pch=20 , col=colors_border , text.col = "black", cex=1.2, pt.cex=3)
+#'
+#' data <- as.data.frame(matrix( sample( 0:20 , 15 , replace=F) , ncol=5))
+#' colnames(data) <- c("math" , "english" , "biology" , "music" , "R-coding" )
+#' rownames(data) <- paste("mister" , letters[1:3] , sep="-")
+#'
+#' rownames(data[-c(1,2),])
+#'
+#' # plot_data <- rbind(rep(max(df_plot),ncol(df_plot),) , rep(min(df_plot),ncol(df_plot)) , df_plot)
+#'
+#' # make_radar_plot(df_prev,sort(cardiovascular_traits[[1]]),sources_vec =c("All","SR","GP","HESIN","Death") )
+#' #
+#' #   lst.proportion<-list()
+#' #   for (trait in vct_diseases){
+#' #     dt_disease_prop<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait))
+#' #     lst.codemap[[cls]]<-fread(fmap)
+#' #
+#' #   }
+#'
+#'
+#'
+#' make_radar_plot<-function(df_prevalence,vct_diseases,sources_vec=c("All","SR","Cancer","HESIN","Death")){
+#'
+#'
+#'   prev_subset<-df_prevalence[,(names(df_prevalence) %in% vct_diseases)]
+#'   # prev_subset<-df_prevalence[,vct_diseases]
+#'
+#'   plot_data <- rbind(rep(max(prev_subset),ncol(prev_subset)) , rep(min(prev_subset),ncol(prev_subset)) , prev_subset[sources_vec,])
+#'
+#'   plot_data<-plot_data[,sort(colnames(prev_subset))]
+#'
+#'   disease_names<-dfDefinitions%>% filter(TRAIT %in% names(prev_subset))%>%select(TRAIT,DESCRIPTION) %>% arrange(TRAIT)
+#'
+#'   colnames(plot_data)<-disease_names$DESCRIPTION
+#'   colors_border=rand_col_vec(ncol(prev_subset),0.7,cust_seed=34)
+#'   colors_in=rand_col_vec(ncol(prev_subset),0.2,cust_seed=34)
+#'   radarchart( plot_data  , axistype=1 ,
+#'               #custom polygon
+#'               pcol=colors_border , pfcol=colors_in , plwd=2 , plty=1,
+#'               #custom the grid
+#'               cglcol="grey", cglty=1, axislabcol="grey", seg=4,caxislabels=round(seq(min(prev_subset),max(prev_subset),length.out=5),1), cglwd=1,
+#'               #custom labels
+#'               vlcex=1)
+#'   # Add a legend
+#'   legend(x=1.5, y=0.8, legend = rownames(plot_data[-c(1,2),]), bty = "n", pch=20 , col=colors_border , text.col = "black", cex=1.2, pt.cex=3)
+#' }
+#'
+#'
+#'
+#'
+#'
+#' # head(case_status)
+#' #
+#' # count(case_status,Any.sr)
+#' # count(case_status,Any.hes)
+#'
+#'
+#' #TODO
+#' # a function to show (number of case) unique to each source
+#'
+#' #add radarplots
+#'
