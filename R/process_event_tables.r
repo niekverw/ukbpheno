@@ -623,7 +623,7 @@ get_cases_controls <-function(definitions,
 
 
   return(list(df.casecontrol=df.casecontrol,
-              all_event_dt.Include_in_cases=all_event_dt.Include_in_cases[all_event_dt.Include_in_cases$identifier %in% all_event_dt.Include_in_cases.summary$identifier,],
+              all_event_dt.Include_in_cases=all_event_dt.Include_in_cases[all_event_dt.Include_in_cases$identifier %in% df.casecontrol$identifier,],
               all_event_dt.Include_in_cases.summary=all_event_dt.Include_in_cases.summary)
   )
 }
