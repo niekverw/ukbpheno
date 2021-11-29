@@ -135,7 +135,7 @@ get_case_count_by_source <- function(definition,
 #############################################################
 
 # lst_df_ref_dt<-list(Baseline=df_reference_dt_v0,Visit2=df_reference_dt_v2,Nov21=df_reference_dt_today)
-# plt_test<-plot_source_proportion_over_time(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait),lst_df_ref_dt,lst.data,dfData.settings,FALSE)
+plt_test<-plot_source_proportion_over_time(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait),lst_df_ref_dt,lst.data,dfData.settings,FALSE)
 
 plot_source_proportion_over_time<-function(definition,lst.dfReferenceDate,lst.data,
                                            df.data.settings,standardize=TRUE){
@@ -171,8 +171,8 @@ plot_source_proportion_over_time<-function(definition,lst.dfReferenceDate,lst.da
 
   plt_source_over_time<-ggplot2::ggplot(prop_df_time, ggplot2::aes(x = variable, y = value, colour = source,group=source)) +
     ggplot2::scale_color_manual(values = color_vec) +
-    ggplot2::geom_line() +
-    ggplot2::geom_point() +ggplot2::xlab("Time point")
+    ggplot2::geom_line()  + ggplot2::scale_y_continuous(breaks = pretty(1:max(prop_df_time$value),n=5))+
+    ggplot2::geom_point() +ggplot2::xlab("Time point")+ggpubr::theme_classic2(base_size = 12)
 
   if(standardize){
     plt_source_over_time<-plt_source_over_time + ggplot2::labs(y = "Proportion")
