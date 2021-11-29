@@ -28,6 +28,59 @@ rand_col_vec<- function(vec_leng=5,alpha=0.75,cust_seed=NULL){
 }
 
 
+#############################################################
+# data source trajectory over time
+#############################################################
+# timeline by eventdate
+plot_disease_timeline_by_source <- function(definition,
+                                            lst.data,
+                                            df.data.settings,
+                                            vct.identifiers
+) {
+  if(nrow(definition)==0){
+    message("No definition is provided.Stop.")
+    return(0)
+  }
+  if (!is.null(vct.identifiers)){
+    lst.case_control <- get_cases_controls(definition, lst.data,dfData.settings, vct.identifiers=vct.identifiers,verbose=FALSE)
+  }else{
+    message("Both df.reference.dates and vct.identifiers are NULL, Please provide one of them.Exit.")
+    return()
+  }
+
+  lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==trait), lst.data,dfData.settings, vct.identifiers=dfukb$identifiers)
+
+  all_event_dt<-lst.case_control$all_event_dt.Include_in_cases
+  # remove non-event  NOTE actual events without event date will be removed as well
+  all_event_dt<-all_event_dt[all_event_dt$event!=0,]
+  # get first date for each individual by source
+  mindate<-all_event_dt[, .(mindt= min(eventdate,na.rm = T)), by = c('identifier','.id')]
+  # to stitch the lines to final point
+  max_dt<-max(mindate$mindt)
+  # get a cumulative count with rank
+  mindate[, cumcnt:= data.table::frank(mindt,ties.method='first'),by=.id]
+  # create rows for stitching the line to final time
+  dt_data_end<-mindate[, .(identifier=9999999,mindt=max_dt,cumcnt= max(cumcnt,na.rm=T)),by=.id
+  ][, tail(.SD, 1) , by = .id  ]
+  # rbind to actual dt
+  mindate<-rbind(mindate,dt_data_end)
+
+  # color_vec<-rand_col_vec(length(unique(mindate$.id)))
+  color_vec<-ggpubr::get_palette("npg",length(unique(mindate$.id)))
+  plt_time<- ggplot2::ggplot( mindate,aes(x=mindt, y=cumcnt,colour=.id,group=.id)) +
+    ggplot2::scale_color_manual(values = color_vec,name="source") +
+    ggplot2::geom_line(alpha=1,size=1)+ggplot2::geom_point(size=0.8,alpha=0.1,shape=20) +ggplot2::xlab("Time")+
+    ggplot2::ylab("Count")+
+    # scale_y_continuous(trans='log10')+
+    ggpubr::theme_classic2(base_size = 12)+
+    ggrepel::geom_text_repel( aes(label = cumcnt), data = dt_data_end,  fontface ="plain", nudge_y=max(dt_data_end$cumcnt)/50 , size = 4)
+  plt_time
+  return(plt_time)
+}
+
+
+
+
 
 
 #' Get case-control status by data sources
@@ -123,16 +176,25 @@ get_case_count_by_source <- function(definition,
   df_prop<-df_prop[order(df_prop$source),]
   return(df_prop)
 }
-#' gc()
-#' #
-#' # prop_af_v0<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait),lst.data,dfData.settings,df.reference.dates=df_reference_dt_v0,standardize = TRUE)
-#' # prop_af_v2<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait),lst.data,dfData.settings,df.reference.dates=df_reference_dt_v2,standardize = TRUE)
-#' #
-#' #
-#' #
+
+
+
+
+
+
+ # prop_af_v0<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait),lst.data,dfData.settings,df.reference.dates=df_reference_dt_v0,standardize = TRUE)
+ # prop_af_v2<-get_case_count_by_source(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait),lst.data,dfData.settings,df.reference.dates=df_reference_dt_v2,standardize = TRUE)
+
 #############################################################
 # data source trajectory over time
 #############################################################
+
+
+
+
+
+
+
 
 # lst_df_ref_dt<-list(Baseline=df_reference_dt_v0,Visit2=df_reference_dt_v2,Nov21=df_reference_dt_today)
 plt_test<-plot_source_proportion_over_time(definition=dfDefinitions_processed_expanded %>% filter(TRAIT==trait),lst_df_ref_dt,lst.data,dfData.settings,FALSE)
