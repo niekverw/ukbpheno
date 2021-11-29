@@ -540,7 +540,14 @@ expand_dfDefinitions_processed2 <-
       message(glue::glue("Read from codings for {cls} from {fmap}"))
       lst.codemap[[cls]]<-fread(fmap)
       # rename the column
-      names(lst.codemap[[cls]])[grep("^cod", names(lst.codemap[[cls]]))] <- "coding"
+      # rename the column
+      if (ncol(lst.codemap[[cls]])!=1){
+        # for files downloaded from showcase
+        names(lst.codemap[[cls]])[grep("^cod", names(lst.codemap[[cls]]))] <- "coding"
+      }else{
+        # for codes created locally / if there is only 1 column it has to be the code
+        names(lst.codemap[[cls]])<-"coding"
+      }
       # if case insensitive,
       # always change to upper letters as this has been done in the preprocessingg of definitiion
       if (isTRUE(ignore.case[1]$ignore.case)) {
@@ -560,12 +567,18 @@ expand_dfDefinitions_processed2 <-
           # otherwise grep patterns (codes) that starts with the input code
 
           Str_expanded <- paste(unique(unlist(
-            lapply(VctStr,  function(x)
+            lapply(VctStr,  function(x){
+              # print(x)
+              # print(cls)
+              # print(lst.codemap[[cls]]$coding)
               lst.codemap[[cls]]$coding [grep(paste("^", x, sep = ""),
                                                       lst.codemap[[cls]]$coding  ,
-                                                      ignore.case = ignore.case)])
+                                                      ignore.case = ignore.case)]
+
+              })
           )), collapse = ",")
           dfDefinitions_processed[r, cls] <- Str_expanded
+              # print(dfDefinitions_processed[r, cls])
           # next
         }
 
