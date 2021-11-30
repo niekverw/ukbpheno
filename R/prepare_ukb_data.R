@@ -118,8 +118,8 @@ harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.he
   # non cancer
   lst.data$tte.sr.20002 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20002",field_sr_date = "20008",qc_threshold_year = 10)
   message(" ->Self-reported operation codes(field 20004)")
-  # operation
-  lst.data$tte.sr.20004 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20004",field_sr_date = "20010",qc_threshold_year = 10)
+  # operation  ,  here we set event=1 to allow multiple operations happening at different time
+  lst.data$tte.sr.20004 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20004",field_sr_date = "20010",qc_threshold_year = 10,event_code=1)
   message(" ->Self-reported medication codes(field 20003)")
   # medication (event==0, since no age of diagnosis)
   lst.data$sr.20003 <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "20003",field_sr_date = "",qc_threshold_year = 10)
@@ -128,9 +128,9 @@ harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.he
   ### cancer registry
   ################################################################################
   message("Convert cancer registry data(field 40006/40013)")
-  # qc_threshold set to zeros, because cancer recurrence is fairly common (?)
-  lst.data$tte.cancer.icd10 <- convert_cancerregister_to_episodedata(dfukb,field_diagnosis = "40006",field_date = "40005",field_date_type="date",qc_threshold_year = 0,codetype = "character")
-  lst.data$tte.cancer.icd9 <- convert_cancerregister_to_episodedata(dfukb,field_diagnosis = "40013",field_date = "40005",field_date_type="date",qc_threshold_year = 0,codetype ="character")
+  # qc_threshold set to zeros, because cancer recurrence is fairly common (?) <-set event=1 to not combine the multiple occurences
+  lst.data$tte.cancer.icd10 <- convert_cancerregister_to_episodedata(dfukb,field_diagnosis = "40006",field_date = "40005",field_date_type="date",qc_threshold_year = 0,codetype = "character",event_code=1)
+  lst.data$tte.cancer.icd9 <- convert_cancerregister_to_episodedata(dfukb,field_diagnosis = "40013",field_date = "40005",field_date_type="date",qc_threshold_year = 0,codetype ="character",event_code=1)
 
   ###################################################
   ## from data portal
