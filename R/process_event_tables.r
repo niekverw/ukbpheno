@@ -199,18 +199,18 @@ get_incidence_prevalence <- function(all_event_dt,
 
   ############################################
   # min instance filter
-  #  TODO: an extra record with visitdate as event data & event ==0 is always created regardless of whether a valid event date had been reported for  TS/Nurse interview/Cancer registry
-  #  if set min_inst for these to n*2  / remove all rows with event ==0 -> create a bias as the events without event dates will be more likely filtered out?????
-  #  c.f. Line 220-225 convert_nurseinterview_to_episodedata.r
-  # # records for people with eventdates :2/4/6/8/...2n   VS  1/2/3/4/...n  which n depends not only on #visit but also available codes 1471,1483 for AF
-  # those cases can be distinguished in theory : with eventdate -> multiple of 2  records one event==2 , one event==0  VS without eventdate  -> 1 record event==0
-  # something like: group_by(code) %>% count(n())
-  #  that means we can reverse engineer to fish out ppl without eventdate ....which sounds a convoluted operation (what is the advantage of adding the Line220-225 block?)
-  # on the other hand , given the data is only collected during visits to assessment centres, how often does one expect to use min_instance>1 ?
   ############################################
   if(verbose){
   message("Filter records by thresholds specified in data setting")
   }
+  # event=1 registry record /event=0 not real eventdate /event=2 self report eventdate
+  # for event =2 there is always an extra row event=0 (refer to conversion functions for self-reported field)
+  # some events do not have reported date hence only 1 row event=0
+  # keep events that are either 1)event ==1/2 [all events with event dates] 2) event=0 + id not in id_event2 (inds with actual event dates) [real event without eventdate reported]
+  id_event2<-unique(all_event_dt[event==2,nomatch=NULL]$identifier)
+  all_event_dt<-all_event_dt[((!identifier %in% id_event2)|(event!=0)),nomatch=NULL]
+
+
   # first merge the datasource specific threshold values to df
   all_event_dt$min.ins<- with(df.data.settings, minimum_instance[match(all_event_dt$.id,datasource)])
 
@@ -566,9 +566,19 @@ get_cases_controls <-function(definitions,
   # exclude id in case_include & case_exclude from summary => potential control
   df.casecontrol <- df.casecontrol[!df.casecontrol$identifier %in% all_event_dt.Include_in_cases.summary$identifier,]
   df.casecontrol$reference_date <- as.Date(as.character(df.casecontrol$reference_date),format="%Y-%m-%d")
-  potential_control<-df.casecontrol$identifier
+
+
   # case without eventdate
-  non_proper_case<-dplyr::intersect(potential_control,all_event_dt.Include_in_cases$identifier)
+  # this line is not correct because it will also get ppl who do not pass the instance filter! i.e. they will have event but not appearing in case.summary!
+  # potential_control<-df.casecontrol$identifier
+  # non_proper_case<-dplyr::intersect(potential_control,all_event_dt.Include_in_cases$identifier)
+  # hence replace with these 2 lines
+  w_dt<-dplyr::union(all_event_dt[all_event_dt$event==1,]$identifier,all_event_dt[all_event_dt$event==2,]$identifier)
+  # TODO differentiate actual case without eventdate from non-case (excluded) due to the instance filter
+  # this currently include everyone back == instance filter not working!!!!!!!!!
+  non_proper_case<-dplyr::setdiff(all_event_dt[all_event_dt$event==0,]$identifier,w_dt)
+
+
   # merge it with the cases
   df.casecontrol <- merge(df.casecontrol,all_event_dt.Include_in_cases.summary,by=c("identifier","reference_date"),all=T)
 
