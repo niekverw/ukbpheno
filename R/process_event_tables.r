@@ -165,7 +165,7 @@ get_incidence_prevalence <- function(all_event_dt,
     df_reference_date$reference_date<- as.Date(df_reference_date$reference)
     df_reference_date<-df_reference_date[!is.na(df_reference_date$reference_date)]
     if(verbose){
-      message(glue::glue("non missing reference_date: {nrow(df_reference_date)}"))
+      message(glue::glue("Non missing reference_date: {nrow(df_reference_date)}"))
     }
     }
     #scenario 2: df_reference_date is NULL
@@ -196,43 +196,6 @@ get_incidence_prevalence <- function(all_event_dt,
     all_event_dt.summary[, (col_date) := lapply(.SD, as.Date), .SDcols = col_date]
     return(all_event_dt.summary)
   }
-
-  ############################################
-  # min instance filter
-  ############################################
-  if(verbose){
-  message("Filter records by thresholds specified in data setting")
-  }
-  # event=1 registry record /event=0 not real eventdate /event=2 self report eventdate
-  # for event =2 there is always an extra row event=0 (refer to conversion functions for self-reported field)
-  # some events do not have reported date hence only 1 row event=0
-  # keep events that are either 1)event ==1/2 [all events with event dates] 2) event=0 + id not in id_event2 (inds with actual event dates) [real event without eventdate reported]
-  id_event2<-unique(all_event_dt[event==2,nomatch=NULL]$identifier)
-  all_event_dt<-all_event_dt[((!identifier %in% id_event2)|(event!=0)),nomatch=NULL]
-
-
-  # first merge the datasource specific threshold values to df
-  all_event_dt$min.ins<- with(df.data.settings, minimum_instance[match(all_event_dt$.id,datasource)])
-
-  # TODO how to make the message look better?
-  # #records by data type after filtering:c("tte.death.icd10.primary", "tte.death.icd10.secondary", "tte.hesin.icd10.primary", "tte.hesin.icd10.secondary", "tte.hesin.icd9.primary", "tte.hesin.icd9.secondary", "tte.hesin.oper4.primary", "tte.hesin.oper4.secondary", "tte.sr.20002")
-  # c(8900, 75114, 1234716, 7340, 1711, 337, 244658, 1604, 129186)
-  # too much information to read
-  # message(glue::glue("#records by data type before filtering: {glue::glue_collapse(all_event_dt%>% dplyr::group_by(.id)%>% count(),sep='\n')}"))
-  # print(all_event_dt%>% dplyr::group_by(.id)%>% count())
-
-  # split df by .id, , group by identifier and filter records
-  all_event_dt<-plyr::ddply(.data=all_event_dt,.variables=".id",function(x) {
-    # print(head(x$.id,1))
-    # print(nrow(x))
-    x%>% dplyr::group_by(identifier)%>% dplyr::filter(n()>=min.ins)
-    # ins.min<-df.data.settings[df.data.settings$datasource==".id",]$minimum_instance
-    # print(ins.min)
-    # x%>%dplyr::group_by(identifier)%>% dplyr::filter(n()>ins.min)
-  })
-  all_event_dt<-as.data.table(all_event_dt)
-  # message(glue::glue("#records by data type after filtering:{glue::glue_collapse(all_event_dt%>% dplyr::group_by(.id)%>% count(),sep='\n')}"))
-  #############################################################################################################
 
 
   df <- merge(all_event_dt,df_reference_date,by = 'identifier') %>% dplyr::arrange(eventdate) %>% data.table::as.data.table()
@@ -406,18 +369,19 @@ get_cases <- function(definitions,
   if(verbose){
   message("..Identify case status")
   }
-  all_event_dt.Include_in_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,df.data.settings)   #MI
+  all_event_dt.Include_in_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,df.data.settings)
+
   all_event_dt.Include_in_cases.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.Include_in_cases,df.data.settings,
                                                                     df_reference_date = df_reference_dt,verbose = verbose)
                                                                     #...)
   if(verbose){
-  message(glue::glue("including {nrow(all_event_dt.Include_in_cases.summary)} cases"))
+  message(glue::glue("Including {nrow(all_event_dt.Include_in_cases.summary)} cases..."))
   }
-  all_event_dt.Exclude_from_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Exclude_from_cases"),lst.data,df.data.settings)   #MI
+  all_event_dt.Exclude_from_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Exclude_from_cases"),lst.data,df.data.settings)
   if(!is.null(all_event_dt.Exclude_from_cases)){
     exclude=all_event_dt.Include_in_cases.summary$identifier %in% unique(all_event_dt.Exclude_from_cases$identifier)
     if(verbose){
-    message(glue::glue("excluding {sum(exclude)} cases"))
+    message(glue::glue("Excluding {sum(exclude)} cases..."))
     }
     set_to_na <- names(all_event_dt.Include_in_cases.summary)[!names(all_event_dt.Include_in_cases.summary) %in% c("identifier","reference_date")]
     # the .summary needed to be flagged for the get_case_control() functoin
@@ -501,10 +465,10 @@ get_cases_controls <-function(definitions,
       # names(df_reference_date)<-c("identifier","reference_date")
     }
     if(verbose){
-    message(glue::glue("...No reference date information supplied, take first event date as reference date"))
+    message(glue::glue("...No reference date information provided, take first event date as reference date"))
     }
 
-    all_event_dt.population <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,dfData.settings)
+    all_event_dt.population <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,dfData.settings,verbose = FALSE)
     # only keep date with real event
     all_event_dt.population[all_event_dt.population$event==0,]$eventdate <-NA
     # get everyone , take the date of relevant events respectively
@@ -573,10 +537,13 @@ get_cases_controls <-function(definitions,
   # potential_control<-df.casecontrol$identifier
   # non_proper_case<-dplyr::intersect(potential_control,all_event_dt.Include_in_cases$identifier)
   # hence replace with these 2 lines
-  w_dt<-dplyr::union(all_event_dt[all_event_dt$event==1,]$identifier,all_event_dt[all_event_dt$event==2,]$identifier)
+  w_dt<-dplyr::union(all_event_dt.Include_in_cases[all_event_dt.Include_in_cases$event==1,]$identifier,all_event_dt.Include_in_cases[all_event_dt.Include_in_cases$event==2,]$identifier)
   # TODO differentiate actual case without eventdate from non-case (excluded) due to the instance filter
   # this currently include everyone back == instance filter not working!!!!!!!!!
-  non_proper_case<-dplyr::setdiff(all_event_dt[all_event_dt$event==0,]$identifier,w_dt)
+  non_proper_case<-dplyr::setdiff(all_event_dt.Include_in_cases[all_event_dt.Include_in_cases$event==0,]$identifier,w_dt)
+
+
+
 
 
   # merge it with the cases
@@ -585,7 +552,7 @@ get_cases_controls <-function(definitions,
 
   if(length(non_proper_case)>0) {
     if(verbose){
-    message(glue::glue("Warning: {length(non_proper_case)} cases without valid event date"))
+    message(glue::glue("!!NOTE: {length(non_proper_case)} cases without valid event date...."))
     }
     # cols to be set to na
     set_to_na <- names(df.casecontrol)[!names(df.casecontrol) %in% c("identifier","reference_date")]
