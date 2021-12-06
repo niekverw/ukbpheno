@@ -84,7 +84,7 @@ lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,dfDefi
 ####################################################
 # we need 1) definition of the target trait, 2)harmonized data tables, 3) data.setting dataframe and # 4) target set of individuals either specified via df_reference_date or vct.identifiers
 # 1) definition of the target trait
-trait<-"Af"
+trait<-"Cad"
 # dfDefinitions_processed_expanded[dfDefinitions_processed_expanded$TRAIT==trait,]$DESCRIPTION
 # [1] "Atrial fibrillation/Atrial flutter"
 
@@ -95,14 +95,12 @@ trait<-"Af"
 # Time to disease will be calculated from these specified reference dates
 df_reference_dt_v0<-lst.harmonized.data$dfukb[,c("identifier","f.53.0.0")]
 lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==trait), lst.harmonized.data$lst.data,dfData.settings, df_reference_date=df_reference_dt_v0)
-summary(lst.case_control)
-#                                       Length Class      Mode
-# df.casecontrol                        16     data.table list
-# all_event_dt.Include_in_cases          7     data.table list
-# all_event_dt.Include_in_cases.summary 16     data.table list
+
 
 df_reference_dt_v2<-lst.harmonized.data$dfukb[,c("identifier","f.53.2.0")]
 lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==trait), lst.harmonized.data$lst.data,dfData.settings, df_reference_date=df_reference_dt_v2)
+# TODO CHECK numbers of cases not a sum from the messages , can be confusing
+
 
 # 4.2) target set of individuals specified via vct.identifiers i.e. no specified reference dates
 # The dates of the first event will be taken as reference date for the calculation of time to disease
@@ -112,17 +110,9 @@ lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expan
 my.curated.identifiers<-df_reference_dt_v2[1:20]$identifier
 my.curated.identifiers[1]<-10000011
 all(my.curated.identifiers %in% lst.harmonized.data$vct.identifiers) #FALSE
-
+rm(lst.data)
+dfData.settings<-df.data.settings
 all_event_dt <- get_all_events(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait)%>%filter(Definitions=="Include_in_cases"),lst.data=lst.harmonized.data$lst.data,df.data.settings=dfData.settings)   #Af
-df_reference_date<-df_reference_dt_v0
-
-# test instance filter
-dfData.settings[df.data.settings$datasource=="tte.sr.20002"]$minimum_instance<-2
-all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,df.data.settings,df_reference_date = df_reference_date,window_fu_days_mask = 15)
-dfData.settings[dfData.settings$datasource=="tte.sr.20002"]$minimum_instance<-1
-all_event_dt.summary <- get_incidence_prevalence(all_event_dt = all_event_dt,dfData.settings,df_reference_date = df_reference_date,window_fu_days_mask = 15)
-
 
 plot_individual_timeline(df.data.settings = dfData.settings,lst.data=lst.harmonized.data$lst.data,ind_identifier = 1111111)
 
-setdiff(all_event_dt[all_event_dt$event==0,]$identifier,all_event_dt[all_event_dt$event==2,]$identifier)
