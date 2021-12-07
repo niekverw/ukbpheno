@@ -108,13 +108,6 @@ get_all_events <- function (definition,lst.data=lst.data,df.data.settings,verbos
   # message(glue::glue("#records by data type after filtering:{glue::glue_collapse(all_event_dt%>% dplyr::group_by(.id)%>% count(),sep='\n')}"))
   #############################################################################################################
 
-
-
-
 }
 
-warnings()
-# TODO composite phenotype from multiple sources get_all_events + TS
-# simple count
-# +time
 

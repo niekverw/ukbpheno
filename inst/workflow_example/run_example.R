@@ -84,7 +84,7 @@ lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,dfDefi
 ####################################################
 # we need 1) definition of the target trait, 2)harmonized data tables, 3) data.setting dataframe and # 4) target set of individuals either specified via df_reference_date or vct.identifiers
 # 1) definition of the target trait
-trait<-"Cad"
+trait<-"DmRxT2"
 # dfDefinitions_processed_expanded[dfDefinitions_processed_expanded$TRAIT==trait,]$DESCRIPTION
 # [1] "Atrial fibrillation/Atrial flutter"
 
@@ -114,5 +114,9 @@ rm(lst.data)
 dfData.settings<-df.data.settings
 all_event_dt <- get_all_events(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait)%>%filter(Definitions=="Include_in_cases"),lst.data=lst.harmonized.data$lst.data,df.data.settings=dfData.settings)   #Af
 
+
 plot_individual_timeline(df.data.settings = dfData.settings,lst.data=lst.harmonized.data$lst.data,ind_identifier = 1111111)
+
+DmRxT2_timeline<-plot_disease_timeline_by_source(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait),lst.harmonized.data$lst.data,dfData.settings,lst.harmonized.data$vct.identifiers)
+DmRxT2_timeline
 
