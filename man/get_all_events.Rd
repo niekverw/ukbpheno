@@ -4,7 +4,12 @@
 \alias{get_all_events}
 \title{Get all episodes for a phenotype}
 \usage{
-get_all_events(definition, lst.data = lst.data, df.data.settings)
+get_all_events(
+  definition,
+  lst.data = lst.data,
+  df.data.settings,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{definition}{phenotype/trait specified in definition table (a row in the table)}
