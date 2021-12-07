@@ -1,110 +1,3 @@
-
-
-#' Summary statistics of events for single phenotype
-#'
-#' Given a data.table with all events for a phenotype, get the summary of code occurence/occurence
-#' @param all_event_dt data table containing all events
-#' @return  a list of 3 summary tables and 4 plots
-#' @keywords event stats
-#' @export
-#' @examples
-#' all_event_dt <- get_all_events(dfDefinitions_processed_expanded[1,],lst.data,df.data.settings)
-#' get_stats_for_events(all_event_dt)
-#' TODO:move this function
-get_stats_for_events <- function(all_event_dt){
-
-  # show stats on codes
-  stats.codes <- all_event_dt[, .(count=.N,sum.event = sum(event,na.rm = T),sum.epidur= sum(epidur,na.rm = T),median.epidur= median(epidur,na.rm = T),max.epidur= max(epidur,na.rm=T) ), keyby=list(identifier,classification, code)]
-  stats.codes <- stats.codes %>% dplyr::group_by(classification, code) %>% summarise(count=n() )
-  stats.codes <- stats.codes %>% arrange(count)
-  stats.codes$rank <- 1:nrow(stats.codes)
-  p1 <-ggplot2::ggplot(stats.codes, ggplot2::aes(rank, count,label=code,color=classification)) + ggplot2::geom_point() + ggplot2::ylim(-((max(stats.codes$count))/3),NA)  + ggrepel::geom_text_repel(size =3,segment.size=0.5)
-
-  p2 <- ggplot2::ggplot(stats.codes,ggplot2:: aes(rank, count,label=code,color=classification)) + ggplot2::scale_y_continuous(trans='log2') + ggplot2::geom_point()   + ggrepel::geom_text_repel(size =3,segment.size=0.5)
-  stats.codes.summary.table <- stats.codes
-  stats.codes.summary.p <- ggpubr::ggarrange(p1,p2,nrow = 1, ncol = 2,common.legend = TRUE)
-
-  # show co-occurences of classifications
-  stats.coocurrence <- table(all_event_dt[,c("identifier" ,"classification")])#[1:10,]
-  stats.coocurrence[stats.coocurrence>0] <-1
-
-  mat <- crossprod(as.matrix(stats.coocurrence))
-  mat <- floor(t(mat * 100 / diag(mat)))                 # calculate the percentage
-  diag(mat) <- NA
-  stats.class.cooccur.table <- mat
-
-    # stats.class.cooccur.p <- pheatmap::pheatmap(mat,display_numbers=mat,cluster_cols = F,cluster_rows = F )
-  # #########ggplot2 implementation of the heatmap##########################################################################
-  longData<- reshape2::melt(mat)
-  names(longData)<- c("Code_presence","Code_occur","%")
-  stats.class.cooccur.p <- ggplot2::ggplot(longData, ggplot2::aes(x = Code_occur , y =Code_presence,fill=`%`)) +
-    ggplot2::geom_tile()+
-    ggplot2::scale_fill_distiller(palette = "RdYlBu",na.value = "grey85") +
-    ggplot2::labs(x="Classfication of co-occurence", y="Classification present",title="Co-occurence of diagnosis by sources",caption = "[% of column covered by row]") +
-    ggplot2::geom_text(ggplot2::aes(label = `%`))
- # ########################################################################################################################
-  # show co-occurences of codes
-  stats.coocurrence <- table(all_event_dt[,c("identifier" ,"code")])
-  stats.coocurrence[stats.coocurrence>0] <-1
-  mat <- crossprod(as.matrix(stats.coocurrence))
-  mat <- floor(t(mat * 100 / diag(mat)))                 # calculate the percentage
-  diag(mat) <- NA
-  stats.codes.cooccur.table <- mat
-
-
-  # stats.codes.cooccur.p <- pheatmap::pheatmap(mat,fontsize = 6,cluster_cols = F,cluster_rows = F)
-  # filter on codes that with co-occurence of at least 10% to reduce sparseness and make clustering more informative.
-  stats.codes.cooccur.filtered.table <- stats.codes.cooccur.table[matrixStats::rowMaxs(stats.codes.cooccur.table,na.rm=T)>10,matrixStats::colMaxs(stats.codes.cooccur.table,na.rm=T)>10]
-  # stats.codes.cooccur.filtered.p <- pheatmap::pheatmap( stats.codes.cooccur.filtered.table  ,fontsize = 6)
-  # ########## ggplot implementation#################################################################################
-  # Create ggplot version dendrogram from ggdendro
-
-   code.dendro <- as.dendrogram(hclust(d = dist(x = stats.codes.cooccur.filtered.table)))
-  ddata_x <-  ggdendro::dendro_data(code.dendro)
-  # to colour leaves by classifications
-
-  lab_gp <- ggdendro::label(ddata_x)
-  lab_gp$group <- stats.codes[match(lab_gp$label,stats.codes$code),]$classification
-
-  stats.codes.cooccur.filtered.p.dendro <- ggplot2::ggplot(ggdendro::segment(ddata_x)) +
-    ggplot2::geom_segment(ggplot2::aes(x=x, y=y+10, xend=xend, yend=yend+10)) +  ggplot2::geom_text(data=ggdendro::label(ddata_x),
-    ggplot2::aes(label=label, x=x, y=-5, colour=lab_gp$group),size =3,angle=45) +ggplot2::theme(axis.line=ggplot2::element_blank(),
-         axis.text.x=ggplot2::element_blank(),
-         axis.text.y=ggplot2::element_blank(),
-         axis.ticks=ggplot2::element_blank(),
-         axis.title.x=ggplot2::element_blank(),
-         axis.title.y=ggplot2::element_blank(),
-           # legend.position="none",
-         panel.background=ggplot2::element_blank(),
-         panel.border=ggplot2::element_blank(),
-         panel.grid.major=ggplot2::element_blank(),
-         panel.grid.minor=ggplot2::element_blank(),
-         plot.background=ggplot2::element_blank())
-  # ggplot version heatmap
-  # code.order <- order.dendrogram(code.dendro)
-  # TODO maker heatmap ordered like dendrogram?
-
-  longData<- reshape2::melt(stats.codes.cooccur.filtered.table)
-  names(longData)<- c("Code_presence","Code_occur","%")
-  stats.codes.cooccur.filtered.p.heat <- ggplot2::ggplot(longData, ggplot2::aes(x = Code_occur , y =Code_presence,fill=`%`)) +
-    ggplot2::geom_tile()+
-    ggplot2::scale_fill_distiller(palette = "RdYlBu",na.value = "grey85") +
-    ggplot2::labs(x="Code of co-occurence", y="Code present",title="Co-occurence of diagnosis code",caption = "[% of column covered by row]") + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45))
-###############################################################################################################
-
-
-  return(list(stats.codes.summary.table = stats.codes.summary.table,
-         stats.codes.summary.p = stats.codes.summary.p,
-         stats.class.cooccur.table = stats.class.cooccur.table,
-         stats.class.cooccur.p = stats.class.cooccur.p,
-         stats.codes.cooccur.table = stats.codes.cooccur.table,
-         # stats.codes.cooccur.p = stats.codes.cooccur.p,
-         # stats.codes.cooccur.filtered.p = stats.codes.cooccur.filtered.p,
-         stats.codes.cooccur.filtered.p.dendro = stats.codes.cooccur.filtered.p.dendro,
-         stats.codes.cooccur.filtered.p.heat = stats.codes.cooccur.filtered.p.heat))
-}
-
-
 #' Get data for phenotype incidence and prevalence
 #'
 #' Given a data.table with all events for a phenotype and reference dates per individual, compute the time to event data for each individual. If no reference date is given then the date of first available event will be taken as reference date for each individual. ...
@@ -340,7 +233,7 @@ get_incidence_prevalence <- function(all_event_dt,
 
 #' Get case for a phenotype
 #'
-#' Given a phenotype, a list of episode data and reference dates per individual, identify cases and compute the time to event data for these individuals.  If no reference date is given then the date of first available event will be taken as reference date for each individual.
+#' Given a phenotype, a list of episode data and reference dates per individual, identify cases /exclude cases fulfilling exclusion criteria and compute the time to event data for these individuals.  If no reference date is given then the date of first available event will be taken as reference date for each individual.
 #' @param definitions phenotype/trait specified in definition table (a row in the table)
 #' @param lst.data list of data table with all episode data
 #' @param df.data.settings data frame containing data settings
@@ -369,13 +262,13 @@ get_cases <- function(definitions,
   if(verbose){
   message("..Identify case status")
   }
-  all_event_dt.Include_in_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,df.data.settings)
+  all_event_dt.Include_in_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,df.data.settings,verbose = verbose)
 
   all_event_dt.Include_in_cases.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.Include_in_cases,df.data.settings,
                                                                     df_reference_date = df_reference_dt,verbose = verbose)
                                                                     #...)
   if(verbose){
-  message(glue::glue("Including {nrow(all_event_dt.Include_in_cases.summary)} cases..."))
+  message(glue::glue("Including {nrow(all_event_dt.Include_in_cases.summary)} cases with reference dates..."))
   }
   all_event_dt.Exclude_from_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Exclude_from_cases"),lst.data,df.data.settings)
   if(!is.null(all_event_dt.Exclude_from_cases)){
@@ -483,7 +376,7 @@ get_cases_controls <-function(definitions,
    }
 
   # define population
-  all_event_dt.population <- get_all_events(definitions %>% dplyr::filter(Definitions =="Study_population"),lst.data,df.data.settings)
+  all_event_dt.population <- get_all_events(definitions %>% dplyr::filter(Definitions =="Study_population"),lst.data,df.data.settings,verbose = FALSE)
 
     # scenario 3: if there is study population stated in the definition, df_reference_date is replaced
     if(! is.null(all_event_dt.population)) {
@@ -521,7 +414,7 @@ get_cases_controls <-function(definitions,
   all_event_dt.Include_in_cases.summary <- cases$all_event_dt.Include_in_cases.summary
   all_event_dt.Include_in_cases <- cases$all_event_dt.Include_in_cases
   # define exclude controls
-  all_event_dt.Exclude_from_controls <- get_all_events(definitions %>% dplyr::filter(Definitions =="Exclude_from_controls"),lst.data,df.data.settings)
+  all_event_dt.Exclude_from_controls <- get_all_events(definitions %>% dplyr::filter(Definitions =="Exclude_from_controls"),lst.data,df.data.settings,verbose = FALSE)
 
   ### define case & control
   df.casecontrol <- df_reference_date
@@ -543,16 +436,14 @@ get_cases_controls <-function(definitions,
   non_proper_case<-dplyr::setdiff(all_event_dt.Include_in_cases[all_event_dt.Include_in_cases$event==0,]$identifier,w_dt)
 
 
-
-
-
   # merge it with the cases
   df.casecontrol <- merge(df.casecontrol,all_event_dt.Include_in_cases.summary,by=c("identifier","reference_date"),all=T)
 
 
   if(length(non_proper_case)>0) {
     if(verbose){
-    message(glue::glue("!!NOTE: {length(non_proper_case)} cases without valid event date...."))
+      non_proper_case_norefdt<- unique(df_reference_date[identifier %in% non_proper_case][is.na(reference_date)]$identifier)
+    message(glue::glue("!!NOTE: {length(non_proper_case)} cases without valid event dates, of which {length(non_proper_case_norefdt)} without reference dates..."))
     }
     # cols to be set to na
     set_to_na <- names(df.casecontrol)[!names(df.casecontrol) %in% c("identifier","reference_date")]
