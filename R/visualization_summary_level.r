@@ -65,7 +65,7 @@ get_stats_for_events <- function(all_event_dt) {
   p2 <-
     ggplot2::ggplot(stats.codes,
                     ggplot2::aes(rank, count, label = code, color = classification)) + ggplot2::scale_y_continuous(trans =
-                                                                                                                     'log2') + ggplot2::geom_point()   + ggrepel::geom_text_repel(size = 3, segment.size =
+                                                                                                                     'log2') + ggplot2::geom_point()   + ggpubr::theme_classic2(base_size = 12) + ggrepel::geom_text_repel(size = 3, segment.size =
                                                                                                                                                                                     0.5)
   stats.codes.summary.table <- stats.codes
   stats.codes.summary.p <-
@@ -183,6 +183,7 @@ get_stats_for_events <- function(all_event_dt) {
                     ggplot2::aes(x = Code_occur , y = Code_presence, fill = `%`)) +
     ggplot2::geom_tile() +
     ggplot2::scale_fill_distiller(palette = "RdYlBu", na.value = "grey85") +
+    ggpubr::theme_classic2(base_size = 12) +
     ggplot2::labs(
       x = "Code of co-occurence",
       y = "Code present",
@@ -716,7 +717,6 @@ plot_source_proportion_over_time <-
 
     return(plt_source_over_time)
   }
-
 
 
 
