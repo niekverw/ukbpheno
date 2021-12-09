@@ -518,13 +518,7 @@ dotplot_diseases_by_source<-function(definitions,
 
 
 
-#######################################################################################
-# maybe remove everything below, is there value to plot by different reference dates?
-# it seems too convoluted
-#######################################################################################
-
-
-#' Get case-control status (Hx) by data sources
+#' Get case-control status (Hx) by data sources used for upset plot
 #'
 #' Given a phenotype, a list of episode data and reference dates per individual, identify cases and control status as of *reference date" by source.
 #' @param definitions phenotype/trait specified in definition table (a row in the table)
@@ -536,13 +530,12 @@ dotplot_diseases_by_source<-function(definitions,
 #' @keywords time-to-event
 #' @export
 #' @examples
-#' get_case_status_by_source(cancer_source,definition=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,lst.data.settings,lst.identifiers=dfukb$f.eid))
-get_case_status_by_source <- function(definition,
+#' get_case_status_by_classification(cancer_source,definition=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,lst.data.settings,lst.identifiers=dfukb$f.eid))
+get_case_status_by_classification <- function(definition,
                                      lst.data,
                                      df.data.settings,
                                      df.reference.dates = NULL,
-                                     vct.identifiers = NULL,
-                                     standardize = TRUE) {
+                                     vct.identifiers = NULL,keep_any=FALSE) {
   if (nrow(definition) == 0) {
     message("No definition is provided.Stop.")
     return(0)
@@ -552,7 +545,7 @@ get_case_status_by_source <- function(definition,
       get_cases_controls(
         definition,
         lst.data,
-        dfData.settings,
+        df.data.settings = df.data.settings,
         df_reference_date = df.reference.dates,
         verbose = FALSE
       )
@@ -561,7 +554,7 @@ get_case_status_by_source <- function(definition,
       get_cases_controls(
         definition,
         lst.data,
-        dfData.settings,
+        df.data.settings = df.data.settings,
         vct.identifiers = vct.identifiers,
         verbose = FALSE
       )
@@ -587,30 +580,27 @@ get_case_status_by_source <- function(definition,
     # take first row for the message
     definition <- definition[1]
   }
-  definition <-
-    message(
-      glue::glue(
-        "{definition$DESCRIPTION}: {length(ppl_future_only)} indivduals have events after reference dates and are not considered"
-      )
-    )
+    message(glue::glue("{definition$DESCRIPTION}: {length(ppl_future_only)} indivduals have events after reference dates and are not considered"))
   # discard future events
   lst.case_control$all_event_dt.Include_in_cases <-
     lst.case_control$all_event_dt.Include_in_cases[(
       !lst.case_control$all_event_dt.Include_in_cases$identifier %in% ppl_future_only
     )]
   # get all available data sources from data
+  # all_sources <-
+    # unique(lst.case_control$all_event_dt.Include_in_cases$.id)
   all_sources <-
-    unique(lst.case_control$all_event_dt.Include_in_cases$.id)
+    unique(lst.case_control$all_event_dt.Include_in_cases$classification)
   # create new columns for each source
   for (source_name in all_sources) {
     varname <- paste('Hx', source_name, sep = '_')
     # create new columns for each source
     cases[, (varname)] <- as.numeric(NA)
-
     # lookup source from df with all episodes i.e. all_event_dt.Include_in_cases
     # if rows in include_in_case which originated from the target source, look up the eid and set to 2
-    cases[[varname]][cases$identifier %in% lst.case_control$all_event_dt.Include_in_cases[lst.case_control$all_event_dt.Include_in_cases$.id %in% source_name, ]$identifier] <-
-      2
+    # cases[[varname]][cases$identifier %in% lst.case_control$all_event_dt.Include_in_cases[lst.case_control$all_event_dt.Include_in_cases$.id %in% source_name, ]$identifier] <- 2
+    cases[[varname]][cases$identifier %in% lst.case_control$all_event_dt.Include_in_cases[lst.case_control$all_event_dt.Include_in_cases$classification %in% source_name, ]$identifier] <- 2
+
   }
 
   for (j in  paste0("Hx_", all_sources)) {
@@ -622,28 +612,53 @@ get_case_status_by_source <- function(definition,
   }
   cases$Any[!cases$identifier %in% lst.case_control$all_event_dt.Include_in_cases$identifier] <-
     0
-
-  cols <- c("Any", paste0("Hx_", all_sources))
-  # alternatve to the block below
-  # df_prop<-cases[ ,cols,with=FALSE]%>% dplyr::summarise(across(where(is.numeric),sum))
-  # df_prop<-df_prop/2
-  # df_prop<-data.table(t(df_prop),keep.rownames = TRUE)
-  # colnames(df_prop)<-c("data_source","proportion")
-
-  df_prop <- data.table(unlist(lapply(cases[, (cols)], function(y) {
-    v1 <- nrow(cases[cases[[y]] == 2, ])
-  })))
-  if (standardize) {
-    df_prop$V1 <- df_prop$V1 / max(df_prop$V1)
-    colnames(df_prop) <- "proportion"
-  } else{
-    colnames(df_prop) <- "n"
+  if(keep_any){
+    cols <- c("Any", paste0("Hx_", all_sources))
+  }else{
+    cols <- c(paste0("Hx_", all_sources))
   }
-  df_prop$source <- c("Any", all_sources)
-  # sort
-  df_prop <- df_prop[order(df_prop$source), ]
-  return(df_prop)
+
+  # to 1/0 for upset plot
+  cases<-cases[ ,cols,with=FALSE]
+  cases[cases!=2]<-0
+  cases[cases==2]<-1
+  return(cases)
+  # # alternatve to the block below
+  # # df_prop<-cases[ ,cols,with=FALSE]%>% dplyr::summarise(across(where(is.numeric),sum))
+  # # df_prop<-df_prop/2
+  # # df_prop<-data.table(t(df_prop),keep.rownames = TRUE)
+  # # colnames(df_prop)<-c("data_source","proportion")
+  #
+  # df_prop <- data.table(unlist(lapply(cases[, (cols)], function(y) {
+  #   v1 <- nrow(cases[cases[[y]] == 2, ])
+  # })))
+  # if (standardize) {
+  #   df_prop$V1 <- df_prop$V1 / max(df_prop$V1)
+  #   colnames(df_prop) <- "proportion"
+  # } else{
+  #   colnames(df_prop) <- "n"
+  # }
+  # df_prop$source <- c("Any", all_sources)
+  # # sort
+  # df_prop <- df_prop[order(df_prop$source), ]
+  # return(df_prop)
 }
+
+
+
+
+
+
+
+
+
+
+#######################################################################################
+# maybe remove everything below, is there value to plot by different reference dates?
+# it seems too convoluted
+#######################################################################################
+
+
 
 
 

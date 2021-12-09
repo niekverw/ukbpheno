@@ -94,6 +94,7 @@ trait<-"DmRxT2"
 # df_reference_date is a data.table with identifiers in first column and corresponding reference dates in second column
 # Time to disease will be calculated from these specified reference dates
 df_reference_dt_v0<-lst.harmonized.data$dfukb[,c("identifier","f.53.0.0")]
+df_reference_dt_v0$f.53.0.0<-as.Date(df_reference_dt_v0$f.53.0.0)
 lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==trait), lst.harmonized.data$lst.data,dfData.settings, df_reference_date=df_reference_dt_v0)
 
 
@@ -110,8 +111,7 @@ lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expan
 my.curated.identifiers<-df_reference_dt_v2[1:20]$identifier
 my.curated.identifiers[1]<-10000011
 all(my.curated.identifiers %in% lst.harmonized.data$vct.identifiers) #FALSE
-rm(lst.data)
-dfData.settings<-df.data.settings
+
 all_event_dt <- get_all_events(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait)%>%filter(Definitions=="Include_in_cases"),lst.data=lst.harmonized.data$lst.data,df.data.settings=dfData.settings)   #Af
 
 
@@ -119,4 +119,3 @@ plot_individual_timeline(df.data.settings = dfData.settings,lst.data=lst.harmoni
 
 DmRxT2_timeline<-plot_disease_timeline_by_source(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait),lst.harmonized.data$lst.data,dfData.settings,lst.harmonized.data$vct.identifiers)
 DmRxT2_timeline
-
