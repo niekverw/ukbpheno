@@ -361,7 +361,7 @@ get_cases_controls <-function(definitions,
     message(glue::glue("...No reference date information provided, take first event date as reference date"))
     }
 
-    all_event_dt.population <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,dfData.settings,verbose = FALSE)
+    all_event_dt.population <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,df.data.settings,verbose = FALSE)
     # only keep date with real event
     all_event_dt.population[all_event_dt.population$event==0,]$eventdate <-NA
     # get everyone , take the date of relevant events respectively
