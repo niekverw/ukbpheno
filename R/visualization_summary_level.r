@@ -530,8 +530,8 @@ dotplot_diseases_by_source<-function(definitions,
 #' @keywords time-to-event
 #' @export
 #' @examples
-#' get_case_status_by_classification(cancer_source,definition=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,lst.data.settings,lst.identifiers=dfukb$f.eid))
-get_case_status_by_classification <- function(definition,
+#' get_case_status_by_source(cancer_source,definition=dfDefinitions_processed_expanded %>% filter(TRAIT=="Nicm"), lst.data,lst.data.settings,lst.identifiers=dfukb$f.eid))
+get_case_status_by_source <- function(definition,
                                      lst.data,
                                      df.data.settings,
                                      df.reference.dates = NULL,
@@ -578,19 +578,22 @@ get_case_status_by_classification <- function(definition,
     cases[cases$Fu == 2 & cases$Any == 2 & cases$Hx != 2, ]$identifier
   if (nrow(definition) > 1) {
     # take first row for the message
-    definition <- definition[1]
+    definition <- definition[1,]
   }
+
     message(glue::glue("{definition$DESCRIPTION}: {length(ppl_future_only)} indivduals have events after reference dates and are not considered"))
+  print(definition$DESCRIPTION)
+      message(glue::glue(" {length(ppl_future_only)} indivduals have events after reference dates and are not considered"))
   # discard future events
   lst.case_control$all_event_dt.Include_in_cases <-
     lst.case_control$all_event_dt.Include_in_cases[(
       !lst.case_control$all_event_dt.Include_in_cases$identifier %in% ppl_future_only
     )]
   # get all available data sources from data
-  # all_sources <-
-    # unique(lst.case_control$all_event_dt.Include_in_cases$.id)
   all_sources <-
-    unique(lst.case_control$all_event_dt.Include_in_cases$classification)
+    unique(lst.case_control$all_event_dt.Include_in_cases$.id)
+  # all_sources <-
+    # unique(lst.case_control$all_event_dt.Include_in_cases$classification)
   # create new columns for each source
   for (source_name in all_sources) {
     varname <- paste('Hx', source_name, sep = '_')
@@ -598,8 +601,8 @@ get_case_status_by_classification <- function(definition,
     cases[, (varname)] <- as.numeric(NA)
     # lookup source from df with all episodes i.e. all_event_dt.Include_in_cases
     # if rows in include_in_case which originated from the target source, look up the eid and set to 2
-    # cases[[varname]][cases$identifier %in% lst.case_control$all_event_dt.Include_in_cases[lst.case_control$all_event_dt.Include_in_cases$.id %in% source_name, ]$identifier] <- 2
-    cases[[varname]][cases$identifier %in% lst.case_control$all_event_dt.Include_in_cases[lst.case_control$all_event_dt.Include_in_cases$classification %in% source_name, ]$identifier] <- 2
+    cases[[varname]][cases$identifier %in% lst.case_control$all_event_dt.Include_in_cases[lst.case_control$all_event_dt.Include_in_cases$.id %in% source_name, ]$identifier] <- 2
+    # cases[[varname]][cases$identifier %in% lst.case_control$all_event_dt.Include_in_cases[lst.case_control$all_event_dt.Include_in_cases$classification %in% source_name, ]$identifier] <- 2
 
   }
 

@@ -119,3 +119,9 @@ plot_individual_timeline(df.data.settings = dfData.settings,lst.data=lst.harmoni
 
 DmRxT2_timeline<-plot_disease_timeline_by_source(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait),lst.harmonized.data$lst.data,dfData.settings,lst.harmonized.data$vct.identifiers)
 DmRxT2_timeline
+
+
+# TODO check the Hx part is not working
+DmRxT2_status_by_source<-get_case_status_by_source(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait),lst.harmonized.data$lst.data,df.data.settings,df.reference.dates = df_reference_dt_v0)
+df_reference_dt_today$f.53.0.0<-Sys.Date()
+DmRxT2_today_status_by_source<-get_case_status_by_source(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait),lst.harmonized.data$lst.data,df.data.settings,df.reference.dates = df_reference_dt_today)
