@@ -2,27 +2,26 @@
 % Please edit documentation in R/visualization_summary_level.r
 \name{get_case_status_by_source}
 \alias{get_case_status_by_source}
-\title{Get case-control status (Hx) by data sources}
+\title{Get case-control status (Hx) by data sources used for upset plot}
 \usage{
 get_case_status_by_source(
   definition,
   lst.data,
   df.data.settings,
   df.reference.dates = NULL,
-  vct.identifiers = NULL,
-  standardize = TRUE
+  keep_any = FALSE
 )
 }
 \arguments{
 \item{lst.data}{list of data table with all episode data}
-
-\item{vct.identifiers}{character vector listing the identifiers in the cohort. This is used to define controls if reference_date is not given}
 
 \item{definitions}{phenotype/trait specified in definition table (a row in the table)}
 
 \item{lst.data.settings}{data frame containing data settings}
 
 \item{reference_date}{reference dates for each individuals in the whole cohort as a named vector}
+
+\item{vct.identifiers}{character vector listing the identifiers in the cohort. This is used to define controls if reference_date is not given}
 }
 \value{
 a data table : case control status according to different sources and one column based on any of the sources.
