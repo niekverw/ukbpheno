@@ -534,8 +534,7 @@ dotplot_diseases_by_source<-function(definitions,
 get_case_status_by_source <- function(definition,
                                      lst.data,
                                      df.data.settings,
-                                     df.reference.dates = NULL,
-                                     vct.identifiers = NULL,keep_any=FALSE) {
+                                     df.reference.dates = NULL,keep_any=FALSE) {
   if (nrow(definition) == 0) {
     message("No definition is provided.Stop.")
     return(0)
@@ -547,15 +546,6 @@ get_case_status_by_source <- function(definition,
         lst.data,
         df.data.settings = df.data.settings,
         df_reference_date = df.reference.dates,
-        verbose = FALSE
-      )
-  } else if (!is.null(vct.identifiers)) {
-    lst.case_control <-
-      get_cases_controls(
-        definition,
-        lst.data,
-        df.data.settings = df.data.settings,
-        vct.identifiers = vct.identifiers,
         verbose = FALSE
       )
   } else{
@@ -575,38 +565,49 @@ get_case_status_by_source <- function(definition,
     lst.case_control$df.casecontrol[lst.case_control$df.casecontrol$Any == 2, ]
   # only those ppl with only future events are excluded, because these ppl would be considered as control at the reference date
   ppl_future_only <-
-    cases[cases$Fu == 2 & cases$Any == 2 & cases$Hx != 2, ]$identifier
+    cases[cases$Fu != 2 & cases$Any == 2 & cases$Hx == 2, ]$identifier
   if (nrow(definition) > 1) {
     # take first row for the message
     definition <- definition[1,]
   }
 
-    message(glue::glue("{definition$DESCRIPTION}: {length(ppl_future_only)} indivduals have events after reference dates and are not considered"))
-  print(definition$DESCRIPTION)
-      message(glue::glue(" {length(ppl_future_only)} indivduals have events after reference dates and are not considered"))
   # discard future events
+    names(df.reference.dates)<-c("identifier","reference_date")
+
+    lst.case_control$all_event_dt.Include_in_cases<-merge(lst.case_control$all_event_dt.Include_in_cases,df.reference.dates,by="identifier",all.x = TRUE,all.y=FALSE)
   lst.case_control$all_event_dt.Include_in_cases <-
     lst.case_control$all_event_dt.Include_in_cases[(
-      !lst.case_control$all_event_dt.Include_in_cases$identifier %in% ppl_future_only
+      lst.case_control$all_event_dt.Include_in_cases$eventdate <=lst.case_control$all_event_dt.Include_in_cases$reference_date
     )]
+  message(glue::glue("{definition$DESCRIPTION}: {length(unique(lst.case_control$all_event_dt.Include_in_cases$identifier))} indivduals have events recorded by the corresponding reference dates"))
+
+
+
   # get all available data sources from data
-  all_sources <-
-    unique(lst.case_control$all_event_dt.Include_in_cases$.id)
+  # all_sources <-
+    # unique(lst.case_control$all_event_dt.Include_in_cases$.id)
   # all_sources <-
     # unique(lst.case_control$all_event_dt.Include_in_cases$classification)
+  `self reported (nurse interview)`<-c("tte.sr.20002","tte.sr.20001" ,"tte.sr.20004", "sr.20003")
+  `cancer registry`<-c("tte.cancer.icd10", "tte.cancer.icd9")
+  `death registry`<-c("tte.death.icd10.primary" ,"tte.death.icd10.secondary")
+  `hospital inpatient records` <-c("tte.hesin.oper3.primary" ,"tte.hesin.oper3.secondary","tte.hesin.oper4.primary","tte.hesin.oper4.secondary", "tte.hesin.icd10.primary","tte.hesin.icd10.secondary","tte.hesin.icd9.primary","tte.hesin.icd9.secondary")
+  `primary care` <-c("tte.gpclincal.read2","tte.gpclincal.read3","tte.gpscript.dmd.england","tte.gpscript.bnf.england","tte.gpscript.bnf.scotland","tte.gpscript.read2.wales")
+  `self reported (touchscreen)` <-c("ts")
+  all_sources<-list(`self reported (nurse interview)`=`self reported (nurse interview)`,`cancer registry`=`cancer registry`,`death registry`=`death registry`,`hospital inpatient records`=`hospital inpatient records`,`primary care`=`primary care`,`self reported (touchscreen)`=`self reported (touchscreen)`)
   # create new columns for each source
-  for (source_name in all_sources) {
-    varname <- paste('Hx', source_name, sep = '_')
+  for (source_name in names(all_sources)) {
+    varname <- paste(source_name, 'Hx', sep = ' ')
     # create new columns for each source
     cases[, (varname)] <- as.numeric(NA)
     # lookup source from df with all episodes i.e. all_event_dt.Include_in_cases
     # if rows in include_in_case which originated from the target source, look up the eid and set to 2
-    cases[[varname]][cases$identifier %in% lst.case_control$all_event_dt.Include_in_cases[lst.case_control$all_event_dt.Include_in_cases$.id %in% source_name, ]$identifier] <- 2
+    cases[[varname]][cases$identifier %in% lst.case_control$all_event_dt.Include_in_cases[lst.case_control$all_event_dt.Include_in_cases$.id %in% all_sources[[source_name]], ]$identifier] <- 2
     # cases[[varname]][cases$identifier %in% lst.case_control$all_event_dt.Include_in_cases[lst.case_control$all_event_dt.Include_in_cases$classification %in% source_name, ]$identifier] <- 2
 
   }
 
-  for (j in  paste0("Hx_", all_sources)) {
+  for (j in  paste( names(all_sources),"Hx",sep=" ")) {
     # for all new Hx_ columns , set everything to 0 for ease of counting
     # if Hx <0 , (excluded cases)
     set(cases, which(cases$Hx <= 0), j, 0)
@@ -616,9 +617,9 @@ get_case_status_by_source <- function(definition,
   cases$Any[!cases$identifier %in% lst.case_control$all_event_dt.Include_in_cases$identifier] <-
     0
   if(keep_any){
-    cols <- c("Any", paste0("Hx_", all_sources))
+    cols <- c("Any", paste( names(all_sources),"Hx",sep=" "))
   }else{
-    cols <- c(paste0("Hx_", all_sources))
+    cols <- c(paste( names(all_sources),"Hx",sep=" "))
   }
 
   # to 1/0 for upset plot
@@ -648,93 +649,62 @@ get_case_status_by_source <- function(definition,
 }
 
 
+#' Make upset plot
+#'
+#' Given a phenotype and reference date , make an upset plot of cases (Hx) by the reference dates by source.
+#' @param definitions phenotype/trait specified in definition table (a row in the table)
+#' @param lst.data list of data table with all episode data
+#' @param lst.data.settings data frame containing data settings
+#' @param reference_date reference dates for each individuals in the whole cohort as a named vector
+#' @return  upset plot
+#' @keywords upset
+#' @export
+#' @examples
+#' make_upsetplot(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait),lst.harmonized.data$lst.data,df.data.settings,df.reference.dates = df_reference_dt_v0)
+make_upsetplot <- function(definition,lst.data,
+                                      df.data.settings,
+                                      df.reference.dates) {
+  # get the count
+  dt_status_by_source<-get_case_status_by_source(definition,lst.data,df.data.settings,df.reference.dates)
+  # make plot
+  # dark green, mud yellow,brwon, blue green,light purple,bright light blue green
+  cus_col<-c("#4d8076","#926c00","#4c1130","#087593","#9b89b3","#00c9a7")
+  upset_plot<-ComplexUpset::upset(
+    dt_status_by_source, c("self reported (nurse interview) Hx","cancer registry Hx","death registry Hx","hospital inpatient records Hx","primary care Hx","self reported (touchscreen) Hx"),min_size=0, base_annotations=list(
+      'Intersection size'=intersection_size(
+        text_colors=c(on_background='#000066', on_bar='#ffc75f'),text=list(size=7.5),fill="#333333"
+      )
+      # + ggplot2::annotate(
+      #   geom='text', x=Inf, y=Inf,
+      #   label=paste('Total:', nrow(case_status_by_classification)),
+      #   vjust=1, hjust=1
+      # )
+      +  ggplot2::ylab('Intersection size')
+      + ggplot2::theme(text=ggplot2::element_text(size=18),axis.text = ggplot2::element_text(size=18))
+    ),
+    width_ratio=0.25
+    ,queries=list(
+      upset_query(set="self reported (nurse interview) Hx", fill=cus_col[1]),
+      upset_query(set="cancer registry Hx", fill=cus_col[2]),
+      upset_query(set="death registry Hx", fill=cus_col[3]),
+      upset_query(set='"hospital inpatient records Hx"', fill=cus_col[4]),
+      upset_query(set="primary care Hx",fill=cus_col[5]),
+      upset_query(set="self reported (touchscreen) Hx",fill=cus_col[6])
+    ),
+    encode_sets=FALSE,  # for annotate() to select the set by name disable encoding
+    set_sizes=(
+      upset_set_size()
+      + ggplot2::geom_text(ggplot2::aes(label=..count..), hjust=1.1, stat='count',size=7.5)
+      # you can also add annotations on top of bars:
+      # + annotate(geom='text', label='@', x='Drama', y=850, color='white', size=3)
+      + ggplot2::expand_limits(y=nrow(case_status_by_classification))
+      + ggplot2::theme(axis.text.x=ggplot2::element_text(angle=90),text = ggplot2::element_text(size=18))
+    ),themes=upset_default_themes(text=ggplot2::element_text(size=18))
+  )
+  return(upset_plot)
+}
 
 
-
-
-
-
-
-
-#######################################################################################
-# maybe remove everything below, is there value to plot by different reference dates?
-# it seems too convoluted
-#######################################################################################
-
-
-
-
-
-
-#############################################################
-# data source trajectory over varying reference dates
-#############################################################
-
-plot_source_proportion_over_time <-
-  function(definition,
-           lst.dfReferenceDate,
-           lst.data,
-           df.data.settings,
-           standardize = TRUE) {
-    time.lab <- names(lst.dfReferenceDate)
-    # lst.dfprop<-list()
-    lst.dfprop <- lapply(lst.dfReferenceDate, function(x) {
-      df_prof <-
-        get_case_count_by_source(
-          definition = definition,
-          lst.data,
-          df.data.settings,
-          df.reference.dates = x,
-          standardize = standardize
-        )
-      df_prof
-    })
-    # print(lst.dfprop)
-    # print(time.lab)
-    # rename for merging
-    lst.dfprop <- lapply(time.lab, function(x) {
-      # print(names(lst.dfprop[[x]]))
-      # print(x)
-      if (standardize) {
-        names(lst.dfprop[[x]])[names(lst.dfprop[[x]]) == 'proportion'] <- x
-      } else{
-        names(lst.dfprop[[x]])[names(lst.dfprop[[x]]) == 'n'] <- x
-      }
-      lst.dfprop[[x]]
-    })
-
-    # merge the data tables
-    prop_df_time <- Reduce(function(x, y, ...)
-      merge(x, y, by = "source", all = TRUE, ...),
-      lst.dfprop)
-    color_vec <- rand_col_vec(nrow(prop_df_time))
-    # long table for plotting
-    prop_df_time <- reshape2::melt(prop_df_time)
-
-
-    plt_source_over_time <-
-      ggplot2::ggplot(prop_df_time,
-                      ggplot2::aes(
-                        x = variable,
-                        y = value,
-                        colour = source,
-                        group = source
-                      )) +
-      ggplot2::scale_color_manual(values = color_vec) +
-      ggplot2::geom_line()  + ggplot2::scale_y_continuous(breaks = pretty(1:max(prop_df_time$value), n =
-                                                                            5)) +
-      ggplot2::geom_point() + ggplot2::xlab("Time point") + ggpubr::theme_pubclean(base_size = 12)
-
-    if (standardize) {
-      plt_source_over_time <-
-        plt_source_over_time + ggplot2::labs(y = "Proportion")
-    } else{
-      plt_source_over_time <-
-        plt_source_over_time + ggplot2::labs(y = "Count")
-    }
-
-    return(plt_source_over_time)
-  }
 
 
 
