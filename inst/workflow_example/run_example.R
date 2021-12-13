@@ -84,7 +84,7 @@ lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,dfDefi
 ####################################################
 # we need 1) definition of the target trait, 2)harmonized data tables, 3) data.setting dataframe and # 4) target set of individuals either specified via df_reference_date or vct.identifiers
 # 1) definition of the target trait
-trait<-"DmRxT2"
+trait<-"Cad"
 # dfDefinitions_processed_expanded[dfDefinitions_processed_expanded$TRAIT==trait,]$DESCRIPTION
 # [1] "Atrial fibrillation/Atrial flutter"
 
@@ -125,3 +125,14 @@ DmRxT2_timeline
 DmRxT2_status_by_source<-get_case_status_by_source(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait),lst.harmonized.data$lst.data,df.data.settings,df.reference.dates = df_reference_dt_v0)
 df_reference_dt_today$f.53.0.0<-Sys.Date()
 DmRxT2_today_status_by_source<-get_case_status_by_source(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait),lst.harmonized.data$lst.data,df.data.settings,df.reference.dates = df_reference_dt_today)
+
+
+Cad_status_by_source<-get_case_status_by_source(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait),lst.harmonized.data$lst.data,dfData.settings,df.reference.dates = df_reference_dt_v0)
+Cad_status_by_source$Cad_gp<-0
+# Cad_status_by_source$Cad_gp[Cad_status_by_source$<-0
+
+
+
+
+Cad_upset<-make_upsetplot(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait),lst.harmonized.data$lst.data,dfData.settings,df.reference.dates = df_reference_dt_v0)
+Cad_upset

@@ -671,7 +671,7 @@ make_upsetplot <- function(definition,lst.data,
   cus_col<-c("#4d8076","#926c00","#4c1130","#087593","#9b89b3","#00c9a7")
   upset_plot<-ComplexUpset::upset(
     dt_status_by_source, c("self reported (nurse interview) Hx","cancer registry Hx","death registry Hx","hospital inpatient records Hx","primary care Hx","self reported (touchscreen) Hx"),min_size=0, base_annotations=list(
-      'Intersection size'=intersection_size(
+      'Intersection size'=ComplexUpset::intersection_size(
         text_colors=c(on_background='#000066', on_bar='#ffc75f'),text=list(size=7.5),fill="#333333"
       )
       # + ggplot2::annotate(
@@ -684,22 +684,22 @@ make_upsetplot <- function(definition,lst.data,
     ),
     width_ratio=0.25
     ,queries=list(
-      upset_query(set="self reported (nurse interview) Hx", fill=cus_col[1]),
-      upset_query(set="cancer registry Hx", fill=cus_col[2]),
-      upset_query(set="death registry Hx", fill=cus_col[3]),
-      upset_query(set='"hospital inpatient records Hx"', fill=cus_col[4]),
-      upset_query(set="primary care Hx",fill=cus_col[5]),
-      upset_query(set="self reported (touchscreen) Hx",fill=cus_col[6])
+      ComplexUpset::upset_query(set="self reported (nurse interview) Hx", fill=cus_col[1]),
+      ComplexUpset::upset_query(set="cancer registry Hx", fill=cus_col[2]),
+      ComplexUpset::upset_query(set="death registry Hx", fill=cus_col[3]),
+      ComplexUpset::upset_query(set='"hospital inpatient records Hx"', fill=cus_col[4]),
+      ComplexUpset::upset_query(set="primary care Hx",fill=cus_col[5]),
+      ComplexUpset::upset_query(set="self reported (touchscreen) Hx",fill=cus_col[6])
     ),
     encode_sets=FALSE,  # for annotate() to select the set by name disable encoding
     set_sizes=(
-      upset_set_size()
+      ComplexUpset::upset_set_size()
       + ggplot2::geom_text(ggplot2::aes(label=..count..), hjust=1.1, stat='count',size=7.5)
       # you can also add annotations on top of bars:
       # + annotate(geom='text', label='@', x='Drama', y=850, color='white', size=3)
-      + ggplot2::expand_limits(y=nrow(case_status_by_classification))
+      + ggplot2::expand_limits(y=nrow(dt_status_by_source))
       + ggplot2::theme(axis.text.x=ggplot2::element_text(angle=90),text = ggplot2::element_text(size=18))
-    ),themes=upset_default_themes(text=ggplot2::element_text(size=18))
+    ),themes=ComplexUpset::upset_default_themes(text=ggplot2::element_text(size=18))
   )
   return(upset_plot)
 }
