@@ -44,7 +44,6 @@ description_to_name <-  function(Vct) {
 #' Used in parsing meta data file ukbxxxxx.html.
 #' @param Vct
 #' @return  imputed character vector
-
 ReplaceNAWithNearestNonNAOnTheLeft <- function(Vct) {
   N <- length(Vct)
   na.pos <- which(is.na(Vct))
@@ -145,6 +144,7 @@ read_ukb_metadata <- function(fhtml) {
     fread_column_type = col_type[as.character(df_meta$Type)]
 
   )
+  df_meta[which(df_meta$field.tab=="f.eid"),]$field.tab<-"identifier"
 
   tictoc::toc()
   return(df_meta)
