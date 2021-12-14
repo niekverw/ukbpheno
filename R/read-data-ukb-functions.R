@@ -199,7 +199,7 @@ read_ukb_tabdata <- function(fukb,
   # rename f.eid to identifier
   names(df)[names(df) == names(df)[grepl("eid", names(df))]]<-"identifier"
   #  change from integer to double; numeric sorting is ~150x faster than character sort
-  df$identifer<-as.numeric(df$identifier)
+  df$identifier<-as.numeric(df$identifier)
   tictoc::toc()
   return(df)
 }
