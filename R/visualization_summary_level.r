@@ -320,7 +320,7 @@ plot_disease_timeline_by_source <- function(definition,
   n_no_dt<-case_by_source$n_no_dt
 
 
-  color_vec <- rand_col_vec(length(unique(mindate$.id)))
+  color_vec <- rand_col_vec(length(unique(mindate$.id)),alpha=1,cust_seed = 477821469)
   # color_vec<-ggpubr::get_palette("rickandmorty",length(unique(mindate$.id)))
   plt_time <-
     ggplot2::ggplot(mindate, ggplot2::aes(
@@ -561,11 +561,12 @@ get_case_status_by_source <- function(definition,
   # exclude future events
   # otherwise the comparison between sources is not fair
   # ##########################################################################
+
   cases <-
     lst.case_control$df.casecontrol[lst.case_control$df.casecontrol$Any == 2, ]
   # only those ppl with only future events are excluded, because these ppl would be considered as control at the reference date
-  ppl_future_only <-
-    cases[cases$Fu != 2 & cases$Any == 2 & cases$Hx == 2, ]$identifier
+  # ppl_future_only <-
+    # cases[cases$Fu != 2 & cases$Any == 2 & cases$Hx == 2, ]$identifier
   if (nrow(definition) > 1) {
     # take first row for the message
     definition <- definition[1,]
@@ -616,12 +617,14 @@ get_case_status_by_source <- function(definition,
   }
   cases$Any[!cases$identifier %in% lst.case_control$all_event_dt.Include_in_cases$identifier] <-
     0
+  # remove these future cases
+  cases<-cases[cases$Any!=0]
+
   if(keep_any){
     cols <- c("Any", paste( names(all_sources),"Hx",sep=" "))
   }else{
     cols <- c(paste( names(all_sources),"Hx",sep=" "))
   }
-
   # to 1/0 for upset plot
   cases<-cases[ ,cols,with=FALSE]
   cases[cases!=2]<-0
