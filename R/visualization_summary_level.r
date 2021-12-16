@@ -534,7 +534,7 @@ dotplot_diseases_by_source<-function(definitions,
 get_case_status_by_source <- function(definition,
                                      lst.data,
                                      df.data.settings,
-                                     df.reference.dates = NULL,keep_any=FALSE) {
+                                     df.reference.dates = NULL,keep_any=FALSE,keep_id=FALSE) {
   if (nrow(definition) == 0) {
     message("No definition is provided.Stop.")
     return(0)
@@ -625,10 +625,18 @@ get_case_status_by_source <- function(definition,
   }else{
     cols <- c(paste( names(all_sources),"Hx",sep=" "))
   }
+  if(keep_id){
+    cols <- c("identifier",cols)
+  }
+
   # to 1/0 for upset plot
   cases<-cases[ ,cols,with=FALSE]
-  cases[cases!=2]<-0
-  cases[cases==2]<-1
+  #  to apply on (.SDcols) all columns except identifier, replace values in these columns non 2 to 0 and 2 to 1
+  cases[,(names(cases)[!names(cases) %in%("identifier")]) := replace(.SD, .SD != 2, 0), .SDcols =names(cases)[!names(cases) %in%("identifier")]]
+  cases[,(names(cases)[!names(cases) %in%("identifier")]) := replace(.SD, .SD == 2, 1), .SDcols =names(cases)[!names(cases) %in%("identifier")]]
+
+  # cases[cases[!=2]<-0
+  # cases[cases==2]<-1
   return(cases)
   # # alternatve to the block below
   # # df_prop<-cases[ ,cols,with=FALSE]%>% dplyr::summarise(across(where(is.numeric),sum))
