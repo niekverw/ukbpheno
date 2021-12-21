@@ -9,7 +9,8 @@ get_case_status_by_source(
   lst.data,
   df.data.settings,
   df.reference.dates = NULL,
-  keep_any = FALSE
+  keep_any = FALSE,
+  keep_id = FALSE
 )
 }
 \arguments{
