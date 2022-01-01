@@ -85,7 +85,7 @@ get_incidence_prevalence <- function(all_event_dt,
     results_cols<-c("identifier","count","sum.epidur","median.epidur","max.epidur", "survival_days", "Death_primary","Death_any" , "Hx_days", "Fu_days" ,"Hx" , "Fu","Ref" , "first_diagnosis_days", "reference_date","Any")
     all_event_dt.summary <- setNames(data.table(matrix(nrow = 0, ncol = 16)),results_cols )
     all_event_dt.summary[, (col_num) := lapply(.SD, as.numeric), .SDcols = col_num]
-    all_event_dt.summary[, (col_chr) := lapply(.SD, as.character), .SDcols = col_chr]
+    # all_event_dt.summary[, (col_chr) := lapply(.SD, as.character), .SDcols = col_chr]
     all_event_dt.summary[, (col_date) := lapply(.SD, as.Date), .SDcols = col_date]
     return(all_event_dt.summary)
   }
