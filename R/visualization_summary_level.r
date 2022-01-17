@@ -41,7 +41,7 @@ rand_col_vec <- function(vec_leng = 5,
 #' @examples
 #' all_event_dt <- get_all_events(dfDefinitions_processed_expanded[1,],lst.data,df.data.settings)
 #' get_stats_for_events(all_event_dt)
-get_stats_for_events <- function(all_event_dt) {
+get_stats_for_events <- function(all_event_dt,color_seed=117) {
   # show stats on codes
   stats.codes <-
     all_event_dt[, .(
@@ -56,17 +56,18 @@ get_stats_for_events <- function(all_event_dt) {
                                                                           n())
   stats.codes <- stats.codes %>% arrange(count)
   stats.codes$rank <- 1:nrow(stats.codes)
+
+  color_vec <- rand_col_vec(length(unique(stats.codes$classification)),alpha = 1,cust_seed = color_seed)
   p1 <-
     ggplot2::ggplot(stats.codes,
                     ggplot2::aes(rank, count, label = code, color = classification)) + ggplot2::geom_point() + ggplot2::ylim(-((max(
                       stats.codes$count
-                    )) / 3), NA)  + ggrepel::geom_text_repel(size = 3, segment.size = 0.5)
-
+                    )) / 3), NA)  + ggrepel::geom_text_repel(size = 3, segment.size = 0.5) + ggpubr::theme_classic2(base_size = 12) +  ggplot2::scale_color_manual(values = color_vec)
   p2 <-
     ggplot2::ggplot(stats.codes,
                     ggplot2::aes(rank, count, label = code, color = classification)) + ggplot2::scale_y_continuous(trans =
                                                                                                                      'log2') + ggplot2::geom_point()   + ggpubr::theme_classic2(base_size = 12) + ggrepel::geom_text_repel(size = 3, segment.size =
-                                                                                                                                                                                    0.5)
+                                                                                                                                                                                    0.5) +ggplot2::scale_color_manual(values = color_vec)
   stats.codes.summary.table <- stats.codes
   stats.codes.summary.p <-
     ggpubr::ggarrange(p1,
