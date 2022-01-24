@@ -350,11 +350,11 @@ read_gp_clinical_data <- function(fgp){
 
 
   #  parse versions
-  tte.gpclincal.read3 <-  dfgp %>% dplyr::filter(read_3 !="")  %>% dplyr::select(eid,event_dt,read_3,event)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = read_3,event=event)  %>% data.table::as.data.table()
-  tte.gpclincal.read2 <-  dfgp %>% dplyr::filter(read_2 !="")  %>% dplyr::select(eid,event_dt,read_2,event)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = read_2,event=event)  %>% data.table::as.data.table()
+  tte.gpclinical.read3 <-  dfgp %>% dplyr::filter(read_3 !="")  %>% dplyr::select(eid,event_dt,read_3,event)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = read_3,event=event)  %>% data.table::as.data.table()
+  tte.gpclinical.read2 <-  dfgp %>% dplyr::filter(read_2 !="")  %>% dplyr::select(eid,event_dt,read_2,event)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = read_2,event=event)  %>% data.table::as.data.table()
 
 
-  lst <- list(tte.gpclincal.read2=tte.gpclincal.read2,tte.gpclincal.read3=tte.gpclincal.read3)
+  lst <- list(tte.gpclinical.read2=tte.gpclinical.read2,tte.gpclinical.read3=tte.gpclinical.read3)
   lst <- lapply(lst,function(x) {data.table::setkey(x,code) })
   lst <- lapply(lst,function(x) {x[, ('identifier') := lapply(.SD, as.numeric), .SDcols = 'identifier'] })
 
@@ -362,7 +362,7 @@ read_gp_clinical_data <- function(fgp){
   # ##instance filter
   # message(glue::glue("Retain only records which occur {min_instance} times."))
   # lst <- lapply(lst,function(x){x[, if(.N>min_instance) .SD, by = c('f.eid','code')]})
-  # message(glue::glue("#indvidual remain {length(unique(c(lst$tte.gpclincal.read2$f.eid,lst$tte.gpclincal.read3$f.eid)))}"))
+  # message(glue::glue("#indvidual remain {length(unique(c(lst$tte.gpclinical.read2$f.eid,lst$tte.gpclinical.read3$f.eid)))}"))
   # #############################################################################################
   #
   # #with more thoughts, I am not sure what to do with the window now?
