@@ -4,7 +4,7 @@
 \alias{get_stats_for_events}
 \title{Summary statistics of events for single phenotype}
 \usage{
-get_stats_for_events(all_event_dt)
+get_stats_for_events(all_event_dt, color_seed = 117)
 }
 \arguments{
 \item{all_event_dt}{data table containing all events}
