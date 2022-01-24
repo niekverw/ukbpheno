@@ -43,7 +43,6 @@ get_incidence_prevalence <- function(all_event_dt,
 
   # reference_date <- reference_date[!is.na(reference_date)]
   # change class of the column to date
-
   # scenario 1: df_reference_date is not NULL
   if(!is.null(df_reference_date)){
     # 1.1 not NULL but empty -> same treatment as of NULL
@@ -56,9 +55,10 @@ get_incidence_prevalence <- function(all_event_dt,
     # referencedate$identifier <- names(reference_date)
     names(df_reference_date)<-c("identifier","reference_date")
     df_reference_date$reference_date<- as.Date(df_reference_date$reference)
-    df_reference_date<-df_reference_date[!is.na(df_reference_date$reference_date)]
+    # comment this line out to allow everyone to have no reference date
+    # df_reference_date<-df_reference_date[!is.na(df_reference_date$reference_date)]
     if(verbose){
-      message(glue::glue("Non missing reference_date: {nrow(df_reference_date)}"))
+      message(glue::glue("Number of individuals in df_reference_date: {nrow(df_reference_date)}"))
     }
     }
     #scenario 2: df_reference_date is NULL
@@ -66,6 +66,8 @@ get_incidence_prevalence <- function(all_event_dt,
     # message("no reference_date given, taking the first available event as reference")
     df_reference_date <- suppressWarnings(all_event_dt[,.(reference_date= min(eventdate,na.rm = T)),by=identifier])
   }
+
+
   if(include_secondary_recurrence){
     sources_recurrence_events <- df.data.settings$datasource
   } else {
@@ -98,7 +100,7 @@ get_incidence_prevalence <- function(all_event_dt,
   # df <- df %>% filter(!is.na(reference_date)) # comment out if missing identifiers is fixed.
   df$days <- df$eventdate - df$reference_date
 
-  data.table::setkey(df,days) # i don't know why, but setkey was alreaday on identifier and cannot refresh..
+  data.table::setkey(df,days) # i don't know why, but setkey was already on identifier and cannot refresh..
   data.table::setkey(df,identifier)
 
 
@@ -360,24 +362,23 @@ get_cases_controls <-function(definitions,
     if(verbose){
     message(glue::glue("...No reference date information provided, take first event date as reference date"))
     }
-
-    all_event_dt.population <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,df.data.settings,verbose = FALSE)
+    all_event_dt.first_occur <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,df.data.settings,verbose = FALSE)
     # only keep date with real event
-    all_event_dt.population[all_event_dt.population$event==0,]$eventdate <-NA
+    all_event_dt.first_occur[all_event_dt.first_occur$event==0,]$eventdate <-NA
     # get everyone , take the date of relevant events respectively
-    all_event_dt.population.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.population,df.data.settings,df_reference_date = NULL,window_fu_days_mask = 15,verbose = verbose)
-
+    all_event_dt.first_occur.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.first_occur,df.data.settings,df_reference_date = NULL,window_fu_days_mask = 15,verbose = verbose)
     #  merge, NA for those without an event
-    df_reference_date<-merge(df_reference_date,all_event_dt.population.summary[, c("identifier","reference_date")],by="identifier",all.x=TRUE)
+    df_reference_date<-merge(df_reference_date,all_event_dt.first_occur.summary[, c("identifier","reference_date")],by="identifier",all.x=TRUE)
     #  should be already be in Date format but just to be sure
     df_reference_date$reference_date<-as.Date(as.character(df_reference_date$reference_date),format="%Y-%m-%d")
     # message(glue::glue("Population: {length(unique(df_reference_date$identifier))} individuals "))
-
    }
+  # until here a df_reference_date with identifier and reference dates is prepared
+  # now to the definitions
+
 
   # define population
   all_event_dt.population <- get_all_events(definitions %>% dplyr::filter(Definitions =="Study_population"),lst.data,df.data.settings,verbose = FALSE)
-
     # scenario 3: if there is study population stated in the definition, df_reference_date is replaced
     if(! is.null(all_event_dt.population)) {
     # Study population field of the definition is not empty , derive the df_reference_date from the study population trait
@@ -388,17 +389,15 @@ get_cases_controls <-function(definitions,
     all_event_dt.population[all_event_dt.population$event==0,]$eventdate <-NA
     # get everyone , take the date of relevant events respectively
     all_event_dt.population.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.population,df.data.settings,df_reference_date = NULL,window_fu_days_mask = 15,verbose = verbose)
-
-
     # update the dates in the original df_reference_date
     # reference_date = setNames(as.Date(as.character(all_event_dt.population.summary$reference_date),format="%Y-%m-%d"),all_event_dt.population.summary$identifier)
     # df_reference_date <- all_event_dt.population.summary[, c("identifier","reference_date")]
     ###############################################
     ###############################################
-    df_reference_date<-merge(df_reference_date[,c("identifier")],all_event_dt.population.summary[, c("identifier","reference_date")],by="identifier",all.x=TRUE)
+    df_reference_date<-merge(df_reference_date[,c("identifier")],all_event_dt.population.summary[, c("identifier","reference_date")],by="identifier",all.y=TRUE)
     df_reference_date$reference_date<-as.Date(as.character(df_reference_date$reference_date),format="%Y-%m-%d")
-    if(verbose){
 
+    if(verbose){
       message(glue::glue("Population: {length(unique(df_reference_date$identifier))} individuals "))
       }
 
@@ -411,6 +410,7 @@ get_cases_controls <-function(definitions,
 
   # define cases
   cases <- get_cases(definitions,lst.data,df.data.settings,df_reference_date,window_ref_days_include=0,window_fu_days_mask=0,verbose=verbose)
+
   all_event_dt.Include_in_cases.summary <- cases$all_event_dt.Include_in_cases.summary
   all_event_dt.Include_in_cases <- cases$all_event_dt.Include_in_cases
   # define exclude controls
@@ -434,8 +434,9 @@ get_cases_controls <-function(definitions,
   # TODO differentiate actual case without eventdate from non-case (excluded) due to the instance filter
   # this currently include everyone back == instance filter not working!!!!!!!!!
   non_proper_case<-dplyr::setdiff(all_event_dt.Include_in_cases[all_event_dt.Include_in_cases$event==0,]$identifier,w_dt)
-
-
+  # restrict to only those included in df_reference_date,
+  # because get_all_events() get all events in the the whole data
+  non_proper_case<-dplyr::intersect(non_proper_case,df_reference_date$identifier)
   # merge it with the cases
   df.casecontrol <- merge(df.casecontrol,all_event_dt.Include_in_cases.summary,by=c("identifier","reference_date"),all=T)
 
@@ -498,60 +499,3 @@ get_cases_controls <-function(definitions,
 
 
 
-
-#' Get survival data
-#'
-#' Given a phenotype and a list of episode data , compute the survival time after first diagnoisis in cases only
-#' @param def phenotype/trait specified in definition table (a row in the table)
-#' @param lst.data list of data table with all episode data
-#' @param df.data.settings data frame containing data settings
-#' @param window_days_mask number of days that future events should not be counted since first diagnosis.Relevant when the death record is the only record i.e. t=0
-
-#' @return  a data table summarizing time to event information for these individuals.
-#' @keywords time-to-event
-#' @export
-#' @examples
-#' get_survival_data(dfDefinitions_processed_expanded[14,],lst.data,df.data.settings)
-get_survival_data<-function(def,lst.data,
-                             df.data.settings,
-                             include_secondary_recurrence=FALSE,
-                             window_days_mask=0){
-  # subset lst.data to get only death records
-  # lst.data.death<-lst.data[grep("death", names(lst.data))]
-
-  lst.data.death<-lst.data[df.data.settings[match(names(lst.data),df.data.settings$datasource),]$death]
-  death_event_dt<-get_all_events(def,lst.data.death,df.data.settings)
-
-  # check consistency in the records w.r.t date
-  discrepant_deaths<-death_event_dt%>%  dplyr::group_by(identifier) %>% dplyr::summarize(max_date = max(eventdate, na.rm = TRUE),min_date = min(eventdate),same_date=(max_date==min_date))%>% dplyr::filter(!same_date)
-
-  if (nrow(discrepant_deaths)>0){
-    message(glue::glue("Number of individuals have inconsistent death dates: {nrow(discrepant_deaths))}"))
-    print(discrepant_deaths)
-
-    # drop these individuals?
-    lst.data.death$tte.death.icd10.primary<-lst.data.death$tte.death.icd10.primary[! lst.data.death$tte.death.icd10.primary$identifier %in% discrepant_deaths$identifier,]
-    lst.data.death$tte.death.icd10.secondary<-lst.data.death$tte.death.icd10.secondary[! lst.data.death$tte.death.icd10.secondary$identifier %in% discrepant_deaths$identifier,]
-  }
-
-  # reference date is the first event date excluding the death records
-  # SHOULD one take everything instead because that does reflect a survival event t=0 day....?
-  # lst.data_nondeath<-lst.data[!df.data.settings[match(names(lst.data),df.data.settings$datasource),]$death]
-  # all_evt_dt <- get_all_events(def,lst.data_nondeath,df.data.settings)
-  #
-  all_evt_dt <- get_all_events(def,lst.data,df.data.settings)
-
-  df_referencedate <- suppressWarnings(all_evt_dt[,.(reference_date= min(eventdate,na.rm = T)),by=identifier])
-
-  death_event_dt.summary<-get_incidence_prevalence(death_event_dt,df.data.settings,df_reference_date=df_referencedate[,c('identifier','reference_date')], include_secondary_recurrence,0, window_days_mask)
-  # fu_days_mask masks FU event but not day==0 which is considered as Hx so apply the mask on the df
-
-  # make the table cleaner
-  death_event_dt.summary<-death_event_dt.summary %>% dplyr::select(identifier,first_diagnosis_days,reference_date,Any )
-  names(death_event_dt.summary) <-  c("identifier",	"days_after_diagnosis",	"reference_date",	"Any")
-
-  death_event_dt.summary[death_event_dt.summary$days_after_diagnosis<window_days_mask ,"days_after_diagnosis"] <- NA
-
-  return(death_event_dt.summary)
-
-}
