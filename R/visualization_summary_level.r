@@ -706,12 +706,12 @@ make_upsetplot <- function(definition,lst.data,
     encode_sets=FALSE,  # for annotate() to select the set by name disable encoding
     set_sizes=(
       ComplexUpset::upset_set_size()
-      + ggplot2::geom_text(ggplot2::aes(label=..count..), hjust=1.1, stat='count',size=7.5)
+      + ggplot2::geom_text(ggplot2::aes(label=..count..), hjust=1.1, stat='count',size=5.5)
       # you can also add annotations on top of bars:
       # + annotate(geom='text', label='@', x='Drama', y=850, color='white', size=3)
       + ggplot2::expand_limits(y=nrow(dt_status_by_source))
-      + ggplot2::theme(axis.text.x=ggplot2::element_text(angle=90),text = ggplot2::element_text(size=18))
-    ),themes=ComplexUpset::upset_default_themes(text=ggplot2::element_text(size=18))
+      + ggplot2::theme(axis.text.x=ggplot2::element_text(angle=90),text = ggplot2::element_text(size=14))
+    ),themes=ComplexUpset::upset_default_themes(text=ggplot2::element_text(size=14))
   )
   return(upset_plot)
 }
