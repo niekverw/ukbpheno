@@ -174,9 +174,11 @@ lst.RxDmIns.case_control<-get_cases_controls(definitions=dfDefinitions_processed
 # individuals of young onset diabetes
 ind_young_onset<- union(lst.SrDmYSaCa.case_control$all_event_dt.Include_in_cases$identifier,lst.SrDmYEw.case_control$all_event_dt.Include_in_cases$identifier)
 # individuals with evidence of other types of diabetes reported
-ind_RxIns_DmT1_DmG<- union(union(lst.DmT1.case_control$all_event_dt.Include_in_cases$identifier,lst.SrDmYEw.case_control$all_event_dt.Include_in_cases$identifier),lst.DmG.case_control$all_event_dt.Include_in_cases$identifier)
+ind_RxInsFirstYear_DmT1_DmG<- union(union(lst.RxDmInsFirstYear.case_control,lst.DmT1.case_control$all_event_dt.Include_in_cases$identifier),lst.DmG.case_control$all_event_dt.Include_in_cases$identifier)
 
-inds_young_onset_probable_DmT2 <-setdiff(ind_young_onset,ind_RxIns_DmT1_DmG)
+inds_young_onset_probable_DmT2 <-setdiff(ind_young_onset,ind_RxInsFirstYear_DmT1_DmG)
+
+
 # remove individuals who are on the metformin but likely NOT diabetes
 inds_young_onset_probable_DmT2 <-setdiff(inds_young_onset_probable_DmT2,RxMet_DmUnlikely)
 
