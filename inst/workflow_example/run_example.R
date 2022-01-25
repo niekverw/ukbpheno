@@ -25,9 +25,7 @@ fdeath_cause_portal=paste(pheno_dir,"death_cause.txt",sep="")
 # load the example definition table and data setting included in the package
 #############################################################################
 data_dir<-paste(repo_dir,"inst/extdata/",sep="")
-fdefinitions = paste(data_dir,"definitions_CadDcmHcmAfHf_CTV_READ2.tsv",sep="")
-fdefinitions = paste(data_dir,"definitions_v3.1.tsv",sep="")
-
+fdefinitions = paste(data_dir,"definitions_DmRxT2.csv",sep="")
 fdata_setting = paste(data_dir,"data.settings.tsv",sep="")
 
 # ##########################################
@@ -188,11 +186,37 @@ lst.DmRxT2.case_control$all_event_dt.Include_in_cases[identifier %in% setdiff(in
 
 
 
-get_stats_for_events(lst.DmT2.case_control$all_event_dt.Include_in_cases)
+####################################
+# generate phenotypes in batch
+####################################
+
+fdefinitions = paste(data_dir,"definitions_cardiometabolic_traits.tsv",sep="")
+
+diseases<-c("Af","Cad","DmRxT2","Hcm","Hf","HtRx","HyperLipRx")
 
 
+out_folder<-paste0(pheno_dir,"output/")
 
 
+if(!dir.exists(file.path(out_folder))){
+ dir.create(file.path(out_folder))
+}
+
+for (disease in c(diseases)){
+  print(disease)
+  lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==disease), lst.harmonized.data$lst.data,dfData.settings, df_reference_date=df_reference_dt_v0)
+
+ # keep a subset of columns depending on downstream analysis
+   lst.case_control$df.casecontrol<-lst.case_control$df.casecontrol[,c("identifier","survival_days","Death_primary",  "Death_any", "Hx_days","Fu_days","Hx","Fu","Any")]
+  # rename col names
+  colnames(lst.case_control$df.casecontrol) <- paste(disease,colnames(lst.case_control$df.casecontrol),  sep = "_")
+  names(lst.case_control$df.casecontrol)[names(lst.case_control$df.casecontrol) == paste(disease,"identifier",  sep = "_")]<-"identifier"
+
+  # write to file
+
+  data.table::fwrite(x=lst.case_control$df.casecontrol,file=paste0(out_folder,paste(disease,"basesline","tsv",sep=".")),sep="\t",showProgress=TRUE)
+
+}
 
 
 
