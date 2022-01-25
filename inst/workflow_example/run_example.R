@@ -82,7 +82,6 @@ lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,dfDefi
 #####################################
 # read withdrawal list and remove them from the data
 ####################################
-# f_particip_withdraw<-'/mnt/THORAX_SHARE/7.UKBiobank/DataDownloads/74395/2021_06_22-47316/w74395_20210809.csv'
 
 
 f_particip_withdraw<-paste(pheno_dir,"w12345_20210809.csv",sep="")
@@ -187,8 +186,7 @@ lst.DmRxT2.case_control$all_event_dt.Include_in_cases[identifier %in% setdiff(in
 
 
 
-
-
+get_stats_for_events(lst.DmT2.case_control$all_event_dt.Include_in_cases)
 
 
 
