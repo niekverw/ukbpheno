@@ -450,9 +450,8 @@ dotplot_diseases_by_source<-function(definitions,
     return(0)
   }
   vct_pheno_lab<-definitions[definitions$Definitions=="Include_in_cases",]$DESCRIPTION
-  vct_pheno<-definitions[definitions$Definitions=="Include_in_cases",]$TRAIT
+  vct_pheno<-unique(definitions[definitions$Definitions=="Include_in_cases",]$TRAIT)
 
-  definitions<-dfDefinitions_processed_expanded[dfDefinitions_processed_expanded$TRAIT %in% c('Cad','DmRxT2','HtRx'),]
   vct.identifiers<-lst.harmonized.data$vct.identifiers
   lst.data=lst.harmonized.data$lst.data
   df.data.settings=dfData.settings
