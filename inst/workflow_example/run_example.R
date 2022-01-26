@@ -218,6 +218,10 @@ for (disease in c(diseases)){
 
 }
 
-
-
-
+# cardio_metabolic_def<-dfDefinitions_processed_expanded[dfDefinitions_processed_expanded$TRAIT %in% diseases,]
+# dotplot<-dotplot_diseases_by_source(cardio_metabolic_def,
+#                                      lst.data=lst.harmonized.data$lst.data,
+#                                      df.data.settings=dfData.settings,
+#                                      vct.identifiers = NULL,standardize=TRUE)
+#
+# dotplot
