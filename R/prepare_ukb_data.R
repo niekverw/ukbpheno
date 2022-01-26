@@ -49,7 +49,7 @@ read_defnition_table <-function(f.definition,f.data.setting,dir.code.map){
 #' @examples
 #' lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,f.gp_clinical = fgp_clinical,f.gp_scripts = fgp_scripts,f.hesin = fhesin,f.hesin_diag = fhesin_diag,f.hesin_oper =fhesin_oper,f.death_portal = fdeath_portal,f.death_cause_portal = fdeath_cause_portal )
 #' summary(lst.harmonized.data)
-harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.hesin=NULL,f.hesin_diag=NULL,f.hesin_oper=NULL,f.death_portal=NULL,f.death_cause_portal=NULL,f.gp_clinical=NULL,f.gp_scripts=NULL,...){
+harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.hesin=NULL,f.hesin_diag=NULL,f.hesin_oper=NULL,f.death_portal=NULL,f.death_cause_portal=NULL,f.gp_clinical=NULL,f.gp_scripts=NULL,forced=FALSE,...){
   message("Start data harmonization")
 
   if (!(is.null(f.html)&is.null(f.ukbtab))){
@@ -74,9 +74,17 @@ harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.he
     message("Verify all required fields from the definitions are present in the main dataset (.tab)")
     dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions,dfhtml)
     # get_allvarnames() returns null if a field is missing
-    if (is.null(dfDefinitions_ukb_fields)){
-      message("Please ensure all required fields are present in the main dataset, abort!")
-      return()
+    if (is.null(dfDefinitions_ukb_fields) ){
+      if (forced==FALSE){
+        message("Please ensure all required fields are present in the main dataset, abort!")
+        return()
+      }else{
+        message("Some required field is missing, extract only default fields from the main dataset")
+        tictoc::tic("time elapsed processing .tab file")
+        # extract default columns from the .tab file
+        dfukb <- read_ukb_tabdata(f.ukbtab,dfhtml)
+        tictoc::toc()
+      }
     }else{
       message("Read .tab file and retrieve required fields.")
       tictoc::tic()
