@@ -10,8 +10,8 @@
 #' @examples
 #' dfDefinitions_processed_expanded<-read_defnition_table(fdefinitions,fdata_setting,dir.code.map=paste0(repo_dir,"inst/extdata/"))
 read_defnition_table <-function(f.definition,f.data.setting,dir.code.map){
-  dfData.settings <-fread(f.data.setting)
-  dfDefinitions <- fread(fdefinitions, colClasses = 'character', data.table = FALSE)
+  dfData.settings <-data.table::fread(f.data.setting)
+  dfDefinitions <- data.table::fread(fdefinitions, colClasses = 'character', data.table = FALSE)
   dfDefinitions_processed <- ProcessDfDefinitions(dfDefinitions)
   # Next we check the codes in the definition table against the code maps
   # The code maps are either downloaded from UK biobank showcase (codingxx.tsv) [search corresponding Data-Coding in showcase] for which has been checked to include all codes present in data # or to be created from the current data at hand (.code)
@@ -49,7 +49,7 @@ read_defnition_table <-function(f.definition,f.data.setting,dir.code.map){
 #' @examples
 #' lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,f.gp_clinical = fgp_clinical,f.gp_scripts = fgp_scripts,f.hesin = fhesin,f.hesin_diag = fhesin_diag,f.hesin_oper =fhesin_oper,f.death_portal = fdeath_portal,f.death_cause_portal = fdeath_cause_portal )
 #' summary(lst.harmonized.data)
-harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.hesin=NULL,f.hesin_diag=NULL,f.hesin_oper=NULL,f.death_portal=NULL,f.death_cause_portal=NULL,f.gp_clinical=NULL,f.gp_scripts=NULL,forced=FALSE,...){
+harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.hesin=NULL,f.hesin_diag=NULL,f.hesin_oper=NULL,f.death_portal=NULL,f.death_cause_portal=NULL,f.gp_clinical=NULL,f.gp_scripts=NULL,allow_missing_fields=TRUE,...){
   message("Start data harmonization")
 
   if (!(is.null(f.html)&is.null(f.ukbtab))){
@@ -71,27 +71,20 @@ harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.he
     # use case 2 : with definition table,  extract only relevant fields needed
     # we then use this meta-data to check if all fields we need are inside the .tab file
     # the function outputs a list of fields that are required
-    message("Verify all required fields from the definitions are present in the main dataset (.tab)")
-    dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions,dfhtml)
+    message("Verify if all required fields from the definitions are present in the main dataset (.tab)")
+    dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions,dfhtml,allow_miss = allow_missing_fields)
     # get_allvarnames() returns null if a field is missing
     if (is.null(dfDefinitions_ukb_fields) ){
-      if (forced==FALSE){
         message("Please ensure all required fields are present in the main dataset, abort!")
         return()
-      }else{
-        message("Some required field is missing, extract only default fields from the main dataset")
-        tictoc::tic("time elapsed processing .tab file")
-        # extract default columns from the .tab file
-        dfukb <- read_ukb_tabdata(f.ukbtab,dfhtml)
-        tictoc::toc()
       }
-    }else{
+
       message("Read .tab file and retrieve required fields.")
       tictoc::tic()
       # Next is to extract those columns required from the .tab file
       dfukb <- read_ukb_tabdata(f.ukbtab,dfhtml,fields_to_keep = dfDefinitions_ukb_fields$all_ukb_fields)
       tictoc::toc()
-    }
+
   }
   # vector of eid needed for subsequent function
   vct.identifiers <- as.numeric(dfukb$identifier)
