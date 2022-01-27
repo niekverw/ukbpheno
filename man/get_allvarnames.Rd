@@ -4,7 +4,7 @@
 \alias{get_allvarnames}
 \title{Retrieve the required data fields in the ukb dataset \emph{ukbxxxxx.tab} as stated in the definition table}
 \usage{
-get_allvarnames(dfDefinitions_processed, dfhtml = NULL)
+get_allvarnames(dfDefinitions_processed, dfhtml = NULL, allow_miss = TRUE)
 }
 \arguments{
 \item{dfDefinitions_processed}{definition table as dataframe}

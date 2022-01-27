@@ -9,7 +9,8 @@ plot_individual_timeline(
   ind_all_event_dt = NULL,
   lst.data = NULL,
   ind_identifier = 1234567,
-  plot_medication = FALSE
+  plot_medication = FALSE,
+  font_size = 5
 )
 }
 \arguments{

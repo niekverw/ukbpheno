@@ -15,6 +15,7 @@ harmonize_ukb_data(
   f.death_cause_portal = NULL,
   f.gp_clinical = NULL,
   f.gp_scripts = NULL,
+  allow_missing_fields = TRUE,
   ...
 )
 }
