@@ -18,7 +18,7 @@
 #' lst.data.identifier<-lapply(lst.data,function(x) {x[, ("identifier") := lapply(.SD, as.numeric), .SDcols = "identifier"] })  set eid to numeric
 #' lst.data.identifier<-lapply(lst.data,function(x) {setkey(x,identifier) }) # double check that everything has the same setkey.
 #' plot_individual_timeline(df.data.settings,NULL,lst.data.identifier,ind_identifier="1234567")
-plot_individual_timeline <- function(df.data.settings,ind_all_event_dt=NULL,lst.data=NULL,ind_identifier=1234567,plot_medication=FALSE) {
+plot_individual_timeline <- function(df.data.settings,ind_all_event_dt=NULL,lst.data=NULL,ind_identifier=1234567,plot_medication=FALSE,font_size=5) {
   # credit:  https://benalexkeen.com/creating-a-timeline-graphic-using-r-and-ggplot2/
   # input: a collapsed datatable with ind_all_event_dt for one participant, e.g. for disease codes.
   # alternative input: lst.data and identifier, so that it generates the ind_all_event_dt based on all available data.
@@ -92,7 +92,7 @@ plot_individual_timeline <- function(df.data.settings,ind_all_event_dt=NULL,lst.
 
   classification_levels <- unique(df$classification)
   # blue green yellow red   max allow 14 classification
-  classification_colors <- c("#0070C0", "#00B050", "#FFC000", "#C00000","grey","purple","pink","black","peru","darkblue","cyan4","seagreen","slateblue1","orangered1")
+  classification_colors <- c("#0070C0", "#00B050", "#FFB200", "#C00000","#7393B3","purple","pink","black","peru","darkblue","cyan4","seagreen","slateblue1","orangered1")
   df$classification <- factor(df$classification, levels=classification_levels, ordered=TRUE)
 
   positions <- c(0.5, -0.5, 1.0, -1.0, 1.5, -1.5)
@@ -133,15 +133,16 @@ plot_individual_timeline <- function(df.data.settings,ind_all_event_dt=NULL,lst.
 
   #### PLOT ####
 
-  timeline_plot<-ggplot2::ggplot(df,ggplot2::aes(x=date,y=0, col=classification, label=code))
-  timeline_plot<-timeline_plot+ggplot2::labs(col="Classifications")
+  timeline_plot<-ggplot2::ggplot(df,ggplot2::aes(x=date,y=0, col=classification, label=code,size=font_size))
+  timeline_plot<-timeline_plot+ggplot2::labs(col="Classifications",size=font_size)
 
   timeline_plot<-timeline_plot+ggplot2::scale_color_manual(values=classification_colors[1:length(classification_levels)], labels=classification_levels, drop = FALSE)
-  timeline_plot<-timeline_plot+ggplot2::theme_classic()
+  timeline_plot<-timeline_plot+ggplot2::theme_classic()+ggplot2::theme(legend.title=ggplot2::element_text(size=font_size*3),
+                                                             legend.text=ggplot2::element_text(size=font_size*3))
 
     # Plot horizontal black line for timeline
   timeline_plot<-timeline_plot+ggplot2::geom_hline(yintercept=0,
-                                          color = "black", size=0.3)
+                                          color = "black", size=0.4)
 
   # Plot vertical segment lines for codes
   timeline_plot<-timeline_plot+ggplot2::geom_segment(data=df[df$month_count == 1,], ggplot2::aes(y=position,yend=0,xend=date), color='black', size=0.2)
@@ -164,9 +165,9 @@ plot_individual_timeline <- function(df.data.settings,ind_all_event_dt=NULL,lst.
   # Show text for each month
   #timeline_plot<-timeline_plot+geom_text(data=month_df, aes(x=month_date_range,y=-0.1,label=month_format),size=2.5,vjust=0.5, color='black', angle=90)
   # Show year text
-  timeline_plot<-timeline_plot+ggplot2::geom_text(data=year_df, ggplot2::aes(x=year_date_range,y=-0.2,label=year_format, fontface="bold"),size=2.5, color='black',angle=90)
+  timeline_plot<-timeline_plot+ggplot2::geom_text(data=year_df, ggplot2::aes(x=year_date_range,y=-0.2,label=year_format, fontface="bold"),size=font_size, color='black',angle=90)
   # Show text for each code
-  timeline_plot<-timeline_plot+ggplot2::geom_text(ggplot2::aes(y=text_position,label=code),size=2.5)
+  timeline_plot<-timeline_plot+ggplot2::geom_text(ggplot2::aes(y=text_position,label=code),size=font_size)
   print(timeline_plot)
   return(timeline_plot)
 }
