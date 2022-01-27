@@ -62,11 +62,11 @@ get_stats_for_events <- function(all_event_dt,color_seed=117) {
     ggplot2::ggplot(stats.codes,
                     ggplot2::aes(rank, count, label = code, color = classification)) + ggplot2::geom_point() + ggplot2::ylim(-((max(
                       stats.codes$count
-                    )) / 3), NA)  + ggrepel::geom_text_repel(size = 3, segment.size = 0.5) + ggpubr::theme_classic2(base_size = 12) +  ggplot2::scale_color_manual(values = color_vec)
+                    )) / 3), NA)  + ggrepel::geom_text_repel(size =4.5, segment.size = 0.5) + ggpubr::theme_classic2(base_size = 16) +  ggplot2::scale_color_manual(values = color_vec)
   p2 <-
     ggplot2::ggplot(stats.codes,
                     ggplot2::aes(rank, count, label = code, color = classification)) + ggplot2::scale_y_continuous(trans =
-                                                                                                                     'log2') + ggplot2::geom_point()   + ggpubr::theme_classic2(base_size = 12) + ggrepel::geom_text_repel(size = 3, segment.size =
+                                                                                                                     'log2') + ggplot2::geom_point()   + ggpubr::theme_classic2(base_size = 16) + ggrepel::geom_text_repel(size = 4.5, segment.size =
                                                                                                                                                                                     0.5) +ggplot2::scale_color_manual(values = color_vec)
   stats.codes.summary.table <- stats.codes
   stats.codes.summary.p <-
@@ -184,7 +184,7 @@ get_stats_for_events <- function(all_event_dt,color_seed=117) {
                     ggplot2::aes(x = Code_occur , y = Code_presence, fill = `%`)) +
     ggplot2::geom_tile() +
     ggplot2::scale_fill_distiller(palette = "RdYlBu", na.value = "grey85") +
-    ggpubr::theme_classic2(base_size = 12) +
+    ggpubr::theme_classic2(base_size = 16) +
     ggplot2::labs(
       x = "Code of co-occurence",
       y = "Code present",
@@ -351,7 +351,7 @@ plot_disease_timeline_by_source <- function(definition,
       x = as.Date(mean.Date(c(
         dt_v0_min, dt_v0_max
       ))),
-      y = max(dt_data_end$cumcnt) * 1.12,
+      y = max(dt_data_end$cumcnt) * 1.15,
       label = "Baseline visits",
       color = "#213745"
     ) +
@@ -370,8 +370,8 @@ plot_disease_timeline_by_source <- function(definition,
       x = as.Date(mean.Date(c(
         dt_v1_min, dt_v1_max
       ))),
-      y = max(dt_data_end$cumcnt) * 1.07,
-      label = "1st return",
+      y = max(dt_data_end$cumcnt) * 1.09,
+      label = "1st repeat",
       color = "#7d300d"
     ) +
     # # annotation window v0
@@ -389,8 +389,8 @@ plot_disease_timeline_by_source <- function(definition,
       x = as.Date(mean.Date(c(
         dt_v2_min, dt_v2_max
       ))),
-      y = max(dt_data_end$cumcnt) * 1.1,
-      label = "Imaging visits",
+      y = max(dt_data_end$cumcnt) * 1.12,
+      label = "Imaging visit",
       color = "#2d0b66"
     ) +
     # # annotation window v0
@@ -405,23 +405,23 @@ plot_disease_timeline_by_source <- function(definition,
     ) +
     ggplot2::annotate(
       geom = "text",
-      x = dt_v3_min,
-      y = max(dt_data_end$cumcnt) * 1.05,
-      label = "1st return imaging",
+      x = dt_v3_min-25,
+      y = max(dt_data_end$cumcnt) * 1.06,
+      label = "1st repeat imaging",
       color = "#777d0d"
     ) +
     # # TODO warn missing
     # ppl_miss<-paste0(n_no_dt, " cases without date of diagnosis not plotted")
-    ggplot2::labs(caption=paste0(n_no_dt, " cases without date of diagnosis not plotted")) +
+    ggplot2::labs(caption=paste0(n_no_dt, " cases without date of diagnosis not plotted"),size=16) +
     # # log2 scale not nice
     # scale_y_continuous(trans='log10')+
-    ggpubr::theme_classic2(base_size = 12) +
+    ggpubr::theme_classic2(base_size = 18) +
     ggrepel::geom_text_repel(ggplot2::aes(label = cumcnt),
       data = dt_data_end,
       fontface = "plain",
       nudge_y = max(dt_data_end$cumcnt) / 50 ,
-      size = 4
-    )
+      size = 5
+    )+ggplot2::theme(legend.text=ggplot2::element_text(size=ggplot2::rel(1)))
 
   # +ggplot2::geom_rect(aes(xmin=dt_v0_max, xmax=dt_v0_max, ymin=0, ymax=Inf),  alpha = .2,fill="#BDC7FA")
 
@@ -593,7 +593,7 @@ get_case_status_by_source <- function(definition,
   `cancer registry`<-c("tte.cancer.icd10", "tte.cancer.icd9")
   `death registry`<-c("tte.death.icd10.primary" ,"tte.death.icd10.secondary")
   `hospital inpatient records` <-c("tte.hesin.oper3.primary" ,"tte.hesin.oper3.secondary","tte.hesin.oper4.primary","tte.hesin.oper4.secondary", "tte.hesin.icd10.primary","tte.hesin.icd10.secondary","tte.hesin.icd9.primary","tte.hesin.icd9.secondary")
-  `primary care` <-c("tte.gpclincal.read2","tte.gpclincal.read3","tte.gpscript.dmd.england","tte.gpscript.bnf.england","tte.gpscript.bnf.scotland","tte.gpscript.read2.wales")
+  `primary care` <-c("tte.gpclinical.read2","tte.gpclinical.read3","tte.gpscript.dmd.england","tte.gpscript.bnf.england","tte.gpscript.bnf.scotland","tte.gpscript.read2.wales")
   `self reported (touchscreen)` <-c("ts")
   all_sources<-list(`self reported (nurse interview)`=`self reported (nurse interview)`,`cancer registry`=`cancer registry`,`death registry`=`death registry`,`hospital inpatient records`=`hospital inpatient records`,`primary care`=`primary care`,`self reported (touchscreen)`=`self reported (touchscreen)`)
   # create new columns for each source
@@ -683,7 +683,7 @@ make_upsetplot <- function(definition,lst.data,
   upset_plot<-ComplexUpset::upset(
     dt_status_by_source, c("self reported (nurse interview) Hx","cancer registry Hx","death registry Hx","hospital inpatient records Hx","primary care Hx","self reported (touchscreen) Hx"),min_size=0, base_annotations=list(
       'Intersection size'=ComplexUpset::intersection_size(
-        text_colors=c(on_background='#000066', on_bar='#ffc75f'),text=list(size=7.5),fill="#333333"
+        text_colors=c(on_background='#000066', on_bar='#FF8C00'),text=list(size=6.5),fill="#333333"
       )
       # + ggplot2::annotate(
       #   geom='text', x=Inf, y=Inf,
@@ -705,12 +705,12 @@ make_upsetplot <- function(definition,lst.data,
     encode_sets=FALSE,  # for annotate() to select the set by name disable encoding
     set_sizes=(
       ComplexUpset::upset_set_size()
-      + ggplot2::geom_text(ggplot2::aes(label=..count..), hjust=1.1, stat='count',size=5.5)
+      + ggplot2::geom_text(ggplot2::aes(label=..count..), hjust="inward", stat='count',size=5.5)
       # you can also add annotations on top of bars:
       # + annotate(geom='text', label='@', x='Drama', y=850, color='white', size=3)
       + ggplot2::expand_limits(y=nrow(dt_status_by_source))
-      + ggplot2::theme(axis.text.x=ggplot2::element_text(angle=90),text = ggplot2::element_text(size=14))
-    ),themes=ComplexUpset::upset_default_themes(text=ggplot2::element_text(size=14))
+      + ggplot2::theme(axis.text.x=ggplot2::element_text(angle=90),text = ggplot2::element_text(size=16))
+    ),themes=ComplexUpset::upset_default_themes(text=ggplot2::element_text(size=18))
   )
   return(upset_plot)
 }
