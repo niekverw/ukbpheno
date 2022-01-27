@@ -405,7 +405,7 @@ parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE,VctAllColumns)
 #' dfDefinitions_processed <- ProcessDfDefinitions(fread("definitions.tsv", colClasses = 'character', data.table = FALSE))
 #' dfhtml <- read_ukb_metadata(fhtml)
 #' dfDefinitions_ukb_fields <- get_allvarnames(dfDefinitions_processed,dfhtml)
-get_allvarnames <- function(dfDefinitions_processed,dfhtml=NULL){
+get_allvarnames <- function(dfDefinitions_processed,dfhtml=NULL,allow_miss=TRUE){
   #  dfDefinitions_processed
   # VctAllUKBVDefinitionColumns=c("TS") #set this variable to a selection of columns (dfDefinition columns) to be outputted by the _UKBV variable, default is 'VctAllUKBVDefinitionColumns=c("TS","SR","TS_RX","SR_RX","LAB")'
   # TS(Touchscreen) in definition
@@ -422,16 +422,24 @@ get_allvarnames <- function(dfDefinitions_processed,dfhtml=NULL){
   nondefault_ukb_fields <- all_ukb_fields[!all_ukb_fields %in% default_ukb_fields() ]
 
   if (!is.null(dfhtml)){
-
+  # check for missing fields if there is metadata file
   if (all(all_ukb_fields %in%dfhtml$field.showcase)){
     message("All fields required are present in the main dataset.")
 
   }else{
     fields_missed<- all_ukb_fields[!all_ukb_fields %in%dfhtml$field.showcase]
     message(glue::glue("WARNING: {length(fields_missed)} fields not found in the main dataset: {glue::glue_collapse(fields_missed, sep = ',')}"))
-    return(NULL)
-  }
+    if (isTRUE(allow_miss)){
+      # grep fields that are present for extraction
+      all_ukb_fields<-all_ukb_fields[all_ukb_fields %in% dfhtml$field.showcase]
+    }else{
+      return(NULL)
+    }
 
+  }
+  # no check for missing fields
+  }else{
+    message("No metadata file given, some fields may be missing.")
   }
 
   return(
