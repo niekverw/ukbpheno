@@ -25,7 +25,7 @@ fdeath_cause_portal=paste(pheno_dir,"death_cause.txt",sep="")
 # load the example definition table and data setting included in the package
 #############################################################################
 data_dir<-paste(repo_dir,"inst/extdata/",sep="")
-fdefinitions = paste(data_dir,"definitions_DmRxT2.csv",sep="")
+fdefinitions = paste(data_dir,"definitions_cardiometabolic_traits.tsv",sep="")
 fdata_setting = paste(data_dir,"data.settings.tsv",sep="")
 
 # ##########################################
@@ -64,18 +64,16 @@ dfData.settings <-fread(fdata_setting)
 # data.table::fwrite(list(missing_codes),paste(pheno_dir,"ukbphenodata_feb2021.Rdata_notInData.code"))
 dfDefinitions_processed_expanded<-read_defnition_table(fdefinitions,fdata_setting,data_dir)
 
-
 # ##################################################
 # Prepare UKB data:
 ####################################################
 
-
 # harmonize data without definition table, default fields including fields from nurse interview are taken
-lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,f.gp_clinical = fgp_clinical,f.gp_scripts = fgp_scripts,f.hesin = fhesin,f.hesin_diag = fhesin_diag,f.hesin_oper =fhesin_oper,f.death_portal = fdeath_portal,f.death_cause_portal = fdeath_cause_portal )
+# lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,f.gp_clinical = fgp_clinical,f.gp_scripts = fgp_scripts,f.hesin = fhesin,f.hesin_diag = fhesin_diag,f.hesin_oper =fhesin_oper,f.death_portal = fdeath_portal,f.death_cause_portal = fdeath_cause_portal )
 
 # with definition table, fields required in definition table are also included
 # rm(lst.harmonized.data)
-lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,dfDefinitions=dfDefinitions_processed_expanded,f.gp_clinical = fgp_clinical,f.gp_scripts = fgp_scripts,f.hesin = fhesin,f.hesin_diag = fhesin_diag,f.hesin_oper =fhesin_oper,f.death_portal = fdeath_portal,f.death_cause_portal = fdeath_cause_portal )
+lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,dfDefinitions=dfDefinitions_processed_expanded,f.gp_clinical = fgp_clinical,f.gp_scripts = fgp_scripts,f.hesin = fhesin,f.hesin_diag = fhesin_diag,f.hesin_oper =fhesin_oper,f.death_portal = fdeath_portal,f.death_cause_portal = fdeath_cause_portal,allow_missing_fields = TRUE)
 
 #####################################
 # read withdrawal list and remove them from the data
@@ -128,6 +126,7 @@ DmRxT2_hesin_rec<-all_DmRxT2_evnt[grepl ("hesin" ,all_DmRxT2_evnt$.id)]
 hesin_stats<-get_stats_for_events(DmRxT2_hesin_rec)
 hesin_stats$stats.codes.summary.p
 
+
 #  get some summary statistics on the records on individual level
 DmRxT2_rec_cnt<-DmRxT2_hesin_rec[,.(count=.N),by=c("identifier")]
 max(DmRxT2_rec_cnt$count)
@@ -136,10 +135,14 @@ mean(DmRxT2_rec_cnt$count)
 quantile(DmRxT2_rec_cnt$count)
 # visualization count with barplot
 ggplot2::ggplot(DmRxT2_rec_cnt, ggplot2::aes(x=count)) +
-  ggplot2::geom_bar(fill="#0073C2FF" )
+  ggplot2::geom_bar(fill="#0073C2FF" )+ggplot2::theme_minimal() +
+  ggplot2::theme(text = ggplot2::element_text(size=24))
+
 
 # plot individual time line
 plot_individual_timeline(df.data.settings = dfData.settings,lst.data=lst.harmonized.data$lst.data,ind_identifier = 1111111)
+
+
 
 ################################
 # refine the diagnoses
@@ -225,3 +228,6 @@ for (disease in c(diseases)){
 #                                      vct.identifiers = NULL,standardize=TRUE)
 #
 # dotplot
+
+
+
