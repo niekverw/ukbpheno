@@ -1,6 +1,7 @@
 library(data.table)
 library(dplyr)
 library(ukbpheno)
+library(tableone)
 
 #############################################################################
 # specify path to UKB data and to the package
@@ -79,9 +80,8 @@ lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,dfDefi
 # read withdrawal list and remove them from the data
 ####################################
 
-
 f_particip_withdraw<-paste(pheno_dir,"w12345_20210809.csv",sep="")
-
+f_particip_withdraw<-"/mnt/THORAX_SHARE/7.UKBiobank/DataDownloads/74395/2021_06_22-47316/w74395_20210809.csv"
 df_withdrawal<-fread(f_particip_withdraw)
 
 
@@ -200,7 +200,6 @@ diseases<-c("Af","Cad","DmRxT2","Hcm","Hf","HtRx","HyperLipRx")
 
 out_folder<-paste0(pheno_dir,"output/")
 
-
 if(!dir.exists(file.path(out_folder))){
  dir.create(file.path(out_folder))
 }
@@ -221,6 +220,58 @@ for (disease in c(diseases)){
 
 }
 
+
+
+##################
+# make baseline table
+##################
+#age at assessment centre visit, sex, BMI , HbA1c, glucose
+baseline_fields<-c(21003,31,21001,30750,30740)
+dfhtml <- read_ukb_metadata(fhtml)
+dfhtml[which(dfhtml$field.tab=="f.eid"),]$field.tab<-"identifier"
+
+dfukb_baseline <- read_ukb_tabdata(fukbtab,dfhtml,fields_to_keep = baseline_fields)
+
+
+dfukb_baseline_pheno<-dfukb_baseline
+
+for (disease in c(diseases,"HxCva","HxDm","HxHrt","HxHt")){
+  print(disease)
+  lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==disease), lst.harmonized.data$lst.data,dfData.settings, df_reference_date=df_reference_dt_v0)
+
+  # rename col names
+  colnames(lst.case_control$df.casecontrol) <- paste(disease,"0",colnames(lst.case_control$df.casecontrol),  sep = "_")
+  names(lst.case_control$df.casecontrol)[names(lst.case_control$df.casecontrol) == paste(disease,"0","identifier",  sep = "_")]<-"identifier"
+
+  dfukb_baseline_pheno<-merge(dfukb_baseline_pheno,lst.case_control$df.casecontrol,by="identifier",all.x = TRUE,all.y = FALSE)
+
+}
+
+
+factorVars <- c("f.31.0.0","HxDm_0_Any","HxHrt_0_Any","HxHt_0_Any","HxCva_0_Any","HtRx_0_Hx","HyperLipRx_0_Hx","Af_0_Hx","Hcm_0_Hx","Hf_0_Hx","DmRxT2_0_Death_any")
+## Create a variable list. Use dput(names(pbc))
+vars <- c("f.21003.0.0","f.21001.0.0","f.30740.0.0","f.30750.0.0",factorVars)
+# Then the TableOne object can be created, and examined as follows.
+dfukb_baseline_pheno<-dfukb_baseline_pheno[,c('identifier',"DmRxT2_0_Hx",vars),with=FALSE]
+colnames(dfukb_baseline_pheno)<-c("identifier","Type 2 diabetes","Age","BMI","Glucose","HbA1c","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Family history of stroke","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertropic cardiomyopathy","Heart failure","Type 2 diabetes related death")
+
+vars<-c("Age","BMI","Glucose","HbA1c","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Family history of stroke","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertropic cardiomyopathy","Heart failure","Type 2 diabetes related death")
+factorVars<-setdiff(vars,c("Age","BMI","Glucose","HbA1c"))
+## Create Table 1 stratified by trt (omit strata argument for overall table)
+tableOne <- CreateTableOne(vars = vars, strata = "Type 2 diabetes", data = dfukb_baseline_pheno, factorVars = factorVars)
+## Just typing the object name will invoke the print.TableOne method
+## Tests are by oneway.test/t.test for continuous, chisq.test for categorical
+tableOne
+
+tab1Mat <- print(tableOne, quote = FALSE, noSpaces = TRUE, printToggle = FALSE)
+## Save to a CSV file
+write.csv(tab1Mat, file =paste0(pheno_dir,"BaselineTable.csv"))
+
+
+
+
+
+
 # cardio_metabolic_def<-dfDefinitions_processed_expanded[dfDefinitions_processed_expanded$TRAIT %in% diseases,]
 # dotplot<-dotplot_diseases_by_source(cardio_metabolic_def,
 #                                      lst.data=lst.harmonized.data$lst.data,
@@ -228,6 +279,4 @@ for (disease in c(diseases)){
 #                                      vct.identifiers = NULL,standardize=TRUE)
 #
 # dotplot
-
-
 
