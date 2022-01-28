@@ -589,16 +589,18 @@ get_case_status_by_source <- function(definition,
     # unique(lst.case_control$all_event_dt.Include_in_cases$.id)
   # all_sources <-
     # unique(lst.case_control$all_event_dt.Include_in_cases$classification)
-  `self reported (nurse interview)`<-c("tte.sr.20002","tte.sr.20001" ,"tte.sr.20004", "sr.20003")
-  `cancer registry`<-c("tte.cancer.icd10", "tte.cancer.icd9")
-  `death registry`<-c("tte.death.icd10.primary" ,"tte.death.icd10.secondary")
-  `hospital inpatient records` <-c("tte.hesin.oper3.primary" ,"tte.hesin.oper3.secondary","tte.hesin.oper4.primary","tte.hesin.oper4.secondary", "tte.hesin.icd10.primary","tte.hesin.icd10.secondary","tte.hesin.icd9.primary","tte.hesin.icd9.secondary")
-  `primary care` <-c("tte.gpclinical.read2","tte.gpclinical.read3","tte.gpscript.dmd.england","tte.gpscript.bnf.england","tte.gpscript.bnf.scotland","tte.gpscript.read2.wales")
-  `self reported (touchscreen)` <-c("ts")
-  all_sources<-list(`self reported (nurse interview)`=`self reported (nurse interview)`,`cancer registry`=`cancer registry`,`death registry`=`death registry`,`hospital inpatient records`=`hospital inpatient records`,`primary care`=`primary care`,`self reported (touchscreen)`=`self reported (touchscreen)`)
+  `Self-report (nurse interview)`<-c("tte.sr.20002","tte.sr.20001" ,"tte.sr.20004", "sr.20003")
+  `Cancer registry`<-c("tte.cancer.icd10", "tte.cancer.icd9")
+  `Death registry`<-c("tte.death.icd10.primary" ,"tte.death.icd10.secondary")
+  `Hospital inpatient records` <-c("tte.hesin.oper3.primary" ,"tte.hesin.oper3.secondary","tte.hesin.oper4.primary","tte.hesin.oper4.secondary", "tte.hesin.icd10.primary","tte.hesin.icd10.secondary","tte.hesin.icd9.primary","tte.hesin.icd9.secondary")
+  `Primary care` <-c("tte.gpclinical.read2","tte.gpclinical.read3","tte.gpscript.dmd.england","tte.gpscript.bnf.england","tte.gpscript.bnf.scotland","tte.gpscript.read2.wales")
+  `Self-report (touchscreen)` <-c("ts")
+  all_sources<-list(`Self-report (nurse interview)` = `Self-report (nurse interview)`,`Cancer registry`=`Cancer registry`,`Death registry`=`Death registry`,`Hospital inpatient records`=`Hospital inpatient records`, `Primary care`=`Primary care`,`Self-report (touchscreen)`=`Self-report (touchscreen)`)
   # create new columns for each source
   for (source_name in names(all_sources)) {
-    varname <- paste(source_name, 'Hx', sep = ' ')
+    # varname <- paste(source_name, 'Hx', sep = ' ')
+    varname <-source_name
+
     # create new columns for each source
     cases[, (varname)] <- as.numeric(NA)
     # lookup source from df with all episodes i.e. all_event_dt.Include_in_cases
@@ -608,22 +610,27 @@ get_case_status_by_source <- function(definition,
 
   }
 
-  for (j in  paste( names(all_sources),"Hx",sep=" ")) {
+  # for (j in  paste( names(all_sources),"Hx",sep=" ")) {
+  for (j in  names(all_sources)) {
+
     # for all new Hx_ columns , set everything to 0 for ease of counting
     # if Hx <0 , (excluded cases)
     set(cases, which(cases$Hx <= 0), j, 0)
     #  if the cell value was NA ->  control
     set(cases, which(is.na(cases[[j]])), j, 0)
   }
-  cases$Any[!cases$identifier %in% lst.case_control$all_event_dt.Include_in_cases$identifier] <-
-    0
+  cases$Any[!cases$identifier %in% lst.case_control$all_event_dt.Include_in_cases$identifier] <-0
   # remove these future cases
   cases<-cases[cases$Any!=0]
 
   if(keep_any){
-    cols <- c("Any", paste( names(all_sources),"Hx",sep=" "))
+    # cols <- c("Any", paste( names(all_sources),"Hx",sep=" "))
+    cols <- c("Any", names(all_sources))
+
   }else{
-    cols <- c(paste( names(all_sources),"Hx",sep=" "))
+    # cols <- c(paste( names(all_sources),"Hx",sep=" "))
+    cols <- c("Any", names(all_sources))
+
   }
   if(keep_id){
     cols <- c("identifier",cols)
@@ -677,13 +684,14 @@ make_upsetplot <- function(definition,lst.data,
                                       df.reference.dates) {
   # get the count
   dt_status_by_source<-get_case_status_by_source(definition,lst.data,df.data.settings,df.reference.dates)
+
   # make plot
   # dark green, mud yellow,brwon, blue green,light purple,bright light blue green
   cus_col<-c("#4d8076","#926c00","#4c1130","#087593","#9b89b3","#00c9a7")
   upset_plot<-ComplexUpset::upset(
-    dt_status_by_source, c("self reported (nurse interview) Hx","cancer registry Hx","death registry Hx","hospital inpatient records Hx","primary care Hx","self reported (touchscreen) Hx"),min_size=0, base_annotations=list(
+    dt_status_by_source, c("Self-report (nurse interview)","Cancer registry","Death registry","Hospital inpatient records","Primary care","Self-report (touchscreen)"),min_size=0, base_annotations=list(
       'Intersection size'=ComplexUpset::intersection_size(
-        text_colors=c(on_background='#000066', on_bar='#FF8C00'),text=list(size=6.5),fill="#333333"
+        text_colors=c(on_background='#000066', on_bar='#FF8C00'),text=list(size=5.5),fill="#333333"
       )
       # + ggplot2::annotate(
       #   geom='text', x=Inf, y=Inf,
@@ -695,12 +703,12 @@ make_upsetplot <- function(definition,lst.data,
     ),
     width_ratio=0.25
     ,queries=list(
-      ComplexUpset::upset_query(set="self reported (nurse interview) Hx", fill=cus_col[1]),
-      ComplexUpset::upset_query(set="cancer registry Hx", fill=cus_col[2]),
-      ComplexUpset::upset_query(set="death registry Hx", fill=cus_col[3]),
-      ComplexUpset::upset_query(set='"hospital inpatient records Hx"', fill=cus_col[4]),
-      ComplexUpset::upset_query(set="primary care Hx",fill=cus_col[5]),
-      ComplexUpset::upset_query(set="self reported (touchscreen) Hx",fill=cus_col[6])
+      ComplexUpset::upset_query(set="Self-report (nurse interview)", fill=cus_col[1]),
+      ComplexUpset::upset_query(set="Cancer registry", fill=cus_col[2]),
+      ComplexUpset::upset_query(set="Death registry", fill=cus_col[3]),
+      ComplexUpset::upset_query(set="Hospital inpatient records", fill=cus_col[4]),
+      ComplexUpset::upset_query(set="Primary care",fill=cus_col[5]),
+      ComplexUpset::upset_query(set="Self-report (touchscreen)",fill=cus_col[6])
     ),
     encode_sets=FALSE,  # for annotate() to select the set by name disable encoding
     set_sizes=(
