@@ -6,12 +6,14 @@ ukbpheno is an R package for efficiently munging the files provided by UK Bioban
 
 ## Installation
 
-`devtools::install("niekverw/ukbpheno")`
+```R 
+devtools::install("niekverw/ukbpheno")
+```
 
 
 ## Usage
 
-```
+```R
 library(ukbpheno)
 
 # the directory with datafiles
@@ -31,11 +33,17 @@ fhesin_oper <- paste(pheno_dir,"hesin_oper.txt",sep="")
 # GP data
 fgp_clinical <- paste(pheno_dir,"gp_clinical.txt",sep="")
 fgp_scripts <- paste(pheno_dir,"gp_scripts.txt",sep="")
-fdata_setting <- "ukbpheno/inst/extdata/data.settings.tsv"
 
 # harmonize the data
-dfData.settings <- fread(fdata_setting)
-lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,dfDefinitions=dfDefinitions_processed_expanded,f.gp_clinical = fgp_clinical,f.gp_scripts = fgp_scripts,f.hesin = fhesin,f.hesin_diag = fhesin_diag,f.hesin_oper =fhesin_oper)
+lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,f.gp_clinical = fgp_clinical,f.gp_scripts = fgp_scripts,f.hesin = fhesin,f.hesin_diag = fhesin_diag,f.hesin_oper=fhesin_oper,allow_missing_fields = TRUE)
+
 ```
 ![dotplot4readme](https://user-images.githubusercontent.com/9621370/151220378-1ade1fa5-8e38-469e-9b9d-aa74138b8be0.png)
 
+## Code lookup with shiny app 
+Required: the code maps (Excel workbook) provided by UK Biobank Showcase Resource 592. 
+
+```shell
+cd ../ukbpheno/inst/util
+Rscript shiny.lookup_codes.R --fcoding_xls path_to_download/all_lkps_maps_v3.xlsx
+```
