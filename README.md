@@ -6,7 +6,7 @@ ukbpheno is an R package for efficiently munging the files provided by UK Bioban
 
 ## Installation
 
-`devtools::install("ukbpheno")`
+`devtools::install("niekverw/ukbpheno")`
 
 
 ## Usage
