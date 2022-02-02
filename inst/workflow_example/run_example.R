@@ -1,6 +1,8 @@
 library(data.table)
 library(dplyr)
 library(ukbpheno)
+library(ggplot2)
+library(ggforce)
 library(tableone)
 
 #############################################################################
@@ -81,7 +83,6 @@ lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,dfDefi
 ####################################
 
 f_particip_withdraw<-paste(pheno_dir,"w12345_20210809.csv",sep="")
-f_particip_withdraw<-"/mnt/THORAX_SHARE/7.UKBiobank/DataDownloads/74395/2021_06_22-47316/w74395_20210809.csv"
 df_withdrawal<-fread(f_particip_withdraw)
 
 
@@ -105,14 +106,12 @@ df_reference_dt_v0<-lst.harmonized.data$dfukb[,c("identifier","f.53.0.0")]
 # remove the individuals who have withdrawn from the study
 df_reference_dt_v0<-df_reference_dt_v0[! identifier  %in% df_withdrawal$V1]
 
-
-
 # individuals with DmT2 based on self-reported codes , medication and linkage
 lst.DmRxT2.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==trait), lst.harmonized.data$lst.data,dfData.settings, df_reference_date=df_reference_dt_v0)
 
-
 View(lst.DmRxT2.case_control$all_event_dt.Include_in_cases.summary)
 View(lst.DmRxT2.case_control$df.casecontrol)
+
 # get a disease time line to see the relative contribution of different data sources over time
 DmRxT2_timeline<-plot_disease_timeline_by_source(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait),lst.harmonized.data$lst.data,dfData.settings,lst.harmonized.data$vct.identifiers)
 DmRxT2_timeline
@@ -126,18 +125,18 @@ DmRxT2_hesin_rec<-all_DmRxT2_evnt[grepl ("hesin" ,all_DmRxT2_evnt$.id)]
 hesin_stats<-get_stats_for_events(DmRxT2_hesin_rec)
 hesin_stats$stats.codes.summary.p
 
-
 #  get some summary statistics on the records on individual level
 DmRxT2_rec_cnt<-DmRxT2_hesin_rec[,.(count=.N),by=c("identifier")]
 max(DmRxT2_rec_cnt$count)
 median(DmRxT2_rec_cnt$count)
 mean(DmRxT2_rec_cnt$count)
 quantile(DmRxT2_rec_cnt$count)
+
 # visualization count with barplot
 ggplot2::ggplot(DmRxT2_rec_cnt, ggplot2::aes(x=count)) +
-  ggplot2::geom_bar(fill="#0073C2FF" )+ggplot2::theme_minimal() +
-  ggplot2::theme(text = ggplot2::element_text(size=24))
-
+  ggplot2::geom_bar(fill="#0073C2FF" ) +  ggplot2::xlab("Number fo secondary care record per person") +
+  ggplot2::ylab("Frequency") + #theme with white background
+  ggplot2::theme_bw() + ggplot2::theme(text = ggplot2::element_text(size=22),panel.grid.minor =ggplot2::element_blank(),panel.grid.major =ggplot2::element_blank()) +  ggforce::facet_zoom(xlim = c(0, 50))
 
 # plot individual time line
 plot_individual_timeline(df.data.settings = dfData.settings,lst.data=lst.harmonized.data$lst.data,ind_identifier = 1111111)
@@ -176,11 +175,10 @@ lst.RxDmIns.case_control<-get_cases_controls(definitions=dfDefinitions_processed
 ind_young_onset<- union(lst.SrDmYSaCa.case_control$all_event_dt.Include_in_cases$identifier,lst.SrDmYEw.case_control$all_event_dt.Include_in_cases$identifier)
 # individuals with evidence of other types of diabetes reported
 ind_RxInsFirstYear_DmT1_DmG<- union(union(lst.RxDmInsFirstYear.case_control,lst.DmT1.case_control$all_event_dt.Include_in_cases$identifier),lst.DmG.case_control$all_event_dt.Include_in_cases$identifier)
-
+# young onset but no DM type 1/ gestational diabetes specific codes nor self report of insulin within first year of diagnosis
 inds_young_onset_probable_DmT2 <-setdiff(ind_young_onset,ind_RxInsFirstYear_DmT1_DmG)
 
-
-# remove individuals who are on the metformin but likely NOT diabetes
+# further filter out individuals who are on the metformin but likely NOT diabetes
 inds_young_onset_probable_DmT2 <-setdiff(inds_young_onset_probable_DmT2,RxMet_DmUnlikely)
 
 # check if these individuals have specific DmT2 codes
@@ -188,95 +186,67 @@ inds_young_onset_probable_DmT2 <-setdiff(inds_young_onset_probable_DmT2,RxMet_Dm
 lst.DmRxT2.case_control$all_event_dt.Include_in_cases[identifier %in% setdiff(inds_young_onset_probable_DmT2,lst.DmT2.case_control$all_event_dt.Include_in_cases$identifier)]
 
 
+###########################################################################
+# Part 2 generate phenotype in batch and make a clinical characteristic table
+##########################################################################
 
-####################################
-# generate phenotypes in batch
-####################################
+# extract clinical variables from the main dataset using read_ukb_tabdata()
+# we need the metadata (.html) file for read_ukb_tabdata()
+dfhtml <- read_ukb_metadata(fhtml)
+# rename the identifier column in the metadata
+dfhtml[which(dfhtml$field.tab=="f.eid"),]$field.tab<-"identifier"
 
+# age at assessment centre visit, sex, BMI , HbA1c, glucose,insulin within 1 year of diagnosis
+baseline_fields<-c(21003,31,21001,30750,30740,2986)
+# extract these variables from main dataset
+dfukb_baseline <- read_ukb_tabdata(fukbtab,dfhtml,fields_to_keep = baseline_fields)
+gc()
+
+# read the definitions table
 fdefinitions = paste(data_dir,"definitions_cardiometabolic_traits.tsv",sep="")
-
+# the target disease traits we will generate in batch
 diseases<-c("Af","Cad","DmRxT2","Hcm","Hf","HtRx","HyperLipRx")
 
-
+# make an output folder to store the result
 out_folder<-paste0(pheno_dir,"output/")
-
 if(!dir.exists(file.path(out_folder))){
  dir.create(file.path(out_folder))
 }
 
-for (disease in c(diseases)){
-  print(disease)
-  lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==disease), lst.harmonized.data$lst.data,dfData.settings, df_reference_date=df_reference_dt_v0)
-
- # keep a subset of columns depending on downstream analysis
-   lst.case_control$df.casecontrol<-lst.case_control$df.casecontrol[,c("identifier","survival_days","Death_primary",  "Death_any", "Hx_days","Fu_days","Hx","Fu","Any")]
-  # rename col names
-  colnames(lst.case_control$df.casecontrol) <- paste(disease,colnames(lst.case_control$df.casecontrol),  sep = "_")
-  names(lst.case_control$df.casecontrol)[names(lst.case_control$df.casecontrol) == paste(disease,"identifier",  sep = "_")]<-"identifier"
-
-  # write to file
-
-  data.table::fwrite(x=lst.case_control$df.casecontrol,file=paste0(out_folder,paste(disease,"basesline","tsv",sep=".")),sep="\t",showProgress=TRUE)
-
-}
-
-
-
-##################
-# make baseline table
-##################
-#age at assessment centre visit, sex, BMI , HbA1c, glucose
-baseline_fields<-c(21003,31,21001,30750,30740)
-dfhtml <- read_ukb_metadata(fhtml)
-dfhtml[which(dfhtml$field.tab=="f.eid"),]$field.tab<-"identifier"
-
-dfukb_baseline <- read_ukb_tabdata(fukbtab,dfhtml,fields_to_keep = baseline_fields)
-
 
 dfukb_baseline_pheno<-dfukb_baseline
-
-for (disease in c(diseases,"HxCva","HxDm","HxHrt","HxHt")){
+# loop through the traits, including family history of related diseases and the diabetes medication use
+for (disease in c(diseases,"HxDm","HxHrt","HxHt","RxDmOr","RxDmIns")){
   print(disease)
+
   lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==disease), lst.harmonized.data$lst.data,dfData.settings, df_reference_date=df_reference_dt_v0)
-
-  # rename col names
+  # add the trait to the  col names
   colnames(lst.case_control$df.casecontrol) <- paste(disease,"0",colnames(lst.case_control$df.casecontrol),  sep = "_")
+  # except for participant identifier
   names(lst.case_control$df.casecontrol)[names(lst.case_control$df.casecontrol) == paste(disease,"0","identifier",  sep = "_")]<-"identifier"
-
+  # merge these columns with dfukb_baseline_pheno
   dfukb_baseline_pheno<-merge(dfukb_baseline_pheno,lst.case_control$df.casecontrol,by="identifier",all.x = TRUE,all.y = FALSE)
-
 }
 
+dfukb_baseline_pheno$DmRxT2_0_first_diagnosis_years<-(-1*dfukb_baseline_pheno$DmRxT2_0_first_diagnosis_days)/365.25
 
-factorVars <- c("f.31.0.0","HxDm_0_Any","HxHrt_0_Any","HxHt_0_Any","HxCva_0_Any","HtRx_0_Hx","HyperLipRx_0_Hx","Af_0_Hx","Hcm_0_Hx","Hf_0_Hx","DmRxT2_0_Death_any")
-## Create a variable list. Use dput(names(pbc))
-vars <- c("f.21003.0.0","f.21001.0.0","f.30740.0.0","f.30750.0.0",factorVars)
-# Then the TableOne object can be created, and examined as follows.
-dfukb_baseline_pheno<-dfukb_baseline_pheno[,c('identifier',"DmRxT2_0_Hx",vars),with=FALSE]
-colnames(dfukb_baseline_pheno)<-c("identifier","Type 2 diabetes","Age","BMI","Glucose","HbA1c","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Family history of stroke","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertropic cardiomyopathy","Heart failure","Type 2 diabetes related death")
+# keep only the variables needed for the table
+dfukb_baseline_pheno<-dfukb_baseline_pheno[,c('identifier',"DmRxT2_0_Hx","f.21003.0.0","f.21001.0.0","f.30740.0.0","f.30750.0.0","DmRxT2_0_first_diagnosis_years","f.31.0.0","HxDm_0_Any","HxHrt_0_Any","HxHt_0_Any","HtRx_0_Hx","HyperLipRx_0_Hx","Af_0_Hx","Hcm_0_Hx","Hf_0_Hx","RxDmOr_0_Hx","RxDmIns_0_Hx","f.2986.0.0"),with=FALSE]
+# rename for readability
+colnames(dfukb_baseline_pheno)<-c("identifier","Type 2 diabetes","Age","BMI","Glucose","HbA1c","Years of diabetes","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertropic cardiomyopathy","Heart failure","Oral diabetes medication","Insulin","Insulin within 1 year of diagnosis")
+# below the parameters for CreateTableOne
+# the full variable list
+vars<-c("Age","BMI","Glucose","HbA1c","Years of diabetes","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertropic cardiomyopathy","Heart failure","Oral diabetes medication","Insulin","Insulin within 1 year of diagnosis")
+# the categorical variables on the clinical characteristics table
+factorVars<-setdiff(vars,c("Age","BMI","Glucose","HbA1c","Years of diabetes"))
 
-vars<-c("Age","BMI","Glucose","HbA1c","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Family history of stroke","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertropic cardiomyopathy","Heart failure","Type 2 diabetes related death")
-factorVars<-setdiff(vars,c("Age","BMI","Glucose","HbA1c"))
-## Create Table 1 stratified by trt (omit strata argument for overall table)
+## Create the clinical characteristic table stratified by type 2 diabetes
 tableOne <- CreateTableOne(vars = vars, strata = "Type 2 diabetes", data = dfukb_baseline_pheno, factorVars = factorVars)
-## Just typing the object name will invoke the print.TableOne method
-## Tests are by oneway.test/t.test for continuous, chisq.test for categorical
+hist(dfukb_baseline_pheno$`Years of diabetes`)
 tableOne
-
-tab1Mat <- print(tableOne, quote = FALSE, noSpaces = TRUE, printToggle = FALSE)
-## Save to a CSV file
-write.csv(tab1Mat, file =paste0(pheno_dir,"BaselineTable.csv"))
-
+tab1Mat <- print(tableOne, quote = FALSE, noSpaces = TRUE, printToggle = FALSE,nonnormal =c("Glucose","HbA1c","Years of diabetes") )
+## Save the table to a CSV file
+write.csv(tab1Mat, file =paste0(out_folder,"BaselineTable.csv"))
 
 
-
-
-
-# cardio_metabolic_def<-dfDefinitions_processed_expanded[dfDefinitions_processed_expanded$TRAIT %in% diseases,]
-# dotplot<-dotplot_diseases_by_source(cardio_metabolic_def,
-#                                      lst.data=lst.harmonized.data$lst.data,
-#                                      df.data.settings=dfData.settings,
-#                                      vct.identifiers = NULL,standardize=TRUE)
-#
-# dotplot
 
