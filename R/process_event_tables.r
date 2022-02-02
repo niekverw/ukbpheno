@@ -169,7 +169,9 @@ get_incidence_prevalence <- function(all_event_dt,
 
   ### Data if participant had event/med  reference date (visit);+/- x day
   #TODO I think episodes for visitdate (event=0 rows) is messing up with this flag! i.e. almost all of them have this flag on
-  dfRef <- df[df$eventdate>=(df$reference_date-window_ref_days_include) & df$eventdate<=(df$reference_date+window_ref_days_include),c("identifier")]
+  # MWY: NOW added df$event!=0 ,though there are still a lot Ref==2 using window of 0 day!
+  dfRef <- df[df$eventdate>=(df$reference_date-window_ref_days_include) & df$eventdate<=(df$reference_date+window_ref_days_include) &df$event!=0,c("identifier")]
+
   dfRef[,Ref:=2]
 
 
@@ -281,6 +283,8 @@ get_cases <- function(definitions,
     set_to_na <- names(all_event_dt.Include_in_cases.summary)[!names(all_event_dt.Include_in_cases.summary) %in% c("identifier","reference_date")]
     # the .summary needed to be flagged for the get_case_control() functoin
     all_event_dt.Include_in_cases.summary[exclude,(set_to_na):=-2]
+    # MWY:added first_diagnosis_days as well because negative value is possible in this col
+    all_event_dt.Include_in_cases.summary[exclude,("first_diagnosis_days"):=NA]
     # remove these in all_event_dt
     all_event_dt.Include_in_cases<-all_event_dt.Include_in_cases[! (all_event_dt.Include_in_cases$identifier %in% unique(all_event_dt.Exclude_from_cases$identifier)),]
     if(verbose){
@@ -446,10 +450,8 @@ get_cases_controls <-function(definitions,
       non_proper_case_norefdt<- unique(df_reference_date[identifier %in% non_proper_case][is.na(reference_date)]$identifier)
     message(glue::glue("!!NOTE: {length(non_proper_case)} cases without valid event dates, of which {length(non_proper_case_norefdt)} without reference dates..."))
     }
-    # cols to be set to na
-    set_to_na <- names(df.casecontrol)[!names(df.casecontrol) %in% c("identifier","reference_date")]
-    # df.casecontrol[df.casecontrol$identifier %in% non_proper_case,(set_to_na):=-2] #mark the non-case as -2
-    df.casecontrol[df.casecontrol$identifier %in% non_proper_case,(c("Any")):=2] #mark the non-case as -2
+    # Hx Fu not known only Any ==2
+    df.casecontrol[df.casecontrol$identifier %in% non_proper_case,(c("Any")):=2]
   }
 
 
@@ -463,6 +465,8 @@ get_cases_controls <-function(definitions,
     # cols to be set to na
     set_to_na <- names(df.casecontrol)[!names(df.casecontrol) %in% c("identifier","reference_date")]
     df.casecontrol[exclude,(set_to_na):=-1] #mark the non-control as -1
+    # MWY:added first_diagnosis_days as well because negative value is possible in this col
+    df.casecontrol[exclude,("first_diagnosis_days"):=NA]
   }
 
   # 2 => case -2 => non-case  -1 => non-control , set control to 1
