@@ -9,7 +9,32 @@
 # require(stringr)
 # require(shiny)
 # require(DT)
-require(ukbpheno)
+# require(ukbpheno)
+
+required_pckg = c("optparse","data.table", "readxl","dplyr", "stringr", "shiny", "DT","devtools","ukbpheno")
+new.pckg <- required_pckg[!(required_pckg %in% installed.packages()[,"Package"])]
+if(length(new.pckg) >0 ) {
+  print("*********The following required packages are not installed*********")
+  print(new.pckg)
+  print("Trying to install the required packages")
+  for(pckg in new.pckg){
+    install.packages(pckg)
+    if(require(pckg)){
+      print("successfully installed and loaded")
+      print(pckg)
+    } else {
+    print(pckg)
+    stop("fail to install required package, exit.")
+    }
+  }
+}else{
+  for( pckg in required_pckg[!(required_pckg %in% new.pckg)]) {
+    print(pckg)
+    library(pckg, character.only=TRUE);
+  }
+}
+
+
 
 # source("ProcessdfDefinitions.R")
 # library(readxl)
@@ -568,6 +593,7 @@ server <- function(input, output) {
 # #######################################
 # setwd("/media/ming/ExtremeSSD/ukbpheno/ukbpheno/R")
 # fcoding_xls="../inst/extdata/all_lkps_maps_v3.xlsx"
+print("Prepare the code maps...")
 if(!exists("LstdfCodesheets")){ LstdfCodesheets <- load_data(fcoding.xls=opt$fcoding_xls,fmed.readSR = opt$f_med_readSR,ficd10 = opt$fcoding_icd10,ficd9 =opt$fcoding_icd9,fopcs4 = opt$fcoding_opcs4,f20003 = opt$fcoding_20003) }
 #
 gc()
