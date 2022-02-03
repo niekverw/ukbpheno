@@ -9,27 +9,27 @@ library(tableone)
 # specify path to UKB data and to the package
 #############################################################################
 
-repo_dir=".../repos/ukbpheno/"
-pheno_dir=".../data/ukb12345/"
+repo_dir<-".../repos/ukbpheno/"
+pheno_dir<-".../data/ukb12345/"
 
 
-fukbtab = paste(pheno_dir,"ukb47316.tab",sep="")
-fhtml = paste(pheno_dir,"ukb47316.html",sep="")
-fhesin=paste(pheno_dir,"hesin.txt",sep="")
-fhesin_diag=paste(pheno_dir,"hesin_diag.txt",sep="")
-fhesin_oper=paste(pheno_dir,"hesin_oper.txt",sep="")
-fgp_clinical =paste(pheno_dir,"gp_clinical.txt",sep="")
-fgp_scripts =paste(pheno_dir,"gp_scripts.txt",sep="")
-fdeath_portal=paste(pheno_dir,"death.txt",sep="")
-fdeath_cause_portal=paste(pheno_dir,"death_cause.txt",sep="")
+fukbtab <- paste(pheno_dir,"ukb47316.tab",sep="")
+fhtml<-paste(pheno_dir,"ukb47316.html",sep="")
+fhesin<-paste(pheno_dir,"hesin.txt",sep="")
+fhesin_diag<-paste(pheno_dir,"hesin_diag.txt",sep="")
+fhesin_oper<-paste(pheno_dir,"hesin_oper.txt",sep="")
+fgp_clinical<-paste(pheno_dir,"gp_clinical.txt",sep="")
+fgp_scripts<-paste(pheno_dir,"gp_scripts.txt",sep="")
+fdeath_portal<-paste(pheno_dir,"death.txt",sep="")
+fdeath_cause_portal<-paste(pheno_dir,"death_cause.txt",sep="")
 
 
 #############################################################################
 # load the example definition table and data setting included in the package
 #############################################################################
 data_dir<-paste(repo_dir,"inst/extdata/",sep="")
-fdefinitions = paste(data_dir,"definitions_cardiometabolic_traits.tsv",sep="")
-fdata_setting = paste(data_dir,"data.settings.tsv",sep="")
+fdefinitions <- paste(data_dir,"definitions_cardiometabolic_traits.tsv",sep="")
+fdata_setting <- paste(data_dir,"data.settings.tsv",sep="")
 
 # ##########################################
 # read setting
@@ -163,7 +163,7 @@ lst.SrDmYSaCa.case_control <- get_cases_controls(definitions=dfDefinitions_proce
 #identify use of insulin/oral diabetic medication other than metformin
 lst.RxDmNoMet.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="RxDmNoMet"), lst.harmonized.data$lst.data,dfData.settings, df_reference_date=df_reference_dt_v0)
 #identify individuals that are on metformin but no self-reported diabetes nor use of insulin/oral diabetic medication other than metformin
-RxMet_DmUnlikely<-setdiff(lst.RxMet.case_control$all_event_dt.Include_in_cases$identifier,union(lst.Dm.case_control$all_event_dt.Include_in_cases.summary$identifier,lst.RxDmNoMet.case_control$all_event_dt.Include_in_cases$identifier))
+RxMet_DmUnlikely<-setdiff(lst.RxMet.case_control$df.casecontrol[Hx==2]$identifier,union(lst.Dm.case_control$df.casecontrol[Hx==2]$identifier,lst.RxDmNoMet.case_control$df.casecontrol[Hx==2]$identifier))
 
 # identify individuals with self-report insulin <12 months post-diagnosis
 lst.RxDmInsFirstYear.case_control<-get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT=="RxDmInsFirstYear"), lst.harmonized.data$lst.data,dfData.settings, df_reference_date=df_reference_dt_v0)
@@ -172,9 +172,11 @@ lst.RxDmIns.case_control<-get_cases_controls(definitions=dfDefinitions_processed
 
 # cross examine various diagnoses, for example to get young onset diabetes who do not have evidence of  other types of diabetes (on insulin, on insulin within 1 year of diagnosis, specific type 1 diabetes codes, specific gestational diabetes codes)
 # individuals of young onset diabetes
-ind_young_onset<- union(lst.SrDmYSaCa.case_control$all_event_dt.Include_in_cases$identifier,lst.SrDmYEw.case_control$all_event_dt.Include_in_cases$identifier)
+ind_young_onset<- union(lst.SrDmYSaCa.case_control$df.casecontrol[Any==2]$identifier,lst.SrDmYEw.case_control$df.casecontrol[Any==2]$identifier)
+
 # individuals with evidence of other types of diabetes reported
-ind_RxInsFirstYear_DmT1_DmG<- union(union(lst.RxDmInsFirstYear.case_control,lst.DmT1.case_control$all_event_dt.Include_in_cases$identifier),lst.DmG.case_control$all_event_dt.Include_in_cases$identifier)
+ind_RxInsFirstYear_DmT1_DmG<- union(union(lst.RxDmInsFirstYear.case_control$df.casecontrol[Any==2]$identifier,lst.DmT1.case_control$df.casecontrol[Hx==2]$identifier),lst.DmG.case_control$df.casecontrol[Hx==2]$identifier)
+
 # young onset but no DM type 1/ gestational diabetes specific codes nor self report of insulin within first year of diagnosis
 inds_young_onset_probable_DmT2 <-setdiff(ind_young_onset,ind_RxInsFirstYear_DmT1_DmG)
 
@@ -183,7 +185,7 @@ inds_young_onset_probable_DmT2 <-setdiff(inds_young_onset_probable_DmT2,RxMet_Dm
 
 # check if these individuals have specific DmT2 codes
 # and inspect the data on those individuals who don't  i.e. the uncertain cases
-lst.DmRxT2.case_control$all_event_dt.Include_in_cases[identifier %in% setdiff(inds_young_onset_probable_DmT2,lst.DmT2.case_control$all_event_dt.Include_in_cases$identifier)]
+lst.DmRxT2.case_control$all_event_dt.Include_in_cases[identifier %in% setdiff(inds_young_onset_probable_DmT2,lst.DmT2.case_control$df.casecontrol[Hx==2]$identifier)]
 
 
 ###########################################################################
@@ -203,7 +205,7 @@ dfukb_baseline <- read_ukb_tabdata(fukbtab,dfhtml,fields_to_keep = baseline_fiel
 gc()
 
 # read the definitions table
-fdefinitions = paste(data_dir,"definitions_cardiometabolic_traits.tsv",sep="")
+fdefinitions <- paste(data_dir,"definitions_cardiometabolic_traits.tsv",sep="")
 # the target disease traits we will generate in batch
 diseases<-c("Af","Cad","DmRxT2","Hcm","Hf","HtRx","HyperLipRx")
 
