@@ -191,6 +191,9 @@ lst.DmRxT2.case_control$all_event_dt.Include_in_cases[identifier %in% setdiff(in
 ###########################################################################
 # Part 2 generate phenotype in batch and make a clinical characteristic table
 ##########################################################################
+# read the definitions table
+fdefinitions <- paste(data_dir,"definitions_cardiometabolic_traits.tsv",sep="")
+dfDefinitions_processed_expanded<-read_defnition_table(fdefinitions,fdata_setting,data_dir)
 
 # extract clinical variables from the main dataset using read_ukb_tabdata()
 # we need the metadata (.html) file for read_ukb_tabdata()
@@ -204,10 +207,8 @@ baseline_fields<-c(21003,31,21001,30750,30740,2986)
 dfukb_baseline <- read_ukb_tabdata(fukbtab,dfhtml,fields_to_keep = baseline_fields)
 gc()
 
-# read the definitions table
-fdefinitions <- paste(data_dir,"definitions_cardiometabolic_traits.tsv",sep="")
 # the target disease traits we will generate in batch
-diseases<-c("Af","Cad","DmRxT2","Hcm","Hf","HtRx","HyperLipRx")
+diseases<-c("Af","Cad","DmT2","Hcm","Hf","HtRx","HyperLipRx")
 
 # make an output folder to store the result
 out_folder<-paste0(pheno_dir,"output/")
@@ -230,10 +231,10 @@ for (disease in c(diseases,"HxDm","HxHrt","HxHt","RxDmOr","RxDmIns")){
   dfukb_baseline_pheno<-merge(dfukb_baseline_pheno,lst.case_control$df.casecontrol,by="identifier",all.x = TRUE,all.y = FALSE)
 }
 
-dfukb_baseline_pheno$DmRxT2_0_first_diagnosis_years<-(-1*dfukb_baseline_pheno$DmRxT2_0_first_diagnosis_days)/365.25
+dfukb_baseline_pheno$DmT2_0_first_diagnosis_years<-(-1*dfukb_baseline_pheno$DmT2_0_first_diagnosis_days)/365.25
 
 # keep only the variables needed for the table
-dfukb_baseline_pheno<-dfukb_baseline_pheno[,c('identifier',"DmRxT2_0_Hx","f.21003.0.0","f.21001.0.0","f.30740.0.0","f.30750.0.0","DmRxT2_0_first_diagnosis_years","f.31.0.0","HxDm_0_Any","HxHrt_0_Any","HxHt_0_Any","HtRx_0_Hx","HyperLipRx_0_Hx","Af_0_Hx","Hcm_0_Hx","Hf_0_Hx","RxDmOr_0_Hx","RxDmIns_0_Hx","f.2986.0.0"),with=FALSE]
+dfukb_baseline_pheno<-dfukb_baseline_pheno[,c('identifier',"DmT2_0_Hx","f.21003.0.0","f.21001.0.0","f.30740.0.0","f.30750.0.0","DmT2_0_first_diagnosis_years","f.31.0.0","HxDm_0_Any","HxHrt_0_Any","HxHt_0_Any","HtRx_0_Hx","HyperLipRx_0_Hx","Af_0_Hx","Hcm_0_Hx","Hf_0_Hx","RxDmOr_0_Hx","RxDmIns_0_Hx","f.2986.0.0"),with=FALSE]
 # rename for readability
 colnames(dfukb_baseline_pheno)<-c("identifier","Type 2 diabetes","Age","BMI","Glucose","HbA1c","Years of diabetes","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertropic cardiomyopathy","Heart failure","Oral diabetes medication","Insulin","Insulin within 1 year of diagnosis")
 # below the parameters for CreateTableOne
