@@ -7,7 +7,7 @@ ukbpheno is an R package for efficiently munging the files provided by UK Bioban
 ## Installation
 
 ```R 
-devtools::install("niekverw/ukbpheno")
+devtools::install_github("niekverw/ukbpheno")
 ```
 
 
@@ -41,9 +41,14 @@ lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,f.gp_c
 ![dotplot4readme](https://user-images.githubusercontent.com/9621370/151220378-1ade1fa5-8e38-469e-9b9d-aa74138b8be0.png)
 
 ## Code lookup with shiny app 
-Required: the code maps (Excel workbook) provided by UK Biobank Showcase Resource 592. 
+Required:
+- the code maps (Excel workbook) provided by UK Biobank Showcase Resource 592. 
+- R library "optparse" 
 
 ```shell
 cd ../ukbpheno/inst/util
+# show input options 
+Rscript shiny.lookup_codes.R --help
+# to start the app
 Rscript shiny.lookup_codes.R --fcoding_xls path_to_download/all_lkps_maps_v3.xlsx
 ```
