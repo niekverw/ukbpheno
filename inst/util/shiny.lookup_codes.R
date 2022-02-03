@@ -1,3 +1,5 @@
+#!/usr/bin/env Rscript
+
 # idea from
 # https://termbrowser.nhs.uk/?perspective=full&conceptId1=404684003&edition=uk-edition&release=v20200610&server=https://termbrowser.nhs.uk/sct-browser-api/snomed&langRefset=999001261000000100,999000691000001104
 # snomedbrowser.com
@@ -42,7 +44,7 @@ e, exit.")
 } else{
   for (pckg in required_pckg[!(required_pckg %in% new.pckg)]) {
     print(pckg)
-    library(pckg, character.only = TRUE)
+    suppressPackageStartupMessages(library(pckg, character.only = TRUE))
 
   }
 }
