@@ -178,15 +178,14 @@ ind_young_onset<- union(lst.SrDmYSaCa.case_control$df.casecontrol[Any==2]$identi
 ind_RxInsFirstYear_DmT1_DmG<- union(union(lst.RxDmInsFirstYear.case_control$df.casecontrol[Any==2]$identifier,lst.DmT1.case_control$df.casecontrol[Hx==2]$identifier),lst.DmG.case_control$df.casecontrol[Hx==2]$identifier)
 
 # young onset but no DM type 1/ gestational diabetes specific codes nor self report of insulin within first year of diagnosis
-inds_young_onset_probable_DmT2 <-setdiff(ind_young_onset,ind_RxInsFirstYear_DmT1_DmG)
+inds_young_onset_potential_DmT2 <-setdiff(ind_young_onset,ind_RxInsFirstYear_DmT1_DmG)
 
 # further filter out individuals who are on the metformin but likely NOT diabetes
-inds_young_onset_probable_DmT2 <-setdiff(inds_young_onset_probable_DmT2,RxMet_DmUnlikely)
+inds_young_onset_potential_DmT2 <-setdiff(inds_young_onset_potential_DmT2,RxMet_DmUnlikely)
 
 # check if these individuals have specific DmT2 codes
 # and inspect the data on those individuals who don't  i.e. the uncertain cases
-lst.DmRxT2.case_control$all_event_dt.Include_in_cases[identifier %in% setdiff(inds_young_onset_probable_DmT2,lst.DmT2.case_control$df.casecontrol[Hx==2]$identifier)]
-
+lst.DmRxT2.case_control$all_event_dt.Include_in_cases[identifier %in% setdiff(inds_young_onset_potential_DmT2,lst.DmT2.case_control$df.casecontrol[Hx==2]$identifier)]
 
 ###########################################################################
 # Part 2 generate phenotype in batch and make a clinical characteristic table
@@ -236,18 +235,18 @@ dfukb_baseline_pheno$DmT2_0_first_diagnosis_years<-(-1*dfukb_baseline_pheno$DmT2
 # keep only the variables needed for the table
 dfukb_baseline_pheno<-dfukb_baseline_pheno[,c('identifier',"DmT2_0_Hx","f.21003.0.0","f.21001.0.0","f.30740.0.0","f.30750.0.0","DmT2_0_first_diagnosis_years","f.31.0.0","HxDm_0_Any","HxHrt_0_Any","HxHt_0_Any","HtRx_0_Hx","HyperLipRx_0_Hx","Af_0_Hx","Hcm_0_Hx","Hf_0_Hx","RxDmOr_0_Hx","RxDmIns_0_Hx","f.2986.0.0"),with=FALSE]
 # rename for readability
-colnames(dfukb_baseline_pheno)<-c("identifier","Type 2 diabetes","Age","BMI","Glucose","HbA1c","Years of diabetes","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertropic cardiomyopathy","Heart failure","Oral diabetes medication","Insulin","Insulin within 1 year of diagnosis")
+colnames(dfukb_baseline_pheno)<-c("identifier","Type 2 diabetes","Age","BMI","Glucose","HbA1c","Years since type 2 diabetes diagnosis","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertrophic cardiomyopathy","Heart failure","Oral diabetes medication","Insulin","Insulin within 1 year of diagnosis")
 # below the parameters for CreateTableOne
 # the full variable list
-vars<-c("Age","BMI","Glucose","HbA1c","Years of diabetes","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertropic cardiomyopathy","Heart failure","Oral diabetes medication","Insulin","Insulin within 1 year of diagnosis")
+vars<-c("Age","BMI","Glucose","HbA1c","Years since type 2 diabetes diagnosis","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertrophic cardiomyopathy","Heart failure","Oral diabetes medication","Insulin","Insulin within 1 year of diagnosis")
 # the categorical variables on the clinical characteristics table
-factorVars<-setdiff(vars,c("Age","BMI","Glucose","HbA1c","Years of diabetes"))
+factorVars<-setdiff(vars,c("Age","BMI","Glucose","HbA1c","Years since type 2 diabetes diagnosis"))
 
 ## Create the clinical characteristic table stratified by type 2 diabetes
 tableOne <- CreateTableOne(vars = vars, strata = "Type 2 diabetes", data = dfukb_baseline_pheno, factorVars = factorVars)
-hist(dfukb_baseline_pheno$`Years of diabetes`)
+hist(dfukb_baseline_pheno$`Years since type 2 diabetes diagnosis`)
 tableOne
-tab1Mat <- print(tableOne, quote = FALSE, noSpaces = TRUE, printToggle = FALSE,nonnormal =c("Glucose","HbA1c","Years of diabetes") )
+tab1Mat <- print(tableOne, quote = FALSE, noSpaces = TRUE, printToggle = FALSE,nonnormal =c("Glucose","HbA1c","Years since type 2 diabetes diagnosis") )
 ## Save the table to a CSV file
 write.csv(tab1Mat, file =paste0(out_folder,"BaselineTable.csv"))
 
