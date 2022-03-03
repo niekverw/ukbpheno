@@ -1,7 +1,7 @@
 # ukbpheno
 
 ## Description
-ukbpheno is an R package for efficiently munging the files provided by UK Biobank to generate data tables of with unified format for further analysis such as making dichotomous phenotypes for UKbio and a composite time-to-event variable combining record level data (HESIN/GP/cancer registry) and main dataset (self reports i.e. nurse interview / touchscreen). The package can also be used to efficiently extract required columns from a huge main dataset for exploration which is aided by visualization functionalities included in the package. 
+ukbpheno is an R package for efficiently munging the files provided by UK Biobank to generate data tables of with unified format for further analysis such as making dichotomous phenotypes for UKbio and a composite time-to-event variable combining record level data (HESIN/GP/cancer registry) and main dataset (self reports i.e. nurse interview / touchscreen). Aim of the package is to define binary phenotype data for different types of longitudinal data analysis (e.g. GWAS analysis, cox regressions, baseline tables) in a standardized and reproducible manner. The package can also be used for data exploration with efficient subsetting of the main dataset and visualization functions.
 
 
 ## Installation
@@ -39,6 +39,7 @@ lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,f.gp_c
 
 ```
 ![dotplot4readme](https://user-images.githubusercontent.com/9621370/151220378-1ade1fa5-8e38-469e-9b9d-aa74138b8be0.png)
+
 
 ## Code lookup with shiny app 
 Required:
