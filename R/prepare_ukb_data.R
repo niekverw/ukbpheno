@@ -1,3 +1,15 @@
+#' Check if string variable is valid
+#'
+#' Any of these will cause file.exists() to throw an error
+#' @param x
+#' @return  logical TRUE / FALSE
+#' @export
+isNullNaNan = function(x) {
+  # "short-circuit" operator || : If condition1 is true, condition 2 and 3 will NOT be checked.
+  # which is important, because is.na/is.nan throws an error when input is NULL
+  any(is.null(x))  || any(is.na(x))  || any(is.nan(x))
+}
+
 #' Process definition table
 #'
 #' Given a definition table, check, clean, format as well as to expand the codes.
@@ -52,7 +64,7 @@ read_defnition_table <-function(f.definition,f.data.setting,dir.code.map){
 harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.hesin=NULL,f.hesin_diag=NULL,f.hesin_oper=NULL,f.death_portal=NULL,f.death_cause_portal=NULL,f.gp_clinical=NULL,f.gp_scripts=NULL,allow_missing_fields=TRUE,...){
   message("Start data harmonization")
 
-  if (!(is.null(f.html)&is.null(f.ukbtab))){
+  if (!(isNullNaNan(f.html)&isNullNaNan(f.ukbtab))){
     message("Read metadata file ")
     # # ukb's .tab meta data which can be generated using ukbconv
     dfhtml <- read_ukb_metadata(f.html)
@@ -102,7 +114,7 @@ harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.he
   ### touchscreen (event==2: only the first occurence is an event)
   ################################################################################
   # if no definition table is supplied, only default fields below are processed
-  print(!is.null(dfDefinitions))
+  # print(!is.null(dfDefinitions))
   if (!is.null(dfDefinitions)){
     message("Convert touchscreen data")
     lst.data$ts <- convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions$TS)
@@ -146,31 +158,33 @@ harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.he
   # lst.data$tte.death.icd10.secondary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
   # death registry from data portal , same data as the main dataset but more up to date, refer document DeathLinkage
   # this is merged with the death from tab file for completeness, but it is the same data now.
-  if (!(is.null(f.death_portal)&is.null(f.death_portal))){
+  if (!isNullNaNan(f.death_portal) & !isNullNaNan(f.death_cause_portal)){
     message("Convert death registry data(data portal)")
-    lst.data_dth <- read_death_data(fdeath_portal,fdeath_cause_portal)
+    lst.data_dth <- read_death_data(f.death_portal,f.death_cause_portal)
     lst.data$tte.death.icd10.primary <-lst.data_dth$primary
     lst.data$tte.death.icd10.secondary<-lst.data_dth$secondary
     rm(lst.data_dth)
   }
-
   ################################################################################
   ###  hesin  (event==1)
   ################################################################################
-  if (!(is.null(f.hesin)&is.null(f.hesin_diag)&is.null(f.hesin_oper))){
-    tictoc::tic("Convert Hospital Inpatient data(data portal)")
-    lst.data <- append(lst.data,read_hesin_data(f.hesin ,f.hesin_diag ,f.hesin_oper)) #tte.hes.primary + tte.hes.secondary
-    tictoc::toc()
+  if (!isNullNaNan(f.hesin)& !isNullNaNan(f.hesin_diag)& !isNullNaNan(f.hesin_oper)){
+
+      tictoc::tic("Convert Hospital Inpatient data(data portal)")
+      lst.data <- append(lst.data,read_hesin_data(f.hesin ,f.hesin_diag ,f.hesin_oper)) #tte.hes.primary + tte.hes.secondary
+      tictoc::toc()
   }
 
   ################################################################################
   ### primary care, gp  (event==1)
   ################################################################################
-  if (!(is.null(f.gp_clinical)&is.null(f.gp_scripts))){
+  if (!(isNullNaNan(f.gp_clinical))){
     tictoc::tic("Convert GP diagnosis data(data portal")
     lst.data <- append(lst.data,read_gp_clinical_data(fgp=f.gp_clinical))
     tictoc::toc()
     gc()
+  }
+  if (!(isNullNaNan(f.gp_scripts))){
     tictoc::tic("Convert GP prescription data(data portal")
     # this one does medication
     lst.data <- append(lst.data,read_gp_script_data(fgp=f.gp_scripts))
