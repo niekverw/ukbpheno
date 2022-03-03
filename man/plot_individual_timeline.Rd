@@ -10,6 +10,7 @@ plot_individual_timeline(
   lst.data = NULL,
   ind_identifier = 1234567,
   plot_medication = FALSE,
+  keep_classifications = NULL,
   font_size = 5
 )
 }
