@@ -83,7 +83,11 @@ parse_html_tables <- function(x){
 #' read_ukb_metadata ("ukb12345.html")
 read_ukb_metadata <- function(fhtml) {
   tictoc::tic(paste("read ukb html",fhtml))
-
+  # this (redundant?) message is perhaps clearer than the one thrown by readHTMLTable()
+  if (!file.exists(fhtml)){
+    message(paste0("ABORT reading metadata of the main dataset: File does not exist \n",fhtml))
+    return()
+  }
   # Column types as described by UKB
   # http://biobank.ctsu.ox.ac.uk/crystal/help.cgi?cd=value_type
   col_type <- c(
@@ -168,6 +172,11 @@ read_ukb_tabdata <- function(fukb,
                           dfhtml,
                           fields_to_keep = default_ukb_fields()) {
   tictoc::tic(paste("read ukb data",fukb))
+  if (!file.exists(fukb)){
+    message(paste0("ABORT reading main dataset: File does not exist \n",fukb))
+    return()
+  }
+
   if (!exists("n_threads")){n_threads=1}
 
   if(!any(fields_to_keep %in% "eid" )){
@@ -218,6 +227,14 @@ read_ukb_tabdata <- function(fukb,
 #' @examples
 #' read_hesin_data("hesin.txt" ,"hesin_diag.txt" ,"hesin_oper.txt" )
 read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
+  # check if file paths are valid
+  if (!file.exists(fhesin)| !file.exists(fhesin_diag) | !file.exists(fhesin_oper)){
+    message("ABORT reading HESIN data: Required file(s) not found:")
+    message(paste("fhesin exists -",file.exists(fhesin),fhesin),sep=" ")
+    message(paste("fhesin_diag exists -",file.exists(fhesin_diag),fhesin_diag,sep=" "))
+    message(paste("fhesin_oper exists -",file.exists(fhesin_oper),fhesin_oper))
+    return()
+  }
 
   #  refer HES Data Dictionary Document ID:141140
   ## TODO; use library(fasttime); fastPOSIXct(DT$start_date)
@@ -314,9 +331,13 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
 #' @examples
 #' read_gp_clinical_data("gpclinical.txt" )
 read_gp_clinical_data <- function(fgp){
-
+  # stop if there is no file
+  if (!file.exists(fgp)){
+    message(paste0("ABORT reading GP clinical data: File does not exist - ",fgp))
+    return()
+  }
   tictoc::tic(paste("read gp data",fgp))
-  message(paste("read gp data",fgp))
+  # message(paste("read gp data",fgp))
   # records potentially erroneous have date changed to 01/01/1901 (occured before birth), 02/02/1902 (occured on DOB), 03/03/1903 (same year as DOB), 07/07/2037 (occured after the time of extraction)
   mindate = as.Date("1930-01-01")
   maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?.
@@ -382,7 +403,11 @@ read_gp_clinical_data <- function(fgp){
 #' @examples
 #' read_gp_clinical_data("gpscripts.txt" )
 read_gp_script_data <- function(fgp){
-
+  # stop if there is no file
+  if (!file.exists(fgp)){
+    message(paste0("ABORT reading GP prescription data: File does not exist - ",fgp))
+    return()
+  }
   tictoc::tic("read gp prescription data")
   mindate = as.Date("1930-01-01")
   maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?.
@@ -537,6 +562,14 @@ get_lst_counts <- function(lst.data,lst.data.settings) {
 #' @examples
 #' read_death_data("death.txt","death_cause.txt" )
 read_death_data <- function(fdeath_portal, fdeath_cause_portal){
+  # check if file paths are valid
+  if (!file.exists(fdeath_portal)| !file.exists(fdeath_cause_portal) ){
+    message("ABORT reading death records: Required file(s) not found:")
+    message(paste("fdeath_portal exists -",file.exists(fdeath_portal),fdeath_portal),sep=" ")
+    message(paste("fdeath_cause_portal exists -",file.exists(fdeath_cause_portal),fdeath_cause_portal,sep=" "))
+    return()
+  }
+
   tictoc::tic(paste("read death data",fdeath_portal,"&",fdeath_cause_portal))
   mindate = as.Date("1930-01-01")
   maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?.
