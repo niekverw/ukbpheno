@@ -18,7 +18,7 @@
 #' lst.data.identifier<-lapply(lst.data,function(x) {x[, ("identifier") := lapply(.SD, as.numeric), .SDcols = "identifier"] })  set eid to numeric
 #' lst.data.identifier<-lapply(lst.data,function(x) {setkey(x,identifier) }) # double check that everything has the same setkey.
 #' plot_individual_timeline(df.data.settings,NULL,lst.data.identifier,ind_identifier="1234567")
-plot_individual_timeline <- function(df.data.settings,ind_all_event_dt=NULL,lst.data=NULL,ind_identifier=1234567,plot_medication=FALSE,font_size=5) {
+plot_individual_timeline <- function(df.data.settings,ind_all_event_dt=NULL,lst.data=NULL,ind_identifier=1234567,plot_medication=FALSE,keep_classifications=NULL,font_size=5) {
   # credit:  https://benalexkeen.com/creating-a-timeline-graphic-using-r-and-ggplot2/
   # input: a collapsed datatable with ind_all_event_dt for one participant, e.g. for disease codes.
   # alternative input: lst.data and identifier, so that it generates the ind_all_event_dt based on all available data.
@@ -69,6 +69,9 @@ plot_individual_timeline <- function(df.data.settings,ind_all_event_dt=NULL,lst.
     df<-df[! df$classification %in% c("f.20003","READ2_drugs","DMD","BNF"),]
   }
 
+  if(!is.null(keep_classifications)){
+     df <- df[df$classification %in% keep_classifications, ]
+  }
   df <- data.frame(month=month(df$eventdate),
             year=year(df$eventdate),
             code= df$code,
