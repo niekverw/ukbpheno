@@ -118,8 +118,7 @@ harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.he
   ### touchscreen (event==2: only the first occurence is an event)
   ################################################################################
   # if no definition table is supplied, only default fields below are processed
-  # print(!is.null(dfDefinitions))
-
+  # check if TS fields contains input, skipping those with NA
   if (any(nchar(dfDefinitions$TS)>0,na.rm=TRUE)){
     message("Convert touchscreen data")
     lst.data$ts <- convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions$TS)
