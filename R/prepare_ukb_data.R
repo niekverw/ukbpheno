@@ -32,8 +32,12 @@ read_defnition_table <-function(f.definition,f.data.setting,dir.code.map){
   missing_codes<-check_dfDefinitions_codes(dfDefinitions_processed,dfData.settings,code_map_dir=dir.code.map,F)
   # WHAT IT MEANS: Codes that are not present will be removed in the expand_dfDefinitions...() as the they will be removed
   # in theory these extra codes will not cause crashes of the pipeline unless the whole line is empty (no codes from any source)
-  dfDefinitions_processed_expanded <-expand_dfDefinitions_processed2(dfDefinitions_processed,dfData.settings,code_map_dir=dir.code.map )
+  # add a slash if the path does not contain a slash
+  if (stringr::str_detect(dir.code.map,"/$",negate=FALSE)){
+    dir.code.map<-paste0(dir.code.map,"/")
+  }
 
+  dfDefinitions_processed_expanded <-expand_dfDefinitions_processed2(dfDefinitions_processed,dfData.settings,code_map_dir=dir.code.map )
   return(dfDefinitions_processed_expanded)
 }
 
@@ -115,7 +119,8 @@ harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.he
   ################################################################################
   # if no definition table is supplied, only default fields below are processed
   # print(!is.null(dfDefinitions))
-  if (!is.null(dfDefinitions)){
+
+  if (any(nchar(dfDefinitions$TS)>0,na.rm=TRUE)){
     message("Convert touchscreen data")
     lst.data$ts <- convert_touchscreen_to_episodedata(dfukb,ts_conditions = dfDefinitions$TS)
   }
