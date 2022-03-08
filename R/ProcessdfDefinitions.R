@@ -410,7 +410,7 @@ get_allvarnames <- function(dfDefinitions_processed,dfhtml=NULL,allow_miss=TRUE)
   # VctAllUKBVDefinitionColumns=c("TS") #set this variable to a selection of columns (dfDefinition columns) to be outputted by the _UKBV variable, default is 'VctAllUKBVDefinitionColumns=c("TS","SR","TS_RX","SR_RX","LAB")'
   # TS(Touchscreen) in definition
   TScolumns = "TS"
-  defcols <- unlist(strsplit(na.omit(unname(unlist(dfDefinitions_processed[,c(TScolumns)]))),split=","))
+  defcols <- unlist(strsplit(na.omit(unname(unlist(as.character(dfDefinitions_processed[,c(TScolumns)])))),split=","))
   defcols <- unlist(strsplit(chartr("[]", "()", defcols),"[()]"))
   defcols <- gsub("(≥|≤|=|>|<).*","",defcols)
   defcols <- gsub("≥.*","",defcols)
