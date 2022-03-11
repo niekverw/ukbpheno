@@ -330,11 +330,11 @@ plot_disease_timeline_by_source <- function(definition,
       colour = .id,
       group = .id
     )) +
-    ggplot2::scale_color_manual(values = color_vec, name = "source") +
+    ggplot2::scale_color_manual(values = color_vec, name = "Source") +
     ggplot2::geom_line(alpha = 1, size = 1) + ggplot2::geom_point(size =
                                                                     0.8,
                                                                   alpha = 0.1,
-                                                                  shape = 20) + ggplot2::xlab("Time") +
+                                                                  shape = 20) + ggplot2::xlab("Time of diagnosis") +
     ggplot2::ylab("Count") +
     # annotation window v0
     ggplot2::annotate(
