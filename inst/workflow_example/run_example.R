@@ -4,6 +4,8 @@ library(ukbpheno)
 library(ggplot2)
 library(ggforce)
 library(tableone)
+library(survminer)
+
 
 #############################################################################
 # specify path to UKB data and to the package
@@ -13,8 +15,8 @@ repo_dir<-".../repos/ukbpheno/"
 pheno_dir<-".../data/ukb12345/"
 
 
-fukbtab <- paste(pheno_dir,"ukb47316.tab",sep="")
-fhtml<-paste(pheno_dir,"ukb47316.html",sep="")
+fukbtab <- paste(pheno_dir,"ukb12345.tab",sep="")
+fhtml<-paste(pheno_dir,"ukb12345.html",sep="")
 fhesin<-paste(pheno_dir,"hesin.txt",sep="")
 fhesin_diag<-paste(pheno_dir,"hesin_diag.txt",sep="")
 fhesin_oper<-paste(pheno_dir,"hesin_oper.txt",sep="")
@@ -113,7 +115,7 @@ View(lst.DmRxT2.case_control$all_event_dt.Include_in_cases.summary)
 View(lst.DmRxT2.case_control$df.casecontrol)
 
 # get a disease time line to see the relative contribution of different data sources over time
-DmRxT2_timeline<-plot_disease_timeline_by_source(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait),lst.harmonized.data$lst.data,dfData.settings,lst.harmonized.data$vct.identifiers)
+DmRxT2_timeline<-plot_disease_timeline_by_source(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait),lst.harmonized.data$lst.data,dfData.settings,df_reference_dt_v0$identifier)
 DmRxT2_timeline
 # get a UpSet plot to see the relative contribution of different data sources at baseline
 upset_plot<-make_upsetplot(definition=dfDefinitions_processed_expanded%>%filter(TRAIT==trait),lst.harmonized.data$lst.data,dfData.settings,df.reference.dates = df_reference_dt_v0)
@@ -200,12 +202,11 @@ dfhtml <- read_ukb_metadata(fhtml)
 # rename the identifier column in the metadata
 dfhtml[which(dfhtml$field.tab=="f.eid"),]$field.tab<-"identifier"
 
-# age at assessment centre visit, sex, BMI , HbA1c, glucose,insulin within 1 year of diagnosis
-baseline_fields<-c(21003,31,21001,30750,30740,2986)
+# age at assessment centre visit, sex, BMI , HbA1c, glucose,insulin within 1 year of diagnosis,UK Biobank assessment center location,visit date
+baseline_fields<-c(21003,31,21001,30750,30740,2986,54,53)
 # extract these variables from main dataset
 dfukb_baseline <- read_ukb_tabdata(fukbtab,dfhtml,fields_to_keep = baseline_fields)
 gc()
-
 # the target disease traits we will generate in batch
 diseases<-c("Af","Cad","DmT2","Hcm","Hf","HtRx","HyperLipRx")
 
@@ -216,11 +217,10 @@ if(!dir.exists(file.path(out_folder))){
 }
 
 
-dfukb_baseline_pheno<-dfukb_baseline
+dfukb_baseline_pheno<-dfukb_baseline[! identifier %in% df_withdrawal$V1]
 # loop through the traits, including family history of related diseases and the diabetes medication use
 for (disease in c(diseases,"HxDm","HxHrt","HxHt","RxDmOr","RxDmIns")){
   print(disease)
-
   lst.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==disease), lst.harmonized.data$lst.data,dfData.settings, df_reference_date=df_reference_dt_v0)
   # add the trait to the  col names
   colnames(lst.case_control$df.casecontrol) <- paste(disease,"0",colnames(lst.case_control$df.casecontrol),  sep = "_")
@@ -230,12 +230,16 @@ for (disease in c(diseases,"HxDm","HxHrt","HxHt","RxDmOr","RxDmIns")){
   dfukb_baseline_pheno<-merge(dfukb_baseline_pheno,lst.case_control$df.casecontrol,by="identifier",all.x = TRUE,all.y = FALSE)
 }
 
+
+##################################
+# Baseline Characteristics table
+#################################
 dfukb_baseline_pheno$DmT2_0_first_diagnosis_years<-(-1*dfukb_baseline_pheno$DmT2_0_first_diagnosis_days)/365.25
 
 # keep only the variables needed for the table
-dfukb_baseline_pheno<-dfukb_baseline_pheno[,c('identifier',"DmT2_0_Hx","f.21003.0.0","f.21001.0.0","f.30740.0.0","f.30750.0.0","DmT2_0_first_diagnosis_years","f.31.0.0","HxDm_0_Any","HxHrt_0_Any","HxHt_0_Any","HtRx_0_Hx","HyperLipRx_0_Hx","Af_0_Hx","Hcm_0_Hx","Hf_0_Hx","RxDmOr_0_Hx","RxDmIns_0_Hx","f.2986.0.0"),with=FALSE]
+dfukb_baseline_pheno_fortable1<-dfukb_baseline_pheno[,c('identifier',"DmT2_0_Hx","f.21003.0.0","f.21001.0.0","f.30740.0.0","f.30750.0.0","DmT2_0_first_diagnosis_years","f.31.0.0","HxDm_0_Any","HxHrt_0_Any","HxHt_0_Any","HtRx_0_Hx","HyperLipRx_0_Hx","Af_0_Hx","Hcm_0_Hx","Hf_0_Hx","RxDmOr_0_Hx","RxDmIns_0_Hx","f.2986.0.0"),with=FALSE]
 # rename for readability
-colnames(dfukb_baseline_pheno)<-c("identifier","Type 2 diabetes","Age","BMI","Glucose","HbA1c","Years since type 2 diabetes diagnosis","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertrophic cardiomyopathy","Heart failure","Oral diabetes medication","Insulin","Insulin within 1 year of diagnosis")
+colnames(dfukb_baseline_pheno_fortable1)<-c("identifier","Type 2 diabetes","Age","BMI","Glucose","HbA1c","Years since type 2 diabetes diagnosis","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertrophic cardiomyopathy","Heart failure","Oral diabetes medication","Insulin","Insulin within 1 year of diagnosis")
 # below the parameters for CreateTableOne
 # the full variable list
 vars<-c("Age","BMI","Glucose","HbA1c","Years since type 2 diabetes diagnosis","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertrophic cardiomyopathy","Heart failure","Oral diabetes medication","Insulin","Insulin within 1 year of diagnosis")
@@ -243,12 +247,57 @@ vars<-c("Age","BMI","Glucose","HbA1c","Years since type 2 diabetes diagnosis","S
 factorVars<-setdiff(vars,c("Age","BMI","Glucose","HbA1c","Years since type 2 diabetes diagnosis"))
 
 ## Create the clinical characteristic table stratified by type 2 diabetes
-tableOne <- CreateTableOne(vars = vars, strata = "Type 2 diabetes", data = dfukb_baseline_pheno, factorVars = factorVars)
-hist(dfukb_baseline_pheno$`Years since type 2 diabetes diagnosis`)
+tableOne <- CreateTableOne(vars = vars, strata = "Type 2 diabetes", data = dfukb_baseline_pheno_fortable1, factorVars = factorVars)
+hist(dfukb_baseline_pheno_fortable1$`Years since type 2 diabetes diagnosis`)
 tableOne
 tab1Mat <- print(tableOne, quote = FALSE, noSpaces = TRUE, printToggle = FALSE,nonnormal =c("Glucose","HbA1c","Years since type 2 diabetes diagnosis") )
 ## Save the table to a CSV file
 write.csv(tab1Mat, file =paste0(out_folder,"BaselineTable.csv"))
 
+
+##################################
+# Survival analysis
+##################################
+# get death dates from data
+deathdt<-unique(lst.harmonized.data$lst.data$tte.death.icd10.primary[,.(identifier,eventdate)])
+# rename the column
+colnames(deathdt)<-c("identifier","deathdt")
+# merge
+dfukb_baseline_pheno<-merge(dfukb_baseline_pheno,deathdt,by="identifier",all.x=TRUE,all.y = FALSE)
+# HESIN censoring date are different by regions
+# retrieve this info using UK Biobank assessment center location attended by the participants
+england<-c("10003","11001","11002","11007","11008","11009","11010","11011","11012","11013","11014","11016","11017","11018","11019","11020","11021")
+scotland<-c("11004","11005")
+wales<-c("11003","11022", "11006","11023")
+dfukb_baseline_pheno[dfukb_baseline_pheno$f.54.0.0 %in% england,"censordateHES"]<-as.Date("2021-03-31")
+dfukb_baseline_pheno[dfukb_baseline_pheno$f.54.0.0 %in% scotland,"censordateHES"]<-as.Date("2021-03-31")
+dfukb_baseline_pheno[dfukb_baseline_pheno$f.54.0.0 %in% wales,"censordateHES"]<-as.Date("2018-02-28")
+
+# time-to-event/observed time is determined at earliest of date of event, date of death and censoring date of HESIN data (last follow up)
+# this is already calculated for those who have events
+range(dfukb_baseline_pheno[Hf_0_Fu==2,Hf_0_Fu_days])
+# ppl wihtout event but died before HESIN censoring date (end of follow up)
+dfukb_baseline_pheno[Hf_0_Fu==1 & !is.na(deathdt) & deathdt-censordateHES<=0,Hf_0_Fu_days:=deathdt-as.Date(f.53.0.0)]
+# people censored at last fu
+# ppl wihtout event but died after censoring date (HESIN),
+dfukb_baseline_pheno[Hf_0_Fu==1 &!is.na(deathdt)& deathdt-censordateHES>0 ,Hf_0_Fu_days:=censordateHES-as.Date(f.53.0.0)]
+# ppl wihtout event and alive by censoring date
+dfukb_baseline_pheno[Hf_0_Fu==1 &is.na(deathdt) ,Hf_0_Fu_days:=censordateHES-as.Date(f.53.0.0)]
+
+#Estimate risk of new onset heart failure by presence/absence of type 2 diabetes at baseline
+fit<-survival::survfit(survival::Surv(Hf_0_Fu_days/365.25,Hf_0_Fu ) ~ DmT2_0_Hx, data = dfukb_baseline_pheno[DmT2_0_Hx>0])
+# summary(fit)
+# Make Kaplan-Meier plot
+ggsurvplot(fit, data =  dfukb_baseline_pheno[DmT2_0_Hx>0], size = 0.8,
+           break.time.by=2,
+           xlab = "Follow up (years)",
+           censor.size=2,
+           palette = c("#072A6C", "#FF8400"),
+           conf.int = TRUE,          # Add confidence interval
+           pval = TRUE,              # Add p-value
+           risk.table = TRUE,        # Add risk table
+           risk.table.col = "strata",# Risk table color by groups
+           legend.labs = c("No type 2 diabetes at baseline","Type 2 diabetes at baseline"),
+           risk.table.height = 0.2)
 
 
