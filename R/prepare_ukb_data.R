@@ -33,8 +33,12 @@ read_defnition_table <-function(f.definition,f.data.setting,dir.code.map){
   # WHAT IT MEANS: Codes that are not present will be removed in the expand_dfDefinitions...() as the they will be removed
   # in theory these extra codes will not cause crashes of the pipeline unless the whole line is empty (no codes from any source)
   # add a slash if the path does not contain a slash
-  if (stringr::str_detect(dir.code.map,"/$",negate=FALSE)){
-    dir.code.map<-paste0(dir.code.map,"/")
+  if (stringr::str_detect(dir.code.map,"/$",negate=TRUE)){
+    if( .Platform$OS.type == "windows" ){
+      dir.code.map<-paste0(dir.code.map,"\\")
+    }else{
+      dir.code.map<-paste0(dir.code.map,"/")
+    }
   }
 
   dfDefinitions_processed_expanded <-expand_dfDefinitions_processed2(dfDefinitions_processed,dfData.settings,code_map_dir=dir.code.map )
