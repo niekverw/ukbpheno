@@ -529,10 +529,10 @@ add_child_nodes <-function(dfcode,codeVct){
 #' @keywords definition
 #' @export
 #' @example
-#' expand_dfDefinitions_processed2(dfDefinitions_processed,lst.data.settings,"inst/extdata/")
+#' expand_dfDefinitions_processed2(dfDefinitions_processed,lst.data.settings,paste0(system.file("extdata", package="ukbpheno"),"/"))
 expand_dfDefinitions_processed2 <-
   function(dfDefinitions_processed,
-           lst.data.settings,code_map_dir="data/") {
+           lst.data.settings,code_map_dir) {
     message("Expand the codes in the definition table")
 
     classifications <-
@@ -607,7 +607,7 @@ expand_dfDefinitions_processed2 <-
 #' @keywords definition
 #' @export
 #' @example
-#' check_dfDefinitions_codes(dfDefinitions_processed,lst.data.settings,code_map_dir ="inst/extdata/")
+#' check_dfDefinitions_codes(dfDefinitions_processed,lst.data.settings,code_map_dir=paste0(system.file("extdata", package="ukbpheno"),"/"))
 check_dfDefinitions_codes <-function(dfDefinitions_processed,
                                      lst.data.settings,code_map_dir="data/",check_expandable_codes_only=T){
    all_missing_codes<-list()
