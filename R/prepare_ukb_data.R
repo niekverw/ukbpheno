@@ -25,13 +25,7 @@ read_defnition_table <-function(f.definition,f.data.setting,dir.code.map){
   dfData.settings <-data.table::fread(f.data.setting)
   dfDefinitions <- data.table::fread(fdefinitions, colClasses = 'character', data.table = FALSE)
   dfDefinitions_processed <- ProcessDfDefinitions(dfDefinitions)
-  # Next we check the codes in the definition table against the code maps
-  # The code maps are either downloaded from UK biobank showcase (codingxx.tsv) [search corresponding Data-Coding in showcase] for which has been checked to include all codes present in data # or to be created from the current data at hand (.code)
 
-  # With the code maps, we check the codes in the definition table
-  missing_codes<-check_dfDefinitions_codes(dfDefinitions_processed,dfData.settings,code_map_dir=dir.code.map,F)
-  # WHAT IT MEANS: Codes that are not present will be removed in the expand_dfDefinitions...() as the they will be removed
-  # in theory these extra codes will not cause crashes of the pipeline unless the whole line is empty (no codes from any source)
   # add a slash if the path does not contain a slash
   if (stringr::str_detect(dir.code.map,"/$",negate=TRUE)){
     if( .Platform$OS.type == "windows" ){
@@ -40,11 +34,14 @@ read_defnition_table <-function(f.definition,f.data.setting,dir.code.map){
       dir.code.map<-paste0(dir.code.map,"/")
     }
   }
-
+  # Check the codes in the definition table against the code maps
+  # The code maps are either downloaded from UK biobank showcase (codingxx.tsv) [search corresponding Data-Coding in showcase] for which has been checked to include all codes present in data # or to be created from the current data at hand (.code)
+  missing_codes<-check_dfDefinitions_codes(dfDefinitions_processed,dfData.settings,code_map_dir=dir.code.map,F)
+  # WHAT IT MEANS: Codes that are not present will be removed in the expand_dfDefinitions...() as the they will be removed
+  # in theory these extra codes will not cause errors of the pipeline unless the whole line is empty (no codes from any source)
   dfDefinitions_processed_expanded <-expand_dfDefinitions_processed2(dfDefinitions_processed,dfData.settings,code_map_dir=dir.code.map )
   return(dfDefinitions_processed_expanded)
 }
-
 
 
 
