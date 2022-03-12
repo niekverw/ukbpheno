@@ -14,6 +14,7 @@ devtools::install_github("niekverw/ukbpheno")
 ## Basic Usage
 
 ```R
+library(data.table)
 library(ukbpheno)
 
 # the directory with datafiles
@@ -75,9 +76,9 @@ View(lst.Cad.case_control$df.casecontrol)
 
 # HF in CAD
 trait<-"HfInCad"
-vct.ind<-setdiff(lst.harmonized.data$vct.identifiers, as.vector(df_withdrawal$V1))
+
 # the reference date is the date of diagnosis of CAD
-lst.HfInCad.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==trait), lst.harmonized.data$lst.data,dfData.settings, vct.identifiers=vct.ind)
+lst.HfInCad.case_control <- get_cases_controls(definitions=dfDefinitions_processed_expanded %>% filter(TRAIT==trait), lst.harmonized.data$lst.data,dfData.settings, vct.identifiers=df_reference_dt_v0$identifier)
 ```
 
 
