@@ -10,11 +10,8 @@ library(survminer)
 #############################################################################
 # specify path to UKB data and to the package
 #############################################################################
-
-repo_dir<-".../repos/ukbpheno/"
+# folder where the files are downloaded and decrypted
 pheno_dir<-".../data/ukb12345/"
-
-
 fukbtab <- paste(pheno_dir,"ukb12345.tab",sep="")
 fhtml<-paste(pheno_dir,"ukb12345.html",sep="")
 fhesin<-paste(pheno_dir,"hesin.txt",sep="")
@@ -29,9 +26,9 @@ fdeath_cause_portal<-paste(pheno_dir,"death_cause.txt",sep="")
 #############################################################################
 # load the example definition table and data setting included in the package
 #############################################################################
-data_dir<-paste(repo_dir,"inst/extdata/",sep="")
-fdefinitions <- paste(data_dir,"definitions_cardiometabolic_traits.tsv",sep="")
-fdata_setting <- paste(data_dir,"data.settings.tsv",sep="")
+data_dir<-paste0(system.file("extdata", package="ukbpheno"),"/")
+fdefinitions <- paste0(data_dir,"definitions_cardiometabolic_traits.tsv")
+fdata_setting <- paste0(data_dir,"data.settings.tsv")
 
 # ##########################################
 # read setting
@@ -269,6 +266,7 @@ dfukb_baseline_pheno<-merge(dfukb_baseline_pheno,deathdt,by="identifier",all.x=T
 england<-c("10003","11001","11002","11007","11008","11009","11010","11011","11012","11013","11014","11016","11017","11018","11019","11020","11021")
 scotland<-c("11004","11005")
 wales<-c("11003","11022", "11006","11023")
+# corresponding censoring dates
 dfukb_baseline_pheno[dfukb_baseline_pheno$f.54.0.0 %in% england,"censordateHES"]<-as.Date("2021-03-31")
 dfukb_baseline_pheno[dfukb_baseline_pheno$f.54.0.0 %in% scotland,"censordateHES"]<-as.Date("2021-03-31")
 dfukb_baseline_pheno[dfukb_baseline_pheno$f.54.0.0 %in% wales,"censordateHES"]<-as.Date("2018-02-28")
