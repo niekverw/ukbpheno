@@ -231,10 +231,12 @@ for (disease in c(diseases,"HxDm","HxHrt","HxHt","RxDmOr","RxDmIns")){
 ##################################
 # Baseline Characteristics table
 #################################
-dfukb_baseline_pheno$DmT2_0_first_diagnosis_years<-(-1*dfukb_baseline_pheno$DmT2_0_first_diagnosis_days)/365.25
 
 # keep only the variables needed for the table
-dfukb_baseline_pheno_fortable1<-dfukb_baseline_pheno[,c('identifier',"DmT2_0_Hx","f.21003.0.0","f.21001.0.0","f.30740.0.0","f.30750.0.0","DmT2_0_first_diagnosis_years","f.31.0.0","HxDm_0_Any","HxHrt_0_Any","HxHt_0_Any","HtRx_0_Hx","HyperLipRx_0_Hx","Af_0_Hx","Hcm_0_Hx","Hf_0_Hx","RxDmOr_0_Hx","RxDmIns_0_Hx","f.2986.0.0"),with=FALSE]
+dfukb_baseline_pheno_fortable1<-dfukb_baseline_pheno[,c('identifier',"DmT2_0_Hx","f.21003.0.0","f.21001.0.0","f.30740.0.0","f.30750.0.0","DmT2_0_first_diagnosis_days","f.31.0.0","HxDm_0_Any","HxHrt_0_Any","HxHt_0_Any","HtRx_0_Hx","HyperLipRx_0_Hx","Af_0_Hx","Hcm_0_Hx","Hf_0_Hx","RxDmOr_0_Hx","RxDmIns_0_Hx","f.2986.0.0"),with=FALSE]
+# -ve first diagnosis day indicates history while +ve indicates follow-up cases
+dfukb_baseline_pheno_fortable1$DmT2_0_first_diagnosis_years<-(-1*dfukb_baseline_pheno_fortable1$DmT2_0_first_diagnosis_days)/365.25
+
 # rename for readability
 colnames(dfukb_baseline_pheno_fortable1)<-c("identifier","Type 2 diabetes","Age","BMI","Glucose","HbA1c","Years since type 2 diabetes diagnosis","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertrophic cardiomyopathy","Heart failure","Oral diabetes medication","Insulin","Insulin within 1 year of diagnosis")
 # below the parameters for CreateTableOne
