@@ -238,7 +238,7 @@ dfukb_baseline_pheno_fortable1<-dfukb_baseline_pheno[,c('identifier',"DmT2_0_Hx"
 dfukb_baseline_pheno_fortable1$DmT2_0_first_diagnosis_years<-(-1*dfukb_baseline_pheno_fortable1$DmT2_0_first_diagnosis_days)/365.25
 
 # rename for readability
-colnames(dfukb_baseline_pheno_fortable1)<-c("identifier","Type 2 diabetes","Age","BMI","Glucose","HbA1c","Years since type 2 diabetes diagnosis","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertrophic cardiomyopathy","Heart failure","Oral diabetes medication","Insulin","Insulin within 1 year of diagnosis")
+colnames(dfukb_baseline_pheno_fortable1)<-c("identifier","Type 2 diabetes","Age","BMI","Glucose","HbA1c","Days since type 2 diabetes diagnosis","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertrophic cardiomyopathy","Heart failure","Oral diabetes medication","Insulin","Insulin within 1 year of diagnosis","Years since type 2 diabetes diagnosis")
 # below the parameters for CreateTableOne
 # the full variable list
 vars<-c("Age","BMI","Glucose","HbA1c","Years since type 2 diabetes diagnosis","Sex","Family history of diabetes","Family history of heart disease","Family history of hypertension","Hypertension","Hyperlipidemia","Atrial fibrillation","Hypertrophic cardiomyopathy","Heart failure","Oral diabetes medication","Insulin","Insulin within 1 year of diagnosis")
