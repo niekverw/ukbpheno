@@ -15,7 +15,9 @@ harmonize_ukb_data(
   f.death_cause_portal = NULL,
   f.gp_clinical = NULL,
   f.gp_scripts = NULL,
+  f.withdrawal_list = NULL,
   allow_missing_fields = TRUE,
+  death_from_portal = TRUE,
   ...
 )
 }
@@ -39,6 +41,12 @@ harmonize_ukb_data(
 \item{f.gp_clinical}{Path to GP clinical event records, RECORD LEVEL DATA}
 
 \item{f.gp_scripts}{Path to GP prescription event records, RECORD LEVEL DATA}
+
+\item{f.withdrawal_list}{Path to participant withdrawal list (.csv)}
+
+\item{allow_missing_fields}{Logical flag specifying whether missing data field(s) is allowed (ignored) by the function. If FALSE, function will halt if any field is missing from the main dataset}
+
+\item{death_from_portal}{Logical flag specifying whether death records will be read from data portal files and from the main dataset. The main dataset will be taken if the files from data portal are not present (readable).}
 }
 \value{
 main dataset as dataframe with only selected data fields

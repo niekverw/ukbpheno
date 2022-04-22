@@ -61,12 +61,15 @@ read_defnition_table <-function(f.definition,f.data.setting,dir.code.map){
 #' @param f.death_cause_portal Path to file with DEATH_CAUSE table, RECORD LEVEL DATA
 #' @param f.gp_clinical Path to GP clinical event records, RECORD LEVEL DATA
 #' @param f.gp_scripts Path to GP prescription event records, RECORD LEVEL DATA
+#' @param f.withdrawal_list Path to participant withdrawal list (.csv)
+#' @param allow_missing_fields Logical flag specifying whether missing data field(s) is allowed (ignored) by the function. If FALSE, function will halt if any field is missing from the main dataset
+#' @param death_from_portal Logical flag specifying whether death records will be read from data portal files and from the main dataset. The main dataset will be taken if the files from data portal are not present (readable).
 #' @return   main dataset as dataframe with only selected data fields
 #' @export
 #' @examples
 #' lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,f.gp_clinical = fgp_clinical,f.gp_scripts = fgp_scripts,f.hesin = fhesin,f.hesin_diag = fhesin_diag,f.hesin_oper =fhesin_oper,f.death_portal = fdeath_portal,f.death_cause_portal = fdeath_cause_portal )
 #' summary(lst.harmonized.data)
-harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.hesin=NULL,f.hesin_diag=NULL,f.hesin_oper=NULL,f.death_portal=NULL,f.death_cause_portal=NULL,f.gp_clinical=NULL,f.gp_scripts=NULL,allow_missing_fields=TRUE,...){
+harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.hesin=NULL,f.hesin_diag=NULL,f.hesin_oper=NULL,f.death_portal=NULL,f.death_cause_portal=NULL,f.gp_clinical=NULL,f.gp_scripts=NULL,f.withdrawal_list=NULL,allow_missing_fields=TRUE,death_from_portal=TRUE,...){
   message("Start data harmonization")
 
   if (!(isNullNaNan(f.html)&isNullNaNan(f.ukbtab))){
@@ -159,17 +162,21 @@ harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.he
   ################################################################################
   # take only the death record from portal for now as they are updated more frequently.
   # death registry from tab file (event==1: every occurence is a real event)
-  # lst.data$tte.death.icd10.primary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40001",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
-  # lst.data$tte.death.icd10.secondary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
   # death registry from data portal , same data as the main dataset but more up to date, refer document DeathLinkage
-  # this is merged with the death from tab file for completeness, but it is the same data now.
-  if (!isNullNaNan(f.death_portal) & !isNullNaNan(f.death_cause_portal)){
-    message("Convert death registry data(data portal)")
-    lst.data_dth <- read_death_data(f.death_portal,f.death_cause_portal)
-    lst.data$tte.death.icd10.primary <-lst.data_dth$primary
-    lst.data$tte.death.icd10.secondary<-lst.data_dth$secondary
-    rm(lst.data_dth)
-  }
+
+    if (!isNullNaNan(f.death_portal) & !isNullNaNan(f.death_cause_portal) & death_from_portal){
+      message("Convert death registry data(data portal)")
+      lst.data_dth <- read_death_data(f.death_portal,f.death_cause_portal)
+      lst.data$tte.death.icd10.primary <-lst.data_dth$primary
+      lst.data$tte.death.icd10.secondary<-lst.data_dth$secondary
+      rm(lst.data_dth)
+    }else{
+      message("Convert death registry data(field 40000/40001/40002)")
+      lst.data$tte.death.icd10.primary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40001",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
+      lst.data$tte.death.icd10.secondary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
+    }
+
+
   ################################################################################
   ###  hesin  (event==1)
   ################################################################################
@@ -204,6 +211,19 @@ harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.he
   lst.data <- lapply(lst.data,function(x) {x[, ('identifier') := lapply(.SD, as.numeric), .SDcols = 'identifier'] })
 
   lst.data <- lapply(lst.data,function(x) {x[,'eventdate'] <-  round(x$eventdate);return(x) })
+
+  if (! is.null(f.withdrawal_list)){
+    message(paste0("Remove records corresponding to all withdrawn partipants specified in ",f.withdrawal_list))
+    df_withdrawal<-fread(f.withdrawal_list)
+    message(glue::glue("*** {nrow(df_withdrawal)} participants on the withdrawal list ***"))
+    lst.data <- lapply(lst.data, function(x) {
+      x<-x[!identifier %in% df_withdrawal$V1]
+    })
+    dfukb<-dfukb[! identifier %in% df_withdrawal$V1]
+    vct.identifiers<-vct.identifiers[!vct.identifiers %in% df_withdrawal$V1]
+  }
+
+
 
   return(list(lst.data=lst.data,dfukb=dfukb,vct.identifiers=vct.identifiers))
 
