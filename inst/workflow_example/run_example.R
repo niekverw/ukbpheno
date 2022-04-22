@@ -22,13 +22,20 @@ fgp_scripts<-paste(pheno_dir,"gp_scripts.txt",sep="")
 fdeath_portal<-paste(pheno_dir,"death.txt",sep="")
 fdeath_cause_portal<-paste(pheno_dir,"death_cause.txt",sep="")
 
+#####################################
+#  Withdrawal list includes participants who have dropped out of the study.
+#  This list is sent to the principal investigator and delegates periodically
+####################################
+
+f_withdrawal<-paste(pheno_dir,"w12345_20210809.csv",sep="")
+
 
 #############################################################################
 # load the example definition table and data setting included in the package
 #############################################################################
-data_dir<-paste0(system.file("extdata", package="ukbpheno"),"/")
-fdefinitions <- paste0(data_dir,"definitions_cardiometabolic_traits.tsv")
-fdata_setting <- paste0(data_dir,"data.settings.tsv")
+extdata_dir<-paste0(system.file("extdata", package="ukbpheno"),"/")
+fdefinitions <- paste0(extdata_dir,"definitions_cardiometabolic_traits.tsv")
+fdata_setting <- paste0(extdata_dir,"data.settings.tsv")
 
 # ##########################################
 # read setting
@@ -47,14 +54,14 @@ dfData.settings <-fread(fdata_setting)
 # cf_read3<-dfData.settings[dfData.settings$classification=="CTV3",]$code_map
 # cf_read2<-dfData.settings[dfData.settings$classification=="READ2",]$code_map
 # # corresponding column names from the .txt file
-# get_all_exsiting_codes(fgp_clinical,c("read_2","read_3"),c(paste0(data_dir,cf_read2),paste0(data_dir,cf_read3)))
+# get_all_exsiting_codes(fgp_clinical,c("read_2","read_3"),c(paste0(extdata_dir,cf_read2),paste0(extdata_dir,cf_read3)))
 #
 # #  3 gp_script
 # cf_dmd<-dfData.settings[dfData.settings$classification=="DMD",]$code_map
 # # bnf.england bnf.scotland are separated because they appear to be coded slightly differently according to the official documentation...hence different post-processing may be needed
 # cf_bnf<-unique(dfData.settings[dfData.settings$classification=="BNF",]$code_map)
 # cf_read2d<-dfData.settings[dfData.settings$classification=="READ2_drugs",]$code_map
-# get_all_exsiting_codes(fgp_scripts,c("read_2","bnf_code","dmd_code"),c(paste0(data_dir,cf_read2d),paste0(data_dir,cf_bnf),paste0(data_dir,cf_dmd)))
+# get_all_exsiting_codes(fgp_scripts,c("read_2","bnf_code","dmd_code"),c(paste0(extdata_dir,cf_read2d),paste0(extdata_dir,cf_bnf),paste0(extdata_dir,cf_dmd)))
 #
 # # get_all_exsiting_codes(fhesin_diag,c('diag_icd9','diag_icd10'),c(paste0(pheno_dir,'hesin_icd9.code'),paste0(pheno_dir,'hesin_icd10.code')))
 # # get_all_exsiting_codes(fdeath_cause_portal,c('cause_icd10'),c(paste0(pheno_dir,'death_icd10.code')))
@@ -64,7 +71,7 @@ dfData.settings <-fread(fdata_setting)
 
 
 # data.table::fwrite(list(missing_codes),paste(pheno_dir,"ukbphenodata_feb2021.Rdata_notInData.code"))
-dfDefinitions_processed_expanded<-read_defnition_table(fdefinitions,fdata_setting,data_dir)
+dfDefinitions_processed_expanded<-read_defnition_table(fdefinitions,fdata_setting,extdata_dir)
 
 # ##################################################
 # Prepare UKB data:
@@ -75,14 +82,7 @@ dfDefinitions_processed_expanded<-read_defnition_table(fdefinitions,fdata_settin
 
 # with definition table, fields required in definition table are also included
 # rm(lst.harmonized.data)
-lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,dfDefinitions=dfDefinitions_processed_expanded,f.gp_clinical = fgp_clinical,f.gp_scripts = fgp_scripts,f.hesin = fhesin,f.hesin_diag = fhesin_diag,f.hesin_oper =fhesin_oper,f.death_portal = fdeath_portal,f.death_cause_portal = fdeath_cause_portal,allow_missing_fields = TRUE)
-
-#####################################
-# read withdrawal list and remove them from the data
-####################################
-
-f_particip_withdraw<-paste(pheno_dir,"w12345_20210809.csv",sep="")
-df_withdrawal<-fread(f_particip_withdraw)
+lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,dfDefinitions=dfDefinitions_processed_expanded,f.gp_clinical = fgp_clinical,f.gp_scripts = fgp_scripts,f.hesin = fhesin,f.hesin_diag = fhesin_diag,f.hesin_oper =fhesin_oper,f.death_portal = fdeath_portal,f.death_cause_portal = fdeath_cause_portal,f.withdrawal_list = f_withdrawal,allow_missing_fields = TRUE)
 
 
 # ##################################################
@@ -190,8 +190,8 @@ lst.DmRxT2.case_control$all_event_dt.Include_in_cases[identifier %in% setdiff(in
 # Part 2 generate phenotype in batch and make a clinical characteristic table
 ##########################################################################
 # read the definitions table
-fdefinitions <- paste(data_dir,"definitions_cardiometabolic_traits.tsv",sep="")
-dfDefinitions_processed_expanded<-read_defnition_table(fdefinitions,fdata_setting,data_dir)
+fdefinitions <- paste(extdata_dir,"definitions_cardiometabolic_traits.tsv",sep="")
+dfDefinitions_processed_expanded<-read_defnition_table(fdefinitions,fdata_setting,extdata_dir)
 
 # extract clinical variables from the main dataset using read_ukb_tabdata()
 # we need the metadata (.html) file for read_ukb_tabdata()
@@ -213,7 +213,7 @@ if(!dir.exists(file.path(out_folder))){
  dir.create(file.path(out_folder))
 }
 
-
+df_withdrawal<-fread(f_withdrawal)
 dfukb_baseline_pheno<-dfukb_baseline[! identifier %in% df_withdrawal$V1]
 # loop through the traits, including family history of related diseases and the diabetes medication use
 for (disease in c(diseases,"HxDm","HxHrt","HxHt","RxDmOr","RxDmIns")){
@@ -252,6 +252,7 @@ tableOne
 tab1Mat <- print(tableOne, quote = FALSE, noSpaces = TRUE, printToggle = FALSE,nonnormal =c("Glucose","HbA1c","Years since type 2 diabetes diagnosis") )
 ## Save the table to a CSV file
 write.csv(tab1Mat, file =paste0(out_folder,"BaselineTable.csv"))
+
 
 
 ##################################
@@ -300,4 +301,23 @@ ggsurvplot(fit, data =  dfukb_baseline_pheno[DmT2_0_Hx>0], size = 0.8,
            legend.labs = c("No type 2 diabetes at baseline","Type 2 diabetes at baseline"),
            risk.table.height = 0.2)
 
+########################################
+# 1:2 case control matching with MatchIt
+########################################
+# Remove individuals with either missing or excluded phenotype for target phenotype (type 2 diabetes at baseline)
+df_to_matchit<-dfukb_baseline_pheno[!is.na(DmT2_0_Hx) & DmT2_0_Hx>0]
 
+# Pick three covariates age at assessment center visit, sex and BMI for matching
+df_to_matchit<-na.omit(df_to_matchit[,.(identifier,DmT2_0_Hx,f.21003.0.0,f.31.0.0,f.21001.0.0)])
+# Format the data for the matchit function
+# Control/case: 1/2 to 0/1
+df_to_matchit$DmT2_0_Hx<-df_to_matchit$DmT2_0_Hx-1
+# Name the rows
+rownames(df_to_matchit)<-df_to_matchit$identifier
+colnames(df_to_matchit)<-c("identifier","Type 2 diabetes","Age","Sex","BMI")
+# Run matchit
+m.dm2<-matchit(`Type 2 diabetes`~Age + Sex+BMI,data=df_to_matchit,ratio=2)
+#Check result
+summary(m.dm2)
+# Each row in the match.matrix shows identifier of one case with 2 matched controls
+m.dm2$match.matrix
