@@ -5,6 +5,7 @@ library(ggplot2)
 library(ggforce)
 library(tableone)
 library(survminer)
+library("MatchIt")
 
 
 #############################################################################
@@ -83,7 +84,6 @@ dfDefinitions_processed_expanded<-read_defnition_table(fdefinitions,fdata_settin
 # with definition table, fields required in definition table are also included
 # rm(lst.harmonized.data)
 lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,dfDefinitions=dfDefinitions_processed_expanded,f.gp_clinical = fgp_clinical,f.gp_scripts = fgp_scripts,f.hesin = fhesin,f.hesin_diag = fhesin_diag,f.hesin_oper =fhesin_oper,f.death_portal = fdeath_portal,f.death_cause_portal = fdeath_cause_portal,f.withdrawal_list = f_withdrawal,allow_missing_fields = TRUE)
-
 
 # ##################################################
 # Get case/control with an example phenotype:
