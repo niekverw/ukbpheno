@@ -2,7 +2,6 @@
 [![DOI](https://zenodo.org/badge/241869442.svg)](https://zenodo.org/badge/latestdoi/241869442)
 
 
-
 ![ukbpheno_concept](https://user-images.githubusercontent.com/9621370/170734618-092b9fb3-3a3d-41c3-bcf9-8ccf83a4e860.jpg)
 
 
@@ -105,3 +104,8 @@ Rscript shiny.lookup_codes.R --help
 # to start the app
 Rscript shiny.lookup_codes.R --fcoding_xls path_to_download/all_lkps_maps_v3.xlsx
 ```
+
+
+
+## Citation
+If you use ukbpheno, please cite [Yeung, M. W., van der Harst, P., & Verweij, N. (2022). ukbpheno v1.0: An R package for phenotyping health-related outcomes in the UK Biobank. STAR Protocols, 3(3), 101471.](https://star-protocols.cell.com/protocols/1733#article-info)
