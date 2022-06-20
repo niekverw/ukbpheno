@@ -172,8 +172,8 @@ harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.he
       rm(lst.data_dth)
     }else{
       message("Convert death registry data(field 40000/40001/40002)")
-      lst.data$tte.death.icd10.primary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40001",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
-      lst.data$tte.death.icd10.secondary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_treshold_year = 10,event_code=1) # death
+      lst.data$tte.death.icd10.primary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40001",field_sr_date = "40000",field_sr_date_type="date",qc_threshold_year = 10,event_code=1) # death
+      lst.data$tte.death.icd10.secondary <- convert_nurseinterview_to_episodedata(dfukb,field_sr_diagnosis = "40002",field_sr_date = "40000",field_sr_date_type="date",qc_threshold_year = 10,event_code=1) # death
     }
 
 
