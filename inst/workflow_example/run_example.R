@@ -72,7 +72,7 @@ dfData.settings <-fread(fdata_setting)
 
 
 # data.table::fwrite(list(missing_codes),paste(pheno_dir,"ukbphenodata_feb2021.Rdata_notInData.code"))
-dfDefinitions_processed_expanded<-read_defnition_table(fdefinitions,fdata_setting,extdata_dir)
+dfDefinitions_processed_expanded<-read_definition_table(fdefinitions,fdata_setting,extdata_dir)
 
 # ##################################################
 # Prepare UKB data:
