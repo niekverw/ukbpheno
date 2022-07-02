@@ -21,7 +21,7 @@ get_incidence_prevalence <- function(all_event_dt,
                                      include_secondary_recurrence=FALSE,
                                      #return_dates=FALSE, # TODO: not working yet.
                                      window_ref_days_include=0,##  indicate number of days around the reference date (visit) that should be used to indicates if individuals had the event on the reference date. For example, relevant if you want to know if participant took medication on the visit
-                                     window_fu_days_mask=0, ## indicates number of days that future events should not be counted; e.g. you could only count events after 10 days from the reference visit to avoid events related to the reference date. e.g. you could also use it to only count events after X years, in order to avoid assesment bias.
+                                     window_fu_days_mask=0, ## indicates number of days that future events should not be counted; e.g. you could only count events after 10 days from the reference visit to avoid events related to the reference date. e.g. you could also use it to only count events after X years, in order to avoid assessment bias.
                                      verbose=TRUE
                                      ) {
   # event==0, event cannot be used forr age - of - diagnosiis or new events.
@@ -242,6 +242,8 @@ get_incidence_prevalence <- function(all_event_dt,
 #' @param lst.data list of data table with all episode data
 #' @param df.data.settings data frame containing data settings
 #' @param reference_date reference dates for each individuals in the whole cohort as a named vector
+#' @param window_fu_days_mask number of days that future events should not be counted. e.g. you could only count events after 10 days from the reference visit to avoid events related to the reference date.
+
 #' @return  a list of 2 data tables : all events for valid cases and an event summary containing time to event information for these individuals.
 #' @keywords time-to-event
 #' @export
@@ -252,6 +254,7 @@ get_cases <- function(definitions,
                        df.data.settings,
                       df_reference_dt=NULL,
                       verbose=TRUE,
+                      window_fu_days_mask=0,
                        ...
                          ) {
 
@@ -267,10 +270,16 @@ get_cases <- function(definitions,
   message("..Identify case status")
   }
   all_event_dt.Include_in_cases <- get_all_events(definitions %>% dplyr::filter(Definitions =="Include_in_cases"),lst.data,df.data.settings,verbose = verbose)
+  # if(missing(window_fu_days_mask)) {
+  #   all_event_dt.Include_in_cases.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.Include_in_cases,df.data.settings,
+  #                                                                     df_reference_date = df_reference_dt,verbose = verbose)
+  #                                                                     #...)
+  # } else {
+    all_event_dt.Include_in_cases.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.Include_in_cases,df.data.settings,
+                                                                      df_reference_date = df_reference_dt,verbose = verbose,window_fu_days_mask=window_fu_days_mask)
+    # }
 
-  all_event_dt.Include_in_cases.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.Include_in_cases,df.data.settings,
-                                                                    df_reference_date = df_reference_dt,verbose = verbose)
-                                                                    #...)
+
   if(verbose){
   message(glue::glue("Including {nrow(all_event_dt.Include_in_cases.summary)} cases with reference dates..."))
   }
@@ -307,6 +316,7 @@ get_cases <- function(definitions,
 #' @param df.data.settings data frame containing data settings
 #' @param df_reference_date dataframe where first column is the identifier and second column the reference dates
 #' @param vct.identifiers character vector listing the identifiers in the cohort. This is used to define controls if reference_date is not given
+#' @param window_fu_days_mask number of days that future events should not be counted. e.g. you could only count events after 10 days from the reference visit to avoid events related to the reference date.
 #' @return  a list of 2 data tables : all events for valid cases and an event summary containing time to event information for these individuals.
 #' @keywords time-to-event
 #' @export
@@ -317,7 +327,8 @@ get_cases_controls <-function(definitions,
                                 df.data.settings,
                                 df_reference_date=NULL,
                                 vct.identifiers=NULL,
-                                verbose=TRUE
+                                verbose=TRUE,
+                              window_fu_days_mask=0
                                 ) {
   # vct.identifiers <-Used to define controls if reference_date is not given (NULL)
   if(nrow(definitions)==0){
@@ -370,7 +381,7 @@ get_cases_controls <-function(definitions,
     # only keep date with real event
     all_event_dt.first_occur[all_event_dt.first_occur$event==0,]$eventdate <-NA
     # get everyone , take the date of relevant events respectively
-    all_event_dt.first_occur.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.first_occur,df.data.settings,df_reference_date = NULL,window_fu_days_mask = 15,verbose = verbose)
+    all_event_dt.first_occur.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.first_occur,df.data.settings,df_reference_date = NULL,window_fu_days_mask = window_fu_days_mask,verbose = verbose)
     #  merge, NA for those without an event
     df_reference_date<-merge(df_reference_date,all_event_dt.first_occur.summary[, c("identifier","reference_date")],by="identifier",all.x=TRUE)
     #  should be already be in Date format but just to be sure
@@ -392,7 +403,7 @@ get_cases_controls <-function(definitions,
     # only consider event with real event date in study population, set those with visitdate to NA
     all_event_dt.population[all_event_dt.population$event==0,]$eventdate <-NA
     # get everyone , take the date of relevant events respectively
-    all_event_dt.population.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.population,df.data.settings,df_reference_date = NULL,window_fu_days_mask = 15,verbose = verbose)
+    all_event_dt.population.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.population,df.data.settings,df_reference_date = NULL,window_fu_days_mask = window_fu_days_mask,verbose = verbose)
     # update the dates in the original df_reference_date
     # reference_date = setNames(as.Date(as.character(all_event_dt.population.summary$reference_date),format="%Y-%m-%d"),all_event_dt.population.summary$identifier)
     # df_reference_date <- all_event_dt.population.summary[, c("identifier","reference_date")]
@@ -413,7 +424,7 @@ get_cases_controls <-function(definitions,
      }
 
   # define cases
-  cases <- get_cases(definitions,lst.data,df.data.settings,df_reference_date,window_ref_days_include=0,window_fu_days_mask=0,verbose=verbose)
+  cases <- get_cases(definitions,lst.data,df.data.settings,df_reference_date,window_ref_days_include=0,window_fu_days_mask=window_fu_days_mask,verbose=verbose)
 
   all_event_dt.Include_in_cases.summary <- cases$all_event_dt.Include_in_cases.summary
   all_event_dt.Include_in_cases <- cases$all_event_dt.Include_in_cases
@@ -435,8 +446,6 @@ get_cases_controls <-function(definitions,
   # non_proper_case<-dplyr::intersect(potential_control,all_event_dt.Include_in_cases$identifier)
   # hence replace with these 2 lines
   w_dt<-dplyr::union(all_event_dt.Include_in_cases[all_event_dt.Include_in_cases$event==1,]$identifier,all_event_dt.Include_in_cases[all_event_dt.Include_in_cases$event==2,]$identifier)
-  # TODO differentiate actual case without eventdate from non-case (excluded) due to the instance filter
-  # this currently include everyone back == instance filter not working!!!!!!!!!
   non_proper_case<-dplyr::setdiff(all_event_dt.Include_in_cases[all_event_dt.Include_in_cases$event==0,]$identifier,w_dt)
   # restrict to only those included in df_reference_date,
   # because get_all_events() get all events in the the whole data

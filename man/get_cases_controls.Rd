@@ -10,7 +10,8 @@ get_cases_controls(
   df.data.settings,
   df_reference_date = NULL,
   vct.identifiers = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  window_fu_days_mask = 0
 )
 }
 \arguments{
@@ -23,6 +24,8 @@ get_cases_controls(
 \item{df_reference_date}{dataframe where first column is the identifier and second column the reference dates}
 
 \item{vct.identifiers}{character vector listing the identifiers in the cohort. This is used to define controls if reference_date is not given}
+
+\item{window_fu_days_mask}{number of days that future events should not be counted. e.g. you could only count events after 10 days from the reference visit to avoid events related to the reference date.}
 }
 \value{
 a list of 2 data tables : all events for valid cases and an event summary containing time to event information for these individuals.

@@ -10,6 +10,7 @@ get_cases(
   df.data.settings,
   df_reference_dt = NULL,
   verbose = TRUE,
+  window_fu_days_mask = 0,
   ...
 )
 }
@@ -19,6 +20,8 @@ get_cases(
 \item{lst.data}{list of data table with all episode data}
 
 \item{df.data.settings}{data frame containing data settings}
+
+\item{window_fu_days_mask}{number of days that future events should not be counted. e.g. you could only count events after 10 days from the reference visit to avoid events related to the reference date.}
 
 \item{reference_date}{reference dates for each individuals in the whole cohort as a named vector}
 }
