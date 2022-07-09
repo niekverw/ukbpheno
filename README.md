@@ -8,6 +8,7 @@
 ## Description
 ukbpheno is an R package for efficiently munging the files provided by UK Biobank to generate data tables of with unified format for further analysis such as making dichotomous phenotypes for UKbio and a composite time-to-event variable combining record level data (HESIN/GP/cancer registry) and main dataset (self reports i.e. nurse interview / touchscreen). Aim of the package is to define binary phenotype data for different types of longitudinal data analysis (e.g. GWAS analysis, cox regressions, baseline tables) in a standardized and reproducible manner. The package can also be used for data exploration with efficient subsetting of the main dataset and visualization functions.
 
+Please check out the [wiki](https://github.com/niekverw/ukbpheno/wiki) for short tutorials on downloading the data as well as usage of the package.
 
 ## Installation
 
