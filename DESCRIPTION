@@ -36,4 +36,5 @@ Imports:
 	RColorBrewer,
 	stringr,
 	tictoc,
+	tidyr,
 	XML

@@ -393,6 +393,86 @@ read_gp_clinical_data <- function(fgp){
 
 }
 
+#' Parse the value columns of the Primary Care clinical records
+#'
+#' This function parse the free text fields of the GP clinical records. Information contains in the columns include test results and remarks
+#' @param fgp Path to GP clinical event records
+#' @return   list of data.table objects with all episodes
+#' @export
+#' @examples
+#' parse_gp_clinical_values("gpclinical.txt" )
+parse_gp_clinical_values <- function(fgp){
+  # stop if there is no file
+  if (!file.exists(fgp)){
+    message(paste0("ABORT reading GP clinical data: File does not exist - ",fgp))
+    return()
+  }
+  tictoc::tic(paste("read gp data",fgp))
+  # message(paste("read gp data",fgp))
+  # records potentially erroneous have date changed to 01/01/1901 (occured before birth), 02/02/1902 (occured on DOB), 03/03/1903 (same year as DOB), 07/07/2037 (occured after the time of extraction)
+  mindate = as.Date("1930-01-01")
+  maxdate = format(Sys.time(),"%Y-%m-%d") ## change to today?.
+  ####################################################
+  # in current structure of gp_clinical.txt
+  ###################################################
+  # $1 eid $3 event_dt $4 read_2 $5 read3
+  # $2 data_provider  $6 - $8 are free-text fields "value" entries differ depending on the data source
+  # eid	data_provider	event_dt	read_2	read_3	value1	value2	value3
+
+  # dfgp <- data.table::fread(cmd = paste("awk -F'\t'  '$6==\"\" && $7==\"\" && $8==\"\" {print $1,$3,$4,$5}' OFS='\t'",fgp) ,sep = "\t",
+  # colClasses = c("integer","character","character","character")) #,select=cols_tokeep)
+  dfgp <- data.table::fread(fgp ,sep = "\t",select=c(eid="integer",data_provider="integer" ,event_dt="character",read_2="character",read_3="character",value1="character",value2="character",value3="character")) # ," | head -10000 "
+  # temp<-fread(paste0(fgp,".head"),sep = "\t",select=c(eid="integer", event_dt="character",read_2="character",read_3="character"))
+
+  #names(dfgp) <-  c("eid",	"data_provider",	"event_dt",	"read_2",	"read_3",	"value1","value2","value3")
+
+  names(dfgp) <-  c("eid","data_provider",	"event_dt",	"read_2",	"read_3","value1","value2","value3")
+  dfgp$event_dt <- as.Date(as.character(dfgp$event_dt),format="%d/%m/%Y")
+  #dfgp$event_dt <- format(fasttime::fastPOSIXct(dfgp$event_dt),format="%Y-%m-%d") # needs specific input format, making that format takes more time...
+
+  message(paste("missing dates for ", sum(is.na(dfgp$event_dt)),"of",nrow(dfgp),"entries = ",100*sum(is.na(dfgp$event_dt))/nrow(dfgp),"%, excluding these." ))
+  dfgp <- dfgp[!is.na(dfgp$event_dt),]
+
+  message(paste("QC dates.. "))
+  dfgp <- subset(dfgp, event_dt > mindate ) # removing before 1930-ish.. some 1900, 1902, 1903 observations..
+  dfgp <- subset(dfgp, event_dt < maxdate ) # removing after today-ish.. some 2037 observations.
+  message(paste("#individuals in gp clinical:",length(unique(dfgp$eid))))
+
+  dfgp$event <- 1
+  # retain only records with entry in the first free-text field which is used across all providers
+  dfgp<-dfgp[value1!=""]
+  #  parse versions & supplier , see official UKB documentation for details
+  # TODO make a second function to process the value column (taking the event code into account)
+  # !!NOTE!!: TPP stores Blood pressures as 2 separate records 246.. for SBP & 246A. for DBP ; others store this as one record with code 246.. mostly (in 2 value columns) but also use 246A. for DBP
+  # TPP England uses CTV3 and only value 1 column is taken
+  tte.gpclinical.read3.tpp <-  dfgp %>% dplyr::filter(read_3 !="")  %>% dplyr::select(eid,event_dt,read_3,event,value1)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = read_3,event=event,value=value1)  %>% data.table::as.data.table()
+  # Vision England READ2 codes and uses value1 & value2
+  tte.gpclinical.read2.vision <-  dfgp %>% dplyr::filter(data_provider==1)  %>% dplyr::mutate(dplyr::across(value1:value3, na_if,"")) %>%  tidyr::unite(value, value1:value3, na.rm = TRUE, sep = ",", remove = TRUE)%>%dplyr::select(eid,event_dt,read_2,event,value)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = read_2,event=event,value=value)  %>% data.table::as.data.table()
+  # Wales also READ2 codes and uses value1 &value2 but values not guaranteed to be NUMERIC
+  tte.gpclinical.read2.wales <-  dfgp %>% dplyr::filter(data_provider==4)  %>%dplyr::mutate(dplyr::across(value1:value3, na_if,"")) %>%  tidyr::unite(value, value1:value3, na.rm = TRUE, sep = ",", remove = TRUE)%>%dplyr::select(eid,event_dt,read_2,event,value)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = read_2,event=event,value=value)  %>% data.table::as.data.table()
+  # Scotland free text data with the most variety READ2 codes and uses all 3 columns not guaranteed to be NUMERIC
+  # As the information depends heavily on the READ2 codes associated, only paste everything together here like for other providers
+  # tidyr::unite() vs  dplyr::mutate(value=paste(...) https://stackoverflow.com/questions/70900172/concatenate-2-columns-into-a-new-column-skip-blanks-in-r
+  tte.gpclinical.read2.scotland <-  dfgp %>% dplyr::filter(data_provider==2)  %>%dplyr::mutate(dplyr::across(value1:value3, na_if,"")) %>%  tidyr::unite(value, value1:value3, na.rm = TRUE, sep = ",", remove = TRUE)%>%dplyr::select(eid,event_dt,read_2,event,value)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = read_2,event=event,value=value)  %>% data.table::as.data.table()
+
+  lst <- list(tte.gpclinical.read2.vision=tte.gpclinical.read2.vision,tte.gpclinical.read2.wales=tte.gpclinical.read2.wales,tte.gpclinical.read2.scotland=tte.gpclinical.read2.scotland,tte.gpclinical.read3.tpp=tte.gpclinical.read3.tpp)
+  lst <- lapply(lst,function(x) {data.table::setkey(x,code) })
+  lst <- lapply(lst,function(x) {x[, ('identifier') := lapply(.SD, as.numeric), .SDcols = 'identifier'] })
+
+  # ############################################################################################
+  # ##instance filter
+  # message(glue::glue("Retain only records which occur {min_instance} times."))
+  # lst <- lapply(lst,function(x){x[, if(.N>min_instance) .SD, by = c('f.eid','code')]})
+  # message(glue::glue("#indvidual remain {length(unique(c(lst$tte.gpclinical.read2$f.eid,lst$tte.gpclinical.read3$f.eid)))}"))
+  # #############################################################################################
+  #
+  # #with more thoughts, I am not sure what to do with the window now?
+  # dfout_extrastats <- suppressWarnings(test[, .(eventdate=eventdate,datediff=(eventdate-shift(eventdate,fill=NA,type="lag"))), keyby=list(f.eid,code)])
+  tictoc::toc() #423.762 sec elapsed  #822.694 sec with the instance filter!
+  return(lst)
+
+}
+
 
 #' Read Primary Care prescription records
 #'
