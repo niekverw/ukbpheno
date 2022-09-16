@@ -331,6 +331,9 @@ parseIncludeExcludeCol <- function (df,InExCol,concat_to_df=FALSE,VctAllColumns)
   # result dataframe with non-empty rows in the corresponding inclusion/exclusion criteria
   dfInEx<-df[!(df[[InExCol]] == "" |is.na(df[[InExCol]])),]
   print(paste(nrow(dfInEx),"traits with dependent trait in",InExCol,sep=" "))
+  if (nrow(dfInEx)==0){
+    return(df)
+  }
   dfInEx[,VctAllColumns]<-NA
 
   repeat {
