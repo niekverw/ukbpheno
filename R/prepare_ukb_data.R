@@ -23,7 +23,7 @@ isNullNaNan = function(x) {
 #' dfDefinitions_processed_expanded<-read_defnition_table(fdefinitions,fdata_setting,dir.code.map=paste0(repo_dir,"inst/extdata/"))
 read_definition_table <-function(f.definition,f.data.setting,dir.code.map){
   dfData.settings <-data.table::fread(f.data.setting)
-  dfDefinitions <- data.table::fread(f.definitions, colClasses = 'character', data.table = FALSE)
+  dfDefinitions <- data.table::fread(f.definition, colClasses = 'character', data.table = FALSE)
   dfDefinitions_processed <- ProcessDfDefinitions(dfDefinitions)
 
   # add a slash if the path does not contain a slash
