@@ -15,10 +15,10 @@ tte.hesin.icd10.primary	ICD10	character	1	1	TRUE	FALSE	ICD10.coding19.tsv	TRUE	1
 tte.hesin.icd10.secondary	ICD10	character	1	2	TRUE	FALSE	ICD10.coding19.tsv	TRUE	1
 tte.hesin.icd9.primary	ICD9	character	1	1	TRUE	FALSE	ICD9.coding87.tsv	TRUE	1
 tte.hesin.icd9.secondary	ICD9	character	1	2	TRUE	FALSE	ICD9.coding87.tsv	TRUE	1
-tte.gpclinical.read2	READ2	character	1	2	FALSE	FALSE	gpclinical.read2.code	FALSE	2
-tte.gpclinical.read3	CTV3	character	1	2	FALSE	FALSE	gpclinical.read3.code	FALSE	2
-tte.gpscript.dmd.england	DMD	character	0	2	FALSE	FALSE	gpscript.dmd.code	FALSE	2
-tte.gpscript.bnf.england	BNF	character	0	2	FALSE	FALSE	gpscript.bnf.code	FALSE	2
-tte.gpscript.bnf.scotland	BNF	character	0	2	FALSE	FALSE	gpscript.bnf.code	FALSE	2
-tte.gpscript.read2.wales	READ2_drugs	character	1	2	FALSE	FALSE	gpscript.read2.code	FALSE	2
+tte.gpclinical.read2	READ2	character	1	2	FALSE	FALSE	gpclinical.read2.code	FALSE	1
+tte.gpclinical.read3	CTV3	character	1	2	FALSE	FALSE	gpclinical.read3.code	FALSE	1
+tte.gpscript.dmd.england	DMD	character	0	2	FALSE	FALSE	gpscript.dmd.code	FALSE	1
+tte.gpscript.bnf.england	BNF	character	0	2	FALSE	FALSE	gpscript.bnf.code	FALSE	1
+tte.gpscript.bnf.scotland	BNF	character	0	2	FALSE	FALSE	gpscript.bnf.code	FALSE	1
+tte.gpscript.read2.wales	READ2_drugs	character	1	2	FALSE	FALSE	gpscript.read2.code	FALSE	1
 ts	TS	character	0	1	TRUE	FALSE	NA	NA	1
