@@ -8,7 +8,7 @@ ProcessDfDefinitions(
   df,
   VctAllColumns = c("TS(Touchscreen)", "ICD10", "ICD9", "OPCS4", "OPCS3", "READ2",
     "READ2_drugs", "CTV3", "BNF", "DMD", "f.20001(sr_cancer)", "f.20002(sr_noncancer)",
-    "f.20003(sr_med)", "f.20004(sr_oper)", "Minimum_Episode_duration"),
+    "f.20003(sr_med)", "f.20004(sr_oper)"),
   VctColstoupper = c("ICD10", "ICD9", "OPCS4", "OPCS3"),
   fill_dependencies = T
 )
