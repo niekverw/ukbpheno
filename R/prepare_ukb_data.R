@@ -64,12 +64,13 @@ read_definition_table <-function(f.definition,f.data.setting,dir.code.map){
 #' @param f.withdrawal_list Path to participant withdrawal list (.csv)
 #' @param allow_missing_fields Logical flag specifying whether missing data field(s) is allowed (ignored) by the function. If FALSE, function will halt if any field is missing from the main dataset
 #' @param death_from_portal Logical flag specifying whether death records will be read from data portal files and from the main dataset. The main dataset will be taken if the files from data portal are not present (readable).
+#' @param add_extra_hesin_columns  if True, adds extra columns "ins_index","source" 
 #' @return   main dataset as dataframe with only selected data fields
 #' @export
 #' @examples
 #' lst.harmonized.data<-harmonize_ukb_data(f.ukbtab = fukbtab,f.html = fhtml,f.gp_clinical = fgp_clinical,f.gp_scripts = fgp_scripts,f.hesin = fhesin,f.hesin_diag = fhesin_diag,f.hesin_oper =fhesin_oper,f.death_portal = fdeath_portal,f.death_cause_portal = fdeath_cause_portal )
 #' summary(lst.harmonized.data)
-harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.hesin=NULL,f.hesin_diag=NULL,f.hesin_oper=NULL,f.death_portal=NULL,f.death_cause_portal=NULL,f.gp_clinical=NULL,f.gp_scripts=NULL,f.withdrawal_list=NULL,allow_missing_fields=TRUE,death_from_portal=TRUE,...){
+harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.hesin=NULL,f.hesin_diag=NULL,f.hesin_oper=NULL,f.death_portal=NULL,f.death_cause_portal=NULL,f.gp_clinical=NULL,f.gp_scripts=NULL,f.withdrawal_list=NULL,allow_missing_fields=TRUE,death_from_portal=TRUE,add_extra_hesin_columns=F,...){
   message("Start data harmonization")
 
   if (!(isNullNaNan(f.html)&isNullNaNan(f.ukbtab))){
@@ -183,7 +184,7 @@ harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.he
   if (!isNullNaNan(f.hesin)& !isNullNaNan(f.hesin_diag)& !isNullNaNan(f.hesin_oper)){
 
       tictoc::tic("Convert Hospital Inpatient data(data portal)")
-      lst.data <- append(lst.data,read_hesin_data(f.hesin ,f.hesin_diag ,f.hesin_oper)) #tte.hes.primary + tte.hes.secondary
+      lst.data <- append(lst.data,read_hesin_data(f.hesin ,f.hesin_diag ,f.hesin_oper,add_extra_hesin_columns)) #tte.hes.primary + tte.hes.secondary
       tictoc::toc()
   }
 

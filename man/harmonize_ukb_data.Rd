@@ -18,6 +18,7 @@ harmonize_ukb_data(
   f.withdrawal_list = NULL,
   allow_missing_fields = TRUE,
   death_from_portal = TRUE,
+  add_extra_hesin_columns = F,
   ...
 )
 }
@@ -47,6 +48,8 @@ harmonize_ukb_data(
 \item{allow_missing_fields}{Logical flag specifying whether missing data field(s) is allowed (ignored) by the function. If FALSE, function will halt if any field is missing from the main dataset}
 
 \item{death_from_portal}{Logical flag specifying whether death records will be read from data portal files and from the main dataset. The main dataset will be taken if the files from data portal are not present (readable).}
+
+\item{add_extra_hesin_columns}{if True, adds extra columns "ins_index","source"}
 }
 \value{
 main dataset as dataframe with only selected data fields

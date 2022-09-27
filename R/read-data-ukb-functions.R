@@ -222,11 +222,12 @@ read_ukb_tabdata <- function(fukb,
 #' @param fhesin Path to HESIN (master file)
 #' @param fhesin_diag Path to HESIN_DIAG file containing diagnosis codes
 #' @param fhesin_oper Path to HESIN_OPER file containing Operations and procedural codes
+#' @param add_extra_hesin_columns  if True, adds extra columns "ins_index","source" 
 #' @return  list of data.table objects with all episodes
 #' @export
 #' @examples
 #' read_hesin_data("hesin.txt" ,"hesin_diag.txt" ,"hesin_oper.txt" )
-read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
+read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper,add_extra_hesin_columns=F){
   # check if file paths are valid
   if (!file.exists(fhesin)| !file.exists(fhesin_diag) | !file.exists(fhesin_oper)){
     message("ABORT reading HESIN data: Required file(s) not found:")
@@ -287,15 +288,16 @@ read_hesin_data <- function(fhesin, fhesin_diag,fhesin_oper){
   dfhesin_oper <- dfhesin_oper[, event:=as.integer(event)]
 
   # filter + rename
-  tte.hesin.oper3.primary <- dfhesin_oper %>% dplyr::filter(level==1 & !is.na(oper3))  %>% dplyr::select(eid,eventdate,epidur,oper3,event)  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% data.table::as.data.table()
-  tte.hesin.oper4.primary <- dfhesin_oper %>% dplyr::filter(level==1 & !is.na(oper4))  %>% dplyr::select(eid,eventdate,epidur,oper4,event)  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% data.table::as.data.table()
-  tte.hesin.icd10.primary <- dfhesin_diag %>% dplyr::filter( level==1 & !is.na(diag_icd10))  %>% dplyr::select(eid,eventdate,epidur,diag_icd10,event)  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% data.table::as.data.table()
-  tte.hesin.icd9.primary <- dfhesin_diag %>% dplyr::filter( level==1 & !is.na(diag_icd9))  %>% dplyr::select(eid,eventdate,epidur,diag_icd9,event)  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% data.table::as.data.table()
+  if(add_extra_hesin_columns==T){extra_hesin_columns=c("ins_index","source")} else{extra_hesin_columns=NULL}
+  tte.hesin.oper3.primary <- dfhesin_oper %>% dplyr::filter(level==1 & !is.na(oper3))  %>% dplyr::select(eid,eventdate,epidur,oper3,event,eval(extra_hesin_columns))  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% data.table::as.data.table()
+  tte.hesin.oper4.primary <- dfhesin_oper %>% dplyr::filter(level==1 & !is.na(oper4))  %>% dplyr::select(eid,eventdate,epidur,oper4,event,eval(extra_hesin_columns))  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% data.table::as.data.table()
+  tte.hesin.icd10.primary <- dfhesin_diag %>% dplyr::filter( level==1 & !is.na(diag_icd10))  %>% dplyr::select(eid,eventdate,epidur,diag_icd10,event,eval(extra_hesin_columns))  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% data.table::as.data.table()
+  tte.hesin.icd9.primary <- dfhesin_diag %>% dplyr::filter( level==1 & !is.na(diag_icd9))  %>% dplyr::select(eid,eventdate,epidur,diag_icd9,event,eval(extra_hesin_columns))  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% data.table::as.data.table()
 
-  tte.hesin.oper3.secondary <- dfhesin_oper %>% dplyr::filter(level==2 & !is.na(oper3))  %>% dplyr::select(eid,eventdate,epidur,oper3,event)  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% data.table::as.data.table()
-  tte.hesin.oper4.secondary <- dfhesin_oper %>% dplyr::filter(level==2 & !is.na(oper4))  %>% dplyr::select(eid,eventdate,epidur,oper4,event)  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% data.table::as.data.table()
-  tte.hesin.icd10.secondary <- dfhesin_diag %>% dplyr::filter( level==2 & !is.na(diag_icd10))  %>% dplyr::select(eid,eventdate,epidur,diag_icd10,event)  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% data.table::as.data.table()
-  tte.hesin.icd9.secondary <- dfhesin_diag %>% dplyr::filter( level==2 & !is.na(diag_icd9))  %>% dplyr::select(eid,eventdate,epidur,diag_icd9,event)  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% data.table::as.data.table()
+  tte.hesin.oper3.secondary <- dfhesin_oper %>% dplyr::filter(level==2 & !is.na(oper3))  %>% dplyr::select(eid,eventdate,epidur,oper3,event,eval(extra_hesin_columns))  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = oper3,event=event)  %>% data.table::as.data.table()
+  tte.hesin.oper4.secondary <- dfhesin_oper %>% dplyr::filter(level==2 & !is.na(oper4))  %>% dplyr::select(eid,eventdate,epidur,oper4,event,eval(extra_hesin_columns))  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = oper4,event=event)  %>% data.table::as.data.table()
+  tte.hesin.icd10.secondary <- dfhesin_diag %>% dplyr::filter( level==2 & !is.na(diag_icd10))  %>% dplyr::select(eid,eventdate,epidur,diag_icd10,event,eval(extra_hesin_columns))  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = diag_icd10,event=event)  %>% data.table::as.data.table()
+  tte.hesin.icd9.secondary <- dfhesin_diag %>% dplyr::filter( level==2 & !is.na(diag_icd9))  %>% dplyr::select(eid,eventdate,epidur,diag_icd9,event,eval(extra_hesin_columns))  %>% dplyr::rename(identifier=eid,eventdate = eventdate,epidur=epidur,code = diag_icd9,event=event)  %>% data.table::as.data.table()
 
 
   lst <- list(tte.hesin.oper3.primary = tte.hesin.oper3.primary,

@@ -4,7 +4,7 @@
 \alias{read_hesin_data}
 \title{Read Hospital Inpatient Data}
 \usage{
-read_hesin_data(fhesin, fhesin_diag, fhesin_oper)
+read_hesin_data(fhesin, fhesin_diag, fhesin_oper, add_extra_hesin_columns = F)
 }
 \arguments{
 \item{fhesin}{Path to HESIN (master file)}
@@ -12,6 +12,8 @@ read_hesin_data(fhesin, fhesin_diag, fhesin_oper)
 \item{fhesin_diag}{Path to HESIN_DIAG file containing diagnosis codes}
 
 \item{fhesin_oper}{Path to HESIN_OPER file containing Operations and procedural codes}
+
+\item{add_extra_hesin_columns}{if True, adds extra columns "ins_index","source"}
 }
 \value{
 list of data.table objects with all episodes
