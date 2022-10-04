@@ -64,7 +64,7 @@ read_definition_table <-function(f.definition,f.data.setting,dir.code.map){
 #' @param f.withdrawal_list Path to participant withdrawal list (.csv)
 #' @param allow_missing_fields Logical flag specifying whether missing data field(s) is allowed (ignored) by the function. If FALSE, function will halt if any field is missing from the main dataset
 #' @param death_from_portal Logical flag specifying whether death records will be read from data portal files and from the main dataset. The main dataset will be taken if the files from data portal are not present (readable).
-#' @param add_extra_hesin_columns  if True, adds extra columns "ins_index","source" 
+#' @param add_extra_hesin_columns  if True, adds extra columns "ins_index","source"
 #' @return   main dataset as dataframe with only selected data fields
 #' @export
 #' @examples
@@ -111,6 +111,7 @@ harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.he
   vct.identifiers <- as.numeric(dfukb$identifier)
   gc()
 
+
   ################################################################################
   # converting data
   ################################################################################
@@ -119,6 +120,14 @@ harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.he
   ##############################
   ## from main dataset .tab
   #############################
+  #  extra check for column name in main dataset
+  dfukb_colnames<-colnames(dfukb)
+  f53 <- dfukb_colnames[grepl(paste0("[^0-9]","53","[^0-9]"),dfukb_colnames)]
+  if (length(f53)==0){
+    message("Unable to extract visit dates fields (field 53) \nPlease check if they are present OR column names are named f.53.y.z (non-numeric character before & after the field [^0-9]53[^0-9])\nConversion with r flag will give the right column headers`ukbconv ukb12345.enc_ukb r`")
+    return()
+  }
+
   ################################################################################
   ### touchscreen (event==2: only the first occurence is an event)
   ################################################################################
@@ -132,6 +141,7 @@ harmonize_ukb_data <- function(f.ukbtab=NULL,f.html=NULL,dfDefinitions=NULL,f.he
   ################################################################################
   ### self reported data  (event==2: only the first occurence is an event)
   ################################################################################
+
   message("Convert self-reported data")
   message(" ->Self-reported cancer codes (field 20001)")
   # cancer
