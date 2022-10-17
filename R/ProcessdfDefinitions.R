@@ -666,11 +666,20 @@ check_dfDefinitions_codes <-function(dfDefinitions_processed,
 
     missing_codes<-na.omit(missing_codes)
 
-    message(glue::glue("Missing in {cls} (will be ignored): \n{glue::glue_collapse(missing_codes,sep=',')} \n******************************"))
+    message(glue::glue("Number of missing codes in {cls} (will be ignored):{length(unique(missing_codes))} \n******************************"))
+
     all_missing_codes<-append(all_missing_codes,setNames(as.data.frame(missing_codes,stringsAsFactors =F),cls))
    }
-
-   return(all_missing_codes)
+   all_missing_codes<-all_missing_codes[lapply(all_missing_codes,length)>0]
+   dt_all_missing_codes <- data.table::rbindlist(
+     lapply(all_missing_codes, function(x) data.table::data.table(t(unique(x)))),
+     fill = TRUE
+   )
+   dt_all_missing_codes<-data.table::data.table(t(dt_all_missing_codes))
+   colnames(dt_all_missing_codes)<-names(all_missing_codes)
+   message(glue::glue("Write missing codes to file missing_code.tsv"))
+   data.table::fwrite(dt_all_missing_codes,"missing_code.tsv",sep="\t")
+   return(dt_all_missing_codes)
 }
 
 
