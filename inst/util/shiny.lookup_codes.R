@@ -59,7 +59,7 @@ e, exit.")
 
 # library(optparse)
 # library(data.table)
-
+# library(ukbpheno)
 
 option_list <- list(
   optparse::make_option(
@@ -97,7 +97,20 @@ option_list <- list(
     type = "character",
     default = "../extdata/20003.coding4.tsv",
     help = "Filepath to code map for field 20003"
+  ),
+  optparse::make_option(
+    "--fbnf",
+    type = "character",
+    default = "../extdata/read2_bnf",
+    help = "Filepath to code map between read2 and bnf"
+  ),
+  optparse::make_option(
+    "--fdmd",
+    type = "character",
+    default = "../extdata/read2_dmd",
+    help = "Filepath to code map between read2 and DMD"
   )
+
 )
 
 
@@ -120,22 +133,17 @@ if (is.null(opt$f_med_readSR)) {
 
 
 
-
-
-
-
 load_data <-
   function(fcoding.xls,
            fmed.readSR,
            ficd10,
            ficd9,
            fopcs4,
-           f20003) {
+           f20003,fread2_bnf,fread2_dmd) {
     #### READ V2
     dfCodesheet.read_v2_read_ctv3 <-
       as.data.frame(readxl::read_xlsx(fcoding.xls, sheet = "read_v2_read_ctv3"))[, c(2, 7)]
     colnames(dfCodesheet.read_v2_read_ctv3) <- c("read_code", "CTV3")
-
     dfCodesheet.read_v2_icd9 <-
       as.data.frame(readxl::read_xlsx(fcoding.xls, sheet = "read_v2_icd9"))[, c(1, 2)]
     dfCodesheet.read_v2_icd10 <-
@@ -148,6 +156,29 @@ load_data <-
     dfCodesheet.read_v2_lkp <-
       as.data.frame(dfCodesheet.read_v2_lkp %>% dplyr::arrange(read_code, term_code))
     #dfCodesheet.read_v2_lkp <- dfCodesheet.read_v2_lkp[dfCodesheet.read_v2_lkp$term_code==0,]
+    dfCodesheet.read_v2_bnf <-
+      as.data.frame(readxl::read_xlsx(fcoding.xls, sheet = "read_v2_drugs_bnf"))[, c(1, 2)]
+    # According to documentation: "BNF codes in the TPP extract follow the format 00.00.00.00.00. However, the coding structure does not
+    # always map to codes provided by the NHSBSA. The first six digits of the code typically relate to BNF
+    # chapter, section and paragraph in the NHSBSA code lists, although this is not consistent. Digits 7 and 8
+    # do not appear to correspond to subparagraphs in the NHSBSA codes, and digits 9 and 10 are always
+    # coded as 00."
+    # It is therefore necessary to preserve the "." inbetween to know this is TPP BNF code??
+    # dfCodesheet.read_v2_bnf$bnf_code<-gsub("\\.","",dfCodesheet.read_v2_bnf$bnf_code)
+    colnames(dfCodesheet.read_v2_bnf)<-c("read_code", "bnf")
+    dfCodesheet.read_v2_bnf<-dfCodesheet.read_v2_bnf[dfCodesheet.read_v2_bnf$read_code!=""& dfCodesheet.read_v2_bnf$bnf!="",]
+    dfCodesheet.read_v2_bnf<-dfCodesheet.read_v2_bnf[!is.na(dfCodesheet.read_v2_bnf$read_code) & !is.na(dfCodesheet.read_v2_bnf$bnf),]
+
+    dfCodesheet.read_v2_dmd <-
+    as.data.frame(data.table::fread(fread2_dmd,sep = "\t",colClasses = c("character","character","character")))[,c(1,2)]
+
+
+    colnames(dfCodesheet.read_v2_dmd)<-c("read_code", "dmd")
+    dfCodesheet.read_v2_dmd<-dfCodesheet.read_v2_dmd[dfCodesheet.read_v2_dmd$read_code!=""& dfCodesheet.read_v2_dmd$dmd!="",]
+    dfCodesheet.read_v2_dmd<-dfCodesheet.read_v2_dmd[dfCodesheet.read_v2_dmd$dmd!="0",]
+    dfCodesheet.read_v2_dmd<-dfCodesheet.read_v2_dmd[!is.na(dfCodesheet.read_v2_dmd$read_code)& !is.na(dfCodesheet.read_v2_dmd$dmd),]
+
+
     dfCodesheet.read_v2_drugs_lkp <-
       as.data.frame(readxl::read_xlsx(fcoding.xls, sheet = "read_v2_drugs_lkp"))
     dfCodesheet.read_v2_lkp <-
@@ -195,12 +226,23 @@ load_data <-
             all = T)
     dfCodesheet.READ <-
       merge(dfCodesheet.READ,
+            dfCodesheet.read_v2_bnf,
+            by = "read_code",
+            all = T)
+    dfCodesheet.READ <-
+      merge(dfCodesheet.READ,
+            dfCodesheet.read_v2_dmd,
+            by = "read_code",
+            all = T)
+    dfCodesheet.READ <-
+      merge(dfCodesheet.READ,
             dfCodesheet.read_v2_lkp,
             by = "read_code",
             all = T)
+
     dfCodesheet.READ <- unique(dfCodesheet.READ)
     colnames(dfCodesheet.READ) <-
-      c("READ", "CTV3", "ICD10", "ICD9", "OPCS4", "n_20003", "text")
+      c("READ", "CTV3", "ICD10", "ICD9", "OPCS4", "n_20003","BNF","DMD","text")
     dfCodesheet.READ$source = "READ"
     dfCodesheet.READ <- data.table::data.table(dfCodesheet.READ)
     dfCodesheet.READ$text <-
@@ -256,12 +298,105 @@ load_data <-
     colnames(dfCodesheet.CTV3) <-
       c("CTV3", "READ", "ICD10", "ICD9", "OPCS4", "text")
     dfCodesheet.CTV3$n_20003 <- NA
+    dfCodesheet.CTV3$BNF <- NA
+    dfCodesheet.CTV3$DMD <- NA
+
     dfCodesheet.CTV3$source = "CTV3"
     dfCodesheet.CTV3$text <-
       stringr::str_replace_all(dfCodesheet.CTV3$text, "[^/[:^punct:]]", "")
 
     dfCodesheet.CTV3 <- data.table::data.table(dfCodesheet.CTV3)
     data.table::setkey(dfCodesheet.CTV3, "CTV3")
+
+    ####################BNF
+    message("BNF")
+    dfCodesheet.bnf_readv2 <-as.data.frame(readxl::read_xlsx(fcoding.xls, sheet = "read_v2_drugs_bnf"))[, c(2,1)]
+
+                                               colnames(dfCodesheet.bnf_readv2)<-c( "bnf","read_code")
+    # see above for not removing the dot!
+    # dfCodesheet.bnf_readv2$bnf<-gsub("\\.","",dfCodesheet.bnf_readv2$bnf)
+    dfCodesheet.bnf_readv2<-dfCodesheet.bnf_readv2[dfCodesheet.bnf_readv2$bnf!="",]
+    dfCodesheet.bnf_readv2<-dfCodesheet.bnf_readv2[ !is.na(dfCodesheet.bnf_readv2$bnf),]
+
+    dfCodesheet.bnf_lookup<-as.data.frame(data.table::fread(fread2_bnf,sep = "\t"))[,c(2,3)]
+    colnames(dfCodesheet.bnf_lookup)<-c( "bnf","text")
+    # dfCodesheet.bnf_lookup$bnf<-gsub("\\.","",dfCodesheet.bnf_lookup$bnf)
+
+    # dfCodesheet.bnf_lookup[dfCodesheet.bnf_lookup$bnf=="",]
+
+    dfCodesheet.bnf_lookup<-dfCodesheet.bnf_lookup[dfCodesheet.bnf_lookup$bnf!="",]
+    dfCodesheet.bnf_lookup<-dfCodesheet.bnf_lookup[ !is.na(dfCodesheet.bnf_lookup$bnf),]
+
+    dfCodesheet.BNF <-
+      merge(
+        dfCodesheet.bnf_readv2,
+        dfCodesheet.bnf_lookup,
+        by = "bnf",
+        all = T
+      )
+
+    dfCodesheet.BNF <- unique(dfCodesheet.BNF)
+    colnames(dfCodesheet.BNF) <-
+      c("BNF", "READ","text")
+    dfCodesheet.BNF$n_20003 <- NA
+    dfCodesheet.BNF$ICD10 <- NA
+    dfCodesheet.BNF$ICD9 <- NA
+    dfCodesheet.BNF$OPCS4 <- NA
+    dfCodesheet.BNF$CTV3 <- NA
+    dfCodesheet.BNF$DMD <- NA
+    dfCodesheet.BNF$source = "BNF"
+    dfCodesheet.BNF$text <-
+      stringr::str_replace_all(dfCodesheet.BNF$text, "[^/[:^punct:]]", "")
+
+    dfCodesheet.BNF <- data.table::data.table(dfCodesheet.BNF)
+    data.table::setkey(dfCodesheet.BNF, "BNF")
+
+
+
+
+
+    #######################DMD
+
+
+
+    dfCodesheet.read_v2_dmd <-
+      as.data.frame(data.table::fread(fread2_dmd))
+    colnames(dfCodesheet.read_v2_dmd)<-c("read_code", "dmd")
+    dfCodesheet.read_v2_dmd<-dfCodesheet.read_v2_dmd[dfCodesheet.read_v2_dmd$read_code!=""& dfCodesheet.read_v2_dmd$dmd!="",]
+    dfCodesheet.read_v2_dmd<-dfCodesheet.read_v2_dmd[!is.na(dfCodesheet.read_v2_dmd$read_code)& !is.na(dfCodesheet.read_v2_dmd$dmd),]
+
+
+    dfCodesheet.DMD<-as.data.frame(data.table::fread(fread2_dmd,sep = "\t",colClasses = c("character","character","character")))
+    colnames(dfCodesheet.DMD)<-c( "READ","DMD","text")
+    # dfCodesheet.bnf_lookup$bnf<-gsub("\\.","",dfCodesheet.bnf_lookup$bnf)
+    dfCodesheet.DMD$DMD<-as.character(dfCodesheet.DMD$DMD)
+    # dfCodesheet.bnf_lookup[dfCodesheet.bnf_lookup$bnf=="",]
+    # clean out non-useful mapping
+    dfCodesheet.DMD<-dfCodesheet.DMD[dfCodesheet.DMD$DMD!="",]
+    dfCodesheet.DMD<-dfCodesheet.DMD[dfCodesheet.DMD$DMD!="0",]
+
+    dfCodesheet.DMD<-dfCodesheet.DMD[ !is.na(dfCodesheet.DMD$DMD),]
+
+    dfCodesheet.DMD <- unique(dfCodesheet.DMD)
+
+    dfCodesheet.DMD$n_20003 <- NA
+    dfCodesheet.DMD$ICD10 <- NA
+    dfCodesheet.DMD$ICD9 <- NA
+    dfCodesheet.DMD$OPCS4 <- NA
+    dfCodesheet.DMD$CTV3 <- as.character(NA)
+    dfCodesheet.DMD$BNF <- NA
+    dfCodesheet.DMD$source = "DMD"
+    dfCodesheet.DMD$text <-
+      stringr::str_replace_all(dfCodesheet.DMD$text, "[^/[:^punct:]]", "")
+
+    dfCodesheet.DMD <- data.table::data.table(dfCodesheet.DMD)
+    data.table::setkey(dfCodesheet.DMD, "DMD")
+
+
+
+
+    #######################33
+
 
     ####### ICD10
     message("ICD10")
@@ -288,6 +423,8 @@ load_data <-
     dfCodesheet.ICD10$CTV3 <- NA
     dfCodesheet.ICD10$OPCS4 <- NA
     dfCodesheet.ICD10$n_20003 <- NA
+    dfCodesheet.ICD10$BNF <- NA
+    dfCodesheet.ICD10$DMD <- NA
     dfCodesheet.ICD10$source = "ICD10"
     dfCodesheet.ICD10$text <-
       stringr::str_replace_all(dfCodesheet.ICD10$text, "[^/[:^punct:]]", "")
@@ -313,6 +450,8 @@ load_data <-
     dfCodesheet.ICD9$CTV3 <- NA
     dfCodesheet.ICD9$OPCS4 <- NA
     dfCodesheet.ICD9$n_20003 <- NA
+    dfCodesheet.ICD9$BNF <- NA
+    dfCodesheet.ICD9$DMD <- NA
     dfCodesheet.ICD9$source = "ICD9"
     dfCodesheet.ICD9$text <-
       stringr::str_replace_all(dfCodesheet.ICD9$text, "[^/[:^punct:]]", "")
@@ -330,6 +469,8 @@ load_data <-
     dfCodesheet.OPCS4$READ <- NA
     dfCodesheet.OPCS4$CTV3 <- NA
     dfCodesheet.OPCS4$n_20003 <- NA
+    dfCodesheet.OPCS4$BNF <- NA
+    dfCodesheet.OPCS4$DMD <- NA
     dfCodesheet.OPCS4$source = "OPCS4"
     dfCodesheet.OPCS4$text <-
       stringr::str_replace_all(dfCodesheet.OPCS4$text, "[^/[:^punct:]]", "")
@@ -348,6 +489,8 @@ load_data <-
     dfCodesheet.n_20003$ICD9 <- NA
     dfCodesheet.n_20003$READ <- NA
     dfCodesheet.n_20003$CTV3 <- NA
+    dfCodesheet.n_20003$BNF <- NA
+    dfCodesheet.n_20003$DMD <- NA
     dfCodesheet.n_20003$source = "n_20003"
     dfCodesheet.n_20003$text <-
       stringr::str_replace_all(dfCodesheet.n_20003$text, "[^/[:^punct:]]", "")
@@ -362,6 +505,8 @@ load_data <-
                                   "ICD9",
                                   "OPCS4",
                                   "n_20003",
+                                  "BNF",
+                                  "DMD",
                                   "text",
                                   "source")],
       CTV3 = dfCodesheet.CTV3[, c("READ",
@@ -370,6 +515,8 @@ load_data <-
                                   "ICD9",
                                   "OPCS4",
                                   "n_20003",
+                                  "BNF",
+                                  "DMD",
                                   "text",
                                   "source")],
       ICD10 = dfCodesheet.ICD10[, c("READ",
@@ -378,6 +525,8 @@ load_data <-
                                     "ICD9",
                                     "OPCS4",
                                     "n_20003",
+                                    "BNF",
+                                    "DMD",
                                     "text",
                                     "source")],
       ICD9 = dfCodesheet.ICD9[, c("READ",
@@ -386,6 +535,8 @@ load_data <-
                                   "ICD9",
                                   "OPCS4",
                                   "n_20003",
+                                  "BNF",
+                                  "DMD",
                                   "text",
                                   "source")],
       OPCS4 = dfCodesheet.OPCS4[, c("READ",
@@ -394,6 +545,8 @@ load_data <-
                                     "ICD9",
                                     "OPCS4",
                                     "n_20003",
+                                    "BNF",
+                                    "DMD",
                                     "text",
                                     "source")],
       n_20003 = dfCodesheet.n_20003[, c("READ",
@@ -402,20 +555,48 @@ load_data <-
                                         "ICD9",
                                         "OPCS4",
                                         "n_20003",
+                                        "BNF",
+                                        "DMD",
+                                        "text",
+                                        "source")],
+      BNF = dfCodesheet.BNF[, c("READ",
+                                        "CTV3",
+                                        "ICD10",
+                                        "ICD9",
+                                        "OPCS4",
+                                        "n_20003",
+                                        "BNF",
+                                        "DMD",
+                                        "text",
+                                        "source")],
+      DMD = dfCodesheet.DMD[, c("READ",
+                                        "CTV3",
+                                        "ICD10",
+                                        "ICD9",
+                                        "OPCS4",
+                                        "n_20003",
+                                        "BNF",
+                                        "DMD",
                                         "text",
                                         "source")],
       ALL = rbind(
-        dfCodesheet.READ,
-        dfCodesheet.CTV3,
-        dfCodesheet.ICD10,
-        dfCodesheet.ICD9,
-        dfCodesheet.OPCS4
+        dfCodesheet.DMD[, c("READ", "CTV3", "ICD10", "ICD9", "OPCS4", "n_20003", "BNF", "DMD","text", "source")],
+        dfCodesheet.READ[, c("READ", "CTV3", "ICD10", "ICD9", "OPCS4", "n_20003", "BNF", "DMD","text", "source")],
+        dfCodesheet.CTV3[, c("READ", "CTV3", "ICD10", "ICD9", "OPCS4", "n_20003", "BNF", "DMD","text", "source")],
+        dfCodesheet.ICD10[, c("READ", "CTV3", "ICD10", "ICD9", "OPCS4", "n_20003", "BNF", "DMD","text", "source")],
+        dfCodesheet.ICD9[, c("READ", "CTV3", "ICD10", "ICD9", "OPCS4", "n_20003", "BNF", "DMD","text", "source")],
+        dfCodesheet.OPCS4[, c("READ", "CTV3", "ICD10", "ICD9", "OPCS4", "n_20003", "BNF", "DMD","text", "source")],
+        dfCodesheet.BNF[, c("READ", "CTV3", "ICD10", "ICD9", "OPCS4", "n_20003", "BNF", "DMD","text", "source")]
+
       )
       ## CAN PROBABLY REMOVE ALL AND CREATE IT WHEN NEEDED.
     )
 
     return(LstdfCodesheets)
   }
+
+
+
 
 ########################################
 ##### FUNCTIONS to convert different codings.
@@ -608,8 +789,10 @@ lookup_codes <-
            LstdfCodesheets = LstdfCodesheets,
            expand_input = F) {
     # codes=row
-    fromcodes = c("ICD10", "ICD9", "READ", "CTV3", "OPCS4", "n_20003")
-    cols = c("ICD10", "ICD9", "READ", "CTV3", "OPCS4", "n_20003")
+    fromcodes = c("ICD10", "ICD9", "READ", "CTV3", "OPCS4", "n_20003","BNF","DMD")
+    cols = c("ICD10", "ICD9", "READ", "CTV3", "OPCS4", "n_20003","BNF","DMD")
+    # fromcodes = c("ICD10", "ICD9", "READ", "CTV3", "OPCS4", "n_20003")
+    # cols = c("ICD10", "ICD9", "READ", "CTV3", "OPCS4", "n_20003")
     codes <-
       PreProcessDfDefinitions(df = codes,
                               VctAllColumns = cols ,
@@ -710,6 +893,20 @@ ui <- shiny::fluidPage(
         width = NULL,
         placeholder = NULL
       ),
+      # shiny::textAreaInput(
+      #   inputId = "iBNF",
+      #   label = "BNF",
+      #   value = "",
+      #   width = NULL,
+      #   placeholder = NULL
+      # ),
+      # shiny::textAreaInput(
+      #   inputId = "iDMD",
+      #   label = "DMD",
+      #   value = "",
+      #   width = NULL,
+      #   placeholder = NULL
+      # ),
       shiny::textAreaInput(
         inputId = "iOPCS4",
         label = "OPCS4",
@@ -720,7 +917,7 @@ ui <- shiny::fluidPage(
       shiny::checkboxInput(inputId = "iExpandcodes", "Expand codes, e.g. I50 -> I501,I502, etc.  ", FALSE),
       shiny::actionButton("goButton", "Go!"),
       shiny::HTML(
-        "<br><br>Note; this is a tryout version for exploration - translations are not reliable and should be manually verified! (BNF/DMD currently not included.)"
+        "<br><br>Note; this is a tryout version for exploration - translations are not reliable and should be manually verified! <br><br>BNF/DMD codes: contains information from NHS Digital licenced under the current version of Open Government Licence <br><br>[https://www.nationalarchives.gov.uk/doc/open-government-licence/open-government-licence.htm]"
       )
     ),
     # Main panel for displaying outputs ----
@@ -735,6 +932,8 @@ ui <- shiny::fluidPage(
         shiny::tabPanel("CTV3",  DT::dataTableOutput("table_oCTV3")),
         shiny::tabPanel("OPCS4",  DT::dataTableOutput("table_oOPCS4")),
         shiny::tabPanel("n_20003",  DT::dataTableOutput("table_on_20003")),
+        # shiny::tabPanel("BNF",  DT::dataTableOutput("table_oBNF")),
+        # shiny::tabPanel("DMD",  DT::dataTableOutput("table_oDMD")),
         shiny::tabPanel(
           "output",
           shiny::checkboxInput(inputId = "iIncludetext", "include description", FALSE),
@@ -750,6 +949,10 @@ ui <- shiny::fluidPage(
           shiny::textOutput("codes_oOPCS4"),
           shiny::h4("n_20003"),
           shiny::textOutput("codes_on_20003")
+          # shiny::h4("BNF"),
+          # shiny::textOutput("codes_oBNF"),
+          # shiny::h4("DMD"),
+          # shiny::textOutput("codes_oDMD")
         ),
         shiny::tabPanel("lookuptable",  DT::dataTableOutput("table_oraw"))
 
@@ -773,6 +976,8 @@ server <- function(input, output) {
       ICD9 = gsub("\\|", ",", input$iICD9),
       READ = gsub("\\|", ",", input$iREAD),
       CTV3 = gsub("\\|", ",", input$iCTV3),
+      # BNF = gsub("\\|", ",", input$iBNF),
+      # DMD = gsub("\\|", ",", input$iDMD),
       OPCS4 = gsub("\\|", ",", input$iOPCS4)
     )
 
@@ -852,6 +1057,21 @@ server <- function(input, output) {
       selected = which(values_lookup$codes.lookup.shinyready$CTV3$input)
     ))
 
+    # output$table_oBNF = DT::renderDataTable({
+    #   values_lookup$codes.lookup.shinyready$BNF[, c(1, 2, 4)]
+    # }, filter = "top", options = dtoptions,
+    # selection = list(
+    #   mode = 'multiple',
+    #   selected = which(values_lookup$codes.lookup.shinyready$BNF$input)
+    # ))
+    #
+    # output$table_oDMD = DT::renderDataTable({
+    #   values_lookup$codes.lookup.shinyready$DMD[, c(1, 2, 4)]
+    # }, filter = "top", options = dtoptions,
+    # selection = list(
+    #   mode = 'multiple',
+    #   selected = which(values_lookup$codes.lookup.shinyready$CTV3$input)
+    # ))
 
     output$table_oOPCS4 = DT::renderDataTable({
       values_lookup$codes.lookup.shinyready$OPCS4[, c(1, 2, 4)]
@@ -936,6 +1156,27 @@ server <- function(input, output) {
     }
   })
 
+  # output$codes_oBNF <- shiny::renderPrint({
+  #   s = input$table_oBNF_rows_selected
+  #   if (input$iIncludetext) {
+  #     paste(values_lookup$codes.lookup.shinyready$BNF[s, ]$c_text,
+  #           collapse = ", ")
+  #   } else {
+  #     paste(values_lookup$codes.lookup.shinyready$BNF[s, ]$codes,
+  #           collapse = ", ")
+  #   }
+  # })
+  # output$codes_oDMD <- shiny::renderPrint({
+  #   s = input$table_oDMD_rows_selected
+  #   if (input$iIncludetext) {
+  #     paste(values_lookup$codes.lookup.shinyready$BNF[s, ]$c_text,
+  #           collapse = ", ")
+  #   } else {
+  #     paste(values_lookup$codes.lookup.shinyready$BNF[s, ]$codes,
+  #           collapse = ", ")
+  #   }
+  # })
+
   #
   output$table_oraw = DT::renderDataTable({
     LstdfCodesheets$ALL
@@ -948,7 +1189,6 @@ server <- function(input, output) {
 # # #######################################
 # # #### LOAD DATA.
 # # #######################################
-# setwd("/media/ming/ExtremeSSD/ukbpheno/ukbpheno/R")
 # # source("ProcessdfDefinitions.R")
 # fcoding_xls="../inst/extdata/all_lkps_maps_v3.xlsx"
 # if(!exists("LstdfCodesheets")){ LstdfCodesheets <- load_data(fcoding.xls=opt$fcoding_xls,fmed.readSR = opt$f_med_readSR) }
@@ -974,7 +1214,6 @@ server <- function(input, output) {
 # #######################################
 # #### LOAD DATA.
 # #######################################
-# setwd("/media/ming/ExtremeSSD/ukbpheno/ukbpheno/R")
 # fcoding_xls="../inst/extdata/all_lkps_maps_v3.xlsx"
 print("Prepare the code maps...")
 if (!exists("LstdfCodesheets")) {
@@ -985,10 +1224,11 @@ if (!exists("LstdfCodesheets")) {
       ficd10 = opt$fcoding_icd10,
       ficd9 = opt$fcoding_icd9,
       fopcs4 = opt$fcoding_opcs4,
-      f20003 = opt$fcoding_20003
+      f20003 = opt$fcoding_20003,fread2_bnf =opt$fbnf,fread2_dmd = opt$fdmd
     )
 }
 #
 gc()
 
 shiny::shinyApp(ui, server)
+
