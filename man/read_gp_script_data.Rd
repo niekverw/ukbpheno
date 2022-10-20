@@ -4,10 +4,12 @@
 \alias{read_gp_script_data}
 \title{Read Primary Care prescription records}
 \usage{
-read_gp_script_data(fgp)
+read_gp_script_data(fgp, add_extra_script_columns = F)
 }
 \arguments{
 \item{fgp}{Path to GP prescription records}
+
+\item{add_extra_script_columns}{whether or not to keep drug_name and quantity columns, default: False}
 }
 \value{
 list of data.table objects with all episodes

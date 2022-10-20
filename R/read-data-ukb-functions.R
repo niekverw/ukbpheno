@@ -222,7 +222,7 @@ read_ukb_tabdata <- function(fukb,
 #' @param fhesin Path to HESIN (master file)
 #' @param fhesin_diag Path to HESIN_DIAG file containing diagnosis codes
 #' @param fhesin_oper Path to HESIN_OPER file containing Operations and procedural codes
-#' @param add_extra_hesin_columns  if True, adds extra columns "ins_index","source" 
+#' @param add_extra_hesin_columns  if True, adds extra columns "ins_index","source"
 #' @return  list of data.table objects with all episodes
 #' @export
 #' @examples
@@ -480,11 +480,12 @@ parse_gp_clinical_values <- function(fgp){
 #'
 #' This function reads the prescription records from General Practitioner (GP) data. Refer to official UKB documetation for more information regarding this data.
 #' @param fgp Path to GP prescription records
+#' @param add_extra_script_columns whether or not to keep drug_name and quantity columns, default: False
 #' @return   list of data.table objects with all episodes
 #' @export
 #' @examples
 #' read_gp_clinical_data("gpscripts.txt" )
-read_gp_script_data <- function(fgp){
+read_gp_script_data <- function(fgp,add_extra_script_columns=F){
   # stop if there is no file
   if (!file.exists(fgp)){
     message(paste0("ABORT reading GP prescription data: File does not exist - ",fgp))
@@ -512,6 +513,7 @@ read_gp_script_data <- function(fgp){
 
   dfgp$event <- 1
 
+  if(add_extra_script_columns==T){extra_script_columns=c("drug_name","quantity")} else{extra_script_columns=NULL}
 
 
   # Parse by data sources
@@ -521,21 +523,21 @@ read_gp_script_data <- function(fgp){
   ########################################################################################
   # England Vision, only provider using dmd codes
   # Sep2020: all records have dmd codes, ~2% has no read2 -> take dmd for these records
-  tte.gpscript.dmd.england <-  dfgp %>% dplyr::filter(dmd_code !="")  %>% dplyr::select(eid,event_dt,dmd_code,event)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = dmd_code,event=event)  %>% data.table::as.data.table()
+  tte.gpscript.dmd.england <-  dfgp %>% dplyr::filter(dmd_code !="")  %>% dplyr::select(eid,event_dt,dmd_code,event,eval(extra_script_columns))  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = dmd_code,event=event)  %>% data.table::as.data.table()
   # England TPP , bnf
   # data_provider 1= England(Vision), 2= Scotland, 3 = England (TPP), 4 = Wales bnf_code !="" &
-  tte.gpscript.bnf.england <-  dfgp %>% dplyr::filter( data_provider == 3 & bnf_code !="")   %>%  dplyr::select(eid,event_dt,bnf_code,event)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% data.table::as.data.table()
+  tte.gpscript.bnf.england <-  dfgp %>% dplyr::filter( data_provider == 3 & bnf_code !="")   %>%  dplyr::select(eid,event_dt,bnf_code,event,eval(extra_script_columns))  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% data.table::as.data.table()
  #######################################################################################
   #Scotland
   # majority of records have bnf codes , while some have BOTH bnf codes and read 2!
   # Sep2020: 2 records have only read2 but not bnf! -> take bnf
   # somehow if filter with && then no result is returned??????????????? but filter twice works....
-  tte.gpscript.bnf.scotland <-  dfgp %>% dplyr::filter((data_provider == 2 )&(bnf_code !="")) %>% dplyr::select(eid,event_dt,bnf_code,event)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% data.table::as.data.table()
+  tte.gpscript.bnf.scotland <-  dfgp %>% dplyr::filter((data_provider == 2 )&(bnf_code !="")) %>% dplyr::select(eid,event_dt,bnf_code,event,eval(extra_script_columns) ) %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = bnf_code,event=event)  %>% data.table::as.data.table()
 # to avoid double counting the record
   # tte.gpscript.read2.scotland <-  dfgp %>% dplyr::filter(read_2 !="" && data_provider == 2 )  %>% dplyr::select(eid,event_dt,read_2,event)  %>% dplyr::rename(f.eid=eid,eventdate = event_dt,code = read_2,event=event)  %>% data.table::as.data.table()
   ########################################################################################
   # Wales , read_2
-  tte.gpscript.read2.wales <-  dfgp %>% dplyr::filter(data_provider == 4 & read_2 !="")  %>% dplyr::select(eid,event_dt,read_2,event)  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = read_2,event=event)  %>% data.table::as.data.table()
+  tte.gpscript.read2.wales <-  dfgp %>% dplyr::filter(data_provider == 4 & read_2 !="")  %>% dplyr::select(eid,event_dt,read_2,event,eval(extra_script_columns))  %>% dplyr::rename(identifier=eid,eventdate = event_dt,code = read_2,event=event)  %>% data.table::as.data.table()
 
 
   # TODO count by tables
