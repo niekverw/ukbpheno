@@ -917,7 +917,7 @@ ui <- shiny::fluidPage(
       shiny::checkboxInput(inputId = "iExpandcodes", "Expand codes, e.g. I50 -> I501,I502, etc.  ", FALSE),
       shiny::actionButton("goButton", "Go!"),
       shiny::HTML(
-        "<br><br>Note; this is a tryout version for exploration - translations are not reliable and should be manually verified! <br><br>BNF/DMD codes: contains information from NHS Digital licenced under the current version of Open Government Licence <br><br>[https://www.nationalarchives.gov.uk/doc/open-government-licence/open-government-licence.htm]"
+        "<br><br>Note; this is a tryout version for exploration - translations are not reliable and should be manually verified! <br><br>BNF/DMD codes: contains information from NHS Digital licenced under the current version of Open Government Licence <br>[https://www.nationalarchives.gov.uk/doc/open-government-licence/open-government-licence.htm]"
       )
     ),
     # Main panel for displaying outputs ----
