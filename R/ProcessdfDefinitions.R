@@ -484,7 +484,7 @@ expand_dfDefinitions_processed <- function(dfDefinitions_processed,lst.data.sett
     VctStr = unlist(strsplit(dfDefinitions_processed[r,c],","))
     lookuptable = lst.counts[[c]]
     ignore.case = unique(lst.data.settings[lst.data.settings$classification %in% c,'ignore.case'])[1]
-
+    
     Str_expanded <- paste(unique(unlist(
       lapply(VctStr,  function(x)  lookuptable$code [ grep(paste("^", x,sep=""),lookuptable$code ,ignore.case=ignore.case )])
       )),collapse=",")
@@ -631,7 +631,6 @@ check_dfDefinitions_codes <-function(dfDefinitions_processed,
     fmap=paste(code_map_dir,unique(lst.data.settings[lst.data.settings$classification==cls,]$code_map),sep="")
     #look up if case sensitive
     ignore.case = unique(lst.data.settings[lst.data.settings$classification %in% cls, 'ignore.case'])[1]
-
     # read file
     message(glue::glue("Read from codings for {cls} from {fmap}"))
     lst.codemap[[cls]]<-fread(fmap)
@@ -654,9 +653,9 @@ check_dfDefinitions_codes <-function(dfDefinitions_processed,
     missing_codes<-dplyr::setdiff(codes,lst.codemap[[cls]]$coding)
 
     # grep match
-    # this is not a very ideal line as it doesn't recognize 2 different expand code options for the same classification (if needed) and will always onlt take the first row
+    # this is not a very ideal line as it doesn't recognize 2 different expand code options for the same classification (if needed) and will always only take the first row
     if ((! unique(lst.data.settings[lst.data.settings$classification==cls,]$hierarchical_map))&(unique(lst.data.settings[lst.data.settings$classification==cls,]$expand_codes==1) )) {
-    extended_matches <- lapply(codes,  function(x) any(stringr::str_detect(lst.codemap[[cls]]$coding,stringr::regex(paste("^", x, sep = ""),ignore_case =ignore.case ))))
+    extended_matches <- lapply(codes,  function(x) any(stringr::str_detect(lst.codemap[[cls]]$coding,stringr::regex(paste("^", x, sep = ""),ignore_case =ignore.case[1]$ignore.case ))))
 
     if (length(extended_matches)>0){
       missing_codes<-codes[!unlist(extended_matches)]
