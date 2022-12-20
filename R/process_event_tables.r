@@ -152,9 +152,9 @@ get_incidence_prevalence <- function(all_event_dt,
 
   ### Future
   # window_fu_days_mask
-  dfFu <- df[  ((days>(0+window_fu_days_mask) & event==1) & (!identifier %in% dfHx$Hx)) |
-               (days>(0+window_fu_days_mask) & event==1 & (identifier %in% dfHx$Hx) & .id %in% sources_recurrence_events ) |
-               (days>(0+window_fu_days_mask) & event==2  & (!identifier %in% dfHx$Hx)) ]
+  dfFu <- df[  ((days>(0+window_fu_days_mask) & event==1) & (!identifier %in% dfHx$identifier)) |
+               (days>(0+window_fu_days_mask) & event==1 & (identifier %in% dfHx$identifier) & .id %in% sources_recurrence_events ) |
+               (days>(0+window_fu_days_mask) & event==2  & (!identifier %in% dfHx$identifier)) ]
   dfFu[,Fu:=2] #unique(dfFu$identifier)
   Fu_days <- suppressWarnings( unique(dfFu[,.(Fu_days= min(days,na.rm=T)), keyby=list(identifier)] ))
   ### age of diagnosis
