@@ -253,6 +253,7 @@ get_cases <- function(definitions,
                        lst.data,
                        df.data.settings,
                       df_reference_dt=NULL,
+                      include_secondary_recurrence=FALSE,
                       verbose=TRUE,
                       window_fu_days_mask=0,
                        ...
@@ -276,7 +277,7 @@ get_cases <- function(definitions,
   #                                                                     #...)
   # } else {
     all_event_dt.Include_in_cases.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.Include_in_cases,df.data.settings,
-                                                                      df_reference_date = df_reference_dt,verbose = verbose,window_fu_days_mask=window_fu_days_mask)
+                                                                      df_reference_date = df_reference_dt,include_secondary_recurrence=include_secondary_recurrence,verbose = verbose,window_fu_days_mask=window_fu_days_mask)
     # }
 
 
@@ -326,6 +327,7 @@ get_cases_controls <-function(definitions,
                                 lst.data,
                                 df.data.settings,
                                 df_reference_date=NULL,
+                              include_secondary_recurrence=FALSE,
                                 vct.identifiers=NULL,
                                 verbose=TRUE,
                               window_fu_days_mask=0
@@ -381,7 +383,7 @@ get_cases_controls <-function(definitions,
     # only keep date with real event
     all_event_dt.first_occur[all_event_dt.first_occur$event==0,]$eventdate <-NA
     # get everyone , take the date of relevant events respectively
-    all_event_dt.first_occur.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.first_occur,df.data.settings,df_reference_date = NULL,window_fu_days_mask = window_fu_days_mask,verbose = verbose)
+    all_event_dt.first_occur.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.first_occur,df.data.settings,df_reference_date = NULL,include_secondary_recurrence=include_secondary_recurrence,window_fu_days_mask = window_fu_days_mask,verbose = verbose)
     #  merge, NA for those without an event
     df_reference_date<-merge(df_reference_date,all_event_dt.first_occur.summary[, c("identifier","reference_date")],by="identifier",all.x=TRUE)
     #  should be already be in Date format but just to be sure
@@ -403,7 +405,7 @@ get_cases_controls <-function(definitions,
     # only consider event with real event date in study population, set those with visitdate to NA
     all_event_dt.population[all_event_dt.population$event==0,]$eventdate <-NA
     # get everyone , take the date of relevant events respectively
-    all_event_dt.population.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.population,df.data.settings,df_reference_date = NULL,window_fu_days_mask = window_fu_days_mask,verbose = verbose)
+    all_event_dt.population.summary <- get_incidence_prevalence(all_event_dt = all_event_dt.population,df.data.settings,df_reference_date = NULL,include_secondary_recurrence=include_secondary_recurrence,window_fu_days_mask = window_fu_days_mask,verbose = verbose)
     # update the dates in the original df_reference_date
     # reference_date = setNames(as.Date(as.character(all_event_dt.population.summary$reference_date),format="%Y-%m-%d"),all_event_dt.population.summary$identifier)
     # df_reference_date <- all_event_dt.population.summary[, c("identifier","reference_date")]
@@ -424,7 +426,7 @@ get_cases_controls <-function(definitions,
      }
 
   # define cases
-  cases <- get_cases(definitions,lst.data,df.data.settings,df_reference_date,window_ref_days_include=0,window_fu_days_mask=window_fu_days_mask,verbose=verbose)
+  cases <- get_cases(definitions,lst.data,df.data.settings,df_reference_date,include_secondary_recurrence=include_secondary_recurrence,window_ref_days_include=0,window_fu_days_mask=window_fu_days_mask,verbose=verbose)
 
   all_event_dt.Include_in_cases.summary <- cases$all_event_dt.Include_in_cases.summary
   all_event_dt.Include_in_cases <- cases$all_event_dt.Include_in_cases

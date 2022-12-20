@@ -9,6 +9,7 @@ get_cases(
   lst.data,
   df.data.settings,
   df_reference_dt = NULL,
+  include_secondary_recurrence = FALSE,
   verbose = TRUE,
   window_fu_days_mask = 0,
   ...

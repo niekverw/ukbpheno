@@ -9,6 +9,7 @@ get_cases_controls(
   lst.data,
   df.data.settings,
   df_reference_date = NULL,
+  include_secondary_recurrence = FALSE,
   vct.identifiers = NULL,
   verbose = TRUE,
   window_fu_days_mask = 0
