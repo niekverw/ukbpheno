@@ -507,7 +507,7 @@ read_gp_script_data <- function(fgp,add_extra_script_columns=F){
   dfgp <- dfgp[!is.na(dfgp$event_dt),]
 
   print(paste("QC dates.. "))
-  #dfgp <- subset(dfgp, event_dt > mindate ) # removing before 1930-ish.. some 1900, 1902, 1903 observations..
+  dfgp <- subset(dfgp, event_dt > mindate ) # removing before 1930-ish.. some 1900, 1902, 1903 observations..
   dfgp <- subset(dfgp, event_dt < maxdate ) # removing after today-ish.. some 2037 observations.
   print(paste("#individuals in gp script:",length(unique(dfgp$eid))))
 
