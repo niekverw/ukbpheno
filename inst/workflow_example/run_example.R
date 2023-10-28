@@ -266,9 +266,9 @@ colnames(deathdt)<-c("identifier","deathdt")
 dfukb_baseline_pheno<-merge(dfukb_baseline_pheno,deathdt,by="identifier",all.x=TRUE,all.y = FALSE)
 # HESIN censoring date are different by regions
 # retrieve this info using UK Biobank assessment center location attended by the participants
-england<-c("10003","11001","11002","11007","11008","11009","11010","11011","11012","11013","11014","11016","11017","11018","11019","11020","11021")
+england<-c("10003","11001","11002","11007","11008","11009","11010","11011","11012","11013","11014","11016","11017","11018","11019","11020","11021", "11006")
 scotland<-c("11004","11005")
-wales<-c("11003","11022", "11006","11023")
+wales<-c("11003","11022","11023")
 # corresponding censoring dates
 dfukb_baseline_pheno[dfukb_baseline_pheno$f.54.0.0 %in% england,"censordateHES"]<-as.Date("2021-03-31")
 dfukb_baseline_pheno[dfukb_baseline_pheno$f.54.0.0 %in% scotland,"censordateHES"]<-as.Date("2021-03-31")
